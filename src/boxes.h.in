@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h.in,v 1.15 1999/06/30 12:19:12 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h,v 1.16 1999/07/20 18:48:46 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *
@@ -22,7 +22,12 @@
  *
  *  Revision History:
  *
- *    $Log: boxes.h.in,v $
+ *    $Log: boxes.h,v $
+ *    Revision 1.16  1999/07/20 18:48:46  tsjensen
+ *    Added GNU GPL disclaimer
+ *    Updated beta version number :-)
+ *    Added killblank member to global options
+ *
  *    Revision 1.15  1999/06/30 12:19:12  tsjensen
  *    Removed DEF_DESIGN macro, because it now defaults to first design
  *    Removed some porting code, hoping for autoconf future
@@ -94,7 +99,7 @@
 
 
 #define PROJECT "boxes"                  /* name of program */
-#define VERSION "1.0 beta 3"             /* current release of project */
+#define VERSION "1.0 beta 5"             /* current release of project */
 
 
 /*
@@ -154,6 +159,7 @@ typedef struct {
     char      *sample;
     char       indentmode;               /* 'b', 't', or 'n' */
     sentry_t   shape[ANZ_SHAPES];
+    size_t     maxshapeheight;           /* height of highest shape in design */
     size_t     minwidth;
     size_t     minheight;
     int        padding[ANZ_SIDES];
