@@ -4,7 +4,7 @@
  *  Date created:     July 4, 1999 (Sunday, 21:04h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: config.h,v 1.1 1999/07/22 12:26:10 tsjensen Exp tsjensen $
+ *  Version:          $Id: config.h,v 1.2 1999/08/18 18:23:06 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Please compiler and ease porting
  *
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: config.h,v $
+ *    Revision 1.2  1999/08/18 18:23:06  tsjensen
+ *    Added Linux defines. Now compiles nicely on (my) Linux.
+ *
  *    Revision 1.1  1999/07/22 12:26:10  tsjensen
  *    Initial revision
  *
@@ -43,7 +46,9 @@
 #define _POSIX_SOURCE
 #define __EXTENSIONS__
 
-#elif
+#elif defined(__FreeBSD__)
+    /* do nothing */
+#else
 
 #define _POSIX_SOURCE
 
@@ -51,5 +56,6 @@
 
 
 #endif /*CONFIG_H*/
+
 
 /*EOF*/
