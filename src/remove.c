@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:59h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: remove.c,v 1.4 1999/08/21 16:03:31 tsjensen Exp tsjensen $
+ *  Version:          $Id: remove.c,v 1.5 1999/11/07 17:46:26 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box removal, i.e. the deletion of boxes
@@ -25,6 +25,11 @@
  *  Revision History:
  *
  *    $Log: remove.c,v $
+ *    Revision 1.5  1999/11/07 17:46:26  tsjensen
+ *    Bugfix: Horizontal box parts were not correctly detected if the west box
+ *    side was empty (reported: Tobias Buchal)
+ *    Bugfix: boxes could hang in detect_horiz() due to goeast/west confusion
+ *
  *    Revision 1.4  1999/08/21 16:03:31  tsjensen
  *    Bugfix: When matching vertical side shape lines, ignore empty shape lines
  *
@@ -53,7 +58,8 @@
 #include "remove.h"
 
 static const char rcsid_remove_c[] =
-    "$Id: remove.c,v 1.4 1999/08/21 16:03:31 tsjensen Exp tsjensen $";
+    "$Id: remove.c,v 1.5 1999/11/07 17:46:26 tsjensen Exp tsjensen $";
+
 
 
 
@@ -101,137 +107,141 @@ static int best_match (const line_t *line,
     #endif
 
     /*
-     *  Find match for WEST side         (TODO: nicht wenn BLEF leer)
+     *  Find match for WEST side
      */
-    quality = 0;
-    cs = opt.design->shape + WNW;
-    for (j=0,k=0,w=3; j<numw; ++j,++k) {
-        if (k == cs->height) {
-            k = 0;
-            cs = opt.design->shape + west_side[--w];
-        }
+    if (!empty_side (opt.design->shape, BLEF)) {
+        quality = 0;
+        cs = opt.design->shape + WNW;
+        for (j=0,k=0,w=3; j<numw; ++j,++k) {
+            if (k == cs->height) {
+                k = 0;
+                cs = opt.design->shape + west_side[--w];
+            }
 
-        chkline.text = cs->chars[k];
-        chkline.len = cs->width;
-        if (empty_line (&chkline))
-            continue;
+            chkline.text = cs->chars[k];
+            chkline.len = cs->width;
+            if (empty_line (&chkline) && !(quality==0 && j==numw-1))
+                continue;
 
-        s = (char *) strdup (cs->chars[k]);
-        if (s == NULL) {
-            perror (PROJECT);
-            return -1;
-        }
-        cq = cs->width;
+            s = (char *) strdup (cs->chars[k]);
+            if (s == NULL) {
+                perror (PROJECT);
+                return -1;
+            }
+            cq = cs->width;
 
-        do {
-            p = strstr (line->text, s);
-            if (p) {
-                q = p-1;
-                while (q >= line->text) {
-                    if (*q-- != ' ') {
-                        p = NULL;
+            do {
+                p = strstr (line->text, s);
+                if (p) {
+                    q = p-1;
+                    while (q >= line->text) {
+                        if (*q-- != ' ') {
+                            p = NULL;
+                            break;
+                        }
+                    }
+                    if (p)
+                        break;
+                }
+                if (!p && cq) {
+                    if (*s == ' ')
+                        memmove (s, s+1, cq--);
+                    else if (s[cq-1] == ' ')
+                        s[--cq] = '\0';
+                    else {
+                        cq = 0;
                         break;
                     }
                 }
-                if (p)
-                    break;
-            }
-            if (!p && cq) {
-                if (*s == ' ')
-                    memmove (s, s+1, cq--);
-                else if (s[cq-1] == ' ')
-                    s[--cq] = '\0';
-                else {
-                    cq = 0;
-                    break;
-                }
-            }
-        } while (cq && !p);
+            } while (cq && !p);
 
-        if (cq == 0) {
+            if (cq == 0) {
+                BFREE (s);
+                continue;
+            }
+
+            /*
+            *  If the current match is the best yet, adjust result values
+            */
+            if (cq > quality) {
+                quality = cq;
+                *ws = p;
+                *we = p + cq;
+            }
+
             BFREE (s);
-            continue;
         }
-
-        /*
-         *  If the current match is the best yet, adjust result values
-         */
-        if (cq > quality) {
-            quality = cq;
-            *ws = p;
-            *we = p + cq;
-        }
-
-        BFREE (s);
     }
 
     /*
      *  Find match for EAST side
      */
-    quality = 0;
-    cs = opt.design->shape + ENE;
-    for (j=0,k=0,w=1; j<nume; ++j,++k) {
-        if (k == cs->height) {
-            k = 0;
-            cs = opt.design->shape + east_side[++w];
-        }
-        #ifdef DEBUG
-            fprintf (stderr, "\nj %d, k %d, w %d, cs->chars[k] = \"%s\"\n",
-                    j, k, w, cs->chars[k]?cs->chars[k]:"(null)");
-        #endif
+    if (!empty_side (opt.design->shape, BRIG)) {
+        quality = 0;
+        cs = opt.design->shape + ENE;
+        for (j=0,k=0,w=1; j<nume; ++j,++k) {
+            if (k == cs->height) {
+                k = 0;
+                cs = opt.design->shape + east_side[++w];
+            }
+            #ifdef DEBUG
+                fprintf (stderr, "\nj %d, k %d, w %d, cs->chars[k] = \"%s\"\n",
+                        j, k, w, cs->chars[k]?cs->chars[k]:"(null)");
+            #endif
 
-        chkline.text = cs->chars[k];
-        chkline.len = cs->width;
-        if (empty_line (&chkline))
-            continue;
+            chkline.text = cs->chars[k];
+            chkline.len = cs->width;
+            if (empty_line (&chkline))
+                continue;
 
-        s = (char *) strdup (cs->chars[k]);
-        if (s == NULL) {
-            perror (PROJECT);
-            return -1;
-        }
-        cq = cs->width;
+            s = (char *) strdup (cs->chars[k]);
+            if (s == NULL) {
+                perror (PROJECT);
+                return -1;
+            }
+            cq = cs->width;
 
-        do {
-            p = my_strnrstr (line->text, s, cq, 0);
-            if (p) {
-                q = p + cq;
-                while (*q) {
-                    if (*q++ != ' ') {
-                        p = NULL;
+            do {
+                p = my_strnrstr (line->text, s, cq, 0);
+                if (p) {
+                    q = p + cq;
+                    while (*q) {
+                        if (*q++ != ' ') {
+                            p = NULL;
+                            break;
+                        }
+                    }
+                    if (p)
+                        break;
+                }
+                if (!p && cq) {
+                    if (*s == ' ')
+                        memmove (s, s+1, cq--);
+                    else if (s[cq-1] == ' ')
+                        s[--cq] = '\0';
+                    else {
+                        cq = 0;
                         break;
                     }
                 }
-                if (p)
-                    break;
-            }
-            if (!p && cq) {
-                if (*s == ' ')
-                    memmove (s, s+1, cq--);
-                else if (s[cq-1] == ' ')
-                    s[--cq] = '\0';
-                else {
-                    cq = 0;
-                    break;
-                }
-            }
-        } while (cq && !p);
+            } while (cq && !p);
 
-        if (cq == 0) {
+            if (cq == 0) {
+                BFREE (s);
+                continue;
+            }
+
+            /*
+            *  If the current match is the best yet, adjust result values
+            */
+            if (cq > quality) {
+                quality = cq;
+                *es = p;
+                *ee = p + cq;
+            }
+
             BFREE (s);
-            continue;
         }
-
-        /*
-         *  If the current match is the best yet, adjust result values
-         */
-        if (cq > quality) {
-            quality = cq;
-            *es = p;
-            *ee = p + cq;
-        }
-
-        BFREE (s);
     }
 
     return *ws || *es ? 1:0;
