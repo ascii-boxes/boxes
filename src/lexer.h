@@ -4,7 +4,7 @@
  *  Date created:     July 01, 1999 (Thursday, 13:43h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.h,v 1.2 1999/07/03 16:12:19 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.h,v 1.3 1999/08/14 19:06:26 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Export symbols used by the parser files only
  *
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: lexer.h,v $
+ *    Revision 1.3  1999/08/14 19:06:26  tsjensen
+ *    Added GNU GPL disclaimer
+ *    Added yylex() declaration to please compiler
+ *
  *    Revision 1.2  1999/07/03 16:12:19  tsjensen
  *    Renamed file from parser.h to lexer.h
  *
@@ -37,9 +41,18 @@
 #define LEXER_H
 
 
+/*
+ *  Valid characters to be used as string delimiters. Note that the
+ *  following list must correspond to the DELIM definition in lexer.l.
+ */
+#define LEX_SDELIM  "\"~'`!@%&*=:;<>?/|.\\"
+
+
 int yylex();                             /* defined in lex.yy.c */
 
 void begin_speedmode();
+
+void chg_strdelims (const char asdel, const char asesc);
 
 extern int speeding;
 
