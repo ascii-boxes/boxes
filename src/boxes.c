@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.31 1999/08/21 23:33:03 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.32 1999/08/22 11:34:46 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -48,6 +48,9 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.32  1999/08/22 11:34:46  tsjensen
+ *    Bugfix: no-input-check must take place before indentation computation
+ *
  *    Revision 1.31  1999/08/21 23:33:03  tsjensen
  *    Added usage of system-wide config file (GLOBALCONF from boxes.h)
  *    Moved config file selection code into it own function (get_config_file())
@@ -202,6 +205,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "shape.h"
 #include "boxes.h"
@@ -215,7 +220,9 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.31 1999/08/21 23:33:03 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.32 1999/08/22 11:34:46 tsjensen Exp tsjensen $";
+
+
 
 
 /*       _\|/_
@@ -270,6 +277,33 @@ static void usage (FILE *st)
 
 
 
+static int is_dir (const char *path)
+/*
+ *  Return true if file specified by path is a directory
+ *
+ *      path    file name to check
+ *
+ *  RETURNS:    ==  0   path is not a directory
+ *               >  0   path is a directory
+ *              == -1   error in stat() call
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    struct stat sinf;
+    int rc;
+
+    rc = stat (path, &sinf);
+    if (rc) {
+        perror (PROJECT);
+        return -1;
+    }
+
+    return (sinf.st_mode & S_IFMT) == S_IFDIR;
+}
+
+
+
 static int get_config_file()
 /*
  *  Set yyin and yyfilename to the config file to be used.
@@ -281,6 +315,8 @@ static int get_config_file()
  *      (3) system-wide config file from GLOBALCONF macro.
  *  If neither file exists, return complainingly.
  *
+ *  May change current working directory to $HOME.
+ *
  *  RETURNS:    == 0    success  (yyin and yyfilename are set)
  *              != 0    error    (yyin is unmodified)
  *
@@ -289,6 +325,7 @@ static int get_config_file()
 {
     FILE *new_yyin = NULL;
     char *s;                             /* points to data from environment */
+    int   rc;
 
     if (yyin != stdin)
         return 0;                        /* we're already ok */
@@ -302,6 +339,14 @@ static int get_config_file()
         if (new_yyin == NULL) {
             fprintf (stderr, "%s: Couldn't open config file '%s' "
                     "for input (taken from $BOXES).\n", PROJECT, s);
+            return 1;
+        }
+        rc = is_dir (s);
+        if (rc == -1)
+            return 1;
+        else if (rc) {
+            fprintf (stderr, "%s: Alleged config file '%s' is a directory "
+                    "(taken from $BOXES)\n", PROJECT, s);
             return 1;
         }
         yyfilename = (char *) strdup (s);
@@ -318,19 +363,31 @@ static int get_config_file()
      */
     s = getenv ("HOME");
     if (s) {
-        char buf[PATH_MAX];              /* to build file name */
-        strncpy (buf, s, PATH_MAX);
-        buf[PATH_MAX-1-7] = '\0';        /* ensure space for "/.boxes" */
-        strcat (buf, "/.boxes");
-        new_yyin = fopen (buf, "r");
+        rc = chdir (s);
+        if (rc) {
+            perror (PROJECT);
+            return 1;
+        }
+        new_yyin = fopen (".boxes", "r");
         if (new_yyin) {
-            yyfilename = (char *) strdup (buf);
-            if (yyfilename == NULL) {
-                perror (PROJECT);
+            rc = is_dir (".boxes");
+            if (rc == -1)
                 return 1;
+            else {
+                if (rc == 0) {
+                    yyfilename = (char *) strdup (".boxes");
+                    if (yyfilename == NULL) {
+                        perror (PROJECT);
+                        return 1;
+                    }
+                    yyin = new_yyin;
+                    return 0;
+                }
+                else {
+                    fclose (new_yyin);
+                    new_yyin = NULL;
+                }
             }
-            yyin = new_yyin;
-            return 0;
         }
     }
     else {
@@ -343,6 +400,14 @@ static int get_config_file()
      */
     new_yyin = fopen (GLOBALCONF, "r");
     if (new_yyin) {
+        rc = is_dir (GLOBALCONF);
+        if (rc == -1)
+            return 1;
+        else if (rc) {
+            fprintf (stderr, "%s: Alleged system-wide config file '%s' "
+                    "is a directory\n", PROJECT, GLOBALCONF);
+            return 1;
+        }
         yyfilename = (char *) strdup (GLOBALCONF);
         if (yyfilename == NULL) {
             perror (PROJECT);
@@ -380,7 +445,6 @@ static int process_commandline (int argc, char *argv[])
     char  *pdummy;
     char   c;
     int    errfl = 0;                    /* true on error */
-    int    outfile_existed = 0;          /* true if we overwrite a file */
     size_t optlen;
     int    rc;
 
@@ -493,6 +557,14 @@ static int process_commandline (int argc, char *argv[])
                 if (f == NULL) {
                     fprintf (stderr, "%s: Couldn\'t open config file \'%s\' "
                             "for input.\n", PROJECT, optarg);
+                    return 1;
+                }
+                rc = is_dir (optarg);
+                if (rc == -1)
+                    return 1;
+                else if (rc) {
+                    fprintf (stderr, "%s: Alleged config file '%s' is a "
+                            "directory\n", PROJECT, optarg);
                     return 1;
                 }
                 yyfilename = (char *) strdup (optarg);
@@ -688,31 +760,22 @@ static int process_commandline (int argc, char *argv[])
     } while (oc != EOF);
 
     /*
-     *  If no config file has as yet been specified, try getting it elsewhere.
-     */
-    rc = get_config_file();              /* sets yyin and yyfilename */
-    if (rc)
-        return rc;
-
-    /*
      *  Input and Output Files
      *
      *  After any command line options, an input file and an output file may
      *  be specified (in that order). "-" may be substituted for standard
      *  input or output. A third file name would be invalid.
-     *  The alogrithm is as follows:
-     *
-     *  If no files are given, use stdin and stdout.
-     *  Else If infile is "-", use stdin for input
-     *       Else open specified file (die if it doesn't work)
-     *       If no output file is given, use stdout for output
-     *       Else If outfile is "-", use stdout for output
-     *            Else open specified file for writing (die if it doesn't work)
-     *            If a third file is given, die.
      */
     if (argv[optind] == NULL) {          /* neither infile nor outfile given */
         opt.infile = stdin;
         opt.outfile = stdout;
+    }
+
+    else if (argv[optind+1] && argv[optind+2]) {       /* illegal third file */
+        fprintf (stderr, "%s: illegal parameter -- %s\n",
+                PROJECT, argv[optind+2]);
+        usage (stderr);
+        return 1;
     }
 
     else {
@@ -731,34 +794,26 @@ static int process_commandline (int argc, char *argv[])
         if (argv[optind+1] == NULL) {
             opt.outfile = stdout;        /* no outfile given */
         }
+        else if (strcmp (argv[optind+1], "-") == 0) {
+            opt.outfile = stdout;        /* use stdout for output */
+        }
         else {
-            if (strcmp (argv[optind+1], "-") == 0) {
-                opt.outfile = stdout;    /* use stdout for output */
-            }
-            else {
-                outfile_existed = !access (argv[optind+1], F_OK);
-                opt.outfile = fopen (argv[optind+1], "w");
-                if (opt.outfile == NULL) {
-                    perror (PROJECT);
-                    if (opt.infile != stdin)
-                        fclose (opt.infile);
-                    return 10;
-                }
-            }
-            if (argv[optind+2]) {        /* illegal third file */
-                fprintf (stderr, "%s: illegal parameter -- %s\n",
-                        PROJECT, argv[optind+2]);
-                usage (stderr);
+            opt.outfile = fopen (argv[optind+1], "w");
+            if (opt.outfile == NULL) {
+                perror (PROJECT);
                 if (opt.infile != stdin)
                     fclose (opt.infile);
-                if (opt.outfile != stdout) {
-                    fclose (opt.outfile);
-                    if (!outfile_existed) unlink (argv[optind+1]);
-                }
-                return 1;
+                return 10;
             }
         }
     }
+
+    /*
+     *  If no config file has as yet been specified, try getting it elsewhere.
+     */
+    rc = get_config_file();              /* sets yyin and yyfilename     */
+    if (rc)                              /* may change working directory */
+        return rc;
 
     #if defined(DEBUG) || 0
         fprintf (stderr, "Command line option settings (excerpt):\n");
