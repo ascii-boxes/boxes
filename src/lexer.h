@@ -1,5 +1,5 @@
 /*
- *  File:             parser.h
+ *  File:             lexer.h
  *  Project Main:     boxes.c
  *  Date created:     July 01, 1999 (Thursday, 13:43h)
  *  Author:           Thomas Jensen
@@ -11,12 +11,15 @@
  *
  *  Revision History:
  *
- *    $Log$
+ *    $Log: lexer.h,v $
+ *    Revision 1.1  1999/07/02 11:47:11  tsjensen
+ *    Initial revision
+ *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef LEXER_H
+#define LEXER_H
 
 
 void begin_speedmode();
@@ -24,6 +27,6 @@ void begin_speedmode();
 extern int speeding;
 
 
-#endif /*PARSER_H*/
+#endif /*LEXER_H*/
 
 /*EOF*/                                                  /* vim: set sw=4: */
