@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.3 1999/03/24 17:29:12 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.4 1999/03/30 09:37:51 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,9 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.4  1999/03/30 09:37:51  tsjensen
+ *    It drew a correct box for the first time!
+ *
  *    Revision 1.3  1999/03/24 17:29:12  tsjensen
  *    Added detection of empty shapes ("") which are now cleared (+warning)
  *    Changed rcs string to #ident directive
@@ -32,7 +35,7 @@
 #include <string.h>
 #include "boxes.h"
 
-#ident "$Id: parser.y,v 1.3 1999/03/24 17:29:12 tsjensen Exp tsjensen $";
+#ident "$Id: parser.y,v 1.4 1999/03/30 09:37:51 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -361,6 +364,8 @@ block: YSAMPLE '{' STRING '}'
 
 | YSHAPES  '{' the_shapes  '}'
     {
+        int i,j;
+
         /*
          *  Check that at least one shape per side is specified
          *  (excluding corners)
@@ -390,6 +395,33 @@ block: YSAMPLE '{' STRING '}'
             if (perform_se_check() != 0)
                 YYABORT;
         }
+
+        /*
+         *  Compute minimum height/width of a box of current design
+         */
+        for (i=0; i<ANZ_SIDES; ++i) {
+            size_t c = 0;
+            if (i % 2) {                 /* vertical sides */
+                for (j=0; j<SHAPES_PER_SIDE; ++j) {
+                    if (!isempty(designs[design_idx].shape + sides[i][j]))
+                        c += designs[design_idx].shape[sides[i][j]].height;
+                }
+                if (c > designs[design_idx].minheight)
+                    designs[design_idx].minheight = c;
+            }
+            else {                       /* horizontal sides */
+                for (j=0; j<SHAPES_PER_SIDE; ++j) {
+                    if (!isempty(designs[design_idx].shape + sides[i][j]))
+                        c += designs[design_idx].shape[sides[i][j]].width;
+                }
+                if (c > designs[design_idx].minwidth)
+                    designs[design_idx].minwidth = c;
+            }
+        }
+        #ifdef DEBUG
+            fprintf (stderr, "Minimum box dimensions: width %d height %d\n",
+                    designs[design_idx].minwidth, designs[design_idx].minheight);
+        #endif
     }
 
 | YELASTIC elist
