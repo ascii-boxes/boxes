@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 13:39h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: shape.c,v 1.2 1999/06/25 18:52:28 tsjensen Exp tsjensen $
+ *  Version:          $Id: shape.c,v 1.3 1999/07/22 12:28:25 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Shape handling and information functions
@@ -25,6 +25,10 @@
  *  Revision History:
  *
  *    $Log: shape.c,v $
+ *    Revision 1.3  1999/07/22 12:28:25  tsjensen
+ *    Added GNU GPL disclaimer
+ *    Added include config.h
+ *
  *    Revision 1.2  1999/06/25 18:52:28  tsjensen
  *    Added empty_side() function from boxes.c
  *    Removed #include regexp.h
@@ -43,7 +47,7 @@
 #include "boxes.h"
 
 static const char rcsid_shape_c[] =
-    "$Id: shape.c,v 1.2 1999/06/25 18:52:28 tsjensen Exp tsjensen $";
+    "$Id: shape.c,v 1.3 1999/07/22 12:28:25 tsjensen Exp tsjensen $";
 
 
 
@@ -62,61 +66,6 @@ shape_t *sides[] = { north_side, east_side, south_side, west_side };
 
 
 
-int iscorner (const shape_t s)
-/*
- *  Return true if shape s is a corner.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int i;
-    shape_t *p;
-
-    for (i=0, p=corners; i<ANZ_CORNERS; ++i, ++p) {
-        if (*p == s)
-            return 1;
-    }
-
-    return 0;
-}
-
-
-
-shape_t *on_side (const shape_t s, const int idx)
-/*
- *  Compute the side that shape s is on.
- *
- *      s    shape to look for
- *      idx  which occurence to return (0 == first, 1 == second (for corners)
- *
- *  RETURNS: pointer to a side list  on success
- *           NULL                    on error (e.g. idx==1 && s no corner)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int       side;
-    int       i;
-    shape_t **sp;
-    shape_t  *p;
-    int       found = 0;
-
-    for (side=0,sp=sides; side<ANZ_SIDES; ++side,++sp) {
-        for (i=0,p=*sp; i<SHAPES_PER_SIDE; ++i,++p) {
-            if (*p == s) {
-                if (found == idx)
-                    return *sp;
-                else
-                    ++found;
-            }
-        }
-    }
-
-    return NULL;
-}
-
-
-
 int isempty (const sentry_t *shape)
 /*
  *  Return true if shape is empty.
@@ -132,116 +81,6 @@ int isempty (const sentry_t *shape)
         return 1;
     else
         return 0;
-}
-
-
-
-int shapecmp (const sentry_t *shape1, const sentry_t *shape2)
-/*
- *  Compare two shapes.
- *
- *  RETURNS: == 0   if shapes are equal
- *           != 0   if shapes differ
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int    e1 = isempty (shape1);
-    int    e2 = isempty (shape2);
-    size_t i;
-
-    if ( e1 &&  e2) return 0;
-    if (!e1 &&  e2) return 1;
-    if ( e1 && !e2) return -1;
-
-    if (shape1->width != shape2->width || shape1->height != shape2->height) {
-        if (shape1->width * shape1->height > shape2->width * shape2->height)
-            return 1;
-        else
-            return -1;
-    }
-
-    for (i=0; i<shape1->height; ++i) {
-        int c = strcmp (shape1->chars[i], shape2->chars[i]);  /* no casecmp! */
-        if (c) return c;
-    }
-
-    return 0;
-}
-
-
-
-shape_t *both_on_side (const shape_t shape1, const shape_t shape2)
-/*
- *  Compute the side that *both* shapes are on.
- *
- *  RETURNS: pointer to a side list  on success
- *           NULL                    on error (e.g. shape on different sides)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int i, j, found;
-
-    for (i=0; i<ANZ_SIDES; ++i) {
-        found = 0;
-        for (j=0; j<SHAPES_PER_SIDE; ++j) {
-            if (sides[i][j] == shape1 || sides[i][j] == shape2)
-                ++found;
-            if (found > 1) {
-                switch (i) {
-                    case 0: return north_side;
-                    case 1: return east_side;
-                    case 2: return south_side;
-                    case 3: return west_side;
-                    default: return NULL;
-                }
-            }
-        }
-    }
-
-    return NULL;
-}
-
-
-
-int shape_distance (const shape_t s1, const shape_t s2)
-/*
- *  Compute distance between two shapes which are located on the same side
- *  of the box. E.g. shape_distance(NW,N) == 2.
- *
- *  RETURNS: distance in steps   if ok
- *           -1                  on error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int i;
-    int distance = -1;
-    shape_t *workside = both_on_side (s1, s2);
-
-    if (!workside) return -1;
-    if (s1 == s2) return 0;
-
-    for (i=0; i<SHAPES_PER_SIDE; ++i) {
-        if (workside[i] == s1 || workside[i] == s2) {
-            if (distance == -1)
-                distance = 0;
-            else if (distance > -1) {
-                ++distance;
-                break;
-            }
-        }
-        else {
-            if (distance > -1)
-                ++distance;
-        }
-    }
-
-    if (distance > 0 && distance < SHAPES_PER_SIDE)
-        return distance;
-    else
-        return -1;
 }
 
 
