@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.2 1999/03/19 17:57:20 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.3 1999/03/24 17:29:12 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,10 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.3  1999/03/24 17:29:12  tsjensen
+ *    Added detection of empty shapes ("") which are now cleared (+warning)
+ *    Changed rcs string to #ident directive
+ *
  *    Revision 1.2  1999/03/19 17:57:20  tsjensen
  *    ... still programming ...
  *
@@ -28,7 +32,7 @@
 #include <string.h>
 #include "boxes.h"
 
-#ident "$Id: parser.y,v 1.2 1999/03/19 17:57:20 tsjensen Exp tsjensen $";
+#ident "$Id: parser.y,v 1.3 1999/03/24 17:29:12 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -36,104 +40,107 @@ static int time_for_se_check = 0;
 
 
 
-shape_t corner_ambiguity()
+int check_sizes()
 /*
- *  Checks for ambiguity in corner specification using elastic and shape
- *  data. It must be clear which shape to use for each corner of the box.
+ *  For the author's convenience, it is required that shapes on one side
+ *  have equal width (vertical sides) and height (horizontal sides).
  *
- *  A corner specification is ambiguous if the distance between the corner
- *  and the nearest specified shape in horizontal and vertical direction is
- *  equal and both shapes have the same elasticity.
- *
- *  RETURNS:  ANZ_SHAPES   no ambiguity
- *            a corner     spec is ambiguous
+ *  RETURNS:  == 0   no problem detected
+ *            != 0   on error (prints error message, too)
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    int hdist, vdist;                    /* distances to corners */
-    shape_t hcand, vcand;                /* candidate shapes */
-    int c;
+    int i, j, k;
 
-    for (c=0; c<ANZ_CORNERS; ++c) {
+    #ifdef DEBUG
+        fprintf (stderr, "check_sizes()\n");
+    #endif
 
-        hdist = vdist = 0;
-        hcand = vcand = 0;
-
-        switch (corners[c])
-        {
-            case NW:
-                if (designs[design_idx].shape[NW].chars == NULL) {
-                    if      (designs[design_idx].shape[NNW].chars) { hdist = 1; hcand = NNW; }
-                    else if (designs[design_idx].shape[N].chars)   { hdist = 2; hcand = N;   }
-                    else if (designs[design_idx].shape[NNE].chars) { hdist = 3; hcand = NNE; }
-                    else if (designs[design_idx].shape[NE].chars)  { hdist = 4; hcand = NE;  }
-                    if      (designs[design_idx].shape[WNW].chars) { vdist = 1; vcand = WNW; }
-                    else if (designs[design_idx].shape[W].chars)   { vdist = 2; vcand = W;   }
-                    else if (designs[design_idx].shape[WSW].chars) { vdist = 3; vcand = WSW; }
-                    else if (designs[design_idx].shape[SW].chars)  { vdist = 4; vcand = SW;  }
-                }
-                else
+    for (i=0; i<ANZ_SIDES; ++i) {
+        if (i == 0 || i == 2) {
+            /*
+             *  horizontal
+             */
+            for (j=0; j<SHAPES_PER_SIDE-1; ++j) {
+                if (designs[design_idx].shape[sides[i][j]].height == 0)
                     continue;
-                break;
-
-            case NE:
-                if (designs[design_idx].shape[NE].chars == NULL) {
-                    if      (designs[design_idx].shape[NNE].chars) { hdist = 1; hcand = NNE; }
-                    else if (designs[design_idx].shape[N].chars)   { hdist = 2; hcand = N;   }
-                    else if (designs[design_idx].shape[NNW].chars) { hdist = 3; hcand = NNW; }
-                    else if (designs[design_idx].shape[NW].chars)  { hdist = 4; hcand = NW;  }
-                    if      (designs[design_idx].shape[ENE].chars) { vdist = 1; vcand = ENE; }
-                    else if (designs[design_idx].shape[E].chars)   { vdist = 2; vcand = E;   }
-                    else if (designs[design_idx].shape[ESE].chars) { vdist = 3; vcand = ESE; }
-                    else if (designs[design_idx].shape[SE].chars)  { vdist = 4; vcand = SE;  }
+                for (k=j+1; k<SHAPES_PER_SIDE; ++k) {
+                    if (designs[design_idx].shape[sides[i][k]].height == 0)
+                        continue;
+                    if (designs[design_idx].shape[sides[i][j]].height
+                            != designs[design_idx].shape[sides[i][k]].height) {
+                        yyerror ("All shapes on horizontal sides must be of "
+                                "equal height (%s: %d, %s: %d)\n",
+                                shape_name[sides[i][j]],
+                                designs[design_idx].shape[sides[i][j]].height,
+                                shape_name[sides[i][k]],
+                                designs[design_idx].shape[sides[i][k]].height);
+                        return 1;
+                    }
                 }
-                else
-                    continue;
-                break;
-
-            case SE:
-                if (designs[design_idx].shape[SE].chars == NULL) {
-                    if      (designs[design_idx].shape[SSE].chars) { hdist = 1; hcand = SSE; }
-                    else if (designs[design_idx].shape[S].chars)   { hdist = 2; hcand = S;   }
-                    else if (designs[design_idx].shape[SSW].chars) { hdist = 3; hcand = SSW; }
-                    else if (designs[design_idx].shape[SW].chars)  { hdist = 4; hcand = SW;  }
-                    if      (designs[design_idx].shape[ESE].chars) { vdist = 1; vcand = ESE; }
-                    else if (designs[design_idx].shape[E].chars)   { vdist = 2; vcand = E;   }
-                    else if (designs[design_idx].shape[ENE].chars) { vdist = 3; vcand = ENE; }
-                    else if (designs[design_idx].shape[NE].chars)  { vdist = 4; vcand = NE;  }
-                }
-                else
-                    continue;
-                break;
-
-            case SW:
-                if (designs[design_idx].shape[SW].chars == NULL) {
-                    if      (designs[design_idx].shape[SSW].chars) { hdist = 1; hcand = SSW; }
-                    else if (designs[design_idx].shape[S].chars)   { hdist = 2; hcand = S;   }
-                    else if (designs[design_idx].shape[SSE].chars) { hdist = 3; hcand = SSE; }
-                    else if (designs[design_idx].shape[SE].chars)  { hdist = 4; hcand = SE;  }
-                    if      (designs[design_idx].shape[WSW].chars) { vdist = 1; vcand = WSW; }
-                    else if (designs[design_idx].shape[W].chars)   { vdist = 2; vcand = W;   }
-                    else if (designs[design_idx].shape[WNW].chars) { vdist = 3; vcand = WNW; }
-                    else if (designs[design_idx].shape[NW].chars)  { vdist = 4; vcand = NW;  }
-                }
-                else
-                    continue;
-                break;
-
-            default:
-                fprintf (stderr, "%s: internal error. Sorry.\n", PROJECT);
-                return corners[c];
+            }
         }
-
-        if ((hdist == vdist) &&
-         designs[design_idx].shape[hcand].elastic ==
-         designs[design_idx].shape[vcand].elastic)
-            return corners[c];
+        else {
+            /*
+             *  vertical
+             */
+            for (j=0; j<SHAPES_PER_SIDE-1; ++j) {
+                if (designs[design_idx].shape[sides[i][j]].width == 0)
+                    continue;
+                for (k=j+1; k<SHAPES_PER_SIDE; ++k) {
+                    if (designs[design_idx].shape[sides[i][k]].width == 0)
+                        continue;
+                    if (designs[design_idx].shape[sides[i][j]].width
+                            != designs[design_idx].shape[sides[i][k]].width) {
+                        yyerror ("All shapes on vertical sides must be of "
+                                "equal width (%s: %d, %s: %d)\n",
+                                shape_name[sides[i][j]],
+                                designs[design_idx].shape[sides[i][j]].width,
+                                shape_name[sides[i][k]],
+                                designs[design_idx].shape[sides[i][k]].width);
+                        return 1;
+                    }
+                }
+            }
+        }
     }
 
-    return (shape_t) ANZ_SHAPES;         /* no ambiguity */
+    return 0;                            /* all clear */
+}
+
+
+
+int corner_check()
+/*
+ *  Check that all corners are explicitly specified in the config file.
+ *  Check that no corners are elastic.
+ *
+ *  RETURNS:  == 0   no problem detected
+ *            != 0   on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int c;
+
+    #ifdef DEBUG
+        fprintf (stderr, "corner_check()\n");
+    #endif
+
+    for (c=0; c<ANZ_CORNERS; ++c) {
+        if (isempty(designs[design_idx].shape+corners[c])) {
+            yyerror ("Missing shape specification for %s corner",
+                    shape_name[corners[c]]);
+            return 1;
+        }
+        if (designs[design_idx].shape[corners[c]].elastic) {
+            yyerror ("Corners may not be elastic (%s)", shape_name[corners[c]]);
+            return 1;
+        }
+    }
+
+    return 0;                            /* all clear */
 }
 
 
@@ -142,9 +149,13 @@ shape_t non_existent_elastics()
 {
     shape_t i;
 
+    #ifdef DEBUG
+        fprintf (stderr, "non_existent_elastics()\n");
+    #endif
+
     for (i=0; i<ANZ_SHAPES; ++i) {
         if (designs[design_idx].shape[i].elastic
-         && (designs[design_idx].shape[i].chars == NULL))
+         && isempty(designs[design_idx].shape+i))
             return i;
     }
 
@@ -155,38 +166,61 @@ shape_t non_existent_elastics()
 
 int insufficient_elasticity()
 {
-    int i;
-    shape_t s;
-    int ok[4] = {0, 0, 0, 0};            /* N, E, S, W */
+    int i, j, ef;
 
-    for (s=0; s<ANZ_SHAPES; ++s) {
-        if (designs[design_idx].shape[s].elastic) {
-            switch (s) {
-                case NW: ok[0] = 1; ok[3] = 1; break;
-                case SW: ok[2] = 1; ok[3] = 1; break;
-                case NE: ok[0] = 1; ok[1] = 1; break;
-                case SE: ok[2] = 1; ok[1] = 1; break;
-                case N: case NNE: case NNW: ok[0] = 1; break;
-                case E: case ESE: case ENE: ok[1] = 1; break;
-                case S: case SSE: case SSW: ok[2] = 1; break;
-                case W: case WSW: case WNW: ok[3] = 1; break;
-                default:
-                    yyerror ("Internal parser error");
-                    return 1;
+    #ifdef DEBUG
+        fprintf (stderr, "insufficient_elasticity()\n");
+    #endif
+
+    for (i=0; i<ANZ_SIDES; ++i) {
+        for (j=1,ef=0; j<4; ++j)
+            if (designs[design_idx].shape[sides[i][j]].elastic)
+                ++ef;
+        if (ef != 1 && ef != 2)
+            return 1;                    /* error */
+    }
+
+    return 0;                            /* all clear */
+}
+
+
+
+int adjoining_elastics()
+{
+    int i, j, ef;
+
+    #ifdef DEBUG
+        fprintf (stderr, "adjoining_elastics()\n");
+    #endif
+
+    for (i=0; i<ANZ_SIDES; ++i) {
+        ef = 0;
+        for (j=1; j<4; ++j) {
+            if (isempty(designs[design_idx].shape+sides[i][j]))
+                continue;
+            if (designs[design_idx].shape[sides[i][j]].elastic) {
+                if (ef)
+                    return 1;            /* error detected */
+                else
+                    ef = 1;
+            }
+            else {
+                ef = 0;
             }
         }
     }
 
-    for (i=0; i<4; ++i) {
-        if (!ok[i]) return 1;
-    }
-
-    return 0;                            /* no problem detected */
+    return 0;                            /* all clear */
 }
 
 
 
 int perform_se_check()
+/*
+ *  (shape-elastic check)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
 {
     shape_t s_rc;
 
@@ -197,15 +231,18 @@ int perform_se_check()
         return 1;
     }
 
-    if (insufficient_elasticity()) {
-        yyerror ("At least one shape per side must be elastic");
+    if (corner_check()) {
+        /* Error message printed in check func */
         return 1;
     }
 
-    s_rc = corner_ambiguity();
-    if (s_rc != ANZ_SHAPES) {
-        yyerror ("Ambiguous Shape/Elastic specification for %s corner",
-                shape_name[s_rc]);
+    if (insufficient_elasticity()) {
+        yyerror ("There must be exactly one or two elastic shapes per side");
+        return 1;
+    }
+
+    if (adjoining_elastics()) {
+        yyerror ("Two adjoining shapes may not be elastic");
         return 1;
     }
 
@@ -326,31 +363,27 @@ block: YSAMPLE '{' STRING '}'
     {
         /*
          *  Check that at least one shape per side is specified
+         *  (excluding corners)
          */
-        if (!((designs[design_idx].shape[NW].chars
-            || designs[design_idx].shape[NNW].chars
-            || designs[design_idx].shape[N].chars
-            || designs[design_idx].shape[NNE].chars
-            || designs[design_idx].shape[NE].chars)
-           && (designs[design_idx].shape[NE].chars
-            || designs[design_idx].shape[ENE].chars
-            || designs[design_idx].shape[E].chars
-            || designs[design_idx].shape[ESE].chars
-            || designs[design_idx].shape[SE].chars)
-           && (designs[design_idx].shape[SW].chars
-            || designs[design_idx].shape[SSW].chars
-            || designs[design_idx].shape[S].chars
-            || designs[design_idx].shape[SSE].chars
-            || designs[design_idx].shape[SE].chars)
-           && (designs[design_idx].shape[NW].chars
-            || designs[design_idx].shape[WNW].chars
-            || designs[design_idx].shape[W].chars
-            || designs[design_idx].shape[WSW].chars
-            || designs[design_idx].shape[SW].chars)))
+        if ((isempty (designs[design_idx].shape + NNW)
+          && isempty (designs[design_idx].shape +   N)
+          && isempty (designs[design_idx].shape + NNE))
+         || (isempty (designs[design_idx].shape + ENE)
+          && isempty (designs[design_idx].shape +   E)
+          && isempty (designs[design_idx].shape + ESE))
+         || (isempty (designs[design_idx].shape + SSW)
+          && isempty (designs[design_idx].shape +   S)
+          && isempty (designs[design_idx].shape + SSE))
+         || (isempty (designs[design_idx].shape + WNW)
+          && isempty (designs[design_idx].shape +   W)
+          && isempty (designs[design_idx].shape + WSW)))
         {
             yyerror ("Must specify at least one shape per side");
             YYABORT;
         }
+
+        if (check_sizes())
+            YYABORT;
 
         ++pflicht;
         if (++time_for_se_check > 1) {
@@ -379,7 +412,13 @@ the_shapes: the_shapes SHAPE slist
                     "height %d)\n", shape_name[$2], $3.width, $3.height);
         #endif
 
-        designs[design_idx].shape[$2] = $3;
+        if (isempty (designs[design_idx].shape+$2)) {
+            designs[design_idx].shape[$2] = $3;
+        }
+        else {
+            yyerror ("Duplicate specification for %s shape", shape_name[$2]);
+            YYABORT;
+        }
     }
 
 | SHAPE slist
@@ -389,7 +428,13 @@ the_shapes: the_shapes SHAPE slist
                     "height %d)\n", shape_name[$1], $2.width, $2.height);
         #endif
 
-        designs[design_idx].shape[$1] = $2;
+        if (isempty (designs[design_idx].shape + $1)) {
+            designs[design_idx].shape[$1] = $2;
+        }
+        else {
+            yyerror ("Duplicate specification for %s shape", shape_name[$1]);
+            YYABORT;
+        }
     }
 ;
 
@@ -453,16 +498,17 @@ slist: '(' slist_entries ')'
 
             yyerror ("warning: minimum shape dimension is 1x1 - clearing.");
 
-            $$ = (sentry_t) { NULL, 0, 0, 0 };
+            $$ = SENTRY_INITIALIZER;
         }
         else {
             $$ = $2;
+            /* memcpy (&($$), &($2), sizeof(sentry_t)); */
         }
     }
 
 | '(' ')'
     {
-        $$ = (sentry_t) { NULL, 0, 0, 0 };
+        $$ = SENTRY_INITIALIZER;
     }
 ;
 
@@ -499,7 +545,7 @@ slist_entries: slist_entries ',' STRING
 
 | STRING
     {
-        sentry_t rval;
+        sentry_t rval = SENTRY_INITIALIZER;
 
         #ifdef DEBUG
             fprintf (stderr, "Initializing a shape entry with first line\n");
