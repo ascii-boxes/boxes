@@ -3,15 +3,20 @@
 #   Date created:     March 17, 1999 (Wednesday, 17:02h)
 #   Author:           Thomas Jensen
 #                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id$
+#   Version:          $Id: boxes-config,v 1.2 1999/03/30 15:36:03 tsjensen Exp tsjensen $
 #   Format:           ASCII Text
 #   World Wide Web:   http://home.pages.de/~jensen/boxes/
 #   Purpose:          Example configuration file for the boxes program
 #   Remarks:          ---
-#
 #   Revision History:
 #
-#     $Log$
+#     $Log: boxes-config,v $
+#     Revision 1.2  1999/03/30 15:36:03  tsjensen
+#     Added some more designs
+#     Incorporated some changes to the still evolving format
+#
+#     Revision 1.1  1999/03/18 15:08:57  tsjensen
+#     Initial revision
 #____________________________________________________________________________
 #============================================================================
 
@@ -35,8 +40,6 @@ sample {
        \\_/_____________________/
 }                               # double all backslashes in sample
 
-# Offsets sind immer "außen bündig"
-
 shapes {
     nw  (" __")
     nnw ()
@@ -53,7 +56,7 @@ shapes {
     ese ()
 }
 
-elastic (n,e,s,w)              # Da muß nur pro Seite mind. einer sein
+elastic (n,e,s,w)
 
 END parchment
 
@@ -135,14 +138,6 @@ shapes {
     se  ("(_____)")
 }
 
-# offsets {
-#     nw-nnw  1
-#     nne-ne -1
-#     ne-ene  1
-#     ese-se -1
-#     sw-wsw  1
-# }
-
 elastic (nnw, e, w, s)
 
 END columns
@@ -223,14 +218,6 @@ shapes {
     w   ("|        |")
 }
 
-# offsets {
-#     ne-ene -1
-#     ese-se  1
-#     sse-s   2
-#     ssw-sw -2
-#     wnw-nw  1
-# }
-
 eLAStic (n, s, e, w)
 
 END scroll
@@ -284,6 +271,8 @@ shapes {
      w ("/*")          e ("*/")
     sw ("/*") s ("*") se ("*/")
 }
+
+replace "\\*/" with "\\\\*\\\\/"         # quote closing comment tags
 
 elastic (n,e,s,w)
 
@@ -556,41 +545,181 @@ elastic (nne,nnw, s, e, w)
 END sunset
 
 
-#                            .-"""-.
-#                           / .===. \
-#                           \/ 6 6 \/
-#                           ( \___/ )
-#              _________ooo__\_____/______________
-#             /                                   \
-#            |   joan stark   spunk1111@juno.com   |
-#            |     VISIT MY ASCII ART GALLERY:     |
-#            | http://www.geocities.com/SoHo/7373/ |
-#        jgs  \________________________ooo________/
-#                            |  |  |
-#                            |_ | _|
-#                            |  |  |
-#                            |__|__|
-#                            /-'Y'-\
-#                           (__/ \__)
-# 
-# 
-# 
-#                            .-"""-.
-#                           / .===. \
-#                          / / a a \ \
-#                         / ( \___/ ) \
-#              ________ooo\__\_____/__/___________
-#             /                                   \
-#            |   joan stark   spunk1111@juno.com   |
-#            |     VISIT MY ASCII ART GALLERY:     |
-#            | http://www.geocities.com/SoHo/7373/ |
-#        jgs  \________________________ooo________/
-#                         /           \
-#                        /:.:.:.:.:.:.:\
-#                            |  |  |
-#                            \==|==/
-#                            /-'Y'-\
-#                           (__/ \__)
+# ============================================================================
+
+
+BOX boy
+
+author "Joan G. Stark <spunk1111@juno.com>"
+revision "1.0"
+revdate "April 02, 1999 (Friday, 15:02h)"
+created "April 02, 1999 (Friday, 15:02h)"
+
+sample {
+                    .-"""-.
+                   / .===. \\
+                   \\/ 6 6 \\/
+                   ( \\___/ )
+      _________ooo__\\_____/______________
+     /                                   \\
+    |   joan stark   spunk1111@juno.com   |
+    |     VISIT MY ASCII ART GALLERY:     |
+    | http://www.geocities.com/SoHo/7373/ |
+     \\_______________________ooo_________/  jgs
+                    |  |  |
+                    |_ | _|
+                    |  |  |
+                    |__|__|
+                    /-'Y'-\\
+                   (__/ \\__)
+}
+
+shapes {
+    e   (" |")
+    w   ("| ")
+    sw  (" \\", "  ", "  ", "  ", "  ", "  ", "  ")
+    se  ("/ ", "  ", "  ", "  ", "  ", "  ", "  ")
+    ssw ("_", " ", " ", " ", " ", " ", " ")
+    sse ("_", " ", " ", " ", " ", " ", " ")
+    nw  ("  ", "  ", "  ", "  ", "  ", " /")
+    nnw (" ", " ", " ", " ", "_", " ") 
+    nne (" ", " ", " ", " ", "_", " ") 
+    ne ("  ", "  ", "  ", "  ", "  ", "\\ ")
+    n ("     .-\"\"\"-.     ",
+       "    / .===. \\    ",
+       "    \\/ 6 6 \\/    ",
+       "    ( \\___/ )    ",
+       "ooo__\\_____/_____",
+       "                 ")
+    s ("______________ooo",
+       "     |  |  |     ",
+       "     |_ | _|     ",
+       "     |  |  |     ",
+       "     |__|__|     ",
+       "     /-'Y'-\\     ",
+       "    (__/ \\__)    ")
+}
+
+#elastic (n,s,e, w)        # then I'd have to call this "boys"
+elastic (nne,nnw, sse,ssw, e, w)
+
+END boy
+
+
+# ============================================================================
+
+
+BOX girl
+
+author "Joan G. Stark <spunk1111@juno.com>"
+revision "1.0"
+revdate "April 02, 1999 (Friday, 19:13h)"
+created "April 02, 1999 (Friday, 19:13h)"
+
+sample {
+                    .-"""-.
+                   / .===. \\
+                  / / a a \\ \\
+                 / ( \\___/ ) \\
+      ________ooo\\__\\_____/__/___________
+     /                                   \\
+    |   joan stark   spunk1111@juno.com   |
+    |     VISIT MY ASCII ART GALLERY:     |
+    | http://www.geocities.com/SoHo/7373/ |
+     \\________________________ooo________/  jgs
+                 /           \\
+                /:.:.:.:.:.:.:\\
+                    |  |  |
+                    \\==|==/
+                    /-'Y'-\\
+                   (__/ \\__)
+}
+
+shapes {
+    n   ("      .-\"\"\"-.      ",
+         "     / .===. \\     ",
+         "    / / a a \\ \\    ",
+         "   / ( \\___/ ) \\   ",
+         "ooo\\__\\_____/__/___",
+         "                   ")
+    s   ("________________ooo",
+         "   /           \\   ",
+         "  /:.:.:.:.:.:.:\\  ",
+         "      |  |  |      ",
+         "      \\==|==/      ",
+         "      /-'Y'-\\      ",
+         "     (__/ \\__)     ")
+    e   (" |")
+    w   ("| ")
+    sw  (" \\", "  ", "  ", "  ", "  ", "  ", "  ")
+    se  ("/ ", "  ", "  ", "  ", "  ", "  ", "  ")
+    ssw ("_", " ", " ", " ", " ", " ", " ")
+    sse ("_", " ", " ", " ", " ", " ", " ")
+    nw  ("  ", "  ", "  ", "  ", "  ", " /")
+    nnw (" ", " ", " ", " ", "_", " ") 
+    nne (" ", " ", " ", " ", "_", " ") 
+    ne ("  ", "  ", "  ", "  ", "  ", "\\ ")
+}
+
+elastic (nne,nnw, sse,ssw, e, w)
+
+END girl
+
+
+# ============================================================================
+
+
+BOX tjc
+
+author   "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate  "April 02, 1999 (Friday, 19:26h)"
+created  "April 02, 1999 (Friday, 19:26h)"
+
+SAMple {
+    static size_t expand_tabs_into (const char *input_buffer, const int in_len,
+        const int tabstop, char **text)
+    /*
+     *  Expand tab chars in input_buffer and store result in text.
+     *
+     *  input_buffer   Line of text with tab chars
+     *  in_len         length of the string in input_buffer
+     *  tabstop        tab stop distance
+     *  text           address of the pointer that will take the result
+     *
+     *  Memory will be allocated for the result.
+     *  Should only be called for lines of length > 0;
+     *
+     *  RETURNS:  Success: Length of the result line in characters (> 0)
+     *            Error:   0       (e.g. out of memory)
+     *
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     */
+    {
+        static char temp ....
+        int ii;          ....
+}
+
+indent "none"     # alternatives: "box", "text"
+
+shapes {
+    w  (" *  ")
+    sw (" *  ", "* * ", " */ ")
+    nw ("/*  ")
+    s  ("  ", "* ", "  ")
+    se (" ", "*", " ")
+    ne (" ")
+    n  (" ")
+    e  (" ")
+}
+
+elastic (n, e, s, w)
+
+END tjc
+
+
+# ============================================================================
+
 # 
 #            #@&%O:
 #             #@&%
@@ -768,35 +897,254 @@ END sunset
 #       \ \||/ /                                                 |//
 #   jgs  `\\//`   \\   \./    \\ /     //    \\./   \\   //   \\ |/ /
 #       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# 
-#  .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
-#  .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
-#  .:-@    ____        (_,      _,  _,  _,  _,                        @-:.
-#  .:-@   (-(__`,_    ,_ |_,     |   |   |   |    Spunk1111@juno.com  @-:.
-#  .:-@    ____)|_)|_|| || \__, _|_ _|_ _|_ _|_                       @-:.
-#  .:-@   (    _|       |_,                                           @-:.
-#  .:-@       (            ____,         ____        (_,              @-:.
-#  .:-@                   (-| _  _ ,_   (-(__`_|_ _ ,_ |_,            @-:.
-#  .:-@                  _  |(_)(_|| |   ____) | (_||  | \_,          @-:.
-#  .:-@                 (__/            (      |_,                    @-:.
-#  .:-@                                                               @-:.
-#  .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
-#  .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
-#         ascii art gallery:  http://www.geocities.com/SoHo/7373/
-# 
-# 
-#   =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#   ^   -,                ,-. .          .    ^
-#   ^    | ,-. ,-. ;-.    `-, |- ,-. ;-. | '  ^
-#   ^  , | | | ,-| | |    , ; |  ,-| |   |`.  ^
-#   ^  `-' `-' `-^ ' ^    `-' `- `-^ '   ` `  ^
-#   ^          Spunk1111@juno.com             ^
-#   ^      ,-.             .   . . . .        ^
-#   ^      `-, ;-. . . ;-. | ' | | | |        ^
-#   ^      , ; | | | | | | |`. | | | |        ^
-#   ^      `-' |-' `-^ ' ^ ` ` ` ` ` `        ^
-#   ^          `                              ^
-#   =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+# ============================================================================
+
+
+BOX stark2
+
+author "Joan G. Stark <spunk1111@juno.com>"
+revision "1.0"
+revdate "April 05, 1999 (Monday, 21:55h)"
+created "April 05, 1999 (Monday, 21:55h)"
+
+sample {
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+    .:-@    ____        (_,      _,  _,  _,  _,                        @-:.
+    .:-@   (-(__`,_    ,_ |_,     |   |   |   |    Spunk1111@juno.com  @-:.
+    .:-@    ____)|_)|_|| || \__, _|_ _|_ _|_ _|_                       @-:.
+    .:-@   (    _|       |_,                                           @-:.
+    .:-@       (            ____,         ____        (_,              @-:.
+    .:-@                   (-| _  _ ,_   (-(__`_|_ _ ,_ |_,            @-:.
+    .:-@                  _  |(_)(_|| |   ____) | (_||  | \_,          @-:.
+    .:-@                 (__/            (      |_,                    @-:.
+    .:-@                                                               @-:.
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+}
+
+shapes {
+    nw  (".:-@", ".:-@")
+    n   (".:-@", ".:-@")
+    nne (".:-",  ".:-")
+    ne  ("@-:.", "@-:.")
+    e   ("@-:.")
+    w   (".:-@")
+    sw  (".:-@", ".:-@")
+    s   (".:-@", ".:-@")
+    sse (".:-",  ".:-")
+    se  ("@-:.", "@-:.")
+}
+
+elastic (n,s,e, w)
+
+END stark2
+
+
+# ============================================================================
+
+
+BOX stark1
+
+author "Joan G. Stark <spunk1111@juno.com>"
+revision "1.0"
+revdate "April 05, 1999 (Monday, 21:55h)"
+created "April 05, 1999 (Monday, 21:55h)"
+
+sample {
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    ^   -,                ,-. .          .    ^
+    ^    | ,-. ,-. ;-.    `-, |- ,-. ;-. | '  ^
+    ^  , | | | ,-| | |    , ; |  ,-| |   |`.  ^
+    ^  `-' `-' `-^ ' ^    `-' `- `-^ '   ` `  ^
+    ^          Spunk1111@juno.com             ^
+    ^      ,-.             .   . . . .        ^
+    ^      `-, ;-. . . ;-. | ' | | | |        ^
+    ^      , ; | | | | | | |`. | | | |        ^
+    ^      `-' |-' `-^ ' ^ ` ` ` ` ` `        ^
+    ^          `                              ^
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+}
+
+shapes {
+    nw ("=") ne ("=") nne ("-") N ("-=")
+    e  ("^")  w ("^")
+    sw ("=") ssw ("-") s ("=-") se ("=")
+}
+
+elastic (n,s,e, w)
+
+END stark1
+
+
+# ============================================================================
+
+
+BOX test1
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+
+sample { test1 }
+
+shapes {
+    nw ("#")
+    n ("123")
+    s ("12345")
+
+    se ("#") e ("#") sw ("#") ne ("#") w ("#")
+}
+
+elastic (n,s,e, w)
+
+END test1
+
+
+# ============================================================================
+
+
+BOX test2
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+
+sample { test2 }
+
+shapes {
+    nw ("#")
+    nnw ("--") sse ("---")
+    n ("123")
+    s ("12345")
+
+    se ("#") e ("#") sw ("#") ne ("#") w ("#")
+}
+
+elastic (n,s,e, w)
+
+END test2
+
+
+# ============================================================================
+
+
+BOX test3
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+
+sample { test3 }
+
+shapes {
+    nnw ("123")
+    nne ("456")
+    n ("---")
+    s ("<>")
+    ssw ("12345")
+    sse ("67890")
+
+    nw ("#") se ("#") e ("#") sw ("#") ne ("#") w ("#")
+}
+
+elastic (nne,nnw,ssw,sse,e, w)
+
+END test3
+
+
+# ============================================================================
+
+
+BOX test4
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+
+sample { test4 }
+
+shapes {
+    e ("1","2","3")
+    w ("1","2","3","4","5")
+
+    s ("#") n ("#") nw ("#") se ("#") sw ("#") ne ("#")
+}
+
+elastic (n,s,e, w)
+
+END test4
+
+
+# ============================================================================
+
+
+BOX test5
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+
+sample { test5 }
+
+shapes {
+    e ("1","2","3")
+    w ("1","2","3","4","5")
+    ene ("|","|")
+    wsw ("|","|","|")
+
+    s ("#") n ("#") nw ("#") se ("#") sw ("#") ne ("#")
+}
+
+elastic (n,s,e, w)
+
+END test5
+
+
+# ============================================================================
+
+
+BOX test6
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+
+sample { test6 }
+
+shapes {
+    ene ("1","2","3")
+    ese ("4","5","6")
+    wnw ("1","2","3","4","5")
+    wsw ("6","7","8","9","0")
+    e ("|","|")
+    w ("|","|","|")
+
+    s ("#") n ("#-") nw ("#") se ("#") sw ("#") ne ("#")
+}
+
+elastic (ene,ese,wnw,wsw,n,s)
+
+END test6
+
+
+# ============================================================================
+
+
+BOX retest
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "April 04, 1999 (Sunday, 18:00h)"
+created "April 04, 1999 (Sunday, 18:00h)"
+
+sample {
+    regular expression test
+    use "foo", "bar", and "--" repeatedly in input
+}
+
+shapes { nw ("*") ne ("*") sw ("*") se ("*")
+         n  ("*") e  ("*") s  ("*") w  ("*")
+}
+
+elastic (n,e,s,W)
+
+replace once "bar" with "raba-raba"
+replace global "f(o)o" with "fu\\1\\1\\1\\1\\1\\1"
+replace "--" with "++++"
+
+END retest
+
 
 
 #EOF                                                  vim: set ai sw=4:
