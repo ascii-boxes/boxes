@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.9 1999/06/17 19:08:50 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h,v 1.10 1999/06/20 14:19:31 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *  Remarks:          ---
@@ -11,6 +11,9 @@
  *  Revision History:
  *
  *    $Log: boxes.h,v $
+ *    Revision 1.10  1999/06/20 14:19:31  tsjensen
+ *    Added padding member to design struct
+ *
  *    Revision 1.9  1999/06/17 19:08:50  tsjensen
  *    Removed #pragma ident "string"
  *    Changed VERSION to 1.0 beta
@@ -44,6 +47,9 @@
 #ifndef BOXES_H
 #define BOXES_H
 
+/* #define DEBUG */
+/* #define REGEXP_DEBUG */
+
 #include "regexp.h"
 
 
@@ -56,6 +62,7 @@
  */
 #define DEF_TABSTOP     8                /* default tab stop distance (-t) */
 #define DEF_INDENTMODE  'b'              /* indent box, not text by default */
+#define DEF_DESIGN      "C"              /* default design name */
 
 
 #define __TJ(s) fprintf (stderr, s);
@@ -70,14 +77,22 @@
 #define EXIT_SUCCESS    0
 #endif
 
-/*  free memory and set pointer to NULL
+/*  max. allowed tab stop distance
  */
-#define BFREE(p) {    \
-   if (p) {           \
-      free (p);       \
-      (p) = NULL;     \
-   }                  \
-}
+#define MAX_TABSTOP     16
+
+/*  max. supported line length
+ *  This is how many characters of a line will be read. Anything beyond
+ *  will be discarded. The line feed character at the end does not count.
+ *  (This should have been done via sysconf(), but I didn't do it in order
+ *  to ease porting to non-unix platforms.)
+ */
+#if defined(LINE_MAX) && (LINE_MAX < 1024)
+#undef LINE_MAX
+#endif
+#ifndef LINE_MAX
+#define LINE_MAX        2048
+#endif
 
 
 extern char *shape_name[];
@@ -152,12 +167,28 @@ extern design_t *designs;
 extern int design_idx;
 
 extern int yylineno;
+extern char *yyfilename;
+
+typedef struct {                         /* Command line options: */
+    int       l;                         /* list available designs */
+    int       r;                         /* remove box from input */
+    int       tabstop;                   /* tab stop distance */
+    int       padding[ANZ_SIDES];        /* in spaces or lines resp. */
+    design_t *design;                    /* currently used box design */
+    int       design_choice_by_user;     /* true if design was chosen by user */
+    long      reqwidth;                  /* requested box width (-s) */
+    long      reqheight;                 /* requested box height (-s) */
+    char      valign;                    /* text position inside box */
+    char      halign;                    /* ( h[lcr]v[tcb] )         */
+    FILE     *infile;                    /* where we get our input */
+    FILE     *outfile;                   /* where we put our output */
+} opt_t;
+
+extern opt_t opt;
 
 int isempty (const sentry_t *);
-int yyerror (const char *, ...);
 size_t widest (const sentry_t *, const int, ...);
 size_t highest (const sentry_t *, const int, ...);
-int empty_line (const line_t *line);
 
 #endif /* BOXES_H */
 
