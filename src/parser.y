@@ -4,14 +4,17 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id$
+ *  Version:          $Id: parser.y,v 1.2 1999/03/19 17:57:20 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
  *
  *  Revision History:
  *
- *    $Log$
+ *    $Log: parser.y,v $
+ *    Revision 1.2  1999/03/19 17:57:20  tsjensen
+ *    ... still programming ...
+ *
  *    Revision 1.1  1999/03/18 15:10:06  tsjensen
  *    Initial revision
  *
@@ -22,12 +25,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>    
+#include <string.h>
 #include "boxes.h"
 
-
-static const char rcsid_parser_y[] =
-    "$Id$";
+#ident "$Id: parser.y,v 1.2 1999/03/19 17:57:20 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -218,7 +219,7 @@ int perform_se_check()
     int num;
     char *s;
     shape_t shape;
-    offset_t offset;
+    soffset_t offset;
     sentry_t sentry;
 }
 
@@ -440,7 +441,23 @@ elist_entries: elist_entries ',' SHAPE
 
 slist: '(' slist_entries ')'
     {
-        $$ = $2;
+        sentry_t rval = $2;
+
+        if (rval.width == 0 || rval.height == 0) {
+
+            int i;
+
+            for (i=0; i<rval.height; ++i)
+                BFREE (rval.chars[i]);
+            BFREE (rval.chars);
+
+            yyerror ("warning: minimum shape dimension is 1x1 - clearing.");
+
+            $$ = (sentry_t) { NULL, 0, 0, 0 };
+        }
+        else {
+            $$ = $2;
+        }
     }
 
 | '(' ')'
