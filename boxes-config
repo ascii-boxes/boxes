@@ -3,7 +3,7 @@
 #   Date created:     March 17, 1999 (Wednesday, 17:02h)
 #   Author:           Thomas Jensen
 #                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id: boxes-config,v 1.10 1999/07/20 18:54:10 tsjensen Exp tsjensen $
+#   Version:          $Id: boxes-config,v 1.11 1999/07/22 12:17:17 tsjensen Exp tsjensen $
 #   Format:           ASCII Text
 #   World Wide Web:   http://home.pages.de/~jensen/boxes/
 #   Purpose:          Example configuration file for the boxes program
@@ -11,6 +11,9 @@
 #   Revision History:
 #
 #     $Log: boxes-config,v $
+#     Revision 1.11  1999/07/22 12:17:17  tsjensen
+#     Modernized code of "columns" design and made code consistent with sample
+#
 #     Revision 1.10  1999/07/20 18:54:10  tsjensen
 #     Completely revised code of "tjc" design
 #
@@ -299,9 +302,8 @@ sample {
 }
 
 shapes {
-    nw ("  ") n (" ") ne ("  ")
-     w ("/*")          e ("*/")
-    sw ("  ") s (" ") se ("  ")
+    w ("/*")
+    e ("*/")
 }
 
 replace "\\*/" with "*\\/"               # quote closing comment tags
@@ -309,7 +311,7 @@ reverse "\\*\\\\/" to "*/"
 
 Padding { h 1 }
 
-elastic (n,e,s,w)
+elastic (e, w)
 
 END c-cmt
 
@@ -332,9 +334,9 @@ sample {
 }
 
 shapes {
-    nw ("/*")           n (" ") ne (" ")
-     w (" *")                    e (" ")
-    sw (" *") ssw ("/") s (" ") se (" ")
+    nw ("/*")
+     w (" *")
+    sw (" *") ssw ("/") s (" ")          # note that S must be defined!
 }
 
 padding { left 2 }
@@ -342,7 +344,7 @@ padding { left 2 }
 replace "\\*/" with "*\\/"               # quote closing comment tags
 reverse "\\*\\\\/" to "*/"
 
-elastic (n,e,s,w)
+elastic (s, w)
 
 END c-cmt2
 
@@ -778,12 +780,9 @@ shapes {
     sw  ("* ", " *")
     ssw ("*", "/")
     s   (" *", "  ")
-
-    ne(" ") n(" ") nw("  ")   # empty north side
-    se(" "," ")    e (" ")    # empty east side
 }
 
-elastic (n, e, s, w)
+elastic (n, s, w)
 
 padding {
     left 2
@@ -1154,7 +1153,6 @@ shapes {
          " \\ \\||/ /  ")
     sw  ("  `\\\\//`   ",
          " ^^^^^^^^^^")
-    ne  ("         ")
     ene ("         ",
          "         ",
          "     jgs ",
@@ -1169,12 +1167,11 @@ shapes {
          "    |//  ")
     se  (" \\\\ |/ / ",
          "^^^^^^^^^")
-    n   (" ")
     s   ("\\   \\./    \\",
          "^^^^^^^^^^^^")
 }
 
-elastic (n,s,e,w)
+elastic (s,e,w)
 
 END spring
 
@@ -1319,14 +1316,12 @@ sample {
 }
 
 shapes {
-    nw ("  ") n (" ") ne (" ")
-     w ("//")          e (" ")
-    sw ("  ") s (" ") se (" ")
+     w ("//")
 }
 
 padding {lef 1}
 
-elastic (n,e,s,w)
+elastic (w)
 
 END java-cmt
 
@@ -1348,14 +1343,12 @@ sample {
 }
 
 shapes {
-    nw (" ") n (" ") ne (" ")
-     w ("#")          e (" ")
-    sw (" ") s (" ") se (" ")
+     w ("#")
 }
 
 padding { left 1}
 
-elastic (n,e,s,w)
+elastic (w)
 
 END pound-cmt
 
@@ -1377,12 +1370,11 @@ sample {
 }
 
 shapes {
-    nw ("     ") n (" ") ne ("    ")
-     w ("<!-- ")          e (" -->")
-    sw ("     ") s (" ") se ("    ")
+     w ("<!-- ")
+     e (" -->")
 }
 
-elastic (n,e,s,w)
+elastic (e,w)
 
 END html-cmt
 
@@ -1404,16 +1396,14 @@ sample {
 }
 
 shapes {
-    nw (" ") n (" ") ne (" ")
-     w ("\"")          e (" ")
-    sw (" ") s (" ") se (" ")
+     w ("\"")
 }
 
 padding {
     left 1
 }
 
-elastic (n,e,s,w)
+elastic ( w )
 
 END vim-cmt
 
@@ -1438,14 +1428,12 @@ sample {
 }
 
 shapes {
-    nw (" ") n (" ") ne ("        ")
-     w (" ")          e ("/*@TJ@*/")
-    sw (" ") s (" ") se ("        ")
+    e ("/*@TJ@*/")
 }
 
 padding { right 4 }
 
-elastic (n,e,s,w)
+elastic ( e )
 
 END right
 
