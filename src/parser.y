@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.5 1999/03/30 13:29:50 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.6 1999/04/04 16:07:53 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,11 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.6  1999/04/04 16:07:53  tsjensen
+ *    Enforced use of PROJECT macro
+ *    Added "indent" directive to grammar
+ *    Added "replace" directive to grammar
+ *
  *    Revision 1.5  1999/03/30 13:29:50  tsjensen
  *    Added computation of minimum width/height of each design.
  *
@@ -38,7 +43,7 @@
 #include <string.h>
 #include "boxes.h"
 
-#ident "$Id: parser.y,v 1.5 1999/03/30 13:29:50 tsjensen Exp tsjensen $";
+#ident "$Id: parser.y,v 1.6 1999/04/04 16:07:53 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -259,21 +264,17 @@ int perform_se_check()
 
 
 %union {
-    int num;
     char *s;
     char c;
     shape_t shape;
-    soffset_t offset;
     sentry_t sentry;
 }
 
-%token YSHAPES YOFFSETS YELASTIC YSAMPLE YREPLACE
+%token YSHAPES YELASTIC YSAMPLE YREPLACE
 %token <s> KEYWORD
 %token <s> WORD
 %token <s> STRING
-%token <num> NUMBER
 %token <shape> SHAPE
-%token <offset> OFFSET
 
 %type <sentry> slist
 %type <sentry> slist_entries
@@ -286,6 +287,8 @@ config_file: config_file design | design ;
 design: KEYWORD WORD layout KEYWORD WORD
     {
         design_t *tmp;
+        int i;
+        unsigned char *p;
 
         #ifdef DEBUG
             fprintf (stderr, "--------- ADDING DESIGN \"%s\".\n", $2);
@@ -308,6 +311,23 @@ design: KEYWORD WORD layout KEYWORD WORD
             YYABORT;
         }
         
+        for (i=0; i<design_idx; ++i) {
+            if (strcasecmp ($2, designs[i].name) == 0) {
+                yyerror ("Duplicate box design name -- %s", $2);
+                YYABORT;
+            }
+        }
+
+        p = $2;
+        while (*p) {
+            if (*p < 32 || *p > 126) {
+                yyerror ("Box design name must consist of printable standard "
+                         "ASCII characters.");
+                YYABORT;
+            }
+            ++p;
+        }
+
         designs[design_idx].name = (char *) strdup ($2);
         pflicht = 0;
         time_for_se_check = 0;
@@ -366,7 +386,9 @@ entry: KEYWORD STRING
 
 | WORD STRING
     {
-        fprintf (stderr, "%s: Discarding entry [%s = %s].\n", PROJECT, $1, $2);
+        #ifdef DEBUG
+            fprintf (stderr, "%s: Discarding entry [%s = %s].\n", PROJECT, $1, $2);
+        #endif
     }
 ;
 
@@ -488,8 +510,6 @@ block: YSAMPLE '{' STRING '}'
         designs[design_idx].reprules[a].mode = $2;
         designs[design_idx].anz_reprules = a + 1;
     }
-
-| YOFFSETS '{' the_offsets '}'
 ;
 
 
@@ -542,28 +562,6 @@ the_shapes: the_shapes SHAPE slist
             yyerror ("Duplicate specification for %s shape", shape_name[$1]);
             YYABORT;
         }
-    }
-;
-
-
-the_offsets: the_offsets OFFSET NUMBER
-    {
-        #ifdef DEBUG
-            fprintf (stderr, "Setting offset of \'%s\' to %d\n",
-                    ofs_name[$2], $3);
-        #endif
-
-        designs[design_idx].offset[$2] = $3;
-    }
-
-| OFFSET NUMBER
-    {
-        #ifdef DEBUG
-            fprintf (stderr, "Setting offset of \'%s\' to %d\n",
-                    ofs_name[$1], $2);
-        #endif
-
-        designs[design_idx].offset[$1] = $2;
     }
 ;
 
