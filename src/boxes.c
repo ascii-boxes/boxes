@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.14 1999/06/14 12:08:49 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.15 1999/06/15 12:07:39 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -34,6 +34,12 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.15  1999/06/15 12:07:39  tsjensen
+ *    Removed a stray debug message
+ *    Move apply_substitutions() regexp handling function up in file
+ *    Use apply_substitutions() in read_input() routine also
+ *    Moved "extern int yyparse()" prototype to start of file
+ *
  *    Revision 1.14  1999/06/14 12:08:49  tsjensen
  *    Bugfix: best_match() box side detection used numw instead of nume
  *    Added apply_substitutions() routine for central regexp handling
@@ -111,7 +117,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.14 1999/06/14 12:08:49 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.15 1999/06/15 12:07:39 tsjensen Exp tsjensen $";
 
 extern int yyparse();
 extern FILE *yyin;                       /* lex input file */
@@ -172,11 +178,6 @@ struct {                                 /* Command line options: */
     FILE     *outfile;                   /* where we put our output */
 } opt;
 
-
-typedef struct {
-    size_t len;
-    char  *text;
-} line_t;
 
 struct {
     line_t *lines;
@@ -319,7 +320,7 @@ int empty_line (const line_t *line)
         return 1;
 
     for (p=line->text, j=0; *p && j<line->len; ++j, ++p) {
-        if (*p != ' ' && *p != '\t')
+        if (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n')
             return 0;
     }
     return 1;
@@ -1867,6 +1868,42 @@ static design_t *select_design (design_t *darr, char *sel)
 
 
 
+int empty_side (const int aside)
+/*
+ *  Return true if the shapes on the given side consist entirely out of
+ *  spaces - and spaces only, tabs are considered non-empty.
+ *
+ *      aside   the box side (one of BTOP etc.)
+ *
+ *  RETURNS:  == 0   side is not empty
+ *            != 0   side is empty
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int       i;
+    size_t    j;
+    sentry_t *cs;
+    char     *p;
+
+    for (i=0; i<SHAPES_PER_SIDE; ++i) {
+        cs = opt.design->shape + sides[aside][i];
+        if (isempty(cs))
+            continue;
+        for (j=0; j<cs->height; ++j) {
+            p = cs->chars[j];
+            while (*p && *p == ' ')
+                ++p;
+            if (*p)
+                return 0;                /* side is not empty */
+        }
+    }
+
+    return 1;                            /* side is empty */
+}
+
+
+
 static int output_box (const sentry_t *thebox)
 /*
  *
@@ -1886,6 +1923,9 @@ static int output_box (const sentry_t *thebox)
     size_t r;
     char   obuf[LINE_MAX+1];             /* final output buffer */
     size_t obuf_len;                     /* length of content of obuf */
+    size_t skip_start;                   /* lines to skip for box top */
+    size_t skip_end;                     /* lines to skip for box bottom */
+    size_t skip_left;                    /* true if left box part is to be skipped */
 
     /*
      *  Create string of spaces for indentation
@@ -1982,13 +2022,27 @@ static int output_box (const sentry_t *thebox)
     #endif
 
     /*
+     *  Find out if and how many leading or trailing blank lines must be
+     *  skipped because the corresponding box side was defined empty.
+     */
+    skip_start = 0;
+    skip_end   = 0;
+    skip_left  = 0;
+    if (empty_side (BTOP))
+        skip_start = opt.design->shape[NW].height;
+    if (empty_side (BBOT))
+        skip_end = opt.design->shape[SW].height;
+    if (empty_side (BLEF))
+        skip_left = opt.design->shape[NW].width; /* could simply be 1, though */
+
+    /*
      *  Generate actual output
      */
-    for (j=0; j<nol; ++j) {
+    for (j=skip_start; j<nol-skip_end; ++j) {
 
         if (j < thebox[BTOP].height) {
             snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
-                    thebox[BLEF].chars[j], thebox[BTOP].chars[j],
+                    skip_left?"":thebox[BLEF].chars[j], thebox[BTOP].chars[j],
                     thebox[BRIG].chars[j]);
         }
 
@@ -1996,7 +2050,8 @@ static int output_box (const sentry_t *thebox)
             r = thebox[BTOP].width;
             trailspc[r] = '\0';
             snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
-                    thebox[BLEF].chars[j], trailspc, thebox[BRIG].chars[j]);
+                    skip_left?"":thebox[BLEF].chars[j], trailspc,
+                    thebox[BRIG].chars[j]);
             trailspc[r] = ' ';
             --vfill1;
         }
@@ -2007,7 +2062,7 @@ static int output_box (const sentry_t *thebox)
                 r = input.maxline - input.lines[ti].len;
                 trailspc[r] = '\0';
                 snprintf (obuf, LINE_MAX+1, "%s%s%s%s%s%s%s", indentspc,
-                        thebox[BLEF].chars[j], hfill1,
+                        skip_left?"":thebox[BLEF].chars[j], hfill1,
                         ti >= 0? input.lines[ti].text : "", hfill2,
                         trailspc, thebox[BRIG].chars[j]);
             }
@@ -2015,14 +2070,15 @@ static int output_box (const sentry_t *thebox)
                 r = thebox[BTOP].width;
                 trailspc[r] = '\0';
                 snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
-                        thebox[BLEF].chars[j], trailspc, thebox[BRIG].chars[j]);
+                        skip_left?"":thebox[BLEF].chars[j], trailspc,
+                        thebox[BRIG].chars[j]);
             }
             trailspc[r] = ' ';
         }
 
         else {
             snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
-                    thebox[BLEF].chars[j],
+                    skip_left?"":thebox[BLEF].chars[j],
                     thebox[BBOT].chars[j-(nol-thebox[BBOT].height)],
                     thebox[BRIG].chars[j]);
         }
@@ -3086,7 +3142,7 @@ int main (int argc, char *argv[])
     /*
      *  If the following parser is one created by lex, the application must
      *  be careful to ensure that LC_CTYPE and LC_COLLATE are set to the
-     *  POSIX locale.
+     *  POSIX locale.  [pasted from man page --TJ]
      */
     #ifdef DEBUG
         fprintf (stderr, "Parsing Config File ...\n");
