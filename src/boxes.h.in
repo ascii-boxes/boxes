@@ -3,14 +3,17 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id$
+ *  Version:          $Id: boxes.h,v 1.2 1999/03/19 17:51:19 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *  Remarks:          ---
  *
  *  Revision History:
  *
- *    $Log$
+ *    $Log: boxes.h,v $
+ *    Revision 1.2  1999/03/19 17:51:19  tsjensen
+ *    ... still programming ...
+ *
  *    Revision 1.1  1999/03/18 15:09:34  tsjensen
  *    Initial revision
  *
@@ -20,11 +23,33 @@
 #ifndef BOXES_H
 #define BOXES_H
 
+#ident "$Id: boxes.h,v 1.2 1999/03/19 17:51:19 tsjensen Exp tsjensen $"
+
 #define PROJECT "boxes"                  /* name of program */
 #define VERSION "1.0"                    /* current release of project */
 
-static const char rcsid_boxes_h[] =
-    "$Id$";
+
+#define __TJ(s) fprintf (stderr, s);
+
+/*
+ *  some systems (especially sunos4) do not define EXIT_* constants
+ */
+#ifndef EXIT_FAILURE
+#define EXIT_FAILURE    1
+#endif
+#ifndef EXIT_SUCCESS
+#define EXIT_SUCCESS    0
+#endif
+
+/*  free memory and set pointer to NULL
+ */
+#define BFREE(p) {    \
+   if (p) {           \
+      free (p);       \
+      (p) = NULL;     \
+   }                  \
+}
+
 
 extern char *shape_name[];
 extern char *ofs_name[];
@@ -34,7 +59,7 @@ extern char *ofs_name[];
 typedef enum {
         NW_NNW, NNW_N, N_NNE, NNE_NE, NE_ENE, ENE_E, E_ESE, ESE_SE,
         SE_SSE, SSE_S, S_SSW, SSW_SW, SW_WSW, WSW_W, W_WNW, WNW_NW
-} offset_t;
+} soffset_t;
 
 
 #define ANZ_SHAPES 16
@@ -52,15 +77,21 @@ extern shape_t east_side[SHAPES_PER_SIDE];
 extern shape_t south_side[SHAPES_PER_SIDE];
 extern shape_t west_side[SHAPES_PER_SIDE];
 extern shape_t corners[ANZ_CORNERS];
-extern shape_t *sides[];
+extern shape_t *sides[ANZ_SIDES];
 
+#define BTOP 0                             /* for use width sides */
+#define BRIG 1
+#define BBOT 2
+#define BLEF 3
 
 typedef struct {
     char **chars;
-    int    height;
-    int    width;
-    int    elastic;
+    size_t height;
+    size_t width;
+    int    elastic;          /* elastic is used only in orginial definition */
 } sentry_t;
+
+#define SENTRY_INITIALIZER (sentry_t) {NULL, 0, 0, 0}
 
 typedef struct {
     char    *name;
@@ -78,9 +109,10 @@ extern int design_idx;
 
 extern int yylineno;
 
-int yyerror (const char *fmt, ...);
-shape_t *on_side (const shape_t shape1, const shape_t shape2);
-int shape_distance (const shape_t s1, const shape_t s2);
+int isempty (const sentry_t *);
+int yyerror (const char *, ...);
+size_t widest (const sentry_t *, const int, ...);
+size_t highest (const sentry_t *, const int, ...);
 
 #endif /* BOXES_H */
 
