@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.33 1999/09/10 19:21:05 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.34 2000/03/17 23:44:26 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -48,6 +48,12 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.34  2000/03/17 23:44:26  tsjensen
+ *    Port to Win32 platform based on patches by Ron Aaron
+ *    Changes only affect Win32 version. Win32 behavior differs from the UNIX
+ *    platforms in the way the config file is searched and the config file
+ *    name (boxes.cfg).
+ *
  *    Revision 1.33  1999/09/10 19:21:05  tsjensen
  *    Eliminated use of PATH_MAX in order to ease porting
  *    Restructured infile/outfile code to eliminate need for access() function
@@ -237,7 +243,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.33 1999/09/10 19:21:05 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.34 2000/03/17 23:44:26 tsjensen Exp tsjensen $";
 
 
 
@@ -319,7 +325,7 @@ static int is_dir (const char *path)
         return -1;
     }
 
-    return (sinf.st_mode & S_IFMT) == S_IFDIR;
+    return S_ISDIR(sinf.st_mode);
 }
 
 
