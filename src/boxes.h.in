@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.16 1999/07/20 18:48:46 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h,v 1.17 1999/08/14 19:31:23 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *
@@ -23,6 +23,10 @@
  *  Revision History:
  *
  *    $Log: boxes.h,v $
+ *    Revision 1.17  1999/08/14 19:31:23  tsjensen
+ *    Incremented beta version number to 5
+ *    Added maxshapeheight member to design_t struct
+ *
  *    Revision 1.16  1999/07/20 18:48:46  tsjensen
  *    Added GNU GPL disclaimer
  *    Updated beta version number :-)
@@ -99,7 +103,8 @@
 
 
 #define PROJECT "boxes"                  /* name of program */
-#define VERSION "1.0 beta 5"             /* current release of project */
+#define VERSION "--BVERSION--"           /* current release of project */
+#define GLOBALCONF "--GLOBALCONF--"      /* name of system-wide config file */
 
 
 /*
