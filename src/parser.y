@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.20 1999/08/16 16:29:25 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.21 1999/08/18 15:38:44 tsjensen Exp tsjensen $
  *  Language:         GNU bison (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.21  1999/08/18 15:38:44  tsjensen
+ *    Added new tokens YCHGDEL and YDELWORD
+ *    Added code for DELIMITER statements
+ *
  *    Revision 1.20  1999/08/16 16:29:25  tsjensen
  *    Changed SAMPLE block syntax to get rid of all the quoting sh*t in SAMPLE
  *    blocks. Samples now look authentic even in the config file. Very simple now.
@@ -126,7 +130,7 @@
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.20 1999/08/16 16:29:25 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.21 1999/08/18 15:38:44 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -645,29 +649,26 @@ entry: KEYWORD STRING
 
 block: YSAMPLE STRING YENDSAMPLE
     {
-        line_t line;
+        /*
+         *  SAMPLE block    (STRING is non-empty if we get here)
+         */
+        char *line;
 
         #ifdef PARSER_DEBUG
-            fprintf (stderr, "SAMPLE block rule fulfilled\n");
+            fprintf (stderr, "SAMPLE block rule satisfied\n");
         #endif
 
         if (designs[design_idx].sample) {
             yyerror ("duplicate SAMPLE block");
             YYERROR;
         }
-        line.text = (char *) strdup ($2);
-        if (line.text == NULL) {
+        line = (char *) strdup ($2);
+        if (line == NULL) {
             perror (PROJECT);
             YYABORT;
         }
-        line.len = strlen (line.text);
-        if (empty_line(&line)) {
-            yyerror ("SAMPLE entry must not be empty");
-            BFREE (line.text);
-            YYERROR;
-        }
 
-        designs[design_idx].sample = line.text;
+        designs[design_idx].sample = line;
         ++pflicht;
     }
 
