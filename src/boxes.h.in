@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.17 1999/08/14 19:31:23 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h.in,v 1.18 1999/08/21 23:37:23 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *
@@ -22,7 +22,11 @@
  *
  *  Revision History:
  *
- *    $Log: boxes.h,v $
+ *    $Log: boxes.h.in,v $
+ *    Revision 1.18  1999/08/21 23:37:23  tsjensen
+ *    Renamed file from boxes.h to boxes.h.in
+ *    VERSION and GLOBALCONF values are now put in by top level Makefile
+ *
  *    Revision 1.17  1999/08/14 19:31:23  tsjensen
  *    Incremented beta version number to 5
  *    Added maxshapeheight member to design_t struct
@@ -227,4 +231,4 @@ extern input_t input;
 
 #endif /* BOXES_H */
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/*EOF*/                                  /* vim: set cindent sw=4 syntax=c: */
