@@ -3,7 +3,7 @@
 #   Date created:     March 17, 1999 (Wednesday, 17:02h)
 #   Author:           Thomas Jensen
 #                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id: boxes-config,v 1.12 1999/08/14 19:00:00 tsjensen Exp tsjensen $
+#   Version:          $Id: boxes-config,v 1.13 1999/08/16 16:24:32 tsjensen Exp tsjensen $
 #   Format:           ASCII Text
 #   World Wide Web:   http://home.pages.de/~jensen/boxes/
 #   Purpose:          Example configuration file for the boxes program
@@ -32,8 +32,9 @@ shapes {
     sw ("/*") s ("*") se ("*/")
 }
 
-replace "\\*/" with "*\\/"               # quote closing comment tags
-reverse "\\*\\\\/" to "*/"
+delim ?"
+replace "\*/" with "*\/"               # quote closing comment tags
+reverse "\*\\/" to "*/"
 
 padding {
     horiz 1             # alternatives: all, vert, lef, rig, bottom, top
@@ -172,8 +173,8 @@ END whirly
 
 BOX scroll
 
-revision "1.1"
-revdate  "August 16, 1999 (Monday, 18:01h)"
+revision "1.2"
+revdate  "August 18, 1999 (Wednesday, 17:00h)"
 created  "March 17, 1999 (Wednesday, 17:04h)"
 
 SAMPLE
@@ -192,17 +193,30 @@ SAMPLE
        ~~~                                             ~~~
 ENDS
 
+delimiter ?"
 shapes {
-    nw  (" / ~~~~~")
-    n   ("~")
-    ne  ("~~~~~ \\ ")
-    ene (" /~~\\  |", "|   / /|", "|\\   / |", "|  ~~  |")
-    wnw ("|  /~~\\ ", "|\\ \\   |", "| \\   /|", "|  ~~  |")
+    ne  ("~~~~~ \ ")
+    ene (" /~~\  |",
+         "|   / /|",
+         "|\   / |",
+         "|  ~~  |")
     e   ("|      |")
-    se  ("|     / ", " \\   /  ", "  ~~~   ")
-    s   ("~"," "," ")
-    sw  (" \\     |", "  \\   / ", "   ~~~  ")
+    se  ("|     / ",
+         " \   /  ",
+         "  ~~~   ")
+
+    nw  (" / ~~~~~")
+    wnw ("|  /~~\ ",
+         "|\ \   |",
+         "| \   /|",
+         "|  ~~  |")
     w   ("|      |")
+    sw  (" \     |",
+         "  \   / ",
+         "   ~~~  ")
+
+    n   ("~")
+    s   ("~"," "," ")
 }
 
 eLAStic (n, s, e, w)
@@ -276,8 +290,8 @@ END c-cmt
 BOX c-cmt2
 
 author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
-revision "1.0"
-revdate "June 17, 1999 (Thursday, 19:59h)"
+revision "1.1"
+revdate "August 18, 1999 (Wednesday, 17:01h)"
 created "June 17, 1999 (Thursday, 19:59h)"
 
 sample
@@ -295,8 +309,9 @@ shapes {
 
 padding { left 2 }
 
-replace "\\*/" with "*\\/"               # quote closing comment tags
-reverse "\\*\\\\/" to "*/"
+delimiter ?"
+replace "\*/" with "*\/"                 # quote closing comment tags
+reverse "\*\\/" to "*/"
 
 elastic (s, w)
 
@@ -416,8 +431,8 @@ END nuke
 BOX diamonds
 
 author "Joan G. Stark <spunk1111@juno.com>"
-revision "1.0"
-revdate "March 30, 1999 (Tuesday, 15:59h)"
+revision "1.1"
+revdate "August 18, 1999 (Wednesday, 17:02h)"
 created "March 30, 1999 (Tuesday, 15:59h)"
 
 Sample
@@ -426,8 +441,12 @@ Sample
      /\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\
     //\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\
     \\//\/                                        \/\\//
-     \/       joan stark   spunk1111@juno.com        \/
-     /\     http://www.geocities.com/SoHo/7373/      /\
+     \/                                              \/
+     /\                                              /\
+    //\\      joan stark   spunk1111@juno.com       //\\
+    \\//    http://www.geocities.com/SoHo/7373/     \\//
+     \/                                              \/
+     /\                                              /\
     //\\/\                                        /\//\\
     \\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\//
      \/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/
@@ -435,28 +454,38 @@ Sample
            \/          \/          \/          \/
 Ends
 
+delimiter ?:
+
 shapes {
-    nw  ("      ", "    /\\", " /\\//\\", "//\\\\\\/")
-    nnw (" /\\     ", "//\\\\/\\  ", "\\\\///\\\\/", "/\\/\\\\///")
-    n   ("     /\\     ", "  /\\//\\\\/\\  ", "\\//\\\\\\///\\\\/",
-         "\\\\\\//\\/\\\\///")
-    nne ("     /\\ ", "  /\\//\\\\", "\\//\\\\\\//", "\\\\\\//\\/\\")
-    ne  ("      ", "/\\    ", "/\\\\/\\ ", "\\///\\\\")
+    nw  (:      :, :    /\:, : /\//\:, ://\\\/:)
+    nnw (: /\     :, ://\\/\  :, :\\///\\/:, :/\/\\///:)
+    n   (:     /\     :, :  /\//\\/\  :, :\//\\\///\\/:,
+         :\\\//\/\\///:)
+    nne (:     /\ :, :  /\//\\:, :\//\\\//:, :\\\//\/\:)
+    ne  (:      :, :/\    :, :/\\/\ :, :\///\\:)
 
-    ene ("\\/\\\\//", "   \\/ ")
-    e   ("   /\\ ", "  //\\\\", "  \\\\//", "   \\/ ")
-    ese ("   /\\ ", "/\\//\\\\")
+    ene (:\/\\//:, :   \/ :)
+    e   (:   /\ :, :  //\\:, :  \\//:, :   \/ :)
+    ese (:   /\ :, :/\//\\:)
 
-    wnw ("\\\\//\\/", " \\/   ")
-    w   (" /\\   ", "//\\\\  ", "\\\\//  ", " \\/   ")
-    wsw (" /\\   ", "//\\\\/\\")
+    wnw (:\\//\/:, : \/   :)
+    w   (: /\   :, ://\\  :, :\\//  :, : \/   :)
+    wsw (: /\   :, ://\\/\:)
 
-    sw  ("\\\\///\\", " \\/\\\\/", "    \\/", "      ")
-    ssw ("\\/\\//\\\\\\", "//\\\\\\//\\", "\\\\//\\/  ", " \\/     ")
-    s   ("///\\\\/\\//\\\\\\", "/\\\\///\\\\\\//\\", "  \\/\\\\//\\/  ",
-         "     \\/     ")
-    sse ("///\\\\/\\/", "/\\\\///\\\\", "  \\/\\\\//", "     \\/ ")
-    se  ("/\\\\\\//", "\\//\\/ ", "\\/    ", "      ")
+    sw  (:\\///\:, : \/\\/:, :    \/:, :      :)
+    ssw (:\/\//\\\:, ://\\\//\:, :\\//\/  :, : \/     :)
+    s   (:///\\/\//\\\:,
+         :/\\///\\\//\:,
+         :  \/\\//\/  :,
+         :     \/     :)
+    sse (:///\\/\/:,
+         :/\\///\\:,
+         :  \/\\//:,
+         :     \/ :)
+    se  (:/\\\//:,
+         :\//\/ :,
+         :\/    :,
+         :      :)
 }
 
 elastic (n,s,e, w)
@@ -788,8 +817,8 @@ END netdata
 BOX xes
 
 author "Joan G. Stark <spunk1111@juno.com>"
-revision "1.0"
-revdate "April 09, 1999 (Friday, 20:05h)"
+revision "1.1"
+revdate "August 18, 1999 (Wednesday, 17:04h)"
 created "April 09, 1999 (Friday, 20:05h)"
 
 sample
@@ -807,23 +836,25 @@ sample
     jgs     </\></\></\>
 ends
 
+delim ?"
+
 shapes {
     nw  ("     ", "    <", "    <")
-    nnw ("   ", "\\/>", "/\\>")
-    n   ("<\\/>", "</\\>", "    ")
-    nne ("   ", "<\\/", "</\\")
+    nnw ("   ", "\/>", "/\>")
+    n   ("<\/>", "</\>", "    ")
+    nne ("   ", "<\/", "</\")
     ne  ("     ", ">    ", ">    ")
-    wnw (" <\\/>", " </\\>")
-    w   ("<\\/> ", "</\\> ")
-    wsw (" <\\/>", " </\\>")
+    wnw (" <\/>", " </\>")
+    w   ("<\/> ", "</\> ")
+    wsw (" <\/>", " </\>")
     sw  ("    <", "    <", "     ")
-    ssw ("\\/>", "/\\>", "   ")
-    s   ("    ", "<\\/>", "</\\>")
-    sse ("<\\/", "</\\", "   ")
+    ssw ("\/>", "/\>", "   ")
+    s   ("    ", "<\/>", "</\>")
+    sse ("<\/", "</\", "   ")
     se  (">    ", ">    ", "     ")
-    ese ("<\\/> ", "</\\> ")
-    e   (" <\\/>", " </\\>")
-    ene ("<\\/> ", "</\\> ")
+    ese ("<\/> ", "</\> ")
+    e   (" <\/>", " </\>")
+    ene ("<\/> ", "</\> ")
 }
 
 elastic (n, e, s, w)
@@ -1070,8 +1101,8 @@ END santa
 BOX spring
 
 author "Joan G. Stark <spunk1111@juno.com>"
-revision "1.0"
-revdate "April 09, 1999 (Friday, 15:53h)"
+revision "1.1"
+revdate "August 18, 1999 (Wednesday, 17:05h)"
 created "April 09, 1999 (Friday, 15:53h)"
 
 sample
@@ -1092,20 +1123,22 @@ sample
      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ends
 
+delim ?"
+
 shapes {
     nw  ("      ,    ")
-    wnw ("  /\\^/`\\   ",
-         " | \\/   |  ",
+    wnw ("  /\^/`\   ",
+         " | \/   |  ",
          " | |    |  ",
-         " \\ \\    /  ",
-         "  '\\\\//'   ")
+         " \ \    /  ",
+         "  '\\//'   ")
     w   ("    ||     ")
     wsw ("    ||  ,  ",
-         "|\\  ||  |\\ ",
+         "|\  ||  |\ ",
          "| | ||  | |",
          "| | || / / ",
-         " \\ \\||/ /  ")
-    sw  ("  `\\\\//`   ",
+         " \ \||/ /  ")
+    sw  ("  `\\//`   ",
          " ^^^^^^^^^^")
     ene ("         ",
          "         ",
@@ -1113,15 +1146,15 @@ shapes {
          "   _ _   ",
          " _{ ' }_ ",
          "{ `.!.` }",
-         "',_/Y\\_,'",
+         "',_/Y\_,'",
          "  {_,_}  ")
     e   ("    |    ")
-    ese ("  (\\|  /)",
-         "   \\| // ",
+    ese ("  (\|  /)",
+         "   \| // ",
          "    |//  ")
-    se  (" \\\\ |/ / ",
+    se  (" \\ |/ / ",
          "^^^^^^^^^")
-    s   ("\\   \\./    \\",
+    s   ("\   \./    \",
          "^^^^^^^^^^^^")
 }
 
@@ -1543,14 +1576,16 @@ END test6
 BOX retest
 
 author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
-revision "1.0"
-revdate "April 04, 1999 (Sunday, 18:00h)"
+revision "1.1"
+revdate "August 18, 1999 (Wednesday, 17:07h)"
 created "April 04, 1999 (Sunday, 18:00h)"
 
 sample
     regular expression test
     use "foo", "bar", and "--" repeatedly in input
  ends
+
+delimiter ?"
 
 shapes { nw ("*") ne ("*") sw ("*") se ("*")
          n  ("*") e  ("*") s  ("*") w  ("*")
@@ -1559,7 +1594,7 @@ shapes { nw ("*") ne ("*") sw ("*") se ("*")
 elastic (n,e,s,W)
 
 replace once "bar" with "raba-raba"
-replace global "f(o)o" with "fu\\1\\1\\1\\1\\1\\1"
+replace global "f(o)o" with "fu\1\1\1\1\1\1"
 replace "--" with "++++"
 
 END retest
