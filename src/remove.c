@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:59h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: remove.c,v 1.3 1999/07/20 18:57:16 tsjensen Exp tsjensen $
+ *  Version:          $Id: remove.c,v 1.4 1999/08/21 16:03:31 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box removal, i.e. the deletion of boxes
@@ -25,6 +25,9 @@
  *  Revision History:
  *
  *    $Log: remove.c,v $
+ *    Revision 1.4  1999/08/21 16:03:31  tsjensen
+ *    Bugfix: When matching vertical side shape lines, ignore empty shape lines
+ *
  *    Revision 1.3  1999/07/20 18:57:16  tsjensen
  *    Added GNU GPL disclaimer
  *    Does not kill leading/trailing blank lines anymore when !opt.killblank
@@ -50,7 +53,7 @@
 #include "remove.h"
 
 static const char rcsid_remove_c[] =
-    "$Id: remove.c,v 1.3 1999/07/20 18:57:16 tsjensen Exp tsjensen $";
+    "$Id: remove.c,v 1.4 1999/08/21 16:03:31 tsjensen Exp tsjensen $";
 
 
 
@@ -98,7 +101,7 @@ static int best_match (const line_t *line,
     #endif
 
     /*
-     *  Find match for WEST side
+     *  Find match for WEST side         (TODO: nicht wenn BLEF leer)
      */
     quality = 0;
     cs = opt.design->shape + WNW;
@@ -315,7 +318,7 @@ static int hmm (const int aside, const size_t follow,
 
 static int detect_horiz (const int aside, size_t *hstart, size_t *hend)
 /*
- *  Detect which part of the input belongs to the top of the box
+ *  Detect which part of the input belongs to the top/bottom of the box
  *
  *      aside   part of box to detect (BTOP or BBOT)
  *      hstart  index of first line of detected box part (result)
@@ -324,9 +327,10 @@ static int detect_horiz (const int aside, size_t *hstart, size_t *hend)
  *  We assume the horizontal parts of the box to be in one piece, i.e. no
  *  blank lines inserted. Lines may be missing, though. Lines may not be
  *  duplicated. They may be shifted left and right by inserting whitespace,
- *  but whitespace which is part of the box must not have been deleted.
- *  Unfortunately, they may even differ in length as long as each line is
- *  in itself a valid horizontal box line.
+ *  but whitespace which is part of the box must not have been deleted
+ *  (unless it's because an entire box side is empty). Box part lines may
+ *  even differ in length as long as each line is in itself a valid
+ *  horizontal box line.
  *
  *  RETURNS:  == 0   success (hstart & hend are set)
  *            != 0   error
@@ -337,18 +341,20 @@ static int detect_horiz (const int aside, size_t *hstart, size_t *hend)
     size_t    follow;                    /* possible box line */
     sentry_t *cs;                        /* current shape */
     line_t   *line;                      /* currently processed input line */
-    size_t    lcnt;                      /* index of currently proc.inp.line */
-    char     *p;                         /* middle line part scanner */
+    size_t    lcnt;                      /* line counter */
+    char     *p = NULL;                  /* middle line part scanner */
     char     *q;                         /* space check rover */
     char     *wcs = NULL;                /* west corner shape position */
     char     *ecs = NULL;                /* east corner shape position */
-    char     *ecs_save;                  /* temp copy of ecs */
     int       mmok = 0;                  /* true if middle match was ok */
     size_t    mheight;                   /* regular height of box part */
-    int       result_init = 0;           /* true if hstart was set */
-    int       goeast, gowest;
+    int       result_init = 0;           /* true if hstart etc. was init. */
+    int       nowside;                   /* true if west side is empty */
+    int       goeast;                    /* no. of finds to ignore on right */
+    int       gowest;                    /* set to request search start incr. */
 
     *hstart = *hend = 0;
+    nowside = empty_side (opt.design->shape, BLEF);
 
     mheight = opt.design->shape[sides[aside][0]].height;
     if (aside == BTOP) {
@@ -375,80 +381,98 @@ static int detect_horiz (const int aside, size_t *hstart, size_t *hend)
             /*
              *  Look for west corner shape
              */
-            cs = opt.design->shape + sides[aside][aside==BTOP?0:SHAPES_PER_SIDE-1];
-            if (gowest) {
-                wcs = strstr (wcs+1, cs->chars[follow]);
-                gowest = 0;
-            }
-            else if (!wcs) {
-                wcs = strstr (line->text, cs->chars[follow]);
-            }
-            if (wcs) {
-                for (q=wcs-1; q>=line->text; --q) {
-                    if (*q != ' ' && *q != '\t')
-                        break;
-                }
-                if (q >= line->text)
+            if (!goeast) {
+                if (nowside) {
                     wcs = NULL;
+                    if (gowest) {
+                        gowest = 0;
+                        if (*p == ' ' || *p == '\t')
+                            ++p;
+                        else
+                            break;
+                    }
+                    else {
+                        p = line->text;
+                    }
+                }
+                else {
+                    cs = opt.design->shape + sides[aside][aside==BTOP?0:SHAPES_PER_SIDE-1];
+                    if (gowest) {
+                        gowest = 0;
+                        wcs = strstr (wcs+1, cs->chars[follow]);
+                    }
+                    else {
+                        wcs = strstr (line->text, cs->chars[follow]);
+                    }
+                    if (wcs) {
+                        for (q=wcs-1; q>=line->text; --q) {
+                            if (*q != ' ' && *q != '\t')
+                                break;
+                        }
+                        if (q >= line->text)
+                            wcs = NULL;
+                    }
+                    if (!wcs)
+                        break;
+
+                    p = wcs + cs->width;
+                }
             }
+            /* Now, wcs is either NULL (if west side is empty)         */
+            /* or not NULL (if west side is not empty). In any case, p */
+            /* points to where we start searching for the east corner. */
             #ifdef DEBUG
                 if (wcs)
-                    fprintf (stderr, "West corner shape matched at position %d.\n",
-                            wcs - line->text);
+                    fprintf (stderr, "West corner shape matched at "
+                            "position %d.\n", wcs - line->text);
                 else
-                    fprintf (stderr, "West corner shape not found.\n");
+                    fprintf (stderr, "West box side is empty.\n");
             #endif
-
-            p = wcs + cs->width;
 
             /*
              *  Look for east corner shape
              */
-            if (wcs) {
-                cs = opt.design->shape + sides[aside][aside==BTOP?SHAPES_PER_SIDE-1:0];
-                ecs_save = ecs;
-                ecs = my_strnrstr (p, cs->chars[follow], cs->width, goeast);
-                if (ecs) {
-                    for (q=ecs+cs->width; *q; ++q) {
-                        if (*q != ' ' && *q != '\t')
-                            break;
-                    }
-                    if (*q)
-                        ecs = NULL;
+            cs = opt.design->shape + sides[aside][aside==BTOP?SHAPES_PER_SIDE-1:0];
+            ecs = my_strnrstr (p, cs->chars[follow], cs->width, goeast);
+            if (ecs) {
+                for (q=ecs+cs->width; *q; ++q) {
+                    if (*q != ' ' && *q != '\t')
+                        break;
                 }
-                if (!ecs) {
-                    gowest = 1;
+                if (*q)
+                    ecs = NULL;
+            }
+            if (!ecs) {
+                if (goeast == 0)
+                    break;
+                else {
                     goeast = 0;
-                    ecs = ecs_save;
+                    gowest = 1;
+                    continue;
                 }
             }
             #ifdef DEBUG
-                if (ecs)
-                    fprintf (stderr, "East corner shape matched at position %d.\n",
-                            ecs-line->text);
-                else
-                    fprintf (stderr, "East corner shape not found.\n");
+                fprintf (stderr, "East corner shape matched at position %d.\n",
+                        ecs-line->text);
             #endif
 
             /*
              *  Check if text between corner shapes is valid
              */
-            if (wcs && ecs) {
-                mmok = !hmm (aside, follow, p, ecs, 0);
-                #ifdef DEBUG
-                    fprintf (stderr, "Text between corner shapes is%s valid.\n",
-                            mmok? "": " NOT");
-                #endif
-                if (!mmok)
-                    ++goeast;
-            }
+            mmok = !hmm (aside, follow, p, ecs, 0);
+            if (!mmok)
+                ++goeast;
+            #ifdef DEBUG
+                fprintf (stderr, "Text between corner shapes is %s.\n",
+                        mmok? "VALID": "NOT valid");
+            #endif
 
-        } while (!mmok && wcs);
+        } while (!mmok);
 
         /*
          *  Proceed to next line
          */
-        if (wcs && ecs && mmok) {  /* match found */
+        if (mmok) {                      /* match found */
             if (!result_init) {
                 result_init = 1;
                 if (aside == BTOP)
@@ -465,8 +489,11 @@ static int detect_horiz (const int aside, size_t *hstart, size_t *hend)
             if (result_init)
                 break;
         }
+
         wcs = NULL;
         ecs = NULL;
+        p = NULL;
+        mmok = 0;
 
         if (aside == BTOP) {
             ++follow;
@@ -826,27 +853,44 @@ int remove_box()
      */
     boxstart = 0;
     textstart = 0;
-    detect_horiz (BTOP, &boxstart, &textstart);
-    #ifdef DEBUG
-        fprintf (stderr, "----> First line of box is %d, ", boxstart);
-        fprintf (stderr, "first line of box body (text) is %d.\n", textstart);
-    #endif
+    if (empty_side (opt.design->shape, BTOP)) {
+        #ifdef DEBUG
+            fprintf (stderr, "----> Top box side is empty: boxstart == textstart == 0.\n");
+        #endif
+    }
+    else {
+        detect_horiz (BTOP, &boxstart, &textstart);
+        #ifdef DEBUG
+            fprintf (stderr, "----> First line of box is %d, ", boxstart);
+            fprintf (stderr, "first line of box body (text) is %d.\n", textstart);
+        #endif
+    }
 
 
     /*
      *  Phase 2: Find out how many lines belong to the bottom of the box
      */
-    textend = 0;
-    boxend = 0;
-    detect_horiz (BBOT, &textend, &boxend);
-    if (textend == 0 && boxend == 0) {
+    if (empty_side (opt.design->shape, BBOT)) {
         textend = input.anz_lines; 
         boxend = input.anz_lines;
+        #ifdef DEBUG
+            fprintf (stderr, "----> Bottom box side is empty: boxend == textend == %d.\n",
+                    input.anz_lines);
+        #endif
     }
-    #ifdef DEBUG
-        fprintf (stderr, "----> Last line of box body (text) is %d, ", textend-1);
-        fprintf (stderr, "last line of box is %d.\n", boxend-1);
-    #endif
+    else {
+        textend = 0;
+        boxend = 0;
+        detect_horiz (BBOT, &textend, &boxend);
+        if (textend == 0 && boxend == 0) {
+            textend = input.anz_lines; 
+            boxend = input.anz_lines;
+        }
+        #ifdef DEBUG
+            fprintf (stderr, "----> Last line of box body (text) is %d, ", textend-1);
+            fprintf (stderr, "last line of box is %d.\n", boxend-1);
+        #endif
+    }
 
     /*
      *  Phase 3: Iterate over body lines, removing box sides where applicable
@@ -865,12 +909,12 @@ int remove_box()
         }
         else if (m == 0) {
             #ifdef DEBUG
-                fprintf (stderr, "line %2d: no side match\n", j);
+                fprintf (stderr, "\033[00;33;01mline %2d: no side match\033[00m\n", j);
             #endif
         }
         else {
             #ifdef DEBUG
-                fprintf (stderr, "\033[00;33mline %2d: west: %d (\'%c\') to "
+                fprintf (stderr, "\033[00;33;01mline %2d: west: %d (\'%c\') to "
                     "%d (\'%c\') [len %d];  east: %d (\'%c\') to %d (\'%c\')"
                     " [len %d]\033[00m\n", j,
                     ws? ws-input.lines[j].text:0,   ws?ws[0]:'?',
