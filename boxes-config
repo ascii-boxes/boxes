@@ -3,7 +3,7 @@
 #   Date created:     March 17, 1999 (Wednesday, 17:02h)
 #   Author:           Thomas Jensen
 #                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id: boxes-config,v 1.7 1999/06/27 17:59:50 tsjensen Exp tsjensen $
+#   Version:          $Id: boxes-config,v 1.8 1999/06/28 18:42:19 tsjensen Exp tsjensen $
 #   Format:           ASCII Text
 #   World Wide Web:   http://home.pages.de/~jensen/boxes/
 #   Purpose:          Example configuration file for the boxes program
@@ -11,6 +11,10 @@
 #   Revision History:
 #
 #     $Log: boxes-config,v $
+#     Revision 1.8  1999/06/28 18:42:19  tsjensen
+#     Moved "C" design to first position in file, so it remains the default
+#     Changed netdata design to use padding option and reversion
+#
 #     Revision 1.7  1999/06/27 17:59:50  tsjensen
 #     Added design c-cmt2
 #     Added padding entries to a few designs
@@ -113,6 +117,8 @@ shapes {
     sw  ("  |","   ")
     ese ()
 }
+
+padding { top 1 }
 
 elastic (n,e,s,w)
 
@@ -1172,11 +1178,11 @@ sample {
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
     .:-@    ____        (_,      _,  _,  _,  _,                        @-:.
     .:-@   (-(__`,_    ,_ |_,     |   |   |   |    Spunk1111@juno.com  @-:.
-    .:-@    ____)|_)|_|| || \__, _|_ _|_ _|_ _|_                       @-:.
+    .:-@    ____)|_)|_|| || \\__, _|_ _|_ _|_ _|_                       @-:.
     .:-@   (    _|       |_,                                           @-:.
     .:-@       (            ____,         ____        (_,              @-:.
     .:-@                   (-| _  _ ,_   (-(__`_|_ _ ,_ |_,            @-:.
-    .:-@                  _  |(_)(_|| |   ____) | (_||  | \_,          @-:.
+    .:-@                  _  |(_)(_|| |   ____) | (_||  | \\_,          @-:.
     .:-@                 (__/            (      |_,                    @-:.
     .:-@                                                               @-:.
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
@@ -1593,6 +1599,42 @@ replace global "f(o)o" with "fu\\1\\1\\1\\1\\1\\1"
 replace "--" with "++++"
 
 END retest
+
+
+# ============================================================================
+
+
+BOX headline
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "March 18, 1999 (Thursday, 15:25h)"
+created "March 18, 1999 (Thursday, 15:25h)"
+
+sample {
+    /*************/
+    /*           */
+    /*           */
+    /*************/
+}
+
+shapes {
+    nw ("/*") n ("*") ne ("*/")
+     w ("/*")          e ("*/")
+    sw ("/*") s ("*") se ("*/")
+}
+
+replace "(.)" with "\\1 "
+reverse "(.) " to "\\1"
+
+padding {
+    left 2
+    right 1
+}
+
+elastic (n,e,s,w)
+
+END headline
 
 
 
