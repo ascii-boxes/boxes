@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: generate.c,v 1.7 1999/08/21 16:04:24 tsjensen Exp tsjensen $
+ *  Version:          $Id: generate.c,v 1.8 1999/08/22 11:36:45 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box generation, i.e. the drawing of boxes
@@ -25,6 +25,9 @@
  *  Revision History:
  *
  *    $Log: generate.c,v $
+ *    Revision 1.8  1999/08/22 11:36:45  tsjensen
+ *    Removed const from 2nd parameter of justify_line() function
+ *
  *    Revision 1.7  1999/08/21 16:04:24  tsjensen
  *    Bugfix: justify_line() still didn't work right. It should now. (This time I
  *    discovered that indentmode=="text" was confusing it. Arghh!)
@@ -65,8 +68,10 @@
 #include "tools.h"
 #include "generate.h"
 
+
 static const char rcsid_generate_c[] =
-    "$Id: generate.c,v 1.7 1999/08/21 16:04:24 tsjensen Exp tsjensen $";
+    "$Id: generate.c,v 1.8 1999/08/22 11:36:45 tsjensen Exp tsjensen $";
+
 
 
 
@@ -996,7 +1001,7 @@ int output_box (const sentry_t *thebox)
     for (j=skip_start; j<nol-skip_end; ++j) {
 
         if (j < thebox[BTOP].height) {   /* box top */
-            snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+            concat_strings (obuf, LINE_MAX+1, 4, indentspc,
                     skip_left?"":thebox[BLEF].chars[j], thebox[BTOP].chars[j],
                     thebox[BRIG].chars[j]);
         }
@@ -1004,7 +1009,7 @@ int output_box (const sentry_t *thebox)
         else if (vfill1) {               /* top vfill */
             r = thebox[BTOP].width;
             trailspc[r] = '\0';
-            snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+            concat_strings (obuf, LINE_MAX+1, 4, indentspc,
                     skip_left?"":thebox[BLEF].chars[j], trailspc,
                     thebox[BRIG].chars[j]);
             trailspc[r] = ' ';
@@ -1023,7 +1028,7 @@ int output_box (const sentry_t *thebox)
                     return rc;
                 r = input.maxline - input.lines[ti].len;
                 trailspc[r] = '\0';
-                snprintf (obuf, LINE_MAX+1, "%s%s%s%s%s%s%s", indentspc,
+                concat_strings (obuf, LINE_MAX+1, 7, indentspc,
                         skip_left?"":thebox[BLEF].chars[j], hfill1,
                         ti >= 0? input.lines[ti].text : "", hfill2,
                         trailspc, thebox[BRIG].chars[j]);
@@ -1031,7 +1036,7 @@ int output_box (const sentry_t *thebox)
             else {                       /* bottom vfill */
                 r = thebox[BTOP].width;
                 trailspc[r] = '\0';
-                snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+                concat_strings (obuf, LINE_MAX+1, 4, indentspc,
                         skip_left?"":thebox[BLEF].chars[j], trailspc,
                         thebox[BRIG].chars[j]);
             }
@@ -1039,7 +1044,7 @@ int output_box (const sentry_t *thebox)
         }
 
         else {                           /* box bottom */
-            snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+            concat_strings (obuf, LINE_MAX+1, 4, indentspc,
                     skip_left?"":thebox[BLEF].chars[j],
                     thebox[BBOT].chars[j-(nol-thebox[BBOT].height)],
                     thebox[BRIG].chars[j]);
