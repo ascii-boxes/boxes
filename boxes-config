@@ -3,7 +3,7 @@
 #   Date created:     March 17, 1999 (Wednesday, 17:02h)
 #   Author:           Thomas Jensen
 #                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id: boxes-config,v 1.3 1999/04/09 13:28:13 tsjensen Exp tsjensen $
+#   Version:          $Id: boxes-config,v 1.4 1999/04/09 18:11:08 tsjensen Exp tsjensen $
 #   Format:           ASCII Text
 #   World Wide Web:   http://home.pages.de/~jensen/boxes/
 #   Purpose:          Example configuration file for the boxes program
@@ -11,6 +11,11 @@
 #   Revision History:
 #
 #     $Log: boxes-config,v $
+#     Revision 1.4  1999/04/09 18:11:08  tsjensen
+#     Added some more designs
+#     Uncommented an unused entry, since boxes no longer generates warnings
+#     upon encountering syntactically correct entries which it doesn't know.
+#
 #     Revision 1.3  1999/04/09 13:28:13  tsjensen
 #     Removed all occurrences of OFFSET specs (obsolete).
 #     Added some new designs
@@ -31,7 +36,7 @@ BOX parchment
 created  "March 12, 1999 (Friday, 17:05h)"
 revision "1.0"
 revdate  "March 12, 1999 (Friday, 17:05h)"
-escaped  "aaa\"bbb\\\"ccc#"	# der String aaa"bbb\"ccc#
+escaped  "aaa\"bbb\\\"ccc#"	         # the string aaa"bbb\"ccc#
 #escaped2 "aaa\\"bbb"        	# unterminated
 
 sample {
@@ -231,7 +236,8 @@ shapes {
     sw ("/*") s ("*") se ("*/")
 }
 
-replace "\\*/" with "\\\\*\\\\/"         # quote closing comment tags
+replace "\\*/" with "*\\/"               # quote closing comment tags
+reverse "\\*\\\\/" to "*/"
 
 elastic (n,e,s,w)
 
@@ -261,6 +267,8 @@ shapes {
      w ("<!-- ")          e (" -->")
     sw ("<!-- ") s ("-") se (" -->")
 }
+
+replace "-->" with "-\\-\\>"
 
 elastic (n,e,s,w)
 
@@ -660,6 +668,8 @@ SAMple {
 }
 
 indent "none"     # alternatives: "box", "text"
+
+replace "\\*/" with "*\\/"
 
 shapes {
     w  (" *  ")
@@ -1136,6 +1146,47 @@ shapes {
 elastic (n,s,e, w)
 
 END stark1
+
+
+# ============================================================================
+
+
+BOX peek
+
+revision "1.0"
+revdate "April 12, 1999 (Monday, 12:52h)"
+created "April 12, 1999 (Monday, 12:52h)"
+
+sample {
+   /*       _\\|/_
+            (o o)
+    +----oOO-{_\}-OOo---------------------+
+    |                                    |
+    | C function headers?                |
+    |                                    |
+    |                                    |
+    +------------------------------------*/
+}
+
+shapes {
+    nw  ("/*", "  ", " +")
+    nnw ("       _\\|/_   ",
+         "       (o o)   ",
+         "----oOO-{_}-OOo")
+    n   (" ", " ", "-")
+    ne  (" ", " ", "+")
+    e   ("|")
+    w   (" |")
+    sw  (" +")
+    s   ("-")
+    se  ("+")
+}
+
+replace "\\*/" with "*\\/"               # quote closing comment tags
+
+elastic (n,e,s,w)
+
+END peek
 
 
 # ============================================================================
