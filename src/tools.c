@@ -4,7 +4,7 @@
  *  Date created:     June 20, 1999 (Sunday, 16:51h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: tools.c,v 1.2 1999/07/20 18:55:20 tsjensen Exp tsjensen $
+ *  Version:          $Id: tools.c,v 1.3 1999/08/13 23:54:24 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Provide tool functions for error reporting and some
@@ -26,6 +26,9 @@
  *  Revision History:
  *
  *    $Log: tools.c,v $
+ *    Revision 1.3  1999/08/13 23:54:24  tsjensen
+ *    Bugfix: cut&paste error in in strisyes() and strisno(). Thanks Warren Seltzer
+ *
  *    Revision 1.2  1999/07/20 18:55:20  tsjensen
  *    Added GNU GPL disclaimer
  *    Added functions strisyes() and strisno()
@@ -49,7 +52,7 @@
 
 
 static const char rcsid_tools_c[] =
-    "$Id: tools.c,v 1.2 1999/07/20 18:55:20 tsjensen Exp tsjensen $";
+    "$Id: tools.c,v 1.3 1999/08/13 23:54:24 tsjensen Exp tsjensen $";
 
 
 
@@ -172,7 +175,7 @@ int empty_line (const line_t *line)
         return 1;
 
     for (p=line->text, j=0; *p && j<line->len; ++j, ++p) {
-        if (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n')
+        if (*p != ' ' && *p != '\t' && *p != '\r')
             return 0;
     }
     return 1;
