@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.16 1999/07/02 11:54:52 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.17 1999/07/22 12:27:16 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *
@@ -24,6 +24,11 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.17  1999/07/22 12:27:16  tsjensen
+ *    Added GNU GPL disclaimer
+ *    Renamed parser.h include to lexer.h (same file)
+ *    Added include config.h
+ *
  *    Revision 1.16  1999/07/02 11:54:52  tsjensen
  *    Some minor changes to please compiler
  *    Communication of speed mode to lexer
@@ -99,7 +104,7 @@
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.16 1999/07/02 11:54:52 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.17 1999/07/22 12:27:16 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -355,14 +360,11 @@ static int design_needed (const char *name, const int design_idx)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    if (opt.l)
-        return 1;
-
     if (opt.design_choice_by_user) {
         return !strcasecmp (name, (char *) opt.design);
     }
     else {
-        if (opt.r)
+        if (opt.r || opt.l)
             return 1;
         if (design_idx == 0)
             return 1;
@@ -515,7 +517,7 @@ layout YEND WORD
          *  Check if we need to continue parsing. If not, return.
          *  The condition here must correspond to design_needed().
          */
-        if (!opt.l && (opt.design_choice_by_user || !opt.r)) {
+        if (opt.design_choice_by_user || (!opt.r && !opt.l)) {
             anz_designs = design_idx + 1;
             YYACCEPT;
         }
@@ -685,9 +687,21 @@ block: YSAMPLE '{' STRING '}'
                     designs[design_idx].minwidth = c;
             }
         }
+
+        /*
+         *  Compute height of highest shape in design
+         */
+        for (i=0; i<ANZ_SHAPES; ++i) {
+            if (isempty(designs[design_idx].shape + i))
+                continue;
+            if (designs[design_idx].shape[i].height > designs[design_idx].maxshapeheight)
+                designs[design_idx].maxshapeheight = designs[design_idx].shape[i].height;
+        }
         #ifdef PARSER_DEBUG
             fprintf (stderr, "Minimum box dimensions: width %d height %d\n",
                     designs[design_idx].minwidth, designs[design_idx].minheight);
+            fprintf (stderr, "Maximum shape height: %d\n",
+                    designs[design_idx].maxshapeheight);
         #endif
     }
 
