@@ -1,11 +1,19 @@
 %{
 /*
- *  lexer.l
+ *  File:             lexer.l
+ *  Date created:     March 15, 1999 (Monday, 17:16h)
+ *  Author:           Thomas Jensen
+ *                    tsjensen@stud.informatik.uni-erlangen.de
+ *  Version:          $Id$
+ *  Language:         lex (ANSI C)
+ *  Purpose:          flex lexical analyzer for boxes configuration files
+ *  Remarks:          ---
  *
- *  flex lexical analyzer for boxes configuration files
+ *  Revision History:
  *
- *  Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>
- *  Date created: March 15, 1999 (Monday, 17:16h)
+ *    $Log$
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
 /* #define DEBUG */
@@ -13,6 +21,8 @@
 #include <string.h>
 #include "boxes.h"
 #include "y.tab.h"
+
+#ident "$Id$"
 
 int yylineno = 1;
 
