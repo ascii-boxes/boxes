@@ -2,16 +2,33 @@
 /*
  *  File:             parser.y
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
- *  Author:           Thomas Jensen
+ *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.15 1999/06/30 12:13:47 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.16 1999/07/02 11:54:52 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
- *  Remarks:          ---
+ *
+ *  Remarks: o This program is free software; you can redistribute it and/or
+ *             modify it under the terms of the GNU General Public License as
+ *             published by the Free Software Foundation; either version 2 of
+ *             the License, or (at your option) any later version.
+ *           o This program is distributed in the hope that it will be useful,
+ *             but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *             MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *             GNU General Public License for more details.
+ *           o You should have received a copy of the GNU General Public
+ *             License along with this program; if not, write to the Free
+ *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *             MA 02111-1307  USA
  *
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.16  1999/07/02 11:54:52  tsjensen
+ *    Some minor changes to please compiler
+ *    Communication of speed mode to lexer
+ *    Bugfix: Forgot to check for opt.l before calling YYACCEPT
+ *
  *    Revision 1.15  1999/06/30 12:13:47  tsjensen
  *    Now parsing only those designs which will be needed later on
  *    Checks formerly done in boxes.c now done here (no valid designs etc.)
@@ -71,17 +88,18 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
-#include "parser.h"
+#include "lexer.h"
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.15 1999/06/30 12:13:47 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.16 1999/07/02 11:54:52 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
