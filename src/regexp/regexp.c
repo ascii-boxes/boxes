@@ -26,6 +26,8 @@
 #include <regexp.h>
 #include "regmagic.h"
 
+#ident "$Id"
+
 /*
  * The "internal use only" fields in regexp.h are present to pass info from
  * compile to execute that permits the execute phase to run lots faster on
