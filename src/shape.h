@@ -2,16 +2,31 @@
  *  File:             shape.h
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 13:45h)
- *  Author:           Thomas Jensen
+ *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: shape.h,v 1.1 1999/06/23 12:27:06 tsjensen Exp tsjensen $
+ *  Version:          $Id: shape.h,v 1.2 1999/06/25 18:52:59 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Shape handling and information functions
- *  Remarks:          ---
+ *
+ *  Remarks: o This program is free software; you can redistribute it and/or
+ *             modify it under the terms of the GNU General Public License as
+ *             published by the Free Software Foundation; either version 2 of
+ *             the License, or (at your option) any later version.
+ *           o This program is distributed in the hope that it will be useful,
+ *             but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *             MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *             GNU General Public License for more details.
+ *           o You should have received a copy of the GNU General Public
+ *             License along with this program; if not, write to the Free
+ *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *             MA 02111-1307  USA
  *
  *  Revision History:
  *
  *    $Log: shape.h,v $
+ *    Revision 1.2  1999/06/25 18:52:59  tsjensen
+ *    Added empty_side() prototype
+ *
  *    Revision 1.1  1999/06/23 12:27:06  tsjensen
  *    Initial revision
  *
@@ -53,17 +68,7 @@ typedef struct {
 
 
 
-int iscorner (const shape_t s);
-
-shape_t *on_side (const shape_t s, const int idx);
-
 int isempty (const sentry_t *shape);
-
-int shapecmp (const sentry_t *shape1, const sentry_t *shape2);
-
-shape_t *both_on_side (const shape_t shape1, const shape_t shape2);
-
-int shape_distance (const shape_t s1, const shape_t s2);
 
 size_t highest (const sentry_t *sarr, const int n, ...);
 size_t widest (const sentry_t *sarr, const int n, ...);
