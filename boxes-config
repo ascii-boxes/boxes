@@ -3,7 +3,7 @@
 #   Date created:     March 17, 1999 (Wednesday, 17:02h)
 #   Author:           Thomas Jensen
 #                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id: boxes-config,v 1.9 1999/07/12 18:34:14 tsjensen Exp tsjensen $
+#   Version:          $Id: boxes-config,v 1.10 1999/07/20 18:54:10 tsjensen Exp tsjensen $
 #   Format:           ASCII Text
 #   World Wide Web:   http://home.pages.de/~jensen/boxes/
 #   Purpose:          Example configuration file for the boxes program
@@ -11,6 +11,9 @@
 #   Revision History:
 #
 #     $Log: boxes-config,v $
+#     Revision 1.10  1999/07/20 18:54:10  tsjensen
+#     Completely revised code of "tjc" design
+#
 #     Revision 1.9  1999/07/12 18:34:14  tsjensen
 #     Added "headline" design to show useful example of regexp backreferences
 #     Fixed small bug in sample block of "stark2" design
@@ -135,8 +138,8 @@ END parchment
 
 BOX columns
 
-revision "1.0"
-revdate  "March 17, 1999 (Wednesday, 15:27h)"
+revision "1.1"
+revdate  "July 20, 1999 (Tuesday, 21:06h)"
 created  "March 17, 1999 (Wednesday, 15:27h)"
 
 sample {
@@ -150,19 +153,24 @@ sample {
 }
 
 shapes {
-    nw  (" __^__ ", "( ___ )")
-    nnw (" ","-")
-    ne  (" __^__ ", "( ___ )")
-    e   (" | / | ")
-    w   (" | \\ | ")
-    wsw (" |___| ")
-    ese (" |___| ")
-    sw  ("(_____)")
+    nw  (" __^__", "( ___ ") nnw (" ",")")
+    n   (" ","-")
+    nne (" ","(") ne  ("__^__ ", " ___ )")
+
+    w   (" | / |")
+    wsw (" |___|")
+
+    e   ("| \\ | ")
+    ese ("|___| ")
+
+    sw  ("(_____") ssw (")")
     s   ("-")
-    se  ("(_____)")
+    sse ("(") se  ("_____)")
 }
 
-elastic (nnw, e, w, s)
+elastic (n, e, w, s)
+
+padding { horiz 1 }
 
 END columns
 
