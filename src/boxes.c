@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.27 1999/07/21 16:53:17 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.28 1999/07/23 16:15:48 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -48,6 +48,9 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.28  1999/07/23 16:15:48  tsjensen
+ *    Added quickinfo mode to list_styles(). Called with -l and -d together.
+ *
  *    Revision 1.27  1999/07/21 16:53:17  tsjensen
  *    Bugfix: Empty box sides were still counted when -s was specified (so
  *    -s x5 would get you only three lines).
@@ -203,7 +206,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.27 1999/07/21 16:53:17 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.28 1999/07/23 16:15:48 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
@@ -901,6 +904,7 @@ static int list_styles()
 
     else {
         design_t **list;                 /* temp list for sorting */
+        char buf[42];
 
         list = (design_t **) calloc (design_idx+1, sizeof(design_t *));
         if (list == NULL) {
@@ -912,9 +916,13 @@ static int list_styles()
             list[i] = &(designs[i]);
         qsort (list, design_idx+1, sizeof(design_t *), style_sort);
 
-        fprintf (opt.outfile, "Available Styles In \"%s\":\n", yyfilename);
-        fprintf (opt.outfile, "-----------------------");
-        for (i=strlen(yyfilename); i>0; --i)
+        sprintf (buf, "%d", anz_designs);
+
+        fprintf (opt.outfile, "%d Available Style%s in \"%s\":\n",
+                anz_designs, anz_designs==1?"":"s", yyfilename);
+        fprintf (opt.outfile, "-----------------------%s",
+                anz_designs==1? "": "-");
+        for (i=strlen(yyfilename)+strlen(buf); i>0; --i)
             fprintf (opt.outfile, "-");
         fprintf (opt.outfile, "\n\n");
         for (i=0; i<anz_designs; ++i)
