@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: generate.c,v 1.3 1999/06/25 18:42:50 tsjensen Exp tsjensen $
+ *  Version:          $Id: generate.c,v 1.4 1999/07/21 16:50:48 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box generation, i.e. the drawing of boxes
@@ -25,6 +25,12 @@
  *  Revision History:
  *
  *    $Log: generate.c,v $
+ *    Revision 1.4  1999/07/21 16:50:48  tsjensen
+ *    Added GNU GPL disclaimer
+ *    Bugfix: When doing the line justification in output_box(), the padding
+ *    was counted as part of the modifyable inner part of the box instead of
+ *    the fixed box itself, which resulted in strange bugs (tricky one).
+ *
  *    Revision 1.3  1999/06/25 18:42:50  tsjensen
  *    Added justify_line() function for alignment of lines inside the text block
  *    Cleaned up hfill calculation in output_box()
@@ -49,7 +55,7 @@
 #include "generate.h"
 
 static const char rcsid_generate_c[] =
-    "$Id: generate.c,v 1.3 1999/06/25 18:42:50 tsjensen Exp tsjensen $";
+    "$Id: generate.c,v 1.4 1999/07/21 16:50:48 tsjensen Exp tsjensen $";
 
 
 
@@ -691,13 +697,13 @@ err:
 
 
 
-static int justify_line (line_t *line, const size_t topwidth, const size_t hpl)
+static int justify_line (line_t *line, const size_t topwidth, const int skew)
 /*
  *  Justify input line according to specified justification
  *
  *     line      line to justify
  *     topwidth  width of top box part
- *     hpl       number of spaces between west box part and text block
+ *     skew      difference in spaces right/left of text block (hpr-hpl)
  *
  *  line is assumed to be already free of trailing whitespace.
  *
@@ -730,15 +736,9 @@ static int justify_line (line_t *line, const size_t topwidth, const size_t hpl)
             break;
 
         case 'c':
-            if (opt.halign == 'c') {
-                if (hpl <= ((topwidth - newlen) / 2))
-                    shift = (topwidth - newlen) / 2 - hpl;
-                else
-                    shift = 0;
-            }
-            else {
-                shift = (input.maxline - newlen) / 2;
-            }
+            shift = (topwidth - newlen) / 2;
+            if ((topwidth - newlen) % 2 && skew == 1)
+                ++shift;
             newtext = (char *) calloc (shift + newlen + 1, sizeof(char));
             if (newtext == NULL) {
                 perror (PROJECT);
@@ -809,6 +809,10 @@ static int justify_line (line_t *line, const size_t topwidth, const size_t hpl)
 
 int output_box (const sentry_t *thebox)
 /*
+ *  Generate final output using the previously generated box parts.
+ *
+ *    thebox    Array of four shapes which contain the previously generated
+ *              box parts in the following order: BTOP, BRIG, BBOT, BLEF
  *
  *  RETURNS:  == 0  if successful
  *            != 0  on error
@@ -986,7 +990,12 @@ int output_box (const sentry_t *thebox)
                     opt.design->padding[BRIG]: hpr;
                 refwidth -= (int) hpl > opt.design->padding[BLEF]?
                     opt.design->padding[BLEF]: hpl;
-                rc = justify_line (input.lines+ti, refwidth, hpl);
+                #ifdef DEBUG
+                    fprintf (stderr, "justify_line ({\"%s\",%d}, %d, %d);\n",
+                            input.lines[ti].text, input.lines[ti].len,
+                            refwidth, hpr-hpl);
+                #endif
+                rc = justify_line (input.lines+ti, refwidth, hpr-hpl);
                 if (rc)
                     return rc;
                 r = input.maxline - input.lines[ti].len;
