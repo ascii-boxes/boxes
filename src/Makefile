@@ -1,18 +1,43 @@
 #
-#   File:        Makefile
-#   Creation:    March 18, 1999 (Thursday, 15:10h)
-#   Author:      Thomas Jensen
-#                tsjensen@stud.informatik.uni-erlangen.de
-#   Version:     $Id: Makefile,v 1.10 1999/07/02 11:50:35 tsjensen Exp tsjensen $
-#   Format:      GNU make
-#   Web Site:    http://home.pages.de/~jensen/boxes/
-#   Platforms:   sparc/Solaris 2.6
-#   Purpose:     Makefile for boxes, the box drawing program
-#   Remarks:     ---
+#   File:       Makefile
+#   Creation:   March 18, 1999 (Thursday, 15:10h)
+#   Author:     Copyright (C) 1999 Thomas Jensen
+#               tsjensen@stud.informatik.uni-erlangen.de
+#   Version:    $Id: Makefile,v 1.11 1999/07/12 18:28:53 tsjensen Exp tsjensen $
+#   Format:     GNU make
+#   Web Site:   http://home.pages.de/~jensen/boxes/
+#   Platforms:  sparc/Solaris 2.6 and others
+#   Purpose:    Makefile for boxes, the box drawing program
+# 
+#   Remarks:  o This program is free software; you can redistribute it and/or
+#               modify it under the terms of the GNU General Public License as
+#               published by the Free Software Foundation; either version 2 of
+#               the License, or (at your option) any later version.
+#             o This program is distributed in the hope that it will be useful,
+#               but WITHOUT ANY WARRANTY; without even the implied warranty of
+#               MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#               GNU General Public License for more details.
+#             o You should have received a copy of the GNU General Public
+#               License along with this program; if not, write to the Free
+#               Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+#               MA 02111-1307  USA
 #
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.11  1999/07/12 18:28:53  tsjensen
+#     Removed --yacc option from bison call
+#     Added logpage target to generate the chronologically sorted global change
+#     log in HTML format. This requires a Perl script (create_changelog.pl).
+#     Added config.h to dependencies and stuff
+#     Removed special targets for yacc and lex files. Thanks to Andreas Heiduk,
+#     it is now possible to compile all files with -W -Wall and no extra
+#     defines.
+#     Moved regexp library to a subdirectory regexp
+#     Some modifications on the source file macros which now differentiate
+#     between files which are listed in the HTML change log and files which
+#     aren't.
+#
 #     Revision 1.10  1999/07/02 11:50:35  tsjensen
 #     Added parser.h header file for lexer-parser communication
 #     Moved from yacc to GNU "bison --yacc"
@@ -68,7 +93,7 @@ CC       = gcc
 CFLAGS   = -ansi -I. -Iregexp $(CFLAGS_ADDTL)
 LDFLAGS  = -Lregexp
 
-SNAPFILE = boxes-SNAP-`date +%Y%m%d`
+SNAPFILE = boxes-SNAP-$(shell date +%Y%m%d)
 CLOGFILE = $(HOME)/d/public_html/software/boxes/changelogs.html
 
 GENSRC   = parser.c parser.h lex.yy.c
@@ -117,7 +142,7 @@ parser.o: parser.c parser.h tools.h shape.h lexer.h config.h
 .c.o:
 	$(CC) $(CFLAGS) -Wall -W -c $<
 
-snap: COPYING $(ALLSRC) Makefile boxes-config
+snap: COPYING Makefile boxes-config $(ALLSRC)
 	mkdir $(SNAPFILE)
 	cp $(ALLSRC) Makefile $(SNAPFILE)
 	gtar cfvz $(SNAPFILE).tar.gz $(SNAPFILE)/*
