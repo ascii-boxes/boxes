@@ -4,14 +4,19 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id$
+ *  Version:          $Id: lexer.l,v 1.2 1999/03/30 09:42:51 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *  Remarks:          ---
  *
  *  Revision History:
  *
- *    $Log$
+ *    $Log: lexer.l,v $
+ *    Revision 1.2  1999/03/30 09:42:51  tsjensen
+ *    Added rcs keywords and standard file header.
+ *
+ *    Revision 1.1  1999/03/18 15:09:48  tsjensen
+ *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
@@ -22,7 +27,7 @@
 #include "boxes.h"
 #include "y.tab.h"
 
-#ident "$Id$"
+#ident "$Id: lexer.l,v 1.2 1999/03/30 09:42:51 tsjensen Exp tsjensen $"
 
 int yylineno = 1;
 
@@ -39,13 +44,6 @@ int yylineno = 1;
 <SAMPLE1,SHAPES,OFFSETS,ELASTIC,INITIAL>[\r\t ]+ /* ignore whitespace */
 
 <SAMPLE1,SHAPES,OFFSETS,ELASTIC,INITIAL>\n yylineno++;
-
-#[^#].*$ {
-    /* ignore comments */
-    #ifdef DEBUG
-        fprintf (stderr, "\nCOMMENT: %s", yytext+1);
-    #endif
-}
 
 \"[^"\n]*$ {
     yyerror ("Unterminated String at %s", yytext);
@@ -174,6 +172,13 @@ Shapes {
     return YSHAPES;
 }
 
+Replace {
+    #ifdef DEBUG
+        fprintf (stderr, "\nYREPLACE: %s", yytext);
+    #endif
+    return YREPLACE;
+}
+
 <OFFSETS>nw-nnw { yylval.offset = NW_NNW; return OFFSET; }
 <OFFSETS>nnw-n  { yylval.offset = NNW_N;  return OFFSET; }
 <OFFSETS>n-nne  { yylval.offset = N_NNE;  return OFFSET; }
@@ -224,9 +229,9 @@ Shapes {
     return yytext[0];
 }
 
-BOX|revision|author|created|revdate|END {
+BOX|revision|author|created|indent|revdate|END {
     /*
-     *  general key words followed by a string
+     *  general key words
      */
     #ifdef DEBUG
         fprintf (stderr, "\nKEYWORD: %s", yytext);
@@ -256,6 +261,13 @@ BOX|revision|author|created|revdate|END {
     #endif
     yylval.num = atoi (yytext);
     return NUMBER;
+}
+
+#.*$ {
+    /* ignore comments */
+    #ifdef DEBUG
+        fprintf (stderr, "\nCOMMENT: %s", yytext+1);
+    #endif
 }
 
 . {
