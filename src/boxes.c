@@ -1,39 +1,56 @@
 /*
  *  File:             boxes.c
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
- *  Author:           Thomas Jensen
+ *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.24 1999/06/30 12:37:25 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.25 1999/07/12 18:16:36 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Filter to draw boxes around input text (and remove it).
  *                    Intended for use with vim(1).
  *
- *  Remarks:        - This version is leaking a small bit of memory. The sizes
- *                    of the leaks do not depend on the number of lines
- *                    processed, so the leaks don't matter as long as this
- *                    program is executed as a single process.
- *                  - The decision to number box shapes in clockwise order was
- *                    a major design mistake. Treatment of box parts of the
- *                    same alignment (N-S and E-W) is usually combined in one
- *                    function, which must now deal with the numbering being
- *                    reversed all the time. This is nasty, but changing the
- *                    shape order would pretty much mean a total rewrite of
- *                    the code, so we'll have to live with it. :-(
- *                  - All shapes defined in a box design must be used in any
- *                    box of that design at least once. In other words, there
- *                    must not be a shape which is defined in the config file
- *                    but cannot be found in an actual box of that design.
- *                    This sort of limits how small your boxes can get.
- *                    However, in practice it is not a problem, because boxes
- *                    which must be small usually consist of small shapes
- *                    which can be packed pretty tightly anyway. And again,
- *                    changing this would pretty much mean a total rewrite.
+ *  Remarks: o This program is free software; you can redistribute it
+ *             and/or modify it under the terms of the GNU General Public
+ *             License as published by the Free Software Foundation; either
+ *             version 2 of the License, or (at your option) any later
+ *             version.
+ *           o This program is distributed in the hope that it will be
+ *             useful, but WITHOUT ANY WARRANTY; without even the implied
+ *             warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *             PURPOSE. See the GNU General Public License for more details.
+ *           o You should have received a copy of the GNU General Public
+ *             License along with this program; if not, write to the Free
+ *             Software Foundation, Inc., 59 Temple Place, Suite 330,
+ *             Boston, MA  02111-1307  USA
+ *
+ *           - This version is leaking a small bit of memory. The sizes of
+ *             the leaks do not depend on the number of lines processed, so
+ *             the leaks don't matter as long as this program is executed as
+ *             a single process.
+ *           - The decision to number box shapes in clockwise order was a
+ *             major design mistake. Treatment of box parts of the same
+ *             alignment (N-S and E-W) is usually combined in one function,
+ *             which must now deal with the numbering being reversed all the
+ *             time. This is nasty, but changing the shape order would
+ *             pretty much mean a total rewrite of the code, so we'll have
+ *             to live with it. :-(
+ *           - All shapes defined in a box design must be used in any box of
+ *             that design at least once. In other words, there must not be
+ *             a shape which is defined in the config file but cannot be
+ *             found in an actual box of that design. This sort of limits
+ *             how small your boxes can get. However, in practice it is not
+ *             a problem, because boxes which must be small usually consist
+ *             of small shapes which can be packed pretty tightly anyway.
+ *             And again, changing this would pretty much mean a total
+ *             rewrite.
  *
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.25  1999/07/12 18:16:36  tsjensen
+ *    Added include "config.h" to top of file
+ *
  *    Revision 1.24  1999/06/30 12:37:25  tsjensen
  *    Added [lcr] "shorthand" to -a option
  *
@@ -176,7 +193,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.24 1999/06/30 12:37:25 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.25 1999/07/12 18:16:36 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
@@ -220,6 +237,7 @@ static void usage (FILE *st)
     fprintf (st, "        -f file  use only file as configuration file\n");
     fprintf (st, "        -h       print usage information\n");
     fprintf (st, "        -i mode  indentation mode\n");
+    fprintf (st, "        -k bool  kill leading/trailing blank lines on removal or not\n");
     fprintf (st, "        -l       list available box designs w/ samples\n");
     fprintf (st, "        -p fmt   padding [default: design-dependent]\n");
     fprintf (st, "        -r       remove box from input\n");
@@ -257,15 +275,16 @@ static int process_commandline (int argc, char *argv[])
      */
     memset (&opt, 0, sizeof(opt_t));
     opt.tabstop = DEF_TABSTOP;
-    yyin = stdin;
+    opt.killblank = -1;
     for (idummy=0; idummy<ANZ_SIDES; ++idummy)
         opt.padding[idummy] = -1;
+    yyin = stdin;
 
     /*
      *  Parse Command Line
      */
     do {
-        oc = getopt (argc, argv, "a:d:f:hi:lp:rs:t:v");
+        oc = getopt (argc, argv, "a:d:f:hi:k:lp:rs:t:v");
 
         switch (oc) {
 
@@ -393,6 +412,20 @@ static int process_commandline (int argc, char *argv[])
                     opt.indentmode = 'n';
                 else {
                     fprintf (stderr, "%s: invalid indentation mode\n", PROJECT);
+                    return 1;
+                }
+                break;
+
+            /*
+             *  Kill blank lines or not [default: design-dependent]
+             */
+            case 'k':
+                if (strisyes (optarg))
+                    opt.killblank = 1;
+                else if (strisno (optarg))
+                    opt.killblank = 0;
+                else {
+                    fprintf (stderr, "%s: -k: invalid parameter\n", PROJECT);
                     return 1;
                 }
                 break;
@@ -650,7 +683,7 @@ static int process_commandline (int argc, char *argv[])
         }
     }
 
-    #ifdef DEBUG
+    #if defined(DEBUG) || 0
         fprintf (stderr, "Command line option settings (excerpt):\n");
         fprintf (stderr, "- Padding: l%d o%d r%d u%d\n", opt.padding[BLEF],
                 opt.padding[BTOP], opt.padding[BRIG], opt.padding[BBOT]);
@@ -663,6 +696,7 @@ static int process_commandline (int argc, char *argv[])
                 opt.indentmode? opt.indentmode: '?');
         fprintf (stderr, "- Line justification: \'%c\'\n",
                 opt.justify? opt.justify: '?');
+        fprintf (stderr, "- Kill blank lines: %d\n", opt.killblank);
     #endif
 
     return 0;
@@ -908,14 +942,6 @@ static int read_all_input()
     }
 
     /*
-     *  Apply regular expression substitutions
-     */
-    if (opt.r == 0) {
-        if (apply_substitutions(0) != 0)
-            return 1;
-    }
-
-    /*
      *  Remove indentation, unless we want to preserve it (when removing
      *  a box or if the user wants to retain it inside the box)
      */
@@ -933,6 +959,14 @@ static int read_all_input()
     }
     else {
         input.indent = 0;                /* seems like blank lines only */
+    }
+
+    /*
+     *  Apply regular expression substitutions
+     */
+    if (opt.r == 0) {
+        if (apply_substitutions(0) != 0)
+            return 1;
     }
 
 #if 0
@@ -1077,6 +1111,13 @@ int main (int argc, char *argv[])
         #ifdef DEBUG
             fprintf (stderr, "Removing Box ...\n");
         #endif
+        if (opt.killblank == -1) {
+            if (empty_side (opt.design->shape, BTOP)
+                    && empty_side (opt.design->shape, BBOT))
+                opt.killblank = 0;
+            else
+                opt.killblank = 1;
+        }
         rc = remove_box();
         if (rc)
             exit (EXIT_FAILURE);
