@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.13 1999/06/28 12:15:47 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.14 1999/06/28 18:32:51 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,14 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.14  1999/06/28 18:32:51  tsjensen
+ *    Unified appearance of error messages, which are now all based on yyerror()
+ *    Eliminated duplicate code by introducing intermediate rules
+ *    New tokens YTO, YWITH, and YRXPFLAG to reduce strcasecmp() usage
+ *    New token YUNREC for integration of lexer into error handling
+ *    Some code restructuring and rule renaming for better consistency
+ *    Added out-of-memory-checks to many strdup()s and such
+ *
  *    Revision 1.13  1999/06/28 12:15:47  tsjensen
  *    Added error handling. Now skips to next design on error.
  *    Replaced DEBUG macro with PARSER_DEBUG, which is now activated in boxes.h
@@ -68,11 +76,12 @@
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.13 1999/06/28 12:15:47 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.14 1999/06/28 18:32:51 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
 static int time_for_se_check = 0;
+static int speeding = 0;
 
 
 
@@ -311,6 +320,31 @@ static void recover()
 }
 
 
+
+static int design_needed (const char *name, const int design_idx)
+/*
+ *  Return true if design of name name will be needed later on
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    if (opt.l)
+        return 1;
+
+    if (opt.design_choice_by_user) {
+        return !strcasecmp (name, (char *) opt.design);
+    }
+    else {
+        if (opt.r)
+            return 1;
+        if (design_idx == 0)
+            return 1;
+    }
+
+    return 0;
+}
+
+
 %}
 
 
@@ -333,7 +367,7 @@ static void recover()
 
 %type <sentry> shape_def
 %type <sentry> shape_lines
-%type <c> rflag;
+%type <c> rflag
 
 %start first_rule
 
@@ -363,7 +397,13 @@ config_file
         if (design_idx == 0) {
             BFREE (designs);
             anz_designs = 0;
-            yyerror ("no valid designs found");
+            if (opt.design_choice_by_user) {
+                fprintf (stderr, "%s: unknown box design -- %s\n",
+                        PROJECT, (char *) opt.design);
+            }
+            else {
+                yyerror ("no valid designs found");
+            }
             YYABORT;
         }
 
@@ -384,13 +424,24 @@ config_file: config_file design_or_error | design_or_error ;
 
 design_or_error: design | error
     {
-        recover();
-        yyerror ("skipping to next design");
+        if (speeding)
+            speeding = 0;
+        else {
+            recover();
+            yyerror ("skipping to next design");
+        }
     }
 ;
     
 
-design: YBOX WORD layout YEND WORD
+design: YBOX WORD
+    {
+        if (!design_needed ($2, design_idx)) {
+            speeding = 1;
+            YYERROR;
+        }
+    }
+layout YEND WORD
     {
         design_t *tmp;
         int i;
@@ -400,7 +451,7 @@ design: YBOX WORD layout YEND WORD
             fprintf (stderr, "--------- ADDING DESIGN \"%s\".\n", $2);
         #endif
 
-        if (strcasecmp ($2, $5)) {
+        if (strcasecmp ($2, $6)) {
             yyerror ("box design name differs at BOX and END");
             YYERROR;
         }
@@ -433,7 +484,19 @@ design: YBOX WORD layout YEND WORD
         }
         pflicht = 0;
         time_for_se_check = 0;
-        
+
+        /*
+         *  Check if we need to continue parsing. If not, return.
+         *  The condition here must correspond to design_needed().
+         */
+        if (opt.design_choice_by_user || !opt.r) {
+            anz_designs = design_idx + 1;
+            YYACCEPT;
+        }
+
+        /*
+         *  Allocate space for next design
+         */
         ++design_idx;
         tmp = (design_t *) realloc (designs, (design_idx+1)*sizeof(design_t));
         if (tmp == NULL) {
