@@ -1,14 +1,24 @@
 %{
 /*
- *  parser.y
+ *  File:             parser.y
+ *  Date created:     March 16, 1999 (Tuesday, 17:17h)
+ *  Author:           Thomas Jensen
+ *                    tsjensen@stud.informatik.uni-erlangen.de
+ *  Version:          $Id$
+ *  Language:         yacc (ANSI C)
+ *  Purpose:          Yacc parser for boxes configuration files
+ *  Remarks:          ---
  *
- *  yacc parser for boxes configuration files
+ *  Revision History:
  *
- *  Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>
- *  Date created: March 16, 1999 (Tuesday, 17:17h)
+ *    $Log$
+ *    Revision 1.1  1999/03/18 15:10:06  tsjensen
+ *    Initial revision
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-#define DEBUG
+/* #define DEBUG */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,23 +26,193 @@
 #include "boxes.h"
 
 
-static int pflicht = 0;
-static int time_for_corner_check = 0;
+static const char rcsid_parser_y[] =
+    "$Id$";
 
-int corner_ambiguity()
+
+static int pflicht = 0;
+static int time_for_se_check = 0;
+
+
+
+shape_t corner_ambiguity()
 /*
  *  Checks for ambiguity in corner specification using elastic and shape
  *  data. It must be clear which shape to use for each corner of the box.
  *
+ *  A corner specification is ambiguous if the distance between the corner
+ *  and the nearest specified shape in horizontal and vertical direction is
+ *  equal and both shapes have the same elasticity.
+ *
+ *  RETURNS:  ANZ_SHAPES   no ambiguity
+ *            a corner     spec is ambiguous
+ *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    /* TODO */
+    int hdist, vdist;                    /* distances to corners */
+    shape_t hcand, vcand;                /* candidate shapes */
+    int c;
 
-    return 0;                            /* no ambiguity */
+    for (c=0; c<ANZ_CORNERS; ++c) {
+
+        hdist = vdist = 0;
+        hcand = vcand = 0;
+
+        switch (corners[c])
+        {
+            case NW:
+                if (designs[design_idx].shape[NW].chars == NULL) {
+                    if      (designs[design_idx].shape[NNW].chars) { hdist = 1; hcand = NNW; }
+                    else if (designs[design_idx].shape[N].chars)   { hdist = 2; hcand = N;   }
+                    else if (designs[design_idx].shape[NNE].chars) { hdist = 3; hcand = NNE; }
+                    else if (designs[design_idx].shape[NE].chars)  { hdist = 4; hcand = NE;  }
+                    if      (designs[design_idx].shape[WNW].chars) { vdist = 1; vcand = WNW; }
+                    else if (designs[design_idx].shape[W].chars)   { vdist = 2; vcand = W;   }
+                    else if (designs[design_idx].shape[WSW].chars) { vdist = 3; vcand = WSW; }
+                    else if (designs[design_idx].shape[SW].chars)  { vdist = 4; vcand = SW;  }
+                }
+                else
+                    continue;
+                break;
+
+            case NE:
+                if (designs[design_idx].shape[NE].chars == NULL) {
+                    if      (designs[design_idx].shape[NNE].chars) { hdist = 1; hcand = NNE; }
+                    else if (designs[design_idx].shape[N].chars)   { hdist = 2; hcand = N;   }
+                    else if (designs[design_idx].shape[NNW].chars) { hdist = 3; hcand = NNW; }
+                    else if (designs[design_idx].shape[NW].chars)  { hdist = 4; hcand = NW;  }
+                    if      (designs[design_idx].shape[ENE].chars) { vdist = 1; vcand = ENE; }
+                    else if (designs[design_idx].shape[E].chars)   { vdist = 2; vcand = E;   }
+                    else if (designs[design_idx].shape[ESE].chars) { vdist = 3; vcand = ESE; }
+                    else if (designs[design_idx].shape[SE].chars)  { vdist = 4; vcand = SE;  }
+                }
+                else
+                    continue;
+                break;
+
+            case SE:
+                if (designs[design_idx].shape[SE].chars == NULL) {
+                    if      (designs[design_idx].shape[SSE].chars) { hdist = 1; hcand = SSE; }
+                    else if (designs[design_idx].shape[S].chars)   { hdist = 2; hcand = S;   }
+                    else if (designs[design_idx].shape[SSW].chars) { hdist = 3; hcand = SSW; }
+                    else if (designs[design_idx].shape[SW].chars)  { hdist = 4; hcand = SW;  }
+                    if      (designs[design_idx].shape[ESE].chars) { vdist = 1; vcand = ESE; }
+                    else if (designs[design_idx].shape[E].chars)   { vdist = 2; vcand = E;   }
+                    else if (designs[design_idx].shape[ENE].chars) { vdist = 3; vcand = ENE; }
+                    else if (designs[design_idx].shape[NE].chars)  { vdist = 4; vcand = NE;  }
+                }
+                else
+                    continue;
+                break;
+
+            case SW:
+                if (designs[design_idx].shape[SW].chars == NULL) {
+                    if      (designs[design_idx].shape[SSW].chars) { hdist = 1; hcand = SSW; }
+                    else if (designs[design_idx].shape[S].chars)   { hdist = 2; hcand = S;   }
+                    else if (designs[design_idx].shape[SSE].chars) { hdist = 3; hcand = SSE; }
+                    else if (designs[design_idx].shape[SE].chars)  { hdist = 4; hcand = SE;  }
+                    if      (designs[design_idx].shape[WSW].chars) { vdist = 1; vcand = WSW; }
+                    else if (designs[design_idx].shape[W].chars)   { vdist = 2; vcand = W;   }
+                    else if (designs[design_idx].shape[WNW].chars) { vdist = 3; vcand = WNW; }
+                    else if (designs[design_idx].shape[NW].chars)  { vdist = 4; vcand = NW;  }
+                }
+                else
+                    continue;
+                break;
+
+            default:
+                fprintf (stderr, "%s: internal error. Sorry.\n", PROJECT);
+                return corners[c];
+        }
+
+        if ((hdist == vdist) &&
+         designs[design_idx].shape[hcand].elastic ==
+         designs[design_idx].shape[vcand].elastic)
+            return corners[c];
+    }
+
+    return (shape_t) ANZ_SHAPES;         /* no ambiguity */
+}
+
+
+
+shape_t non_existent_elastics()
+{
+    shape_t i;
+
+    for (i=0; i<ANZ_SHAPES; ++i) {
+        if (designs[design_idx].shape[i].elastic
+         && (designs[design_idx].shape[i].chars == NULL))
+            return i;
+    }
+
+    return (shape_t) ANZ_SHAPES;         /* all elastic shapes exist */
+}
+
+
+
+int insufficient_elasticity()
+{
+    int i;
+    shape_t s;
+    int ok[4] = {0, 0, 0, 0};            /* N, E, S, W */
+
+    for (s=0; s<ANZ_SHAPES; ++s) {
+        if (designs[design_idx].shape[s].elastic) {
+            switch (s) {
+                case NW: ok[0] = 1; ok[3] = 1; break;
+                case SW: ok[2] = 1; ok[3] = 1; break;
+                case NE: ok[0] = 1; ok[1] = 1; break;
+                case SE: ok[2] = 1; ok[1] = 1; break;
+                case N: case NNE: case NNW: ok[0] = 1; break;
+                case E: case ESE: case ENE: ok[1] = 1; break;
+                case S: case SSE: case SSW: ok[2] = 1; break;
+                case W: case WSW: case WNW: ok[3] = 1; break;
+                default:
+                    yyerror ("Internal parser error");
+                    return 1;
+            }
+        }
+    }
+
+    for (i=0; i<4; ++i) {
+        if (!ok[i]) return 1;
+    }
+
+    return 0;                            /* no problem detected */
+}
+
+
+
+int perform_se_check()
+{
+    shape_t s_rc;
+
+    s_rc = non_existent_elastics();
+    if (s_rc != ANZ_SHAPES) {
+        yyerror ("Shape %s has been specified as elastic but doesn't exist",
+                shape_name[s_rc]);
+        return 1;
+    }
+
+    if (insufficient_elasticity()) {
+        yyerror ("At least one shape per side must be elastic");
+        return 1;
+    }
+
+    s_rc = corner_ambiguity();
+    if (s_rc != ANZ_SHAPES) {
+        yyerror ("Ambiguous Shape/Elastic specification for %s corner",
+                shape_name[s_rc]);
+        return 1;
+    }
+
+    return 0;
 }
 
 %}
+
 
 %union {
     int num;
@@ -84,6 +264,7 @@ design: KEYWORD WORD layout KEYWORD WORD
         
         designs[design_idx].name = (char *) strdup ($2);
         pflicht = 0;
+        time_for_se_check = 0;
         
         ++design_idx;
         tmp = (design_t *) realloc (designs, (design_idx+1)*sizeof(design_t));
@@ -169,64 +350,26 @@ block: YSAMPLE '{' STRING '}'
             yyerror ("Must specify at least one shape per side");
             YYABORT;
         }
+
         ++pflicht;
-        ++time_for_corner_check;
-        if (time_for_corner_check > 1 && corner_ambiguity()) {
-            yyerror ("Ambiguous Shape/Elastic specification for corners");
-            YYABORT;
+        if (++time_for_se_check > 1) {
+            if (perform_se_check() != 0)
+                YYABORT;
         }
     }
 
 | YELASTIC elist
     {
-        int i;
-        int ok[4] = {0, 0, 0, 0};
-
-        /*
-         *  Check that at least one shape per side is elastic
-         */
-        for (i=0; i<designs[design_idx].anz_elastic; ++i) {
-            if (designs[design_idx].elastic[i] == NW
-             || designs[design_idx].elastic[i] == NNW
-             || designs[design_idx].elastic[i] == N
-             || designs[design_idx].elastic[i] == NNE
-             || designs[design_idx].elastic[i] == NE)
-                ++ok[0];
-            if (designs[design_idx].elastic[i] == NE
-             || designs[design_idx].elastic[i] == ENE
-             || designs[design_idx].elastic[i] == E
-             || designs[design_idx].elastic[i] == ESE
-             || designs[design_idx].elastic[i] == SE)
-                ++ok[1];
-            if (designs[design_idx].elastic[i] == SW
-             || designs[design_idx].elastic[i] == SSW
-             || designs[design_idx].elastic[i] == S
-             || designs[design_idx].elastic[i] == SSE
-             || designs[design_idx].elastic[i] == SE)
-                ++ok[2];
-            if (designs[design_idx].elastic[i] == NW
-             || designs[design_idx].elastic[i] == WNW
-             || designs[design_idx].elastic[i] == W
-             || designs[design_idx].elastic[i] == WSW
-             || designs[design_idx].elastic[i] == SW)
-                ++ok[3];
-        }
-        for (i=0; i<4; ++i) {
-            if (!ok[i]) {
-                yyerror ("At least one shape per side must be elastic");
-                YYABORT;
-            }   
-        }
         ++pflicht;
-        ++time_for_corner_check;
-        if (time_for_corner_check > 1 && corner_ambiguity()) {
-            yyerror ("Ambiguous Shape/Elastic specification for corners");
-            YYABORT;
+        if (++time_for_se_check > 1) {
+            if (perform_se_check() != 0)
+                YYABORT;
         }
     }
 
 | YOFFSETS '{' the_offsets '}'
 ;
+
 
 the_shapes: the_shapes SHAPE slist
     {
@@ -237,6 +380,7 @@ the_shapes: the_shapes SHAPE slist
 
         designs[design_idx].shape[$2] = $3;
     }
+
 | SHAPE slist
     {
         #ifdef DEBUG
@@ -247,6 +391,7 @@ the_shapes: the_shapes SHAPE slist
         designs[design_idx].shape[$1] = $2;
     }
 ;
+
 
 the_offsets: the_offsets OFFSET NUMBER
     {
@@ -269,7 +414,9 @@ the_offsets: the_offsets OFFSET NUMBER
     }
 ;
 
+
 elist: '(' elist_entries ')' ;
+
 
 elist_entries: elist_entries ',' SHAPE
     {
@@ -277,29 +424,31 @@ elist_entries: elist_entries ',' SHAPE
             fprintf (stderr, "Marked \'%s\' shape as elastic\n",
                     shape_name[(int)$3]);
         #endif
-        designs[design_idx].elastic[designs[design_idx].anz_elastic] = $3;
-        ++(designs[design_idx].anz_elastic);
+        designs[design_idx].shape[$3].elastic = 1;
     }
+
 | SHAPE
     {
         #ifdef DEBUG
             fprintf (stderr, "Marked \'%s\' shape as elastic\n",
                     shape_name[(int)$1]);
         #endif
-        designs[design_idx].elastic[designs[design_idx].anz_elastic] = $1;
-        ++(designs[design_idx].anz_elastic);
+        designs[design_idx].shape[$1].elastic = 1;
     }
 ;
 
+
 slist: '(' slist_entries ')'
-{
-    $$ = $2;
-}
+    {
+        $$ = $2;
+    }
+
 | '(' ')'
-{
-    $$ = (sentry_t) { NULL, 0, 0 };
-}
+    {
+        $$ = (sentry_t) { NULL, 0, 0, 0 };
+    }
 ;
+
 
 slist_entries: slist_entries ',' STRING
     {
