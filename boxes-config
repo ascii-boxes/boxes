@@ -3,7 +3,7 @@
 #   Date created:     March 17, 1999 (Wednesday, 17:02h)
 #   Author:           Thomas Jensen
 #                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id: boxes-config,v 1.5 1999/06/16 10:52:59 tsjensen Exp tsjensen $
+#   Version:          $Id: boxes-config,v 1.6 1999/06/17 19:03:09 tsjensen Exp tsjensen $
 #   Format:           ASCII Text
 #   World Wide Web:   http://home.pages.de/~jensen/boxes/
 #   Purpose:          Example configuration file for the boxes program
@@ -11,6 +11,10 @@
 #   Revision History:
 #
 #     $Log: boxes-config,v $
+#     Revision 1.6  1999/06/17 19:03:09  tsjensen
+#     Added designs c-cmt, pound-cmt, java-cmt, html-cmt, right, vim-cmt
+#     They have become possible because boxes now checks for empty sides.
+#
 #     Revision 1.5  1999/06/16 10:52:59  tsjensen
 #     Added "reverse" entry for testing, more "reverse" entries needed still
 #     Added "peek" design for C funtion headers
@@ -244,6 +248,10 @@ shapes {
 replace "\\*/" with "*\\/"               # quote closing comment tags
 reverse "\\*\\\\/" to "*/"
 
+padding {
+    horiz 1             # alternatives: all, vert, lef, rig, bottom, top
+}                       # can be combined, e.g. all 3 top 1
+
 elastic (n,e,s,w)
 
 END c
@@ -275,9 +283,44 @@ shapes {
 replace "\\*/" with "*\\/"               # quote closing comment tags
 reverse "\\*\\\\/" to "*/"
 
+Padding { h 1 }
+
 elastic (n,e,s,w)
 
 END c-cmt
+
+
+# ============================================================================
+
+
+BOX c-cmt2
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "June 17, 1999 (Thursday, 19:59h)"
+created "June 17, 1999 (Thursday, 19:59h)"
+
+sample {
+    /*
+     *  regular C language
+     *  comments
+     */
+}
+
+shapes {
+    nw ("/*")           n (" ") ne (" ")
+     w (" *")                    e (" ")
+    sw (" *") ssw ("/") s (" ") se (" ")
+}
+
+padding { left 2 }
+
+replace "\\*/" with "*\\/"               # quote closing comment tags
+reverse "\\*\\\\/" to "*/"
+
+elastic (n,e,s,w)
+
+END c-cmt2
 
 
 # ============================================================================
@@ -749,6 +792,10 @@ shapes {
 
 replace "%}" with "%\\}"
 
+padding {
+    horizontal 1
+}
+
 elastic (n, e, s, w)
 
 END netdata
@@ -1201,7 +1248,7 @@ sample {
     | C function headers?                |
     |                                    |
     |                                    |
-    +------------------------------------*/
+    +-----------------------------------*/
 }
 
 shapes {
@@ -1215,7 +1262,8 @@ shapes {
     w   (" |")
     sw  (" +")
     s   ("-")
-    se  ("+")
+    sse ("*")
+    se  ("/")
 }
 
 replace "\\*/" with "*\\/"               # quote closing comment tags
@@ -1248,6 +1296,8 @@ shapes {
     sw ("  ") s (" ") se (" ")
 }
 
+padding {lef 1}
+
 elastic (n,e,s,w)
 
 END java-cmt
@@ -1274,6 +1324,8 @@ shapes {
      w ("#")          e (" ")
     sw (" ") s (" ") se (" ")
 }
+
+padding { left 1}
 
 elastic (n,e,s,w)
 
@@ -1319,7 +1371,7 @@ created "June 17, 1999 (Thursday, 19:59h)"
 
 sample {
     "
-    "  comments used in the vim editor's config file (.vimrc)
+    " comments used in the vim editor's config file (.vimrc)
     "
 }
 
@@ -1327,6 +1379,10 @@ shapes {
     nw (" ") n (" ") ne (" ")
      w ("\"")          e (" ")
     sw (" ") s (" ") se (" ")
+}
+
+padding {
+    left 1
 }
 
 elastic (n,e,s,w)
@@ -1349,7 +1405,7 @@ sample {
     (I don't like it, but some people work this way):
 
     for (j=0; j<blank_count; ++j)        /*@TJ@*/
-        fprintf (opt.outfile, "\n");     /*@TJ@*/
+        fprintf (opt.outfile, "\\n");     /*@TJ@*/
     blank_count = 0;                     /*@TJ@*/
 }
 
@@ -1358,6 +1414,8 @@ shapes {
      w (" ")          e ("/*@TJ@*/")
     sw (" ") s (" ") se ("        ")
 }
+
+padding { right 4 }
 
 elastic (n,e,s,w)
 
