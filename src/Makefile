@@ -3,7 +3,7 @@
 #   Creation:    March 18, 1999 (Thursday, 15:10h)
 #   Author:      Thomas Jensen
 #                tsjensen@stud.informatik.uni-erlangen.de
-#   Version:     $Id: Makefile,v 1.6 1999/06/04 12:15:37 tsjensen Exp tsjensen $
+#   Version:     $Id: Makefile,v 1.7 1999/06/23 12:27:50 tsjensen Exp tsjensen $
 #   Format:      GNU make
 #   Web Site:    http://home.pages.de/~jensen/boxes/
 #   Platforms:   sparc/Solaris 2.6
@@ -13,6 +13,11 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.7  1999/06/23 12:27:50  tsjensen
+#     Added tools.o and shape.o
+#     Change in snapshot target directory (download)
+#     Added GENSRC, HSSRC, ORIGSRC, ALLSRC, and ALLOBJ macros for more order
+#
 #     Revision 1.6  1999/06/04 12:15:37  tsjensen
 #     Added snap target for automatic snapshot publication
 #
@@ -48,9 +53,9 @@ LDFLAGS = -L. -L/local/GNU/lib
 
 GENSRC  = y.tab.c y.tab.h lex.yy.c
 HSSRC   = regexp.c regexp.h regmagic.h regsub.c
-ORIGSRC = boxes.c boxes.h lexer.l parser.y tools.c tools.h shape.c shape.h
+ORIGSRC = boxes.c boxes.h lexer.l parser.y tools.c tools.h shape.c shape.h generate.c generate.h remove.h remove.c
 ALLSRC  = $(ORIGSRC) $(HSSRC) $(GENSRC)
-ALLOBJ  = y.tab.o lex.yy.o boxes.o shape.o tools.o
+ALLOBJ  = y.tab.o lex.yy.o boxes.o shape.o tools.o generate.o remove.o
 
 boxes: $(ALLOBJ) libregexp.a
 	$(CC) $(LDFLAGS) $(ALLOBJ) -o boxes -lregexp -lfl
@@ -66,22 +71,23 @@ regexp.o: regexp.c regmagic.h regexp.h
 regsub.o: regsub.c regmagic.h regexp.h
 	gcc -traditional -O -I. -c regsub.c
 
-lex.yy.o: lex.yy.c y.tab.h tools.h shape.h
-	$(CC) $(CFLAGS) -DYY_NO_UNPUT -Wall -W -c lex.yy.c
+boxes.o: boxes.c boxes.h regexp.h shape.h tools.h generate.h remove.h
+tools.o: tools.c tools.h boxes.h shape.h
+shape.o: shape.c shape.h boxes.h
+generate.o: generate.c generate.h boxes.h shape.h tools.h
+remove.o: remove.c remove.h boxes.h shape.h tools.h
+
+.c.o:
+	$(CC) $(CFLAGS) -Wall -W -c $<
 
 y.tab.o: y.tab.c y.tab.h tools.h shape.h
-
-boxes.o: boxes.c boxes.h regexp.h shape.h tools.h
-	$(CC) $(CFLAGS) -Wall -W -c boxes.c
-
-tools.o: tools.c tools.h boxes.h
-	$(CC) $(CFLAGS) -Wall -W -c tools.c
-
-shape.o: shape.c shape.h boxes.h
-	$(CC) $(CFLAGS) -Wall -W -c shape.c
+	$(CC) $(CFLAGS) -c y.tab.c
 
 y.tab.c y.tab.h: parser.y boxes.h regexp.h
 	$(YACC) -d parser.y
+
+lex.yy.o: lex.yy.c y.tab.h tools.h shape.h
+	$(CC) $(CFLAGS) -DYY_NO_UNPUT -Wall -W -c lex.yy.c
 
 lex.yy.c: lexer.l boxes.h
 	$(LEX) -i lexer.l
