@@ -3,7 +3,7 @@
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.3 1999/08/21 23:39:01 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.4 1999/08/22 11:43:55 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,9 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.4  1999/08/22 11:43:55  tsjensen
+#     Added comment to guide user to GLOBALCONF definition line
+#
 #     Revision 1.3  1999/08/21 23:39:01  tsjensen
 #     Added GLOBALCONF and BVERSION macros whose values are put into boxes.h and
 #     boxes.1
@@ -44,7 +47,7 @@
 
 # The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/local/share/boxes
-BVERSION   = 1.0
+BVERSION   = 1.0.1
 
 SNAPFILE   = boxes-SNAP-$(shell date +%Y%m%d)
 WEBHOME    = $(HOME)/d/public_html/software/boxes
@@ -52,7 +55,7 @@ CLOGFILE   = $(WEBHOME)/changelogs.html
 
 CL_FILES   = boxes-config
 RCS_FILES  = $(CL_FILES) Makefile doc/boxes.1.in
-ALL_FILES  = COPYING README boxes-config Makefile
+ALL_FILES  = COPYING README README.Win32.txt boxes-config Makefile
 DOC_FILES  = doc/boxes.1 doc/boxes.1.in
 
 
@@ -81,8 +84,8 @@ locsnap: $(ALL_FILES) $(DOC_FILES)
 
 snap: locsnap
 	cp $(SNAPFILE).tar.gz $(WEBHOME)/download/
-	rm -f $(WEBHOME)/download/current-SNAP.tar.gz
-	(cd $(WEBHOME)/download; ln -s $(SNAPFILE).tar.gz current-SNAP.tar.gz)
+	rm -f $(WEBHOME)/download/boxes-SNAP-latest.tar.gz
+	(cd $(WEBHOME)/download; ln -s $(SNAPFILE).tar.gz boxes-SNAP-latest.tar.gz)
 	mv -i $(SNAPFILE).tar.gz archive/
 	chmod 444 archive/$(SNAPFILE).tar.gz
 
