@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: generate.c,v 1.6 1999/08/18 15:37:09 tsjensen Exp tsjensen $
+ *  Version:          $Id: generate.c,v 1.7 1999/08/21 16:04:24 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box generation, i.e. the drawing of boxes
@@ -25,6 +25,10 @@
  *  Revision History:
  *
  *    $Log: generate.c,v $
+ *    Revision 1.7  1999/08/21 16:04:24  tsjensen
+ *    Bugfix: justify_line() still didn't work right. It should now. (This time I
+ *    discovered that indentmode=="text" was confusing it. Arghh!)
+ *
  *    Revision 1.6  1999/08/18 15:37:09  tsjensen
  *    Bugfix: justify_line() still didn't work right. It should now. (Man, I got
  *    a strong sense of déja vu! Weird ...)
@@ -62,7 +66,7 @@
 #include "generate.h"
 
 static const char rcsid_generate_c[] =
-    "$Id: generate.c,v 1.6 1999/08/18 15:37:09 tsjensen Exp tsjensen $";
+    "$Id: generate.c,v 1.7 1999/08/21 16:04:24 tsjensen Exp tsjensen $";
 
 
 
@@ -704,7 +708,7 @@ err:
 
 
 
-static int justify_line (line_t *line, const int skew)
+static int justify_line (line_t *line, int skew)
 /*
  *  Justify input line according to specified justification
  *
