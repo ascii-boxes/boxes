@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.14 1999/06/28 18:32:51 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.15 1999/06/30 12:13:47 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,10 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.15  1999/06/30 12:13:47  tsjensen
+ *    Now parsing only those designs which will be needed later on
+ *    Checks formerly done in boxes.c now done here (no valid designs etc.)
+ *
  *    Revision 1.14  1999/06/28 18:32:51  tsjensen
  *    Unified appearance of error messages, which are now all based on yyerror()
  *    Eliminated duplicate code by introducing intermediate rules
@@ -73,15 +77,20 @@
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
+#include "parser.h"
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.14 1999/06/28 18:32:51 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.15 1999/06/30 12:13:47 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
 static int time_for_se_check = 0;
-static int speeding = 0;
+
+int speeding = 0;                        /* true if we're skipping designs, */
+                                         /* but no error                    */
+int yylex();                             /* defined in lex.yy.c */
+
 
 
 
@@ -424,9 +433,7 @@ config_file: config_file design_or_error | design_or_error ;
 
 design_or_error: design | error
     {
-        if (speeding)
-            speeding = 0;
-        else {
+        if (!speeding) {
             recover();
             yyerror ("skipping to next design");
         }
@@ -438,6 +445,7 @@ design: YBOX WORD
     {
         if (!design_needed ($2, design_idx)) {
             speeding = 1;
+            begin_speedmode();
             YYERROR;
         }
     }
@@ -489,7 +497,7 @@ layout YEND WORD
          *  Check if we need to continue parsing. If not, return.
          *  The condition here must correspond to design_needed().
          */
-        if (opt.design_choice_by_user || !opt.r) {
+        if (!opt.l && (opt.design_choice_by_user || !opt.r)) {
             anz_designs = design_idx + 1;
             YYACCEPT;
         }
@@ -801,7 +809,7 @@ shape_def: '(' shape_lines ')'
 
         if (rval.width == 0 || rval.height == 0) {
 
-            int i;
+            size_t i;
 
             for (i=0; i<rval.height; ++i)
                 BFREE (rval.chars[i]);
