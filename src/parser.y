@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.17 1999/07/22 12:27:16 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.18 1999/07/23 16:14:17 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.18  1999/07/23 16:14:17  tsjensen
+ *    Added computation of height of highest shape in design (maxshapeheight)
+ *    Options -l and -d together now call quickinfo mode -> parse only 1 design
+ *
  *    Revision 1.17  1999/07/22 12:27:16  tsjensen
  *    Added GNU GPL disclaimer
  *    Renamed parser.h include to lexer.h (same file)
@@ -104,16 +108,16 @@
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.17 1999/07/22 12:27:16 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.18 1999/07/23 16:14:17 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
 static int time_for_se_check = 0;
+static int anz_shapespec = 0;            /* number of user-specified shapes */
 
 int speeding = 0;                        /* true if we're skipping designs, */
                                          /* but no error                    */
-int yylex();                             /* defined in lex.yy.c */
-
+static int skipping = 0;                 /* used to limit "skipping" msgs */
 
 
 
@@ -190,7 +194,6 @@ static int check_sizes()
 
 static int corner_check()
 /*
- *  Check that all corners are explicitly specified in the config file.
  *  Check that no corners are elastic.
  *
  *  RETURNS:  == 0   no problem detected
@@ -206,11 +209,6 @@ static int corner_check()
     #endif
 
     for (c=0; c<ANZ_CORNERS; ++c) {
-        if (isempty(designs[design_idx].shape+corners[c])) {
-            yyerror ("Missing shape specification for %s corner",
-                    shape_name[corners[c]]);
-            return 1;
-        }
         if (designs[design_idx].shape[corners[c]].elastic) {
             yyerror ("Corners may not be elastic (%s)", shape_name[corners[c]]);
             return 1;
@@ -337,6 +335,7 @@ static void recover()
 {
      pflicht = 0;
      time_for_se_check = 0;
+     anz_shapespec = 0;
 
      /*
       *  Clear current design
@@ -455,7 +454,9 @@ design_or_error: design | error
     {
         if (!speeding) {
             recover();
-            yyerror ("skipping to next design");
+            if (!skipping)
+                yyerror ("skipping to next design");
+            skipping = 1;
         }
     }
 ;
@@ -463,6 +464,7 @@ design_or_error: design | error
 
 design: YBOX WORD
     {
+        skipping = 0;
         if (!design_needed ($2, design_idx)) {
             speeding = 1;
             begin_speedmode();
@@ -512,6 +514,7 @@ layout YEND WORD
         }
         pflicht = 0;
         time_for_se_check = 0;
+        anz_shapespec = 0;
 
         /*
          *  Check if we need to continue parsing. If not, return.
@@ -632,28 +635,95 @@ block: YSAMPLE '{' STRING '}'
 
 | YSHAPES  '{' slist  '}'
     {
-        int i,j;
+        int     i,j;
+        shape_t fshape;                  /* found shape */
+        int     fside;                   /* first side */
+        int     sc;                      /* side counter */
+        int     side;                    /* effective side */
+        int     rc;                      /* received return code */
 
         /*
-         *  Check that at least one shape per side is specified
-         *  (excluding corners)
+         *  At least one shape must be specified
          */
-        if ((isempty (designs[design_idx].shape + NNW)
-          && isempty (designs[design_idx].shape +   N)
-          && isempty (designs[design_idx].shape + NNE))
-         || (isempty (designs[design_idx].shape + ENE)
-          && isempty (designs[design_idx].shape +   E)
-          && isempty (designs[design_idx].shape + ESE))
-         || (isempty (designs[design_idx].shape + SSW)
-          && isempty (designs[design_idx].shape +   S)
-          && isempty (designs[design_idx].shape + SSE))
-         || (isempty (designs[design_idx].shape + WNW)
-          && isempty (designs[design_idx].shape +   W)
-          && isempty (designs[design_idx].shape + WSW)))
-        {
-            yyerror ("must specify at least one shape per side "
-                     "(corners don\'t count as sides)");
+        if (anz_shapespec < 1) {
+            yyerror ("must specify at least one non-empty shape per design");
             YYERROR;
+        }
+
+        /*
+         *  Ensure that all corners have been specified. Generate corners
+         *  as necessary, starting at any side which already includes at
+         *  least one shape in order to ensure correct measurements.
+         */
+        fshape = findshape (designs[design_idx].shape, ANZ_SHAPES);
+        if (fshape == ANZ_SHAPES) {
+            yyerror ("internal error");
+            YYABORT;                        /* never happens ;-) */
+        }
+        fside = on_side (fshape, 0);
+        if (fside == ANZ_SIDES) {
+            yyerror ("internal error");
+            YYABORT;                        /* never happens ;-) */
+        }
+
+        for (sc=0,side=fside; sc<ANZ_SIDES; ++sc,side=(side+1)%ANZ_SIDES) {
+            shape_t   nshape;               /* next shape */
+            sentry_t *c;                    /* corner to be processed */
+            c = designs[design_idx].shape + sides[side][SHAPES_PER_SIDE-1];
+
+            if (isempty(c)) {
+                nshape = findshape (c, SHAPES_PER_SIDE);
+                if (side == BLEF || side == BRIG) {
+                    if (nshape == SHAPES_PER_SIDE)
+                        c->height = 1;
+                    else
+                        c->height = c[nshape].height;
+                    c->width = designs[design_idx].shape[fshape].width;
+                }
+                else {
+                    if (nshape == SHAPES_PER_SIDE)
+                        c->width = 1;
+                    else
+                        c->width = c[nshape].width;
+                    c->height = designs[design_idx].shape[fshape].height;
+                }
+                c->elastic = 0;
+                rc = genshape (c->width, c->height, &(c->chars));
+                if (rc)
+                    YYABORT;
+            }
+
+            fshape = sides[side][SHAPES_PER_SIDE-1];
+        }
+
+        /*
+         *  For all sides whose side shapes have not been defined, generate
+         *  an elastic middle side shape.
+         */
+        for (side=0; side<ANZ_SIDES; ++side) {
+            int found = 0;
+            for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
+                if (isempty (designs[design_idx].shape + sides[side][i]))
+                    continue;
+                else
+                    found = 1;
+            }
+            if (!found) {
+                sentry_t *c = designs[design_idx].shape
+                    + sides[side][SHAPES_PER_SIDE/2];
+                if (side == BLEF || side == BRIG) {
+                    c->width = designs[design_idx].shape[sides[side][0]].width;
+                    c->height = 1;
+                }
+                else {
+                    c->width = 1;
+                    c->height = designs[design_idx].shape[sides[side][0]].height;
+                }
+                c->elastic = 1;
+                rc = genshape (c->width, c->height, &(c->chars));
+                if (rc)
+                    YYABORT;
+            }
         }
 
         if (check_sizes())
@@ -826,6 +896,8 @@ slist_entry: SHAPE shape_def
 
         if (isempty (designs[design_idx].shape + $1)) {
             designs[design_idx].shape[$1] = $2;
+            if (!isdeepempty(&($2)))
+                ++anz_shapespec;
         }
         else {
             yyerror ("duplicate specification for %s shape", shape_name[$1]);
@@ -837,24 +909,11 @@ slist_entry: SHAPE shape_def
 
 shape_def: '(' shape_lines ')'
     {
-        sentry_t rval = $2;
-
-        if (rval.width == 0 || rval.height == 0) {
-
-            size_t i;
-
-            for (i=0; i<rval.height; ++i)
-                BFREE (rval.chars[i]);
-            BFREE (rval.chars);
-
+        if ($2.width == 0 || $2.height == 0) {
             yyerror ("minimum shape dimension is 1x1 - clearing");
-
-            $$ = SENTRY_INITIALIZER;
+            freeshape (&($2));
         }
-        else {
-            $$ = $2;
-            /* memcpy (&($$), &($2), sizeof(sentry_t)); */
-        }
+        $$ = $2;
     }
 
 | '(' ')'
