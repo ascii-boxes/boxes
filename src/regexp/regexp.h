@@ -1,14 +1,14 @@
 /*
  * Definitions etc. for regexp(3) routines.
  *
+ * Version: $Id: regexp.h,v 1.3 1999/04/12 18:16:52 tsjensen Exp tsjensen $
+ *
  * Caveat:  this is V8 regexp(3) [actually, a reimplementation thereof],
  * not the System V one.
  */
 
 #ifndef REGEXP_H
 #define REGEXP_H
-
-#pragma ident "$Id$"
 
 
 #define NSUBEXP  10
