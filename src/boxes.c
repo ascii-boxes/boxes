@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.5 1999/03/31 17:34:21 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.6 1999/04/01 17:26:18 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -14,6 +14,13 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.6  1999/04/01 17:26:18  tsjensen
+ *    ... still programming ...
+ *    Some bug fixes
+ *    Added size option (-s)
+ *    Added Alignment Option (-a)
+ *    It seems actually usable for drawing boxes :-)
+ *
  *    Revision 1.5  1999/03/31 17:34:21  tsjensen
  *    ... still programming ...
  *    (some bug fixes and restructuring)
@@ -43,6 +50,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include "boxes.h"
 
 extern int snprintf (char *, size_t, const char *, ...);        /* stdio.h */
@@ -51,7 +59,7 @@ extern char *optarg;                     /* for getopt() */
 extern int optind, opterr, optopt;       /* for getopt() */
 
 
-#ident "$Id: boxes.c,v 1.5 1999/03/31 17:34:21 tsjensen Exp tsjensen $"
+#ident "$Id: boxes.c,v 1.6 1999/04/01 17:26:18 tsjensen Exp tsjensen $"
 
 extern FILE *yyin;                       /* lex input file */
 
@@ -116,6 +124,8 @@ struct {                                 /* Command line options: */
     long      reqheight;                 /* requested box height (-s) */
     char      valign;                    /* text position inside box */
     char      halign;                    /* ('c', 'l', or 'r')       */
+    FILE     *infile;
+    FILE     *outfile;
 } opt;
 
 
@@ -373,6 +383,7 @@ static int process_commandline (int argc, char *argv[])
     int   idummy;
     char *pdummy;
     int   errfl = 0;                     /* true on error */
+    int   outfile_existed;               /* true if we overwrite a file */
 
     memset (&opt, 0, sizeof(opt));
     opt.tabstop = DEF_TABSTOP;
@@ -568,7 +579,7 @@ static int process_commandline (int argc, char *argv[])
             s = getenv ("HOME");
             if (s) {
                 strncpy (buf, s, PATH_MAX);
-                buf[PATH_MAX-1-7] = '\0';    /* ensure space for /.boxes */
+                buf[PATH_MAX-1-7] = '\0';    /* ensure space for "/.boxes" */
                 strcat (buf, "/.boxes");
                 f = fopen (buf, "r");
                 if (f) {
@@ -584,6 +595,72 @@ static int process_commandline (int argc, char *argv[])
             else {
                 fprintf (stderr, "%s: Environment variable HOME must point to "
                         "the user\'s home directory.\n", PROJECT);
+                return 1;
+            }
+        }
+    }
+
+   /*
+    *  Input and Output Files
+    *
+    *  After any command line options, an input file and an output file may
+    *  be specified (in that order). "-" may be substituted for standard
+    *  input or output. A third file name would be invalid.
+    *  The alogrithm is as follows:
+    *
+    *  If no files are given, use stdin and stdout.
+    *  Else If infile is "-", use stdin for input
+    *       Else open specified file (die if it doesn't work)
+    *       If no output file is given, use stdout for output
+    *       Else If outfile is "-", use stdout for output
+    *            Else open specified file for writing (die if it doesn't work)
+    *            If a third file is given, die.
+    */
+    if (argv[optind] == NULL) {          /* neither infile nor outfile given */
+        opt.infile = stdin;
+        opt.outfile = stdout;
+    }
+
+    else {
+        if (strcmp (argv[optind], "-") == 0) {
+            opt.infile = stdin;          /* use stdin for input */
+        }
+        else {
+            opt.infile = fopen (argv[optind], "r");
+            if (opt.infile == NULL) {
+                fprintf (stderr, "%s: Can\'t open input file -- %s\n", PROJECT,
+                        argv[optind]);
+                return 9;                /* can't read infile */
+            }
+        }
+
+        if (argv[optind+1] == NULL) {
+            opt.outfile = stdout;        /* no outfile given */
+        }
+        else {
+            if (strcmp (argv[optind+1], "-") == 0) {
+                opt.outfile = stdout;    /* use stdout for output */
+            }
+            else {
+                outfile_existed = !access (argv[optind+1], F_OK);
+                opt.outfile = fopen (argv[optind+1], "w");
+                if (opt.outfile == NULL) {
+                    perror (PROJECT);
+                    if (opt.infile != stdin)
+                        fclose (opt.infile);
+                    return 10;
+                }
+            }
+            if (argv[optind+2]) {        /* illegal third file */
+                fprintf (stderr, "%s: illegal parameter -- %s\n",
+                        PROJECT, argv[optind+2]);
+                usage (stderr);
+                if (opt.infile != stdin)
+                    fclose (opt.infile);
+                if (opt.outfile != stdout) {
+                    fclose (opt.outfile);
+                    if (!outfile_existed) unlink (argv[optind+1]);
+                }
                 return 1;
             }
         }
@@ -621,10 +698,10 @@ int list_styles()
         list[i] = &(designs[i]);
     qsort (list, design_idx+1, sizeof(design_t *), style_sort);
 
-    printf ("Available Styles:\n");
-    printf ("-----------------\n\n");
+    fprintf (opt.outfile, "Available Styles:\n");
+    fprintf (opt.outfile, "-----------------\n\n");
     for (i=0; i<=design_idx; ++i)
-        printf ("%s (%s):\n\n%s\n\n", list[i]->name,
+        fprintf (opt.outfile, "%s (%s):\n\n%s\n\n", list[i]->name,
                 list[i]->author? list[i]->author: "unknown artist",
                 list[i]->sample);
 
@@ -681,6 +758,26 @@ static size_t expand_tabs_into (const char *input_buffer, const int in_len,
 
 
 
+void btrim (char *text, size_t *len)
+/*
+ *  Remove trailing whitespace from line.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    long idx = (long) (*len) - 1;
+
+    while (idx >= 0 && (text[idx] == '\n' || text[idx] == '\r'
+                     || text[idx] == '\t' || text[idx] == ' '))
+    {
+        text[idx--] = '\0';
+    }
+
+    *len = idx + 1;
+}
+
+
+
 int read_all_input()
 /*
  *  Read entire input from stdin and store it in 'input' array.
@@ -705,7 +802,7 @@ int read_all_input()
     input.indent = LINE_MAX;
     input.maxline = 0;
 
-    while (fgets (buf, LINE_MAX+1, stdin))
+    while (fgets (buf, LINE_MAX+1, opt.infile))
     {
         if (input_size % 100 == 0) {
             input_size += 100;
@@ -720,15 +817,7 @@ int read_all_input()
 
         input.lines[input.anz_lines].len = strlen (buf);
 
-        while (input.lines[input.anz_lines].len > 0 &&
-              (buf[input.lines[input.anz_lines].len-1] == '\n'
-            || buf[input.lines[input.anz_lines].len-1] == '\r'
-            || buf[input.lines[input.anz_lines].len-1] == ' '
-            || buf[input.lines[input.anz_lines].len-1] == '\t'))
-        {
-            buf[input.lines[input.anz_lines].len-1] = '\0';
-            input.lines[input.anz_lines].len -= 1;
-        }
+        btrim (buf, &(input.lines[input.anz_lines].len));
 
         if (input.lines[input.anz_lines].len > 0) {
             newlen = expand_tabs_into (buf,
@@ -1576,6 +1665,8 @@ static int output_box (const sentry_t *thebox)
     size_t hfill;
     char  *hfill1, *hfill2;              /* space before/after text */
     size_t r;
+    char   obuf[LINE_MAX+1];             /* final output buffer */
+    size_t obuf_len;                     /* length of content of obuf */
 
     /*
      *  Create string of spaces for indentation
@@ -1668,15 +1759,16 @@ static int output_box (const sentry_t *thebox)
     for (j=0; j<nol; ++j) {
 
         if (j < thebox[BTOP].height) {
-            printf ("%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
-                    thebox[BTOP].chars[j], thebox[BRIG].chars[j]);
+            snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+                    thebox[BLEF].chars[j], thebox[BTOP].chars[j],
+                    thebox[BRIG].chars[j]);
         }
 
         else if (vfill1) {
             r = thebox[BTOP].width;
             trailspc[r] = '\0';
-            printf ("%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
-                    trailspc, thebox[BRIG].chars[j]);
+            snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+                    thebox[BLEF].chars[j], trailspc, thebox[BRIG].chars[j]);
             trailspc[r] = ' ';
             --vfill1;
         }
@@ -1686,24 +1778,38 @@ static int output_box (const sentry_t *thebox)
             if (ti < (long) input.anz_lines) {
                 r = input.maxline - input.lines[ti].len;
                 trailspc[r] = '\0';
-                printf ("%s%s%s%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
-                        hfill1, ti >= 0? input.lines[ti].text : "", hfill2,
+                snprintf (obuf, LINE_MAX+1, "%s%s%s%s%s%s%s", indentspc,
+                        thebox[BLEF].chars[j], hfill1,
+                        ti >= 0? input.lines[ti].text : "", hfill2,
                         trailspc, thebox[BRIG].chars[j]);
             }
             else {
                 r = thebox[BTOP].width;
                 trailspc[r] = '\0';
-                printf ("%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
-                        trailspc, thebox[BRIG].chars[j]);
+                snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+                        thebox[BLEF].chars[j], trailspc, thebox[BRIG].chars[j]);
             }
             trailspc[r] = ' ';
         }
 
         else {
-            printf ("%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
+            snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+                    thebox[BLEF].chars[j],
                     thebox[BBOT].chars[j-(nol-thebox[BBOT].height)],
                     thebox[BRIG].chars[j]);
         }
+
+        obuf_len = strlen (obuf);
+
+        if (obuf_len > LINE_MAX) {
+            size_t newlen = LINE_MAX;
+            btrim (obuf, &newlen);
+        }
+        else {
+            btrim (obuf, &obuf_len);
+        }
+
+        fprintf (opt.outfile, "%s\n", obuf);
     }
 
     BFREE (indentspc);
