@@ -3,59 +3,11 @@
 #   Date created:     March 17, 1999 (Wednesday, 17:02h)
 #   Author:           Thomas Jensen
 #                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id: boxes-config,v 1.11 1999/07/22 12:17:17 tsjensen Exp tsjensen $
+#   Version:          $Id: boxes-config,v 1.12 1999/08/14 19:00:00 tsjensen Exp tsjensen $
 #   Format:           ASCII Text
 #   World Wide Web:   http://home.pages.de/~jensen/boxes/
 #   Purpose:          Example configuration file for the boxes program
 #   Remarks:          ---
-#   Revision History:
-#
-#     $Log: boxes-config,v $
-#     Revision 1.11  1999/07/22 12:17:17  tsjensen
-#     Modernized code of "columns" design and made code consistent with sample
-#
-#     Revision 1.10  1999/07/20 18:54:10  tsjensen
-#     Completely revised code of "tjc" design
-#
-#     Revision 1.9  1999/07/12 18:34:14  tsjensen
-#     Added "headline" design to show useful example of regexp backreferences
-#     Fixed small bug in sample block of "stark2" design
-#     Added padding of t1 for design "parchment"
-#
-#     Revision 1.8  1999/06/28 18:42:19  tsjensen
-#     Moved "C" design to first position in file, so it remains the default
-#     Changed netdata design to use padding option and reversion
-#
-#     Revision 1.7  1999/06/27 17:59:50  tsjensen
-#     Added design c-cmt2
-#     Added padding entries to a few designs
-#     A few cosmetic corrections in sample blocks etc.
-#
-#     Revision 1.6  1999/06/17 19:03:09  tsjensen
-#     Added designs c-cmt, pound-cmt, java-cmt, html-cmt, right, vim-cmt
-#     They have become possible because boxes now checks for empty sides.
-#
-#     Revision 1.5  1999/06/16 10:52:59  tsjensen
-#     Added "reverse" entry for testing, more "reverse" entries needed still
-#     Added "peek" design for C funtion headers
-#     Simplified some replacement entries
-#
-#     Revision 1.4  1999/04/09 18:11:08  tsjensen
-#     Added some more designs
-#     Uncommented an unused entry, since boxes no longer generates warnings
-#     upon encountering syntactically correct entries which it doesn't know.
-#
-#     Revision 1.3  1999/04/09 13:28:13  tsjensen
-#     Removed all occurrences of OFFSET specs (obsolete).
-#     Added some new designs
-#     Added some test/debugging designs
-#
-#     Revision 1.2  1999/03/30 15:36:03  tsjensen
-#     Added some more designs
-#     Incorporated some changes to the still evolving format
-#
-#     Revision 1.1  1999/03/18 15:08:57  tsjensen
-#     Initial revision
 #____________________________________________________________________________
 #============================================================================
 
@@ -67,12 +19,12 @@ revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:25h)"
 created "March 18, 1999 (Thursday, 15:25h)"
 
-sample {
+sample
     /*************/
     /*           */
     /*           */
     /*************/
-}
+ends
 
 shapes {
     nw ("/*") n ("*") ne ("*/")
@@ -103,15 +55,15 @@ revdate  "March 12, 1999 (Friday, 17:05h)"
 escaped  "aaa\"bbb\\\"ccc#"	         # the string aaa"bbb\"ccc#
 #escaped2 "aaa\\"bbb"        	# unterminated
 
-sample {
+sample
      ________________________
-    /\\                       \\
-    \\_|                       |
+    /\                       \
+    \_|                       |
       |                       |
       |                       |
       |   ____________________|_
-       \\_/_____________________/
-}                               # double all backslashes in sample
+       \_/_____________________/
+ends
 
 shapes {
     nw  (" __")
@@ -145,15 +97,15 @@ revision "1.1"
 revdate  "July 20, 1999 (Tuesday, 21:06h)"
 created  "March 17, 1999 (Wednesday, 15:27h)"
 
-sample {
+sample
      __^__                 __^__
     ( ___ )---------------( ___ )
-     | / |                 | \\ |
-     | / |                 | \\ |
-     | / |                 | \\ |
+     | / |                 | \ |
+     | / |                 | \ |
+     | / |                 | \ |
      |___|                 |___|
     (_____)---------------(_____)
-}
+ends
 
 shapes {
     nw  (" __^__", "( ___ ") nnw (" ",")")
@@ -187,13 +139,13 @@ created "March 17, 1999 (Wednesday, 15:40h)"
 revdate "March 17, 1999 (Wednesday, 15:40h)"
 revision "1.0"
 
-sample {
+sample
      .+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.
     (                                                             )
      )                                                           (
     (                                                             )
      "+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"
-}
+ends
 
 shapes {
     nw  (" .")
@@ -220,40 +172,42 @@ END whirly
 
 BOX scroll
 
-revision "1.0"
-revdate  "March 17, 1999 (Wednesday, 17:04h)"
+revision "1.1"
+revdate  "August 16, 1999 (Monday, 18:01h)"
 created  "March 17, 1999 (Wednesday, 17:04h)"
 
-sample {
-     / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \\  
-    |   / ~ \\                                           / ~ \\   |
-    |\\  \\    |                                         |    /  /|
-    |  \\    /|                                         |\\    /  |
-    |    ~~  |                                         |  ~~    |
-    |        |                                         |        |
-    |        |                                         |        |
-    |        |                                         |        |
-    |        |                                         |        |
-    |        |                                         |        |
-     \\       |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|       /
-       \\    /                                           \\    /
-         ~~                                               ~~
-}
+SAMPLE
+     / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \  
+    |  /~~\                                           /~~\  |
+    |\ \   |                                         |   / /|
+    | \   /|                                         |\   / |
+    |  ~~  |                                         |  ~~  |
+    |      |                                         |      |
+    |      |                                         |      |
+    |      |                                         |      |
+    |      |                                         |      |
+    |      |                                         |      |
+     \     |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|     /
+      \   /                                           \   /
+       ~~~                                             ~~~
+ENDS
 
 shapes {
-    nw  (" / ~~~~~~~")
+    nw  (" / ~~~~~")
     n   ("~")
-    ne  ("~~~~~~~ \\ ")
-    ene (" / ~ \\   |", "|    /  /|", "|\\    /  |", "|  ~~    |")
-    wnw ("|   / ~ \\ ", "|\\  \\    |", "|  \\    /|", "|    ~~  |")
-    e   ("|        |")
-    se  ("|       / ", " \\    /   ", "   ~~     ")
+    ne  ("~~~~~ \\ ")
+    ene (" /~~\\  |", "|   / /|", "|\\   / |", "|  ~~  |")
+    wnw ("|  /~~\\ ", "|\\ \\   |", "| \\   /|", "|  ~~  |")
+    e   ("|      |")
+    se  ("|     / ", " \\   /  ", "  ~~~   ")
     s   ("~"," "," ")
-    sw  (" \\       |", "   \\    / ", "     ~~   ")
-    w   ("|        |")
+    sw  (" \\     |", "  \\   / ", "   ~~~  ")
+    w   ("|      |")
 }
 
 eLAStic (n, s, e, w)
+
+padding { h 2 v 1 }
 
 END scroll
 
@@ -268,12 +222,12 @@ revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:24h)"
 created "March 18, 1999 (Thursday, 15:24h)"
 
-sample {
+sample
     *************
     *           *
     *           *
     *************
-}
+ends
 
 shapes { nw ("*") ne ("*") sw ("*") se ("*")
          n  ("*") e  ("*") s  ("*") w  ("*")
@@ -294,12 +248,12 @@ revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
 
-sample {
+sample
     /*                               */
     /*     regular C language        */
     /*     comments                  */
     /*                               */
-}
+ends
 
 shapes {
     w ("/*")
@@ -326,12 +280,12 @@ revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
 
-sample {
+sample
     /*
      *  regular C language
      *  comments
      */
-}
+ends
 
 shapes {
     nw ("/*")
@@ -359,13 +313,13 @@ revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:26h)"
 created "March 18, 1999 (Thursday, 15:26h)"
 
-sample {
+sample
     <!-- ------------------- -->
     <!--                     -->
     <!--                     -->
     <!--                     -->
     <!-- ------------------- -->
-}
+ends
 
 shapes {
     nw ("<!-- ") n ("-") ne (" -->")
@@ -390,12 +344,12 @@ revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:27h)"
 created "March 18, 1999 (Thursday, 15:27h)"
 
-sample {
+sample
     #############
     #           #
     #           #
     #############
-}
+ends
 
 shapes {
     nw ("#") n ("#")
@@ -419,19 +373,19 @@ revision "1.0"
 revdate "March 30, 1999 (Tuesday, 15:55h)"
 created "March 30, 1999 (Tuesday, 15:55h)"
 
-sample {
+sample
                             _ ._  _ , _ ._
                           (_ ' ( `  )_  .__)
                         ( (  (    )   `)  ) _)
                        (__ (_   (_ . _) _) ,__)
-                           `~~`\\ ' . /`~~`
+                           `~~`\ ' . /`~~`
                            ,::: ;   ; :::,
                           ':::::::::::::::'
-     _________________jgs______/_ __ \\________________________
+     _________________jgs______/_ __ \________________________
     |                                                         |
     |                 BAD, BAD, BUG HERE :-)                  |
     |_________________________________________________________|
-}
+ends
 
 shapes {
     nw  (" "," "," "," "," "," "," "," ","|")
@@ -466,20 +420,20 @@ revision "1.0"
 revdate "March 30, 1999 (Tuesday, 15:59h)"
 created "March 30, 1999 (Tuesday, 15:59h)"
 
-sample {
-           /\\          /\\          /\\          /\\  
-        /\\//\\\\/\\    /\\//\\\\/\\    /\\//\\\\/\\    /\\//\\\\/\\  
-     /\\//\\\\\\///\\\\/\\//\\\\\\///\\\\/\\//\\\\\\///\\\\/\\//\\\\\\///\\\\/\\
-    //\\\\\\//\\/\\\\///\\\\\\//\\/\\\\///\\\\\\//\\/\\\\///\\\\\\//\\/\\\\///\\\\
-    \\\\//\\/                                        \\/\\\\//
-     \\/       joan stark   spunk1111@juno.com        \\/
-     /\\     http://www.geocities.com/SoHo/7373/      /\\
-    //\\\\/\\                                        /\\//\\\\
-    \\\\///\\\\/\\//\\\\\\///\\\\/\\//\\\\\\///\\\\/\\//\\\\\\///\\\\/\\//\\\\\\//
-     \\/\\\\///\\\\\\//\\/\\\\///\\\\\\//\\/\\\\///\\\\\\//\\/\\\\///\\\\\\//\\/
-        \\/\\\\//\\/    \\/\\\\//\\/    \\/\\\\//\\/    \\/\\\\//\\/
-           \\/          \\/          \\/          \\/
-}
+Sample
+           /\          /\          /\          /\  
+        /\//\\/\    /\//\\/\    /\//\\/\    /\//\\/\  
+     /\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\
+    //\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\
+    \\//\/                                        \/\\//
+     \/       joan stark   spunk1111@juno.com        \/
+     /\     http://www.geocities.com/SoHo/7373/      /\
+    //\\/\                                        /\//\\
+    \\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\//
+     \/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/
+        \/\\//\/    \/\\//\/    \/\\//\/    \/\\//\/
+           \/          \/          \/          \/
+Ends
 
 shapes {
     nw  ("      ", "    /\\", " /\\//\\", "//\\\\\\/")
@@ -520,22 +474,22 @@ revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:27h)"
 created "March 18, 1999 (Thursday, 15:27h)"
 
-sample {
+sample
                 .--,       .--,
-               ( (  \\.---./  ) )
-                '.__/o   o\\__.'
-                   \{=  ^  =\}
+               ( (  \.---./  ) )
+                '.__/o   o\__.'
+                   {=  ^  =}
                     >  -  <
      ___________.""`-------`"".____________
-    /                                      \\ 
-    \\ o          joan stark        O       / 
-    /          spunk1111@juno.com          \\
-    \\          ascii art gallery           /
-    / http://www.geocities.com/SoHo/7373/  \\
-    \\______________________________________/
+    /                                      \ 
+    \ o          joan stark        O       / 
+    /          spunk1111@juno.com          \
+    \          ascii art gallery           /
+    / http://www.geocities.com/SoHo/7373/  \
+    \______________________________________/
                   ___)( )(___
                  (((__) (__)))     
-}
+ends
 
 shapes {
     nnw (" ", " ", " ", " ", " ", "_", " ")
@@ -550,7 +504,7 @@ shapes {
     n (" .--,       .--, ",
        "( (  \\.---./  ) )",
        " '.__/o   o\\__.' ",
-       "    \{=  ^  =\}    ",
+       "    {=  ^  =}    ",
        "     >  -  <     ",
        "_.\"\"`-------`\"\"._",
        "                 ")
@@ -578,11 +532,11 @@ revision "1.0"
 revdate "March 30, 1999 (Tuesday, 17:10h)"
 created "March 30, 1999 (Tuesday, 17:10h)"
 
-sample {
+sample
                                .
                           .    |    .
-                           \\   |   /
-                       '.   \\  '  /   .'
+                           \   |   /
+                       '.   \  '  /   .'
                          '. .'```'. .'
      <>.............:::::::`.......`:::::::................<>
      <>:   ., .., . . .  . .  .  .  .  .  . joan stark    :<>
@@ -592,7 +546,7 @@ sample {
      <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
    ~you can't hurt your eyesight by looking on the bright side~
        ~but you can hurt them by looking at bad ascii art!~
-}
+ends
 
 shapes {
     e (":<>")
@@ -627,24 +581,24 @@ revision "1.0"
 revdate "April 02, 1999 (Friday, 15:02h)"
 created "April 02, 1999 (Friday, 15:02h)"
 
-sample {
+sample
                     .-"""-.
-                   / .===. \\
-                   \\/ 6 6 \\/
-                   ( \\___/ )
-      _________ooo__\\_____/______________
-     /                                   \\
+                   / .===. \
+                   \/ 6 6 \/
+                   ( \___/ )
+      _________ooo__\_____/______________
+     /                                   \
     |   joan stark   spunk1111@juno.com   |
     |     VISIT MY ASCII ART GALLERY:     |
     | http://www.geocities.com/SoHo/7373/ |
-     \\_______________________ooo_________/  jgs
+     \_______________________ooo_________/  jgs
                     |  |  |
                     |_ | _|
                     |  |  |
                     |__|__|
-                    /-'Y'-\\
-                   (__/ \\__)
-}
+                    /-'Y'-\
+                   (__/ \__)
+ends
 
 shapes {
     e   (" |")
@@ -688,24 +642,24 @@ revision "1.0"
 revdate "April 02, 1999 (Friday, 19:13h)"
 created "April 02, 1999 (Friday, 19:13h)"
 
-sample {
+sample
                     .-"""-.
-                   / .===. \\
-                  / / a a \\ \\
-                 / ( \\___/ ) \\
-      ________ooo\\__\\_____/__/___________
-     /                                   \\
+                   / .===. \
+                  / / a a \ \
+                 / ( \___/ ) \
+      ________ooo\__\_____/__/___________
+     /                                   \
     |   joan stark   spunk1111@juno.com   |
     |     VISIT MY ASCII ART GALLERY:     |
     | http://www.geocities.com/SoHo/7373/ |
-     \\________________________ooo________/  jgs
-                 /           \\
-                /:.:.:.:.:.:.:\\
+     \________________________ooo________/  jgs
+                 /           \
+                /:.:.:.:.:.:.:\
                     |  |  |
-                    \\==|==/
-                    /-'Y'-\\
-                   (__/ \\__)
-}
+                    \==|==/
+                    /-'Y'-\
+                   (__/ \__)
+ends
 
 shapes {
     n   ("      .-\"\"\"-.      ",
@@ -748,7 +702,7 @@ revision "1.1"
 revdate  "July 16, 1999 (Friday, 18:55h)"
 created  "April 02, 1999 (Friday, 19:26h)"
 
-SAmple {
+SAmple
     static char *foo (const int a, const int b)
     /*
      *  Do the foo on the bar and around again.
@@ -767,7 +721,7 @@ SAmple {
     {
         static char temp ....
         int ii;          ....
-}
+ends
 
 indent "none"                 # alternatives: "box", "text"
 
@@ -802,12 +756,12 @@ revision "1.0"
 revdate "April 09, 1999 (Friday, 19:06h)"
 created "April 09, 1999 (Friday, 19:06h)"
 
-sample {
+sample
     %{-----------------------------------------------------------------+
      | IBM Net.Data Macro Sample - Perl and SQL Backends               |
      | Thomas Jensen, February 17, 1998 (Tuesday, 16:40h)              |
-     +-----------------------------------------------------------------%\}
-}
+     +-----------------------------------------------------------------%}
+ends
 
 shapes {
     nw ("%{") ne ("+ ")
@@ -838,20 +792,20 @@ revision "1.0"
 revdate "April 09, 1999 (Friday, 20:05h)"
 created "April 09, 1999 (Friday, 20:05h)"
 
-sample {
-            <\\/><\\/><\\/>
-        <\\/></\\></\\></\\><\\/>
-        </\\>            </\\>
-     <\\/>                  <\\/>
-     </\\>                  </\\>
-    <\\/>                    <\\/>
-    </\\>                    </\\>
-     <\\/>                  <\\/>
-     </\\>                  </\\>
-        <\\/>            <\\/>
-        </\\><\\/><\\/><\\/></\\>
-    jgs     </\\></\\></\\>
-}
+sample
+            <\/><\/><\/>
+        <\/></\></\></\><\/>
+        </\>            </\>
+     <\/>                  <\/>
+     </\>                  </\>
+    <\/>                    <\/>
+    </\>                    </\>
+     <\/>                  <\/>
+     </\>                  </\>
+        <\/>            <\/>
+        </\><\/><\/><\/></\>
+    jgs     </\></\></\>
+ends
 
 shapes {
     nw  ("     ", "    <", "    <")
@@ -887,22 +841,22 @@ revision "1.0"
 revdate "April 09, 1999 (Friday, 19:45h)"
 created "April 09, 1999 (Friday, 19:45h)"
 
-sample {
+sample
                 __   _,--="=--,_   __
-               /  \\."    .-.    "./  \\
-              /  ,/  _   : :   _  \\/` \\
-              \\  `| /o\\  :_:  /o\\ |\\__/
+               /  \."    .-.    "./  \
+              /  ,/  _   : :   _  \/` \
+              \  `| /o\  :_:  /o\ |\__/
                `-'| :="~` _ `~"=: |
-                  \\`     (_)     `/
-       jgs .-"-.   \\      |      /   .-"-.
-    .-----{     \}--|  /,.-'-.,\\  |--{     \}-----.
-     )    (_)_)_)  \\_/`~-===-~`\\_/  (_(_(_)    (
+                  \`     (_)     `/
+       jgs .-"-.   \      |      /   .-"-.
+    .-----{     }--|  /,.-'-.,\  |--{     }-----.
+     )    (_)_)_)  \_/`~-===-~`\_/  (_(_(_)    (
     (                joan  stark                )
      )          < spunk1111@juno.com >         (
     (             ASCII ART GALLERY:            )
      ) < http://www.geocities.com/SoHo/7373/ > (
     '-------------------------------------------'
-}
+ends
 
 shapes {
     nnw (" ", " ", " ", " ", " ", " ", " ", "-", " ")
@@ -940,23 +894,23 @@ revision "1.0"
 revdate "April 09, 1999 (Friday, 19:45h)"
 created "April 09, 1999 (Friday, 19:45h)"
 
-sample {
-                  /\\             /\\
-                 |`\\\\_,--="=--,_//`|
-                 \\ ."  :'. .':  ". /
+sample
+                  /\             /\
+                 |`\\_,--="=--,_//`|
+                 \ ."  :'. .':  ". /
                 ==)  _ :  '  : _  (==
-                  |>/O\\   _   /O\\<|
-                  | \\-"~` _ `~"-/ |
-                 >|`===. \\_/ .===`|<
-       jgs .-"-.   \\==='  |  '===/   .-"-.
-    .-----{'. '`\}---\\,  .-'-.  ,/---{.'. '\}-----.
+                  |>/O\   _   /O\<|
+                  | \-"~` _ `~"-/ |
+                 >|`===. \_/ .===`|<
+       jgs .-"-.   \==='  |  '===/   .-"-.
+    .-----{'. '`}---\,  .-'-.  ,/---{.'. '}-----.
      )    `"---"`     `~-===-~`     `"---"`    (
     (                 joan  stark               )
      )           < spunk1111@juno.com >        (
     (              ASCII ART GALLERY:           )
      ) < http://www.geocities.com/SoHo/7373/ > (
     '-------------------------------------------'
-}
+ends
 
 shapes {
     nnw (" ", " ", " ", " ", " ", " ", " ", " ", "-", " ")
@@ -995,25 +949,25 @@ revision "1.0"
 revdate "April 09, 1999 (Friday, 19:24h)"
 created "April 09, 1999 (Friday, 19:24h)"
 
-sample {
+sample
                     .-"```"-.
-                   /_______; \\
-                  (_________)\\|
-                  / / a a \\ \\(_)
-                 / ( \\___/ ) \\
-      ________ooo\\__\\_____/__/___________
-     /                                   \\
+                   /_______; \
+                  (_________)\|
+                  / / a a \ \(_)
+                 / ( \___/ ) \
+      ________ooo\__\_____/__/___________
+     /                                   \
     |   joan stark   spunk1111@juno.com   |
     |     VISIT MY ASCII ART GALLERY:     |
     |      http://www.ascii-art.com       |
-     \\________________________ooo________/
-                 /           \\   jgs
-                /:.:.:.:.:.:.:\\
+     \________________________ooo________/
+                 /           \   jgs
+                /:.:.:.:.:.:.:\
                     |  |  |
-                    \\==|==/
-                    /-'Y'-\\
-                   (__/ \\__)
-}
+                    \==|==/
+                    /-'Y'-\
+                   (__/ \__)
+ends
 
 shapes {
     n   ("      .-\"```\"-.    ",
@@ -1057,26 +1011,26 @@ revision "1.0"
 revdate "April 09, 1999 (Friday, 19:24h)"
 created "April 09, 1999 (Friday, 19:24h)"
 
-sample {
+sample
                      .-"``"-.
-                    /______; \\
-                   {_______\}\\|
-                   (/ a a \\)(_)
+                    /______; \
+                   {_______}\|
+                   (/ a a \)(_)
                    (.-.).-.)
       _______ooo__(    ^    )____________
-     /             '-.___.-'             \\
+     /             '-.___.-'             \
     |             joan stark              |
     |         spunk1111@juno.com          |
     |         ASCII ART GALLERY:          |
     |      http://www.ascii-art.com       |
-     \\________________________ooo________/
+     \________________________ooo________/
                    |_  |  _|  jgs
-                   \\___|___/
-                   {___|___\}
+                   \___|___/
+                   {___|___}
                     |_ | _|
-                    /-'Y'-\\
-                   (__/ \\__)
-}
+                    /-'Y'-\
+                   (__/ \__)
+ends
 
 shapes {
     n   ("        .-\"``\"-.    ",
@@ -1120,23 +1074,23 @@ revision "1.0"
 revdate "April 09, 1999 (Friday, 15:53h)"
 created "April 09, 1999 (Friday, 15:53h)"
 
-sample {
+sample
           ,
-      /\\^/`\\             
-     | \\/   |            
+      /\^/`\             
+     | \/   |            
      | |    |               SPRING IS IN THE AIR!              jgs
-     \\ \\    /                                                _ _
-      '\\\\//'                                               _{ ' \}_
-        ||                      joan stark                { `.!.` \}
-        ||                  <spunk1111@juno.com>          ',_/Y\\_,'
-        ||  ,                                               {_,_\}
-    |\\  ||  |\\                                                |
-    | | ||  | |              ASCII ART GALLERY:             (\\|  /)
-    | | || / /      <http://www.geocities.com/SoHo/7373/>    \\| //
-     \\ \\||/ /                                                 |//
-      `\\\\//`   \\\\   \\./    \\\\ /     //    \\\\./   \\\\   //   \\\\ |/ /
+     \ \    /                                                _ _
+      '\\//'                                               _{ ' }_
+        ||                      joan stark                { `.!.` }
+        ||                  <spunk1111@juno.com>          ',_/Y\_,'
+        ||  ,                                               {_,_}
+    |\  ||  |\                                                |
+    | | ||  | |              ASCII ART GALLERY:             (\|  /)
+    | | || / /      <http://www.geocities.com/SoHo/7373/>    \| //
+     \ \||/ /                                                 |//
+      `\\//`   \\   \./    \\ /     //    \\./   \\   //   \\ |/ /
      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-}
+ends
 
 shapes {
     nw  ("      ,    ")
@@ -1186,21 +1140,21 @@ revision "1.0"
 revdate "April 05, 1999 (Monday, 21:55h)"
 created "April 05, 1999 (Monday, 21:55h)"
 
-sample {
+sample
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
     .:-@    ____        (_,      _,  _,  _,  _,                        @-:.
     .:-@   (-(__`,_    ,_ |_,     |   |   |   |    Spunk1111@juno.com  @-:.
-    .:-@    ____)|_)|_|| || \\__, _|_ _|_ _|_ _|_                       @-:.
+    .:-@    ____)|_)|_|| || \__, _|_ _|_ _|_ _|_                       @-:.
     .:-@   (    _|       |_,                                           @-:.
     .:-@       (            ____,         ____        (_,              @-:.
     .:-@                   (-| _  _ ,_   (-(__`_|_ _ ,_ |_,            @-:.
-    .:-@                  _  |(_)(_|| |   ____) | (_||  | \\_,          @-:.
+    .:-@                  _  |(_)(_|| |   ____) | (_||  | \_,          @-:.
     .:-@                 (__/            (      |_,                    @-:.
     .:-@                                                               @-:.
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
-}
+ends
 
 shapes {
     nw  (".:-@", ".:-@")
@@ -1230,7 +1184,7 @@ revision "1.0"
 revdate "April 05, 1999 (Monday, 21:55h)"
 created "April 05, 1999 (Monday, 21:55h)"
 
-sample {
+sample
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     ^   -,                ,-. .          .    ^
     ^    | ,-. ,-. ;-.    `-, |- ,-. ;-. | '  ^
@@ -1243,7 +1197,7 @@ sample {
     ^      `-' |-' `-^ ' ^ ` ` ` ` ` `        ^
     ^          `                              ^
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-}
+ends
 
 shapes {
     nw ("=") ne ("=") nne ("-") N ("-=")
@@ -1265,16 +1219,16 @@ revision "1.0"
 revdate "April 12, 1999 (Monday, 12:52h)"
 created "April 12, 1999 (Monday, 12:52h)"
 
-sample {
-   /*       _\\|/_
+sample
+   /*       _\|/_
             (o o)
-    +----oOO-{_\}-OOo---------------------+
+    +----oOO-{_}-OOo---------------------+
     |                                    |
     | C function headers?                |
     |                                    |
     |                                    |
     +-----------------------------------*/
-}
+ends
 
 shapes {
     nw  ("/*", "  ", " +")
@@ -1308,12 +1262,12 @@ revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
 
-sample {
+sample
     //
     // regular Java
     // comments
     //
-}
+ends
 
 shapes {
      w ("//")
@@ -1336,11 +1290,11 @@ revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
 
-sample {
+sample
     #
     #  regular comments used in Perl, Shell scripts, etc.
     #
-}
+ends
 
 shapes {
      w ("#")
@@ -1363,11 +1317,11 @@ revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
 
-sample {
+sample
     <!--                                     -->
     <!-- regular comments used in HTML files -->
     <!--                                     -->
-}
+ends
 
 shapes {
      w ("<!-- ")
@@ -1389,11 +1343,11 @@ revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
 
-sample {
+sample
     "
     " comments used in the vim editor's config file (.vimrc)
     "
-}
+ends
 
 shapes {
      w ("\"")
@@ -1418,14 +1372,14 @@ revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
 
-sample {
+sample
     This can be used for marking code changes with your initials
     (I don't like it, but some people work this way):
 
     for (j=0; j<blank_count; ++j)        /*@TJ@*/
-        fprintf (opt.outfile, "\\n");     /*@TJ@*/
+        fprintf (opt.outfile, "\n");     /*@TJ@*/
     blank_count = 0;                     /*@TJ@*/
-}
+ends
 
 shapes {
     e ("/*@TJ@*/")
@@ -1445,7 +1399,8 @@ BOX test1
 
 author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
 
-sample { test1 }
+sample test1
+ends
 
 shapes {
     nw ("#")
@@ -1467,7 +1422,8 @@ BOX test2
 
 author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
 
-sample { test2 }
+sample test2
+ends
 
 shapes {
     nw ("#")
@@ -1490,7 +1446,8 @@ BOX test3
 
 author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
 
-sample { test3 }
+sample test3
+ends
 
 shapes {
     nnw ("123")
@@ -1515,7 +1472,8 @@ BOX test4
 
 author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
 
-sample { test4 }
+sample test4
+ends
 
 shapes {
     e ("1","2","3")
@@ -1536,7 +1494,8 @@ BOX test5
 
 author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
 
-sample { test5 }
+sample   test5
+               ends
 
 shapes {
     e ("1","2","3")
@@ -1559,7 +1518,8 @@ BOX test6
 
 author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
 
-sample { test6 }
+sample test6
+ends   
 
 shapes {
     ene ("1","2","3")
@@ -1587,10 +1547,10 @@ revision "1.0"
 revdate "April 04, 1999 (Sunday, 18:00h)"
 created "April 04, 1999 (Sunday, 18:00h)"
 
-sample {
+sample
     regular expression test
     use "foo", "bar", and "--" repeatedly in input
-}
+ ends
 
 shapes { nw ("*") ne ("*") sw ("*") se ("*")
          n  ("*") e  ("*") s  ("*") w  ("*")
@@ -1615,12 +1575,12 @@ revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:25h)"
 created "March 18, 1999 (Thursday, 15:25h)"
 
-sample {
+sample
     /*************/
     /*           */
     /*           */
     /*************/
-}
+ends
 
 shapes {
     nw ("/*") n ("*") ne ("*/")
