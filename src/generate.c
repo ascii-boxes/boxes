@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id$
+ *  Version:          $Id: generate.c,v 1.1 1999/06/23 18:52:54 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box generation, i.e. the drawing of boxes
@@ -12,7 +12,10 @@
  *
  *  Revision History:
  *
- *    $Log$
+ *    $Log: generate.c,v $
+ *    Revision 1.1  1999/06/23 18:52:54  tsjensen
+ *    Initial revision
+ *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
@@ -25,7 +28,7 @@
 #include "generate.h"
 
 static const char rcsid_generate_c[] =
-    "$Id$";
+    "$Id: generate.c,v 1.1 1999/06/23 18:52:54 tsjensen Exp tsjensen $";
 
 
 
@@ -663,6 +666,217 @@ err:
         }
     }
     return rc;                           /* error */
+}
+
+
+
+int output_box (const sentry_t *thebox)
+/*
+ *
+ *  RETURNS:  == 0  if successful
+ *            != 0  on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t j;
+    size_t nol = thebox[BRIG].height;    /* number of output lines */
+    char   trailspc[LINE_MAX+1];
+    char  *indentspc;
+    size_t vfill, vfill1, vfill2;        /* empty lines/columns in box */
+    size_t hfill;
+    char  *hfill1, *hfill2;              /* space before/after text */
+    size_t r;
+    char   obuf[LINE_MAX+1];             /* final output buffer */
+    size_t obuf_len;                     /* length of content of obuf */
+    size_t skip_start;                   /* lines to skip for box top */
+    size_t skip_end;                     /* lines to skip for box bottom */
+    size_t skip_left;                    /* true if left box part is to be skipped */
+
+    /*
+     *  Create string of spaces for indentation
+     */
+    if (opt.design->indentmode == 'b') {
+        indentspc = (char *) malloc (input.indent+1);
+        if (indentspc == NULL) {
+            perror (PROJECT);
+            return 1;
+        }
+        memset (indentspc, (int)' ', input.indent);
+        indentspc[input.indent] = '\0';
+    }
+    else {
+        indentspc = (char *) strdup ("");
+        if (indentspc == NULL) {
+            perror (PROJECT);
+            return 1;
+        }
+    }
+
+    /*
+     *  Provide string of spaces for filling of space between text and
+     *  right side of box
+     */
+    memset (trailspc, (int)' ', LINE_MAX);
+    trailspc[LINE_MAX] = '\0';
+
+    /*
+     *  Compute number of empty lines in box (vfill).
+     */
+    vfill = nol - thebox[BTOP].height - thebox[BBOT].height - input.anz_lines;
+    vfill -= opt.design->padding[BTOP] + opt.design->padding[BBOT];
+    if (opt.valign == 'c') {
+        vfill1 = vfill / 2;
+        vfill2 = vfill1 + (vfill % 2);
+    }
+    else if (opt.valign == 'b') {
+        vfill1 = vfill;
+        vfill2 = 0;
+    }
+    else {
+        vfill1 = 0;
+        vfill2 = vfill;
+    }
+    vfill1 += opt.design->padding[BTOP];
+    vfill2 += opt.design->padding[BBOT];
+    vfill  += opt.design->padding[BTOP] + opt.design->padding[BBOT];
+
+    /*
+     *  Provide strings for horizontal text alignment.
+     */
+    hfill = thebox[BTOP].width - input.maxline;
+    hfill1 = (char *) malloc (hfill+1);
+    hfill2 = (char *) malloc (hfill+1);
+    if (!hfill1 || !hfill2) {
+        perror (PROJECT);
+        return 1;
+    }
+    memset (hfill1, (int)' ', hfill+1);
+    memset (hfill2, (int)' ', hfill+1);
+    hfill1[hfill] = '\0';
+    hfill2[hfill] = '\0';
+    if (hfill == 0) {
+        hfill1[0] = '\0';
+        hfill2[0] = '\0';
+    }
+    else if (hfill == 1) {
+        if (opt.halign == 'r'
+                || opt.design->padding[BLEF] > opt.design->padding[BRIG]) {
+            hfill1[1] = '\0';
+            hfill2[0] = '\0';
+        }
+        else {
+            hfill1[0] = '\0';
+            hfill2[1] = '\0';
+        }
+    }
+    else {
+        size_t hpl = opt.design->padding[BLEF];
+        size_t hpr = opt.design->padding[BRIG];
+        hfill -= hpl + hpr;
+        if (opt.halign == 'c') {
+            hfill1[hpl+hfill/2] = '\0';
+            if (hfill % 2)
+                hfill2[hpr+hfill/2+1] = '\0';
+            else
+                hfill2[hpr+hfill/2] = '\0';
+        }
+        else if (opt.halign == 'r') {
+            hfill1[hfill+hpl] = '\0';
+            hfill2[hpr] = '\0';
+        }
+        else {
+            hfill1[hpl] = '\0';
+            hfill2[hfill+hpr] = '\0';
+        }
+        hfill += hpl + hpr;
+    }
+
+    #if defined(DEBUG) || 0
+        fprintf (stderr, "Alignment: hfill %d hfill1 %dx\' \' hfill2 %dx\' \' "
+                "vfill %d vfill1 %d vfill2 %d.\n", hfill, strlen(hfill1),
+                strlen(hfill2), vfill, vfill1, vfill2);
+    #endif
+
+    /*
+     *  Find out if and how many leading or trailing blank lines must be
+     *  skipped because the corresponding box side was defined empty.
+     */
+    skip_start = 0;
+    skip_end   = 0;
+    skip_left  = 0;
+    if (empty_side (opt.design, BTOP))
+        skip_start = opt.design->shape[NW].height;
+    if (empty_side (opt.design, BBOT))
+        skip_end = opt.design->shape[SW].height;
+    if (empty_side (opt.design, BLEF))
+        skip_left = opt.design->shape[NW].width; /* could simply be 1, though */
+
+    /*
+     *  Generate actual output
+     */
+    for (j=skip_start; j<nol-skip_end; ++j) {
+
+        if (j < thebox[BTOP].height) {
+            snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+                    skip_left?"":thebox[BLEF].chars[j], thebox[BTOP].chars[j],
+                    thebox[BRIG].chars[j]);
+        }
+
+        else if (vfill1) {
+            r = thebox[BTOP].width;
+            trailspc[r] = '\0';
+            snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+                    skip_left?"":thebox[BLEF].chars[j], trailspc,
+                    thebox[BRIG].chars[j]);
+            trailspc[r] = ' ';
+            --vfill1;
+        }
+
+        else if (j < nol-thebox[BBOT].height) {
+            long ti = j - thebox[BTOP].height - (vfill-vfill2);
+            if (ti < (long) input.anz_lines) {
+                r = input.maxline - input.lines[ti].len;
+                trailspc[r] = '\0';
+                snprintf (obuf, LINE_MAX+1, "%s%s%s%s%s%s%s", indentspc,
+                        skip_left?"":thebox[BLEF].chars[j], hfill1,
+                        ti >= 0? input.lines[ti].text : "", hfill2,
+                        trailspc, thebox[BRIG].chars[j]);
+            }
+            else {
+                r = thebox[BTOP].width;
+                trailspc[r] = '\0';
+                snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+                        skip_left?"":thebox[BLEF].chars[j], trailspc,
+                        thebox[BRIG].chars[j]);
+            }
+            trailspc[r] = ' ';
+        }
+
+        else {
+            snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
+                    skip_left?"":thebox[BLEF].chars[j],
+                    thebox[BBOT].chars[j-(nol-thebox[BBOT].height)],
+                    thebox[BRIG].chars[j]);
+        }
+
+        obuf_len = strlen (obuf);
+
+        if (obuf_len > LINE_MAX) {
+            size_t newlen = LINE_MAX;
+            btrim (obuf, &newlen);
+        }
+        else {
+            btrim (obuf, &obuf_len);
+        }
+
+        fprintf (opt.outfile, "%s\n", obuf);
+    }
+
+    BFREE (indentspc);
+    BFREE (hfill1);
+    BFREE (hfill2);
+    return 0;                            /* all clear */
 }
 
 
