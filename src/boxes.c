@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.7 1999/04/02 18:42:44 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.8 1999/04/04 16:09:01 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -18,6 +18,11 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.8  1999/04/04 16:09:01  tsjensen
+ *    Added code for specification of indentation handling of input
+ *    Added regular expression substitutions
+ *    Some minor fixes
+ *
  *    Revision 1.7  1999/04/02 18:42:44  tsjensen
  *    ... still programming ...
  *    Added infile/outfile parameter code (pasted from tal, more or less)
@@ -70,7 +75,7 @@ extern char *optarg;                     /* for getopt() */
 extern int optind, opterr, optopt;       /* for getopt() */
 
 
-#ident "$Id: boxes.c,v 1.7 1999/04/02 18:42:44 tsjensen Exp tsjensen $"
+#ident "$Id: boxes.c,v 1.8 1999/04/04 16:09:01 tsjensen Exp tsjensen $"
 
 extern FILE *yyin;                       /* lex input file */
 
@@ -106,11 +111,6 @@ int anz_designs = 0;                     /* no of designs after parsing */
 char *shape_name[] = {
     "NW", "NNW", "N", "NNE", "NE", "ENE", "E", "ESE",
     "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW"
-};
-
-char *ofs_name[] =   {
-    "NW_NNW", "NNW_N", "N_NNE", "NNE_NE", "NE_ENE", "ENE_E", "E_ESE", "ESE_SE",
-    "SE_SSE", "SSE_S", "S_SSW", "SSW_SW", "SW_WSW", "WSW_W", "W_WNW", "WNW_NW"
 };
 
 shape_t north_side[SHAPES_PER_SIDE] = { NW, NNW, N, NNE, NE };  /* clockwise */
@@ -1125,8 +1125,6 @@ static int horiz_precalc (const sentry_t *sarr,
         int *stoggle;                    /* ptr to btoggle or ttoggle */
         int numsh;                       /* either bnumsh or tnumsh */
 
-        /* FIXME Hier hängt er sich auf "boxes -d parchment -s 1x1") */
-
         /*
          *  Set pointers to the side which is currently shorter,
          *  so it will be advanced in this step.
@@ -1893,7 +1891,7 @@ static int output_box (const sentry_t *thebox)
                     thebox[BRIG].chars[j]);
         }
 
-        obuf_len = strlen (obuf);
+        obuf_len = strlen (obuf);        /* TODO Can't we compute this?! */
 
         if (obuf_len > LINE_MAX) {
             size_t newlen = LINE_MAX;

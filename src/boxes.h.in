@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.4 1999/03/31 17:34:43 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h,v 1.5 1999/04/04 16:10:51 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *  Remarks:          ---
@@ -11,6 +11,10 @@
  *  Revision History:
  *
  *    $Log: boxes.h,v $
+ *    Revision 1.5  1999/04/04 16:10:51  tsjensen
+ *    Added some flags to design structure
+ *    Move default settings here from boxes.c
+ *
  *    Revision 1.4  1999/03/31 17:34:43  tsjensen
  *    ... still programming ...
  *    Added minwidth and minheight to design structure
@@ -34,7 +38,7 @@
 #include "regexp.h"
 
 
-#pragma ident "$Id: boxes.h,v 1.4 1999/03/31 17:34:43 tsjensen Exp tsjensen $"
+#pragma ident "$Id: boxes.h,v 1.5 1999/04/04 16:10:51 tsjensen Exp tsjensen $"
 
 #define PROJECT "boxes"                  /* name of program */
 #define VERSION "1.0"                    /* current release of project */
@@ -70,15 +74,6 @@
 
 
 extern char *shape_name[];
-extern char *ofs_name[];
-
-#define ANZ_OFFSETS 16
-
-typedef enum {
-        NW_NNW, NNW_N, N_NNE, NNE_NE, NE_ENE, ENE_E, E_ESE, ESE_SE,
-        SE_SSE, SSE_S, S_SSW, SSW_SW, SW_WSW, WSW_W, W_WNW, WNW_NW
-} soffset_t;
-
 
 #define ANZ_SHAPES 16
 
@@ -135,7 +130,6 @@ typedef struct {
     reprule_t *reprules;
     size_t     anz_reprules;
     sentry_t   shape[ANZ_SHAPES];
-    int        offset[ANZ_OFFSETS];
 } design_t;
 
 extern design_t *designs;
