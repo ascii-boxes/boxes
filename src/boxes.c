@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.29 1999/08/16 18:29:39 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.30 1999/08/21 15:55:42 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -48,6 +48,12 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.30  1999/08/21 15:55:42  tsjensen
+ *    Updated usage information
+ *    Updated quickinfo (-l -d) with killblank default value
+ *    Made indentation computation into a function of its own (get_indent())
+ *    Bugfix: REVERSION code may change indentation -> recompute if necessary
+ *
  *    Revision 1.29  1999/08/16 18:29:39  tsjensen
  *    Added output of total number of designs for -l
  *
@@ -209,7 +215,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.29 1999/08/16 18:29:39 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.30 1999/08/21 15:55:42 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
@@ -264,6 +270,97 @@ static void usage (FILE *st)
 
 
 
+static int get_config_file()
+/*
+ *  Set yyin and yyfilename to the config file to be used.
+ *
+ *  If no config file was specified on the command line (yyin == stdin),
+ *  try getting it from other locations:
+ *      (1) contents of BOXES environment variable
+ *      (2) file ~/.boxes
+ *      (3) system-wide config file from GLOBALCONF macro.
+ *  If neither file exists, return complainingly.
+ *
+ *  RETURNS:    == 0    success  (yyin and yyfilename are set)
+ *              != 0    error    (yyin is unmodified)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    FILE *new_yyin = NULL;
+    char *s;                             /* points to data from environment */
+
+    if (yyin != stdin)
+        return 0;                        /* we're already ok */
+
+    /*
+     *  Try getting it from the BOXES environment variable
+     */
+    s = getenv ("BOXES");
+    if (s) {
+        new_yyin = fopen (s, "r");
+        if (new_yyin == NULL) {
+            fprintf (stderr, "%s: Couldn't open config file '%s' "
+                    "for input (taken from $BOXES).\n", PROJECT, s);
+            return 1;
+        }
+        yyfilename = (char *) strdup (s);
+        if (yyfilename == NULL) {
+            perror (PROJECT);
+            return 1;
+        }
+        yyin = new_yyin;
+        return 0;
+    }
+
+    /*
+     *  Try getting it from ~/.boxes
+     */
+    s = getenv ("HOME");
+    if (s) {
+        char buf[PATH_MAX];              /* to build file name */
+        strncpy (buf, s, PATH_MAX);
+        buf[PATH_MAX-1-7] = '\0';        /* ensure space for "/.boxes" */
+        strcat (buf, "/.boxes");
+        new_yyin = fopen (buf, "r");
+        if (new_yyin) {
+            yyfilename = (char *) strdup (buf);
+            if (yyfilename == NULL) {
+                perror (PROJECT);
+                return 1;
+            }
+            yyin = new_yyin;
+            return 0;
+        }
+    }
+    else {
+        fprintf (stderr, "%s: warning: Environment variable HOME not set!\n",
+                PROJECT);
+    }
+
+    /*
+     *  Try reading the system-wide config file
+     */
+    new_yyin = fopen (GLOBALCONF, "r");
+    if (new_yyin) {
+        yyfilename = (char *) strdup (GLOBALCONF);
+        if (yyfilename == NULL) {
+            perror (PROJECT);
+            return 1;
+        }
+        yyin = new_yyin;
+        return 0;
+    }
+
+    /*
+     *  Darn. No luck today.
+     */
+    fprintf (stderr, "%s: Can't find config file.\n", PROJECT);
+    return 2;
+}
+
+
+
 static int process_commandline (int argc, char *argv[])
 /*
  *  Process command line options.
@@ -285,6 +382,7 @@ static int process_commandline (int argc, char *argv[])
     int    errfl = 0;                    /* true on error */
     int    outfile_existed = 0;          /* true if we overwrite a file */
     size_t optlen;
+    int    rc;
 
     /*
      *  Set default values
@@ -583,72 +681,35 @@ static int process_commandline (int argc, char *argv[])
                  */
                 break;
 
-            default:                        /* This case must never be */
-                fprintf (stderr, "%s: Uh-oh! This should have been "
-                        "unreachable code. %%-)\n", PROJECT);
+            default:                     /* This case must never be */
+                fprintf (stderr, "%s: internal error\n", PROJECT);
                 return 1;
         }
     } while (oc != EOF);
 
     /*
-     *  If no config file has been specified, try getting it from other
-     *  locations. (1) contents of BOXES environment variable (2) file
-     *  ~/.boxes. If neither file exists, complain and die.
+     *  If no config file has as yet been specified, try getting it elsewhere.
      */
-    if (yyin == stdin) {
-        char *s = getenv ("BOXES");
-        if (s) {
-            f = fopen (s, "r");
-            if (f == NULL) {
-                fprintf (stderr, "%s: Couldn\'t open config file \'%s\' "
-                        "for input (taken from environment).\n", PROJECT, s);
-                return 1;
-            }
-            yyfilename = (char *) strdup (s);
-            yyin = f;
-        }
-        else {
-            char buf[PATH_MAX];              /* to build file name */
-            s = getenv ("HOME");
-            if (s) {
-                strncpy (buf, s, PATH_MAX);
-                buf[PATH_MAX-1-7] = '\0';    /* ensure space for "/.boxes" */
-                strcat (buf, "/.boxes");
-                f = fopen (buf, "r");
-                if (f) {
-                    yyfilename = (char *) strdup (buf);
-                    yyin = f;
-                }
-                else {
-                    fprintf (stderr, "%s: Could not find config file.\n",
-                            PROJECT);
-                    return 1;
-                }
-            }
-            else {
-                fprintf (stderr, "%s: Environment variable HOME must point to "
-                        "the user\'s home directory.\n", PROJECT);
-                return 1;
-            }
-        }
-    }
+    rc = get_config_file();              /* sets yyin and yyfilename */
+    if (rc)
+        return rc;
 
-   /*
-    *  Input and Output Files
-    *
-    *  After any command line options, an input file and an output file may
-    *  be specified (in that order). "-" may be substituted for standard
-    *  input or output. A third file name would be invalid.
-    *  The alogrithm is as follows:
-    *
-    *  If no files are given, use stdin and stdout.
-    *  Else If infile is "-", use stdin for input
-    *       Else open specified file (die if it doesn't work)
-    *       If no output file is given, use stdout for output
-    *       Else If outfile is "-", use stdout for output
-    *            Else open specified file for writing (die if it doesn't work)
-    *            If a third file is given, die.
-    */
+    /*
+     *  Input and Output Files
+     *
+     *  After any command line options, an input file and an output file may
+     *  be specified (in that order). "-" may be substituted for standard
+     *  input or output. A third file name would be invalid.
+     *  The alogrithm is as follows:
+     *
+     *  If no files are given, use stdin and stdout.
+     *  Else If infile is "-", use stdin for input
+     *       Else open specified file (die if it doesn't work)
+     *       If no output file is given, use stdout for output
+     *       Else If outfile is "-", use stdout for output
+     *            Else open specified file for writing (die if it doesn't work)
+     *            If a third file is given, die.
+     */
     if (argv[optind] == NULL) {          /* neither infile nor outfile given */
         opt.infile = stdin;
         opt.outfile = stdout;
