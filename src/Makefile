@@ -3,7 +3,7 @@
 #   Creation:   March 18, 1999 (Thursday, 15:10h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.14 1999/08/21 16:10:41 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.15 1999/08/21 23:35:44 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,10 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.15  1999/08/21 23:35:44  tsjensen
+#     boxes.h is now generated from boxes.h.in by top level Makefile
+#     Added -Wall -W to CFLAGS and removed .c.o rule
+#
 #     Revision 1.14  1999/08/21 16:10:41  tsjensen
 #     Removed case insensitivity option (-i) from flex call (-> lexer.l)
 #
@@ -74,8 +78,8 @@ LDFLAGS    = -Lregexp
 GEN_HDR    = parser.h boxes.h
 GEN_SRC    = parser.c lex.yy.c
 GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
-ORIG_HDRCL = boxes.h.in
-ORIG_HDR   = $(ORIG_HDRCL) lexer.h tools.h shape.h generate.h remove.h config.h
+ORIG_HDRCL = boxes.h.in config.h
+ORIG_HDR   = $(ORIG_HDRCL) lexer.h tools.h shape.h generate.h remove.h
 ORIG_GEN   = lexer.l parser.y
 ORIG_NORM  = boxes.c tools.c shape.c generate.c remove.c
 ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
