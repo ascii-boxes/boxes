@@ -2,17 +2,34 @@
  *  File:             generate.c
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
- *  Author:           Thomas Jensen
+ *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: generate.c,v 1.2 1999/06/23 19:23:55 tsjensen Exp tsjensen $
+ *  Version:          $Id: generate.c,v 1.3 1999/06/25 18:42:50 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box generation, i.e. the drawing of boxes
- *  Remarks:          ---
+ *
+ *  Remarks: o This program is free software; you can redistribute it and/or
+ *             modify it under the terms of the GNU General Public License as
+ *             published by the Free Software Foundation; either version 2 of
+ *             the License, or (at your option) any later version.
+ *           o This program is distributed in the hope that it will be useful,
+ *             but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *             MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *             GNU General Public License for more details.
+ *           o You should have received a copy of the GNU General Public
+ *             License along with this program; if not, write to the Free
+ *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *             MA 02111-1307  USA
  *
  *  Revision History:
  *
  *    $Log: generate.c,v $
+ *    Revision 1.3  1999/06/25 18:42:50  tsjensen
+ *    Added justify_line() function for alignment of lines inside the text block
+ *    Cleaned up hfill calculation in output_box()
+ *    Changed parameters of empty_side() calls to comply with new signature
+ *
  *    Revision 1.2  1999/06/23 19:23:55  tsjensen
  *    Added output_box() from boxes.c
  *
@@ -22,6 +39,7 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
+#include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -31,7 +49,7 @@
 #include "generate.h"
 
 static const char rcsid_generate_c[] =
-    "$Id: generate.c,v 1.2 1999/06/23 19:23:55 tsjensen Exp tsjensen $";
+    "$Id: generate.c,v 1.3 1999/06/25 18:42:50 tsjensen Exp tsjensen $";
 
 
 
@@ -917,6 +935,8 @@ int output_box (const sentry_t *thebox)
     #if defined(DEBUG)
         fprintf (stderr, "Alignment: hfill %d hpl %d hpr %d, vfill %d "
             "vfill1 %d vfill2 %d.\n", hfill, hpl, hpr, vfill, vfill1, vfill2);
+        fprintf (stderr, "           hfill1 = \"%s\";  hfill2 = \"%s\";  "
+                "indentspc = \"%s\";\n", hfill1, hfill2, indentspc);
     #endif
 
     /*
@@ -932,6 +952,10 @@ int output_box (const sentry_t *thebox)
         skip_end = opt.design->shape[SW].height;
     if (empty_side (opt.design->shape, BLEF))
         skip_left = opt.design->shape[NW].width; /* could simply be 1, though */
+    #if defined(DEBUG)
+        fprintf (stderr, "skip_start = %d;  skip_end = %d;  skip_left = %d;  "
+                "nol = %d;\n", skip_start, skip_end, skip_left, nol);
+    #endif
 
     /*
      *  Generate actual output
@@ -957,7 +981,12 @@ int output_box (const sentry_t *thebox)
         else if (j < nol-thebox[BBOT].height) {
             long ti = j - thebox[BTOP].height - (vfill-vfill2);
             if (ti < (long) input.anz_lines) {      /* box content (lines) */
-                rc = justify_line (input.lines+ti, thebox[BTOP].width, hpl);
+                size_t refwidth = thebox[BTOP].width;
+                refwidth -= (int) hpr > opt.design->padding[BRIG]?
+                    opt.design->padding[BRIG]: hpr;
+                refwidth -= (int) hpl > opt.design->padding[BLEF]?
+                    opt.design->padding[BLEF]: hpl;
+                rc = justify_line (input.lines+ti, refwidth, hpl);
                 if (rc)
                     return rc;
                 r = input.maxline - input.lines[ti].len;
