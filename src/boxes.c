@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.15 1999/06/15 12:07:39 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.16 1999/06/17 19:07:06 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -34,6 +34,12 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.16  1999/06/17 19:07:06  tsjensen
+ *    Moved line_t to boxes.h
+ *    empty_line() now also considers \r and \n whitespace
+ *    Added empty_side() function
+ *    Added handling of empty box sides in output_box()
+ *
  *    Revision 1.15  1999/06/15 12:07:39  tsjensen
  *    Removed a stray debug message
  *    Move apply_substitutions() regexp handling function up in file
@@ -97,7 +103,7 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-/* #define DEBUG */
+#define DEBUG
 /* #define REGEXP_DEBUG */
 
 #include <errno.h>
@@ -117,7 +123,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.15 1999/06/15 12:07:39 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.16 1999/06/17 19:07:06 tsjensen Exp tsjensen $";
 
 extern int yyparse();
 extern FILE *yyin;                       /* lex input file */
@@ -142,6 +148,7 @@ extern FILE *yyin;                       /* lex input file */
 #define LINE_MAX        2048
 #endif
 
+#define BMAX(a,b) ((a)>(b)? (a):(b))     /* return the larger value */
 
 char *yyfilename = NULL;                 /* file name of config file used */
 
@@ -168,6 +175,7 @@ struct {                                 /* Command line options: */
     int       l;                         /* list available designs */
     int       r;                         /* remove box from input */
     int       tabstop;                   /* tab stop distance */
+    int       padding[ANZ_SIDES];        /* in spaces or lines resp. */
     design_t *design;                    /* currently used box design */
     int       design_choice_by_user;     /* true if design was chosen by user */
     long      reqwidth;                  /* requested box width (-s) */
@@ -451,6 +459,7 @@ static void usage (FILE *st)
     fprintf (st, "       -f file  use only file as configuration file\n");
     fprintf (st, "       -h       print usage information\n");
     fprintf (st, "       -l       list available box designs w/ samples\n");
+    fprintf (st, "       -p fmt   padding (default is design-dependent)\n");
     fprintf (st, "       -r       remove box from input\n");
     fprintf (st, "       -s wxh   specify box size (width w and/or height h)\n");
     fprintf (st, "       -t uint  set tab stop distance [default: %d]\n", DEF_TABSTOP);
@@ -461,7 +470,13 @@ static void usage (FILE *st)
 
 static int process_commandline (int argc, char *argv[])
 /*
+ *  Process command line options.
  *
+ *    argc, argv   command line as passed to main()
+ *
+ *  RETURNS:   == 0    success, continue
+ *             == 42   success, but terminate anyway (e.g. help/version)
+ *             != 0/42 error
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
@@ -470,15 +485,18 @@ static int process_commandline (int argc, char *argv[])
     FILE *f;                             /* potential input file */
     int   idummy;
     char *pdummy;
+    char  c;
     int   errfl = 0;                     /* true on error */
     int   outfile_existed = 0;           /* true if we overwrite a file */
 
     memset (&opt, 0, sizeof(opt));
     opt.tabstop = DEF_TABSTOP;
     yyin = stdin;
+    for (idummy=0; idummy<ANZ_SIDES; ++idummy)
+        opt.padding[idummy] = -1;
 
     do {
-        oc = getopt (argc, argv, "a:d:f:hlrs:t:v");
+        oc = getopt (argc, argv, "a:d:f:hlp:rs:t:v");
 
         switch (oc) {
 
@@ -572,6 +590,65 @@ static int process_commandline (int argc, char *argv[])
                  *  List available box styles
                  */
                 opt.l = 1;
+                break;
+
+            case 'p':
+                /*
+                 *  Padding. format is ([ahvbtrl]n)+
+                 */
+                errfl = 0;
+                pdummy = optarg;
+                while (*pdummy) {
+                    if (pdummy[1] == '\0') {
+                        errfl = 1;
+                        break;
+                    }
+                    c = *pdummy;
+                    errno = 0;
+                    idummy = (int) strtol (pdummy+1, &pdummy, 10);
+                    if (errno || idummy < 0) {
+                        errfl = 1;
+                        break;
+                    }
+                    switch (c) {
+                        case 'a': case 'A':
+                            opt.padding[BTOP] = idummy;
+                            opt.padding[BBOT] = idummy;
+                            opt.padding[BLEF] = idummy;
+                            opt.padding[BRIG] = idummy;
+                            break;
+                        case 'h': case 'H':
+                            opt.padding[BLEF] = idummy;
+                            opt.padding[BRIG] = idummy;
+                            break;
+                        case 'v': case 'V':
+                            opt.padding[BTOP] = idummy;
+                            opt.padding[BBOT] = idummy;
+                            break;
+                        case 't': case 'T':
+                            opt.padding[BTOP] = idummy;
+                            break;
+                        case 'l': case 'L':
+                            opt.padding[BLEF] = idummy;
+                            break;
+                        case 'b': case 'B':
+                            opt.padding[BBOT] = idummy;
+                            break;
+                        case 'r': case 'R':
+                            opt.padding[BRIG] = idummy;
+                            break;
+                        default:
+                            errfl = 1;
+                            break;
+                    }
+                    if (errfl)
+                        break;
+                }
+                if (errfl) {
+                    fprintf (stderr, "%s: invalid padding specification - "
+                            "%s\n", PROJECT, optarg);
+                    return 1;
+                }
                 break;
 
             case 'r':
@@ -760,6 +837,17 @@ static int process_commandline (int argc, char *argv[])
             }
         }
     }
+
+    #ifdef DEBUG
+        fprintf (stderr, "Command line option settings (excerpt):\n");
+        fprintf (stderr, "- Padding: l%d o%d r%d u%d\n", opt.padding[BLEF],
+                opt.padding[BTOP], opt.padding[BRIG], opt.padding[BBOT]);
+        fprintf (stderr, "- Requested box size: %ldx%ld\n", opt.reqwidth,
+                opt.reqheight);
+        fprintf (stderr, "- Tabstop distance: %d\n", opt.tabstop);
+        fprintf (stderr, "- Alignment: horiz %c, vert %c\n",
+                opt.halign?opt.halign:'?', opt.valign?opt.valign:'?');
+    #endif
 
     return 0;
 }
@@ -1958,9 +2046,10 @@ static int output_box (const sentry_t *thebox)
      *  Compute number of empty lines in box (vfill).
      */
     vfill = nol - thebox[BTOP].height - thebox[BBOT].height - input.anz_lines;
+    vfill -= opt.design->padding[BTOP] + opt.design->padding[BBOT];
     if (opt.valign == 'c') {
         vfill1 = vfill / 2;
-        vfill2 = vfill1 + ((vfill % 2)? 1 : 0);
+        vfill2 = vfill1 + (vfill % 2);
     }
     else if (opt.valign == 'b') {
         vfill1 = vfill;
@@ -1970,6 +2059,9 @@ static int output_box (const sentry_t *thebox)
         vfill1 = 0;
         vfill2 = vfill;
     }
+    vfill1 += opt.design->padding[BTOP];
+    vfill2 += opt.design->padding[BBOT];
+    vfill  += opt.design->padding[BTOP] + opt.design->padding[BBOT];
 
     /*
      *  Provide strings for horizontal text alignment.
@@ -1990,7 +2082,8 @@ static int output_box (const sentry_t *thebox)
         hfill2[0] = '\0';
     }
     else if (hfill == 1) {
-        if (opt.halign == 'r') {
+        if (opt.halign == 'r'
+                || opt.design->padding[BLEF] > opt.design->padding[BRIG]) {
             hfill1[1] = '\0';
             hfill2[0] = '\0';
         }
@@ -2000,22 +2093,28 @@ static int output_box (const sentry_t *thebox)
         }
     }
     else {
+        size_t hpl = opt.design->padding[BLEF];
+        size_t hpr = opt.design->padding[BRIG];
+        hfill -= hpl + hpr;
         if (opt.halign == 'c') {
-            hfill1[hfill/2] = '\0';
+            hfill1[hpl+hfill/2] = '\0';
             if (hfill % 2)
-                hfill2[hfill/2+1] = '\0';
+                hfill2[hpr+hfill/2+1] = '\0';
             else
-                hfill2[hfill/2] = '\0';
+                hfill2[hpr+hfill/2] = '\0';
         }
         else if (opt.halign == 'r') {
-            hfill2[0] = '\0';
+            hfill1[hfill+hpl] = '\0';
+            hfill2[hpr] = '\0';
         }
         else {
-            hfill1[0] = '\0';
+            hfill1[hpl] = '\0';
+            hfill2[hfill+hpr] = '\0';
         }
+        hfill += hpl + hpr;
     }
 
-    #if defined(DEBUG)
+    #if defined(DEBUG) || 0
         fprintf (stderr, "Alignment: hfill %d hfill1 %dx\' \' hfill2 %dx\' \' "
                 "vfill %d vfill1 %d vfill2 %d.\n", hfill, strlen(hfill1),
                 strlen(hfill2), vfill, vfill1, vfill2);
@@ -3068,8 +3167,8 @@ int remove_box()
             input.maxline = input.lines[j].len;
     }
     memset (input.lines + input.anz_lines, 0,
-            ((textstart - boxstart > 0 ? textstart - boxstart : 0) +
-             (boxend - textend > 0 ? boxend - textend : 0)) * sizeof(line_t));
+            (BMAX (textstart - boxstart, 0) + BMAX (boxend - textend, 0)) *
+            sizeof(line_t));
 
     #ifdef DEBUG
         #if 0
@@ -3079,8 +3178,7 @@ int remove_box()
             }
         #endif
         fprintf (stderr, "Number of lines shrunk by %d.\n",
-                (textstart - boxstart > 0 ? textstart - boxstart : 0) +
-                (boxend - textend > 0 ? boxend - textend : 0));
+                BMAX (textstart - boxstart, 0) + BMAX (boxend - textend, 0));
     #endif
 
     return 0;                            /* all clear */
@@ -3110,9 +3208,11 @@ void output_input()
 
 int main (int argc, char *argv[])
 {
-    int rc;                              /* general return code */
+    int       rc;                        /* general return code */
     design_t *tmp;
     sentry_t *thebox;
+    size_t    pad;
+    int       i;
 
     #ifdef DEBUG
         fprintf (stderr, "BOXES STARTING ...\n");
@@ -3168,6 +3268,9 @@ int main (int argc, char *argv[])
     BFREE (opt.design);
     opt.design = tmp;
 
+    /*
+     *  If "-l" option was given, list styles and exit.
+     */
     if (opt.l) {
         rc = list_styles();
         if (rc) {
@@ -3177,6 +3280,9 @@ int main (int argc, char *argv[])
         exit (EXIT_SUCCESS);
     }
 
+    /*
+     *  Read input lines
+     */
     #ifdef DEBUG
         fprintf (stderr, "Reading all input ...\n");
     #endif
@@ -3185,11 +3291,17 @@ int main (int argc, char *argv[])
     if (input.anz_lines == 0)
         exit (EXIT_SUCCESS);
 
+    /*
+     *  Adjust box size to command line specification
+     */
     if (opt.reqheight > (long) opt.design->minheight)
         opt.design->minheight = opt.reqheight;
     if (opt.reqwidth > (long) opt.design->minwidth)
         opt.design->minwidth = opt.reqwidth;
 
+    /*
+     *  Remove box, if the user commands. If not, we'll add a box.
+     */
     if (opt.r) {
         rc = remove_box();
         if (rc == 0) {
@@ -3202,12 +3314,67 @@ int main (int argc, char *argv[])
         exit (EXIT_FAILURE);
     }
 
+    /*
+     *  Adjust box size to fit requested padding value
+     *  Command line-specified box size takes precedence over padding.
+     */
+    for (i=0; i<ANZ_SIDES; ++i) {
+        if (opt.padding[i] > -1)
+            opt.design->padding[i] = opt.padding[i];
+    }
+    pad  = opt.design->padding[BTOP] + opt.design->padding[BBOT];
+    if (pad > 0) {
+        pad += input.anz_lines;
+        pad += opt.design->shape[NW].height + opt.design->shape[SW].height;
+        if (pad > opt.design->minheight) {
+            if (opt.reqheight) {
+                for (i=0; i<(int)(pad-opt.design->minheight); ++i) {
+                    if (opt.design->padding[i%2?BBOT:BTOP])
+                        opt.design->padding[i%2?BBOT:BTOP] -= 1;
+                    else if (opt.design->padding[i%2?BTOP:BBOT])
+                        opt.design->padding[i%2?BTOP:BBOT] -= 1;
+                    else
+                        break;
+                }
+            }
+            else {
+                opt.design->minheight = pad;
+            }
+        }
+    }
+    pad = opt.design->padding[BLEF] + opt.design->padding[BRIG];
+    if (pad > 0) {
+        pad += input.maxline;
+        pad += opt.design->shape[NW].width + opt.design->shape[SW].width;
+        if (pad > opt.design->minwidth) {
+            if (opt.reqwidth) {
+                for (i=0; i<(int)(pad-opt.design->minwidth); ++i) {
+                    if (opt.design->padding[i%2?BRIG:BLEF])
+                        opt.design->padding[i%2?BRIG:BLEF] -= 1;
+                    else if (opt.design->padding[i%2?BLEF:BRIG])
+                        opt.design->padding[i%2?BLEF:BRIG] -= 1;
+                    else
+                        break;
+                }
+            }
+            else {
+                opt.design->minwidth = pad;
+            }
+        }
+    }
+
+    /*
+     *  Generate box
+     */
     #ifdef DEBUG
         fprintf (stderr, "Generating Box ...\n");
     #endif
     rc = generate_box (thebox);
     if (rc) exit (EXIT_FAILURE);
 
+    /*
+     *  Generate output
+     */
     #ifdef DEBUG
         fprintf (stderr, "Generating Output ...\n");
     #endif
