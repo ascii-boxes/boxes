@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.30 1999/08/21 15:55:42 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.31 1999/08/21 23:33:03 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -48,6 +48,10 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.31  1999/08/21 23:33:03  tsjensen
+ *    Added usage of system-wide config file (GLOBALCONF from boxes.h)
+ *    Moved config file selection code into it own function (get_config_file())
+ *
  *    Revision 1.30  1999/08/21 15:55:42  tsjensen
  *    Updated usage information
  *    Updated quickinfo (-l -d) with killblank default value
@@ -186,10 +190,6 @@
  *    Added minimum width/height for a design. Fixed screwed tiny boxes.
  *    Bugfix: Did not handle zero input.
  *
- *    Revision 1.3  1999/03/30 09:36:23  tsjensen
- *    ... still programming ...
- *    (removed setlocale() call and locale.h include)
- *
  *    Revision 1.1  1999/03/18 15:09:17  tsjensen
  *    Initial revision
  *
@@ -215,7 +215,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.30 1999/08/21 15:55:42 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.31 1999/08/21 23:33:03 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
@@ -1243,6 +1243,12 @@ static int read_all_input()
     }
 
     /*
+     *  Exit if there was no input at all
+     */
+    if (input.lines == NULL || input.lines[0].text == NULL)
+        return 0;
+
+    /*
      *  Compute indentation
      */
     rc = get_indent (input.lines, input.anz_lines);
@@ -1250,13 +1256,6 @@ static int read_all_input()
         input.indent = (size_t) rc;
     else
         return 1;
-
-    /*
-     *  Exit if there was no input at all
-     */
-    if (input.lines == NULL || input.lines[0].text == NULL) {
-        return 0;
-    }
 
     /*
      *  Remove indentation, unless we want to preserve it (when removing
