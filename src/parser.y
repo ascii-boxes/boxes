@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.7 1999/04/09 13:31:54 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.8 1999/06/03 18:54:49 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,9 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.8  1999/06/03 18:54:49  tsjensen
+ *    *** empty log message ***
+ *
  *    Revision 1.7  1999/04/09 13:31:54  tsjensen
  *    Added checks for duplicate design names
  *    Added checks for valid design names (no extended ASCII or ctrl chars)
@@ -49,7 +52,7 @@
 #include "boxes.h"
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.7 1999/04/09 13:31:54 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.8 1999/06/03 18:54:49 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -276,7 +279,7 @@ int perform_se_check()
     sentry_t sentry;
 }
 
-%token YSHAPES YELASTIC YSAMPLE YREPLACE
+%token YSHAPES YELASTIC YSAMPLE YREPLACE YREVERSE
 %token <s> KEYWORD
 %token <s> WORD
 %token <s> STRING
@@ -491,8 +494,8 @@ block: YSAMPLE '{' STRING '}'
             YYABORT;
         }
         #ifdef DEBUG
-            fprintf (stderr, "Adding replacement rule: \"%s\" with \"%s\"\n",
-                    $3, $5);
+            fprintf (stderr, "Adding replacement rule: \"%s\" with \"%s\" (%c)\n",
+                    $3, $5, $2);
         #endif
 
         designs[design_idx].reprules = (reprule_t *) realloc
@@ -516,6 +519,42 @@ block: YSAMPLE '{' STRING '}'
         designs[design_idx].reprules[a].mode = $2;
         designs[design_idx].anz_reprules = a + 1;
     }
+
+| YREVERSE rflag STRING WORD STRING
+    {
+        int a = designs[design_idx].anz_revrules;
+
+        if (strcasecmp ($4, "to") != 0) {
+            yyerror ("Search pattern and reversion string must be separated"
+                     " by \"to\"");
+            YYABORT;
+        }
+        #ifdef DEBUG
+            fprintf (stderr, "Adding reversion rule: \"%s\" to \"%s\" (%c)\n",
+                    $3, $5, $2);
+        #endif
+
+        designs[design_idx].revrules = (reprule_t *) realloc
+            (designs[design_idx].revrules, (a+1) * sizeof(reprule_t));
+        if (designs[design_idx].revrules == NULL) {
+            perror (PROJECT);
+            YYABORT;
+        }
+        memset (&(designs[design_idx].revrules[a]), 0, sizeof(reprule_t));
+        designs[design_idx].revrules[a].search =
+            (char *) strdup ($3);
+        designs[design_idx].revrules[a].repstr =
+            (char *) strdup ($5);
+        if (designs[design_idx].revrules[a].search == NULL
+         || designs[design_idx].revrules[a].repstr == NULL)
+        {
+            perror (PROJECT);
+            YYABORT;
+        }
+        designs[design_idx].revrules[a].line = yylineno;
+        designs[design_idx].revrules[a].mode = $2;
+        designs[design_idx].anz_revrules = a + 1;
+    }
 ;
 
 
@@ -526,7 +565,8 @@ rflag: WORD
         else if (strcasecmp ($1, "once") == 0)
             $$ = 'o';
         else {
-            yyerror ("Replace may be modified by \"global\" or \"once\"");
+            yyerror ("Replace/Reverse may only be modified by \"global\" "
+                    "or \"once\"");
             YYABORT;
         }
     }
