@@ -4,8 +4,8 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.18 1999/07/23 16:14:17 tsjensen Exp tsjensen $
- *  Language:         yacc (ANSI C)
+ *  Version:          $Id: parser.y,v 1.19 1999/08/14 19:19:25 tsjensen Exp tsjensen $
+ *  Language:         GNU bison (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *
  *  Remarks: o This program is free software; you can redistribute it and/or
@@ -24,6 +24,19 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.19  1999/08/14 19:19:25  tsjensen
+ *    Added anz_shapespec variable to count non-deepempty user-specified shapes
+ *    (must at least be 1)
+ *    Moved yylex declaration to lexer.h, where it belongs
+ *    Bugfix: bison and yacc seem to differ in the way action code is treated
+ *    which is associated with an error token. Since bison calls the action
+ *    routine whenever a token is skipped while recovering, added skipping
+ *    variable to ensure that only one "skipping to next design" message is
+ *    printed. That was not necessary before. %-/
+ *    Removed existence check from corner_check() routine (obsolete).
+ *    Added code to generate required shapes which were not specified by the user
+ *    Clean-up in shape_def rule (use freeshape() and some more)
+ *
  *    Revision 1.18  1999/07/23 16:14:17  tsjensen
  *    Added computation of height of highest shape in design (maxshapeheight)
  *    Options -l and -d together now call quickinfo mode -> parse only 1 design
@@ -108,7 +121,7 @@
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.18 1999/07/23 16:14:17 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.19 1999/08/14 19:19:25 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -384,8 +397,8 @@ static int design_needed (const char *name, const int design_idx)
     int num;
 }
 
-%token YSHAPES YELASTIC YSAMPLE YREPLACE YREVERSE YPADDING YBOX YEND YUNREC
-%token YTO YWITH
+%token YSHAPES YELASTIC YPADDING YSAMPLE YENDSAMPLE YBOX YEND YUNREC
+%token YREPLACE YREVERSE YTO YWITH
 %token <s> KEYWORD
 %token <s> WORD
 %token <s> STRING
@@ -605,7 +618,7 @@ entry: KEYWORD STRING
 ;
 
 
-block: YSAMPLE '{' STRING '}'
+block: YSAMPLE STRING YENDSAMPLE
     {
         line_t line;
 
@@ -617,7 +630,7 @@ block: YSAMPLE '{' STRING '}'
             yyerror ("duplicate SAMPLE block");
             YYERROR;
         }
-        line.text = (char *) strdup ($3);
+        line.text = (char *) strdup ($2);
         if (line.text == NULL) {
             perror (PROJECT);
             YYABORT;
