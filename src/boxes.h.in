@@ -1,16 +1,33 @@
 /*
  *  File:             boxes.h
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
- *  Author:           Thomas Jensen
+ *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.14 1999/06/25 18:51:04 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h.in,v 1.15 1999/06/30 12:19:12 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
- *  Remarks:          ---
+ *
+ *  Remarks: o This program is free software; you can redistribute it and/or
+ *             modify it under the terms of the GNU General Public License as
+ *             published by the Free Software Foundation; either version 2 of
+ *             the License, or (at your option) any later version.
+ *           o This program is distributed in the hope that it will be useful,
+ *             but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *             MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *             GNU General Public License for more details.
+ *           o You should have received a copy of the GNU General Public
+ *             License along with this program; if not, write to the Free
+ *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *             MA 02111-1307  USA
  *
  *  Revision History:
  *
- *    $Log: boxes.h,v $
+ *    $Log: boxes.h.in,v $
+ *    Revision 1.15  1999/06/30 12:19:12  tsjensen
+ *    Removed DEF_DESIGN macro, because it now defaults to first design
+ *    Removed some porting code, hoping for autoconf future
+ *    Added PARSER_DEBUG and LEXER_DEBUG macros
+ *
  *    Revision 1.14  1999/06/25 18:51:04  tsjensen
  *    Removed empty_side() prototype (now in shape.h)
  *    Added indentmode and justify members to command line options struct
@@ -77,7 +94,7 @@
 
 
 #define PROJECT "boxes"                  /* name of program */
-#define VERSION "1.0 beta 2"             /* current release of project */
+#define VERSION "1.0 beta 3"             /* current release of project */
 
 
 /*
@@ -170,6 +187,7 @@ typedef struct {                         /* Command line options: */
     char      halign;                    /* ( h[lcr]v[tcb] )         */
     char      indentmode;                /* 'b', 't', 'n', or '\0' */
     char      justify;                   /* 'l', 'c', 'r', or '\0' */
+    int       killblank;                 /* -1 if not set */
     FILE     *infile;                    /* where we get our input */
     FILE     *outfile;                   /* where we put our output */
 } opt_t;
