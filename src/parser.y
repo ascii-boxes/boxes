@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.9 1999/06/14 12:13:01 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.10 1999/06/17 19:04:45 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,10 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.10  1999/06/17 19:04:45  tsjensen
+ *    Added detection of empty sample blocks (we don't want that)
+ *    Added detection of duplicate sample blocks
+ *
  *    Revision 1.9  1999/06/14 12:13:01  tsjensen
  *    Added YREVERSE token
  *    Added code for regexp reversion
@@ -56,7 +60,7 @@
 #include "boxes.h"
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.9 1999/06/14 12:13:01 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.10 1999/06/17 19:04:45 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -281,13 +285,15 @@ int perform_se_check()
     char c;
     shape_t shape;
     sentry_t sentry;
+    int num;
 }
 
-%token YSHAPES YELASTIC YSAMPLE YREPLACE YREVERSE
+%token YSHAPES YELASTIC YSAMPLE YREPLACE YREVERSE YPADDING
 %token <s> KEYWORD
 %token <s> WORD
 %token <s> STRING
 %token <shape> SHAPE
+%token <num> YNUMBER
 
 %type <sentry> slist
 %type <sentry> slist_entries
@@ -577,6 +583,17 @@ block: YSAMPLE '{' STRING '}'
         designs[design_idx].revrules[a].mode = $2;
         designs[design_idx].anz_revrules = a + 1;
     }
+
+| YPADDING '{' wlist '}'
+    {
+        #ifdef DEBUG
+            fprintf (stderr, "Padding set to (l%d o%d r%d u%d)\n",
+                    designs[design_idx].padding[BLEF],
+                    designs[design_idx].padding[BTOP],
+                    designs[design_idx].padding[BRIG],
+                    designs[design_idx].padding[BBOT]);
+        #endif
+    }
 ;
 
 
@@ -682,6 +699,50 @@ slist: '(' slist_entries ')'
 | '(' ')'
     {
         $$ = SENTRY_INITIALIZER;
+    }
+;
+
+
+wlist: wlist wlist_entry | wlist_entry;
+
+wlist_entry: WORD YNUMBER
+    {
+        if ($2 < 0) {
+            yyerror ("warning: padding must be a positive number (%s %d) -- "
+                     "ignore", $1, $2);
+        }
+        else {
+            size_t len1 = strlen ($1);
+            if (len1 <= 3 && !strncasecmp ("all", $1, len1)) {
+                designs[design_idx].padding[BTOP] = $2;
+                designs[design_idx].padding[BBOT] = $2;
+                designs[design_idx].padding[BLEF] = $2;
+                designs[design_idx].padding[BRIG] = $2;
+            }
+            else if (len1 <= 10 && !strncasecmp ("horizontal", $1, len1)) {
+                designs[design_idx].padding[BRIG] = $2;
+                designs[design_idx].padding[BLEF] = $2;
+            }
+            else if (len1 <= 8 && !strncasecmp ("vertical", $1, len1)) {
+                designs[design_idx].padding[BTOP] = $2;
+                designs[design_idx].padding[BBOT] = $2;
+            }
+            else if (len1 <= 3 && !strncasecmp ("top", $1, len1)) {
+                designs[design_idx].padding[BTOP] = $2;
+            }
+            else if (len1 <= 5 && !strncasecmp ("right", $1, len1)) {
+                designs[design_idx].padding[BRIG] = $2;
+            }
+            else if (len1 <= 4 && !strncasecmp ("left", $1, len1)) {
+                designs[design_idx].padding[BLEF] = $2;
+            }
+            else if (len1 <= 6 && !strncasecmp ("bottom", $1, len1)) {
+                designs[design_idx].padding[BBOT] = $2;
+            }
+            else {
+                yyerror ("warning: invalid padding area %s -- ignore", $1);
+            }
+        }
     }
 ;
 
