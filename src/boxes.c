@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.21 1999/06/25 18:46:39 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.22 1999/06/28 12:19:29 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -34,6 +34,10 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.22  1999/06/28 12:19:29  tsjensen
+ *    Moved parser init and cleanup from main() to parser.y
+ *    Some further cleanup in main()
+ *
  *    Revision 1.21  1999/06/25 18:46:39  tsjensen
  *    Bugfix: Mixed up SW and NE in padding calculation (tricky, that one)
  *    Added indent mode command line option for grammar overrides
@@ -162,7 +166,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.21 1999/06/25 18:46:39 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.22 1999/06/28 12:19:29 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
@@ -241,16 +245,11 @@ static int process_commandline (int argc, char *argv[])
     /*
      *  Set default values
      */
-    memset (&opt, 0, sizeof(opt));
+    memset (&opt, 0, sizeof(opt_t));
     opt.tabstop = DEF_TABSTOP;
     yyin = stdin;
     for (idummy=0; idummy<ANZ_SIDES; ++idummy)
         opt.padding[idummy] = -1;
-    opt.design = (design_t *) ((char *) strdup (DEF_DESIGN));
-    if (opt.design == NULL) {
-        perror (PROJECT);
-        return 1;
-    }
 
     /*
      *  Parse Command Line
@@ -927,45 +926,6 @@ static int read_all_input()
 }
 
 
-
-static design_t *select_design (design_t *darr, char *sel)
-/*
- *  Select a design to use for our box.
- *
- *  darr      design array as read from config file
- *  sel       name of desired design
- *
- *  If the specified name is not found, defaults to design DEF_DESIGN;
- *  If DEF_DESIGN design is not found, default to design number 0;
- *  If there are no designs, print error message and return error.
- *
- *  RETURNS:  pointer to current design   on success
- *            NULL                        on error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int i;
-
-    if (darr) {
-        for (i=0; i<anz_designs; ++i) {
-            if (strcasecmp (darr[i].name, sel) == 0)
-                return &(darr[i]);
-        }
-        if (opt.design_choice_by_user) {
-            fprintf (stderr, "%s: unknown box design -- %s\n", PROJECT, sel);
-            return NULL;
-        }
-
-        if (darr[0].name != NULL)
-            return darr;
-    }
-
-    fprintf (stderr, "%s: Internal error -- no box designs found\n", PROJECT);
-    return NULL;
-}
-
-
 /*       _\|/_
          (o o)
  +----oOO-{_}-OOo------------------------------------------------------------+
@@ -974,10 +934,9 @@ static design_t *select_design (design_t *darr, char *sel)
 
 int main (int argc, char *argv[])
 {
-    int       rc;                        /* general return code */
-    design_t *tmp;
-    size_t    pad;
-    int       i;
+    int    rc;                           /* general return code */
+    size_t pad;
+    int    i;
 
     #ifdef DEBUG
         fprintf (stderr, "BOXES STARTING ...\n");
@@ -996,7 +955,7 @@ int main (int argc, char *argv[])
         exit (EXIT_FAILURE);
 
     /*
-     *  Parse config file
+     *  Parse config file, then reset design pointer
      */
     #ifdef DEBUG
         fprintf (stderr, "Parsing Config File ...\n");
@@ -1004,18 +963,8 @@ int main (int argc, char *argv[])
     rc = yyparse();
     if (rc)
         exit (EXIT_FAILURE);
-
-    /*
-     *  Select design to use
-     */
-    #ifdef DEBUG
-        fprintf (stderr, "Selecting Design ...\n");
-    #endif
-    tmp = select_design (designs, (char *) opt.design);
-    if (tmp == NULL)
-        exit (EXIT_FAILURE);
     BFREE (opt.design);
-    opt.design = tmp;
+    opt.design = designs;
 
     /*
      *  If "-l" option was given, list styles and exit.
