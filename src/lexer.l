@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.9 1999/06/22 12:00:05 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.10 1999/06/28 12:17:46 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,10 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.10  1999/06/28 12:17:46  tsjensen
+ *    Added tokens YBOX and YEND (thus, BOX and END are no longer YKEYWORDs)
+ *    Added #define FILE_LEXER_L around #include boxes.h to please compiler
+ *
  *    Revision 1.9  1999/06/22 12:00:05  tsjensen
  *    Added #undef DEBUG, because DEBUGging is now activated in boxes.h
  *    Added #include tools.h
@@ -53,15 +57,17 @@
 #include "tools.h"
 #include "y.tab.h"
 
-#undef DEBUG
-/* #define DEBUG */
+
+
+#define LEX_MAX_WARN 3                   /* number of errors per design */
 
 
 static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.9 1999/06/22 12:00:05 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.10 1999/06/28 12:17:46 tsjensen Exp tsjensen $";
 
 
 int yylineno = 1;
+int yyerrcnt = 0;
 
 %}
 
@@ -77,8 +83,9 @@ int yylineno = 1;
 <SAMPLE1,SHAPES,ELASTIC,INITIAL>\n yylineno++;
 
 \"[^"\n]*$ {
-    yyerror ("Unterminated String at %s", yytext);
-    exit (EXIT_FAILURE);
+    if (yyerrcnt++ < 5)
+        yyerror ("Unterminated String at %s", yytext);
+    return YUNREC;
 }
 
 \"[^"\n]*\" {
@@ -104,16 +111,20 @@ int yylineno = 1;
         yytext[yyleng-1] = '\0';
         --yyleng;
 
-        #ifdef DEBUG
+        #ifdef LEXER_DEBUG
             fprintf (stderr, "\n STRING: \"%s\"", yytext);
         #endif
         yylval.s = (char *) strdup (yytext);
+        if (yylval.s == NULL) {
+            perror (PROJECT);
+            exit (EXIT_FAILURE);
+        }
         return STRING;
     }
 }
 
 Sample {
-    #ifdef DEBUG
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\n   WORD: %s -- STATE SAMPLE1", yytext);
     #endif
     BEGIN SAMPLE1;
@@ -121,7 +132,7 @@ Sample {
 }
 
 <SAMPLE1>\{ {
-    #ifdef DEBUG
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\n SYMBOL: \'%c\' -- STATE SAMPLE2", yytext[0]);
     #endif
     BEGIN SAMPLE2;
@@ -129,8 +140,9 @@ Sample {
 }
 
 <SAMPLE1>[^{\n\t\r ]+ {
-    yyerror ("Syntax Error at \"%s\"", yytext);
-    exit (EXIT_FAILURE);
+    if (yyerrcnt++ < 5)
+        yyerror ("Syntax Error at \"%s\"", yytext);
+    return YUNREC;
 }
 
 <SAMPLE2>\n {
@@ -163,16 +175,21 @@ Sample {
                 }
             }
             BEGIN INITIAL;
-            #ifdef DEBUG
+            #ifdef LEXER_DEBUG
                 fprintf (stderr, "\n SAMPLE: %s -- STATE INITIAL", yytext);
             #endif
             yylval.s = (char *) strdup (yytext);
+            if (yylval.s == NULL) {
+                perror (PROJECT);
+                exit (EXIT_FAILURE);
+            }
             return STRING;
         }
     }
     else {
-        yyerror ("SAMPLE entry must not be empty");
-        exit (EXIT_FAILURE);
+        if (yyerrcnt++ < 5)
+            yyerror ("SAMPLE entry must not be empty");
+        return YUNREC;
     }
 }
 
@@ -180,8 +197,8 @@ Sample {
     yymore();
 }
 
-elastic {
-    #ifdef DEBUG
+Elastic {
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\nYELASTC: %s -- STATE ELASTIC", yytext);
     #endif
     BEGIN ELASTIC;
@@ -189,47 +206,29 @@ elastic {
 }
 
 Shapes {
-    #ifdef DEBUG
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\nYSHAPES: %s -- STATE SHAPES", yytext);
     #endif
     BEGIN SHAPES;
     return YSHAPES;
 }
 
-Replace {
-    #ifdef DEBUG
-        fprintf (stderr, "\nYREPLACE: %s", yytext);
-    #endif
-    return YREPLACE;
-}
-
-Reverse {
-    #ifdef DEBUG
-        fprintf (stderr, "\nYREVERSE: %s", yytext);
-    #endif
-    return YREVERSE;
-}
-
-Padding {
-    #ifdef DEBUG
-        fprintf (stderr, "\nYPADDING: %s", yytext);
-    #endif
-    return YPADDING;
-}
-
 Box {
-    #ifdef DEBUG
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\nYBOX: %s", yytext);
     #endif
+    yyerrcnt = 0;
     return YBOX;
 }
 
-End {
-    #ifdef DEBUG
-        fprintf (stderr, "\nYEND: %s", yytext);
-    #endif
-    return YEND;
-}
+Replace { return YREPLACE; }
+Reverse { return YREVERSE; }
+Padding { return YPADDING; }
+End     { return YEND;     }
+To      { return YTO;      }
+With    { return YWITH;    }
+Global  { yylval.c = 'g'; return YRXPFLAG; }
+Once    { yylval.c = 'o'; return YRXPFLAG; }
 
 
 <SHAPES,ELASTIC>nw  { yylval.shape = NW;  return SHAPE; }
@@ -250,7 +249,7 @@ End {
 <SHAPES,ELASTIC>wnw { yylval.shape = WNW; return SHAPE; }
 
 <ELASTIC>\) {
-    #ifdef DEBUG
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\n SYMBOL: \'%c\' -- STATE INITIAL", yytext[0]);
     #endif
     BEGIN INITIAL;
@@ -258,7 +257,7 @@ End {
 }
 
 <SHAPES>\} {
-    #ifdef DEBUG
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\n SYMBOL: \'%c\' -- STATE INITIAL", yytext[0]);
     #endif
     BEGIN INITIAL;
@@ -270,25 +269,33 @@ author|created|revision|revdate|indent {
     /*
      *  general key words
      */
-    #ifdef DEBUG
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\nKEYWORD: %s", yytext);
     #endif
     yylval.s = (char *) strdup (yytext);
+    if (yylval.s == NULL) {
+        perror (PROJECT);
+        exit (EXIT_FAILURE);
+    }
     return KEYWORD;
 }
 
 
 [a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]* {
-    #ifdef DEBUG
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\n   WORD: %s", yytext);
     #endif
     yylval.s = (char *) strdup (yytext);
+    if (yylval.s == NULL) {
+        perror (PROJECT);
+        exit (EXIT_FAILURE);
+    }
     return WORD;
 }
 
 
 [\+-]?[0-9]+ {
-    #ifdef DEBUG
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\nYNUMBER: %s", yytext);
     #endif
     yylval.num = atoi (yytext);
@@ -297,7 +304,7 @@ author|created|revision|revdate|indent {
 
 
 [,(){}] {
-    #ifdef DEBUG
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\n SYMBOL: \'%c\'", yytext[0]);
     #endif
     return yytext[0];
@@ -306,15 +313,16 @@ author|created|revision|revdate|indent {
 
 #.*$ {
     /* ignore comments */
-    #ifdef DEBUG
+    #ifdef LEXER_DEBUG
         fprintf (stderr, "\nCOMMENT: %s", yytext+1);
     #endif
 }
 
 
 . {
-    yyerror ("Unrecognized input at %s", yytext);
-    exit (EXIT_FAILURE);
+    if (yyerrcnt++ < LEX_MAX_WARN)
+        yyerror ("Unrecognized input at %s", yytext);
+    return YUNREC;
 }
 
 
