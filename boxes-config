@@ -1,13 +1,17 @@
 #
-#   File:             boxes-config
-#   Date created:     March 17, 1999 (Wednesday, 17:02h)
-#   Author:           Thomas Jensen
-#                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id: boxes-config,v 1.14 1999/08/18 15:34:38 tsjensen Exp tsjensen $
-#   Format:           ASCII Text
-#   World Wide Web:   http://home.pages.de/~jensen/boxes/
-#   Purpose:          Example configuration file for the boxes program
-#   Remarks:          ---
+#   File:           boxes-config
+#   Date created:   March 17, 1999 (Wednesday, 17:02h)
+#   Author:         Thomas Jensen
+#                   tsjensen@stud.informatik.uni-erlangen.de
+#   Version:        $Id: boxes-config,v 1.15 1999/08/22 11:37:27 tsjensen Exp tsjensen $
+#   Format:         ASCII Text
+#   World Wide Web: http://home.pages.de/~jensen/boxes/
+#   Purpose:        Example configuration file for the boxes program
+#
+#   Remarks:        Extensive documentation may be found on the Web at
+#                      http://home.pages.de/~jensen/boxes/docs/
+#                   The config file syntax in particular is described in
+#                      http://home.pages.de/~jensen/boxes/docs/config-syntax.html
 #____________________________________________________________________________
 #============================================================================
 
@@ -323,6 +327,40 @@ END c-cmt2
 # ============================================================================
 
 
+BOX javadoc
+
+author   "Ted Berg <tedberg@spiritone.com>"
+revision "1.0"
+revdate  "October 25, 1999 (Monday 10:16h)"
+created  "October 25, 1999 (Monday 10:16h)"
+
+sample
+    /**
+     *  Javadoc Comments
+     *
+     */
+ends
+
+shapes {
+    nw ("/*") nnw ("*") n (" ")
+     w (" *")
+    sw (" *") ssw ("/") s (" ")
+}
+
+padding { left 2 }
+
+delimiter ?"
+replace "\*/" with "*\/"                 # quote closing comment tags
+reverse "\*\\/" to "*/"
+
+elastic (s, w, n)
+
+END javadoc
+
+
+# ============================================================================
+
+
 BOX html
 
 author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
@@ -466,48 +504,48 @@ Sample
            \/          \/          \/          \/
 Ends
 
-delimiter ?:
+delimiter ?"
 
 shapes {
-    nw  (:      :, :    /\:, : /\//\:, ://\\\/:)
-    nnw (: /\     :, ://\\/\  :, :\\///\\/:, :/\/\\///:)
-    n   (:     /\     :, :  /\//\\/\  :, :\//\\\///\\/:,
-         :\\\//\/\\///:)
-    nne (:     /\ :, :  /\//\\:, :\//\\\//:, :\\\//\/\:)
-    ne  (:      :, :/\    :, :/\\/\ :, :\///\\:)
+    nw  ("      ", "    /\", " /\//\", "//\\\/")
+    nnw (" /\     ", "//\\/\  ", "\\///\\/", "/\/\\///")
+    n   ("     /\     ", "  /\//\\/\  ", "\//\\\///\\/",
+         "\\\//\/\\///")
+    nne ("     /\ ", "  /\//\\", "\//\\\//", "\\\//\/\")
+    ne  ("      ", "/\    ", "/\\/\ ", "\///\\")
 
-    ene (:\/\\//:, :   \/ :)
-    e   (:   /\ :, :  //\\:, :  \\//:, :   \/ :)
-    ese (:   /\ :, :/\//\\:)
+    ene ("\/\\//", "   \/ ")
+    e   ("   /\ ", "  //\\", "  \\//", "   \/ ")
+    ese ("   /\ ", "/\//\\")
 
-    wnw (:\\//\/:, : \/   :)
-    w   (: /\   :, ://\\  :, :\\//  :, : \/   :)
-    wsw (: /\   :, ://\\/\:)
+    wnw ("\\//\/", " \/   ")
+    w   (" /\   ", "//\\  ", "\\//  ", " \/   ")
+    wsw (" /\   ", "//\\/\")
 
-    sw  (:\\///\:,
-         : \/\\/:,
-         :    \/:,
-         :      :)
+    sw  ("\\///\",
+         " \/\\/",
+         "    \/",
+         "      ")
 
-    ssw (:\/\//\\\:,
-         ://\\\//\:,
-         :\\//\/  :,
-         : \/     :)
+    ssw ("\/\//\\\",
+         "//\\\//\",
+         "\\//\/  ",
+         " \/     ")
 
-    s   (:///\\/\//\\\:,
-         :/\\///\\\//\:,
-         :  \/\\//\/  :,
-         :     \/     :)
+    s   ("///\\/\//\\\",
+         "/\\///\\\//\",
+         "  \/\\//\/  ",
+         "     \/     ")
 
-    sse (:///\\/\/:,
-         :/\\///\\:,
-         :  \/\\//:,
-         :     \/ :)
+    sse ("///\\/\/",
+         "/\\///\\",
+         "  \/\\//",
+         "     \/ ")
 
-    se  (:/\\\//:,
-         :\//\/ :,
-         :\/    :,
-         :      :)
+    se  ("/\\\//",
+         "\//\/ ",
+         "\/    ",
+         "      ")
 }
 
 elastic (n,s,e, w)
@@ -1456,6 +1494,66 @@ padding { right 4 }
 elastic ( e )
 
 END right
+
+
+# ============================================================================
+
+
+BOX ada-cmt
+
+author   "Neil Bird <neil.bird@rdel.co.uk>"
+revision "1.0"
+revdate  "March 15, 2000 (Wednesday 12:17h)"
+created  "March 15, 2000 (Wednesday 12:17h)"
+
+sample
+    --
+    -- regular Ada
+    -- comments
+    --
+ends
+
+shapes {
+    w ("--")
+}
+
+padding {lef 1}
+
+elastic (w)
+
+END ada-cmt
+
+
+# ============================================================================
+
+
+BOX ada-box
+
+author   "Neil Bird <neil.bird@rdel.co.uk>"
+revision "1.0"
+revdate  "March 15, 2000 (Wednesday 12:24h)"
+created  "March 15, 2000 (Wednesday 12:24h)"
+
+sample
+    ---------------
+    --           --
+    --           --
+    ---------------
+ends
+
+shapes {
+    nw ("--") n ("-") ne ("--")
+     w ("--")          e ("--")
+    sw ("--") s ("-") se ("--")
+}
+
+padding {
+    horiz 1
+}
+
+elastic (n,e,s,w)
+
+END ada-box
 
 
 # ============================================================================
