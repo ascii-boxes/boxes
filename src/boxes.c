@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.22 1999/06/28 12:19:29 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.23 1999/06/30 12:16:38 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -34,6 +34,12 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.23  1999/06/30 12:16:38  tsjensen
+ *    Removed entire select_design stuff, because the parser now returns much
+ *    smaller data structures. The first design pointed to by designs is always
+ *    the one we need (except for ops on *all* designs).
+ *    The first design in config file is now default design (no DEF_DESIGN anymore).
+ *
  *    Revision 1.22  1999/06/28 12:19:29  tsjensen
  *    Moved parser init and cleanup from main() to parser.y
  *    Some further cleanup in main()
@@ -166,7 +172,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.22 1999/06/28 12:19:29 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.23 1999/06/30 12:16:38 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
@@ -266,37 +272,52 @@ static int process_commandline (int argc, char *argv[])
                 errfl = 0;
                 pdummy = optarg;
                 while (*pdummy) {
-                    if (pdummy[1] == '\0') {
+                    if (pdummy[1] == '\0' && !strchr ("lLcCrR", *pdummy)) {
                         errfl = 1;
                         break;
                     }
                     switch (*pdummy) {
-                        case 'h':
-                        case 'H':
+                        case 'h': case 'H':
                             switch (pdummy[1]) {
                                 case 'c': case 'C': opt.halign = 'c'; break;
                                 case 'l': case 'L': opt.halign = 'l'; break;
                                 case 'r': case 'R': opt.halign = 'r'; break;
                                 default:            errfl = 1;        break;
                             }
+                            ++pdummy;
                             break;
-                        case 'v':
-                        case 'V':
+                        case 'v': case 'V':
                             switch (pdummy[1]) {
                                 case 'c': case 'C': opt.valign = 'c'; break;
                                 case 't': case 'T': opt.valign = 't'; break;
                                 case 'b': case 'B': opt.valign = 'b'; break;
                                 default:            errfl = 1;        break;
                             }
+                            ++pdummy;
                             break;
-                        case 'j':
-                        case 'J':
+                        case 'j': case 'J':
                             switch (pdummy[1]) {
                                 case 'l': case 'L': opt.justify = 'l'; break;
                                 case 'c': case 'C': opt.justify = 'c'; break;
                                 case 'r': case 'R': opt.justify = 'r'; break;
                                 default:            errfl = 1;         break;
                             }
+                            ++pdummy;
+                            break;
+                        case 'l': case 'L':
+                            opt.justify = 'l';
+                            opt.halign = 'l';
+                            opt.valign = 'c';
+                            break;
+                        case 'r': case 'R':
+                            opt.justify = 'r';
+                            opt.halign = 'r';
+                            opt.valign = 'c';
+                            break;
+                        case 'c': case 'C':
+                            opt.justify = 'c';
+                            opt.halign = 'c';
+                            opt.valign = 'c';
                             break;
                         default:
                             errfl = 1;
@@ -305,7 +326,7 @@ static int process_commandline (int argc, char *argv[])
                     if (errfl)
                         break;
                     else
-                        pdummy += 2;
+                        ++pdummy;
                 }
                 if (errfl) {
                     fprintf (stderr, "%s: Illegal text format -- %s\n",
