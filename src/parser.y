@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.12 1999/06/22 12:01:01 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.13 1999/06/28 12:15:47 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,12 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.13  1999/06/28 12:15:47  tsjensen
+ *    Added error handling. Now skips to next design on error.
+ *    Replaced DEBUG macro with PARSER_DEBUG, which is now activated in boxes.h
+ *    Added rule first_rule, which performs init and cleanup formerly done in main()
+ *    Introduced symbols YBOX and YEND
+ *
  *    Revision 1.12  1999/06/22 12:01:01  tsjensen
  *    Added #undef DEBUG, because DEBUGging is now activated in boxes.h
  *    Added #include tools.h
@@ -62,7 +68,7 @@
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.12 1999/06/22 12:01:01 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.13 1999/06/28 12:15:47 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -316,20 +322,24 @@ static void recover()
     int num;
 }
 
-%token YSHAPES YELASTIC YSAMPLE YREPLACE YREVERSE YPADDING YBOX YEND
+%token YSHAPES YELASTIC YSAMPLE YREPLACE YREVERSE YPADDING YBOX YEND YUNREC
+%token YTO YWITH
 %token <s> KEYWORD
 %token <s> WORD
 %token <s> STRING
 %token <shape> SHAPE
 %token <num> YNUMBER
+%token <c> YRXPFLAG
 
-%type <sentry> slist
-%type <sentry> slist_entries
+%type <sentry> shape_def
+%type <sentry> shape_lines
 %type <c> rflag;
 
 %start first_rule
 
+
 %%
+
 
 first_rule:
     {
@@ -368,7 +378,9 @@ config_file
     }
 ;
 
-config_file: config_file design_or_error | design_or_error;
+
+config_file: config_file design_or_error | design_or_error ;
+
 
 design_or_error: design | error
     {
@@ -389,17 +401,17 @@ design: YBOX WORD layout YEND WORD
         #endif
 
         if (strcasecmp ($2, $5)) {
-            yyerror ("Box design name differs at BOX and END");
+            yyerror ("box design name differs at BOX and END");
             YYERROR;
         }
         if (pflicht < 3) {
-            yyerror ("Entries SAMPLE, SHAPES, and ELASTIC are mandatory");
+            yyerror ("entries SAMPLE, SHAPES, and ELASTIC are mandatory");
             YYERROR;
         }
         
         for (i=0; i<design_idx; ++i) {
             if (strcasecmp ($2, designs[i].name) == 0) {
-                yyerror ("Duplicate box design name -- %s", $2);
+                yyerror ("duplicate box design name -- %s", $2);
                 YYERROR;
             }
         }
@@ -407,7 +419,7 @@ design: YBOX WORD layout YEND WORD
         p = $2;
         while (*p) {
             if (*p < 32 || *p > 126) {
-                yyerror ("Box design name must consist of printable standard "
+                yyerror ("box design name must consist of printable standard "
                          "ASCII characters.");
                 YYERROR;
             }
@@ -415,6 +427,10 @@ design: YBOX WORD layout YEND WORD
         }
 
         designs[design_idx].name = (char *) strdup ($2);
+        if (designs[design_idx].name == NULL) {
+            perror (PROJECT);
+            YYABORT;
+        }
         pflicht = 0;
         time_for_se_check = 0;
         
@@ -430,7 +446,9 @@ design: YBOX WORD layout YEND WORD
     }
 ;
 
+
 layout: layout entry | layout block | entry | block ;
+
 
 entry: KEYWORD STRING
     {
@@ -439,15 +457,31 @@ entry: KEYWORD STRING
         #endif
         if (strcasecmp ($1, "author") == 0) {
             designs[design_idx].author = (char *) strdup ($2);
+            if (designs[design_idx].author == NULL) {
+                perror (PROJECT);
+                YYABORT;
+            }
         }
         else if (strcasecmp ($1, "revision") == 0) {
             designs[design_idx].revision = (char *) strdup ($2);
+            if (designs[design_idx].revision == NULL) {
+                perror (PROJECT);
+                YYABORT;
+            }
         }
         else if (strcasecmp ($1, "created") == 0) {
             designs[design_idx].created = (char *) strdup ($2);
+            if (designs[design_idx].created == NULL) {
+                perror (PROJECT);
+                YYABORT;
+            }
         }
         else if (strcasecmp ($1, "revdate") == 0) {
             designs[design_idx].revdate = (char *) strdup ($2);
+            if (designs[design_idx].revdate == NULL) {
+                perror (PROJECT);
+                YYABORT;
+            }
         }
         else if (strcasecmp ($1, "indent") == 0) {
             if (strcasecmp ($2, "text") == 0 ||
@@ -486,7 +520,7 @@ block: YSAMPLE '{' STRING '}'
         #endif
 
         if (designs[design_idx].sample) {
-            yyerror ("Duplicate SAMPLE block");
+            yyerror ("duplicate SAMPLE block");
             YYERROR;
         }
         line.text = (char *) strdup ($3);
@@ -505,7 +539,7 @@ block: YSAMPLE '{' STRING '}'
         ++pflicht;
     }
 
-| YSHAPES  '{' the_shapes  '}'
+| YSHAPES  '{' slist  '}'
     {
         int i,j;
 
@@ -526,7 +560,7 @@ block: YSAMPLE '{' STRING '}'
           && isempty (designs[design_idx].shape +   W)
           && isempty (designs[design_idx].shape + WSW)))
         {
-            yyerror ("Must specify at least one shape per side "
+            yyerror ("must specify at least one shape per side "
                      "(corners don\'t count as sides)");
             YYERROR;
         }
@@ -568,7 +602,7 @@ block: YSAMPLE '{' STRING '}'
         #endif
     }
 
-| YELASTIC elist
+| YELASTIC '(' elist ')'
     {
         ++pflicht;
         if (++time_for_se_check > 1) {
@@ -577,15 +611,10 @@ block: YSAMPLE '{' STRING '}'
         }
     }
 
-| YREPLACE rflag STRING WORD STRING
+| YREPLACE rflag STRING YWITH STRING
     {
         int a = designs[design_idx].anz_reprules;
 
-        if (strcasecmp ($4, "with") != 0) {
-            yyerror ("Search pattern and replacement string must be separated"
-                     " by \"with\"");
-            YYERROR;
-        }
         #ifdef PARSER_DEBUG
             fprintf (stderr, "Adding replacement rule: \"%s\" with \"%s\" (%c)\n",
                     $3, $5, $2);
@@ -613,15 +642,10 @@ block: YSAMPLE '{' STRING '}'
         designs[design_idx].anz_reprules = a + 1;
     }
 
-| YREVERSE rflag STRING WORD STRING
+| YREVERSE rflag STRING YTO STRING
     {
         int a = designs[design_idx].anz_revrules;
 
-        if (strcasecmp ($4, "to") != 0) {
-            yyerror ("Search pattern and reversion string must be separated"
-                     " by \"to\"");
-            YYERROR;
-        }
         #ifdef PARSER_DEBUG
             fprintf (stderr, "Adding reversion rule: \"%s\" to \"%s\" (%c)\n",
                     $3, $5, $2);
@@ -662,19 +686,10 @@ block: YSAMPLE '{' STRING '}'
 ;
 
 
-rflag: WORD
+rflag: YRXPFLAG
     {
-        if (strcasecmp ($1, "global") == 0)
-            $$ = 'g';
-        else if (strcasecmp ($1, "once") == 0)
-            $$ = 'o';
-        else {
-            yyerror ("Replace/Reverse may only be modified by \"global\" "
-                    "or \"once\"");
-            YYERROR;
-        }
+        $$ = $1;
     }
-
 |
     {
         $$ = 'g';
@@ -682,53 +697,10 @@ rflag: WORD
 ;
 
 
-the_shapes: the_shapes SHAPE slist
-    {
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Adding shape spec for \'%s\' (width %d "
-                    "height %d)\n", shape_name[$2], $3.width, $3.height);
-        #endif
-
-        if (isempty (designs[design_idx].shape+$2)) {
-            designs[design_idx].shape[$2] = $3;
-        }
-        else {
-            yyerror ("Duplicate specification for %s shape", shape_name[$2]);
-            YYERROR;
-        }
-    }
-
-| SHAPE slist
-    {
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Adding shape spec for \'%s\' (width %d "
-                    "height %d)\n", shape_name[$1], $2.width, $2.height);
-        #endif
-
-        if (isempty (designs[design_idx].shape + $1)) {
-            designs[design_idx].shape[$1] = $2;
-        }
-        else {
-            yyerror ("Duplicate specification for %s shape", shape_name[$1]);
-            YYERROR;
-        }
-    }
-;
+elist: elist ',' elist_entry | elist_entry;
 
 
-elist: '(' elist_entries ')' ;
-
-
-elist_entries: elist_entries ',' SHAPE
-    {
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Marked \'%s\' shape as elastic\n",
-                    shape_name[(int)$3]);
-        #endif
-        designs[design_idx].shape[$3].elastic = 1;
-    }
-
-| SHAPE
+elist_entry: SHAPE
     {
         #ifdef PARSER_DEBUG
             fprintf (stderr, "Marked \'%s\' shape as elastic\n",
@@ -739,7 +711,28 @@ elist_entries: elist_entries ',' SHAPE
 ;
 
 
-slist: '(' slist_entries ')'
+slist: slist slist_entry | slist_entry ;
+
+
+slist_entry: SHAPE shape_def
+    {
+        #ifdef PARSER_DEBUG
+            fprintf (stderr, "Adding shape spec for \'%s\' (width %d "
+                    "height %d)\n", shape_name[$1], $2.width, $2.height);
+        #endif
+
+        if (isempty (designs[design_idx].shape + $1)) {
+            designs[design_idx].shape[$1] = $2;
+        }
+        else {
+            yyerror ("duplicate specification for %s shape", shape_name[$1]);
+            YYERROR;
+        }
+    }
+;
+
+
+shape_def: '(' shape_lines ')'
     {
         sentry_t rval = $2;
 
@@ -751,7 +744,7 @@ slist: '(' slist_entries ')'
                 BFREE (rval.chars[i]);
             BFREE (rval.chars);
 
-            yyerror ("warning: minimum shape dimension is 1x1 - clearing.");
+            yyerror ("minimum shape dimension is 1x1 - clearing");
 
             $$ = SENTRY_INITIALIZER;
         }
@@ -768,13 +761,69 @@ slist: '(' slist_entries ')'
 ;
 
 
+shape_lines: shape_lines ',' STRING
+    {
+        sentry_t rval = $1;
+        size_t slen = strlen ($3);
+        char **tmp;
+
+        #ifdef PARSER_DEBUG
+            fprintf (stderr, "Extending a shape entry\n");
+        #endif
+
+        if (slen != rval.width) {
+            yyerror ("all elements of a shape spec must be of equal length");
+            YYERROR;
+        }
+
+        rval.height++;
+        tmp = (char **) realloc (rval.chars, rval.height*sizeof(char*));
+        if (tmp == NULL) {
+            perror (PROJECT": shape_lines11");
+            YYABORT;
+        }
+        rval.chars = tmp;
+        rval.chars[rval.height-1] = (char *) strdup ($3);
+        if (rval.chars[rval.height-1] == NULL) {
+            perror (PROJECT": shape_lines12");
+            YYABORT;
+        }
+        $$ = rval;
+    }
+
+| STRING
+    {
+        sentry_t rval = SENTRY_INITIALIZER;
+
+        #ifdef PARSER_DEBUG
+            fprintf (stderr, "Initializing a shape entry with first line\n");
+        #endif
+
+        rval.width = strlen ($1);
+        rval.height = 1;
+        rval.chars = (char **) malloc (sizeof(char*));
+        if (rval.chars == NULL) {
+            perror (PROJECT": shape_lines21");
+            YYABORT;
+        }
+        rval.chars[0] = (char *) strdup ($1);
+        if (rval.chars[0] == NULL) {
+            perror (PROJECT": shape_lines22");
+            YYABORT;
+        }
+        $$ = rval;
+    }
+;
+
+
 wlist: wlist wlist_entry | wlist_entry;
+
 
 wlist_entry: WORD YNUMBER
     {
         if ($2 < 0) {
-            yyerror ("warning: padding must be a positive number (%s %d) -- "
-                     "ignore", $1, $2);
+            yyerror ("padding must be a positive integer (%s %d) (ignored)",
+                    $1, $2);
         }
         else {
             size_t len1 = strlen ($1);
@@ -805,68 +854,13 @@ wlist_entry: WORD YNUMBER
                 designs[design_idx].padding[BBOT] = $2;
             }
             else {
-                yyerror ("warning: invalid padding area %s (ignored)", $1);
+                yyerror ("invalid padding area %s (ignored)", $1);
             }
         }
     }
 ;
 
 
-slist_entries: slist_entries ',' STRING
-    {
-        sentry_t rval = $1;
-        size_t slen = strlen ($3);
-        char **tmp;
-
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Extending a shape entry\n");
-        #endif
-
-        if (slen != rval.width) {
-            yyerror ("All elements of a shape spec must be of equal length");
-            YYERROR;
-        }
-
-        rval.height++;
-        tmp = (char **) realloc (rval.chars, rval.height*sizeof(char*));
-        if (tmp == NULL) {
-            perror (PROJECT": slist_entries11");
-            YYABORT;
-        }
-        rval.chars = tmp;
-        rval.chars[rval.height-1] = (char *) strdup ($3);
-        if (rval.chars[rval.height-1] == NULL) {
-            perror (PROJECT": slist_entries12");
-            YYABORT;
-        }
-        $$ = rval;
-    }
-
-| STRING
-    {
-        sentry_t rval = SENTRY_INITIALIZER;
-
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Initializing a shape entry with first line\n");
-        #endif
-
-        rval.width = strlen ($1);
-        rval.height = 1;
-        rval.chars = (char **) malloc (sizeof(char*));
-        if (rval.chars == NULL) {
-            perror (PROJECT": slist_entries21");
-            YYABORT;
-        }
-        rval.chars[0] = (char *) strdup ($1);
-        if (rval.chars[0] == NULL) {
-            perror (PROJECT": slist_entries22");
-            YYABORT;
-        }
-        $$ = rval;
-    }
-;
-
 %%
-
 
 /*EOF*/                                          /* vim: set sw=4 cindent: */
