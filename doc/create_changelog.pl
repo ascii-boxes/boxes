@@ -3,11 +3,16 @@
 #  Author:       Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>
 #  Date created: July 12, 1999 (Monday, 13:14h)
 #  Language:     Perl 5
-#  Version:      $Id: create_changelog.pl,v 1.2 1999/07/12 18:03:14 tsjensen Exp tsjensen $
+#  Version:      $Id: create_changelog.pl,v 1.3 1999/08/18 18:41:41 tsjensen Exp tsjensen $
 #
 #  History:
 #
 #    $Log: create_changelog.pl,v $
+#    Revision 1.3  1999/08/18 18:41:41  tsjensen
+#    Added HTML conversions for '&' and eacute
+#    Removing path from file name
+#    Changed introductory text
+#
 #    Revision 1.2  1999/07/12 18:03:14  tsjensen
 #    Moved "List of Files" from top to bottom of page
 #    Many modifications on the page's appearance
@@ -22,6 +27,11 @@
 
 @files = @ARGV;
 $#files >= 0 or die "no input files";
+
+%milestones = (
+    "1999/08/22 11:37:27" => "VERSION 1.0 RELEASED",
+    "1999/06/25 18:52:28" => "FIRST BETA RELEASED"
+);
 
 print '<HTML>
 
@@ -38,7 +48,7 @@ print '<HTML>
 This page is automatically updated whenever a few of the <A
 HREF="#flist">files listed below</A> are checked in, so it is very
 up-to-date. It might already show changes which are not even in the <A
-HREF="download/current-SNAP.tar.gz">current snapshot</A> yet.
+HREF="download/boxes-SNAP-latest.tar.gz">current snapshot</A> yet.
 
 <H1>Chronological Change Log</H1>
 
@@ -110,6 +120,13 @@ foreach $dat (sort @files) {
 
 
 foreach $line (reverse sort keys %cl) {
+    foreach (keys %milestones) {
+        if ($line =~ /^$_/) {
+            print "</DL>\n\n<HR>\n<CENTER><STRONG><FONT SIZE=\"-1\">";
+            print $milestones{$_}, "</FONT></STRONG></CENTER>\n";
+            print "<HR>\n\n<DL>\n";
+        }
+    }
     print "<DT><TT>$line</TT>\n";
     print "<DD><TT>", @{$cl{$line}}, "</TT><P>\n\n";
 }
