@@ -3,7 +3,7 @@
 #   Creation:    March 18, 1999 (Thursday, 15:10h)
 #   Author:      Thomas Jensen
 #                tsjensen@stud.informatik.uni-erlangen.de
-#   Version:     $Id: Makefile,v 1.5 1999/04/04 16:12:40 tsjensen Exp tsjensen $
+#   Version:     $Id: Makefile,v 1.6 1999/06/04 12:15:37 tsjensen Exp tsjensen $
 #   Format:      GNU make
 #   Web Site:    http://home.pages.de/~jensen/boxes/
 #   Platforms:   sparc/Solaris 2.6
@@ -13,6 +13,9 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.6  1999/06/04 12:15:37  tsjensen
+#     Added snap target for automatic snapshot publication
+#
 #     Revision 1.5  1999/04/04 16:12:40  tsjensen
 #     Added rules for new regular expression handling files
 #     Added file header
@@ -43,10 +46,14 @@ CC      = gcc
 CFLAGS  = -ansi -D_POSIX_C_SOURCE -D__EXTENSIONS__ -I. $(CFLAGS_ADDTL)
 LDFLAGS = -L. -L/local/GNU/lib
 
-SRC     = boxes.c boxes.h lex.yy.c lexer.l parser.y regexp.c regexp.h regmagic.h regsub.c y.tab.c y.tab.h
+GENSRC  = y.tab.c y.tab.h lex.yy.c
+HSSRC   = regexp.c regexp.h regmagic.h regsub.c
+ORIGSRC = boxes.c boxes.h lexer.l parser.y tools.c tools.h shape.c shape.h
+ALLSRC  = $(ORIGSRC) $(HSSRC) $(GENSRC)
+ALLOBJ  = y.tab.o lex.yy.o boxes.o shape.o tools.o
 
-boxes: y.tab.o lex.yy.o boxes.o libregexp.a
-	$(CC) $(LDFLAGS) -o boxes y.tab.o lex.yy.o boxes.o -lregexp -lfl
+boxes: $(ALLOBJ) libregexp.a
+	$(CC) $(LDFLAGS) $(ALLOBJ) -o boxes -lregexp -lfl
 
 build:
 	$(MAKE) CFLAGS_ADDTL=-O boxes
@@ -59,13 +66,19 @@ regexp.o: regexp.c regmagic.h regexp.h
 regsub.o: regsub.c regmagic.h regexp.h
 	gcc -traditional -O -I. -c regsub.c
 
-lex.yy.o: lex.yy.c y.tab.h
+lex.yy.o: lex.yy.c y.tab.h tools.h shape.h
 	$(CC) $(CFLAGS) -DYY_NO_UNPUT -Wall -W -c lex.yy.c
 
-y.tab.o: y.tab.c y.tab.h
+y.tab.o: y.tab.c y.tab.h tools.h shape.h
 
-boxes.o: boxes.c boxes.h regexp.h
+boxes.o: boxes.c boxes.h regexp.h shape.h tools.h
 	$(CC) $(CFLAGS) -Wall -W -c boxes.c
+
+tools.o: tools.c tools.h boxes.h
+	$(CC) $(CFLAGS) -Wall -W -c tools.c
+
+shape.o: shape.c shape.h boxes.h
+	$(CC) $(CFLAGS) -Wall -W -c shape.c
 
 y.tab.c y.tab.h: parser.y boxes.h regexp.h
 	$(YACC) -d parser.y
@@ -73,14 +86,14 @@ y.tab.c y.tab.h: parser.y boxes.h regexp.h
 lex.yy.c: lexer.l boxes.h
 	$(LEX) -i lexer.l
 
-snap: $(SRC) Makefile
+snap: $(ALLSRC) Makefile
 	mkdir boxes-SNAP-`date +%Y%m%d`
-	cp $(SRC) Makefile boxes-SNAP-`date +%Y%m%d`
+	cp $(ALLSRC) Makefile boxes-SNAP-`date +%Y%m%d`
 	gtar cfvz boxes-SNAP-`date +%Y%m%d`.tar.gz boxes-SNAP-`date +%Y%m%d`/*
 	rm -rf boxes-SNAP-`date +%Y%m%d`/
-	cp boxes-SNAP-`date +%Y%m%d`.tar.gz $(HOME)/d/public_html/software/boxes/
-	rm -f $(HOME)/d/public_html/software/boxes/current-SNAP.tar.gz
-	(cd $(HOME)/d/public_html/software/boxes/; ln -s boxes-SNAP-`date +%Y%m%d`.tar.gz current-SNAP.tar.gz)
+	cp boxes-SNAP-`date +%Y%m%d`.tar.gz $(HOME)/d/public_html/software/boxes/download/
+	rm -f $(HOME)/d/public_html/software/boxes/download/current-SNAP.tar.gz
+	(cd $(HOME)/d/public_html/software/boxes/download/; ln -s boxes-SNAP-`date +%Y%m%d`.tar.gz current-SNAP.tar.gz)
 
 clean:
 	rm -f lex.yy.c y.tab.c y.tab.h
