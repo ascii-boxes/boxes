@@ -3,7 +3,7 @@
 #   Creation:    March 18, 1999 (Thursday, 15:10h)
 #   Author:      Thomas Jensen
 #                tsjensen@stud.informatik.uni-erlangen.de
-#   Version:     $Id: Makefile,v 1.8 1999/06/23 19:35:17 tsjensen Exp tsjensen $
+#   Version:     $Id: Makefile,v 1.9 1999/06/28 12:21:34 tsjensen Exp tsjensen $
 #   Format:      GNU make
 #   Web Site:    http://home.pages.de/~jensen/boxes/
 #   Platforms:   sparc/Solaris 2.6
@@ -13,6 +13,12 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.9  1999/06/28 12:21:34  tsjensen
+#     Added macro SNAPFILE for boxes-SNAP-`date +%Y%m%d`
+#     Added target rcstest
+#     Now builds optimized code by default
+#     Added debug target for non-optimized code w/ debugging info
+#
 #     Revision 1.8  1999/06/23 19:35:17  tsjensen
 #     Added remove.o and generate.o
 #     Introduced implicit rule .c.o, simplifying commands for most sources
@@ -50,16 +56,16 @@
 
 
 LEX      = flex
-YACC     = yacc
+YACC     = bison --yacc
 CC       = gcc
 CFLAGS   = -ansi -D_POSIX_C_SOURCE -D__EXTENSIONS__ -I. $(CFLAGS_ADDTL)
-LDFLAGS  = -L. -L/local/GNU/lib
+LDFLAGS  = -L.
 
 SNAPFILE = boxes-SNAP-`date +%Y%m%d`
 
 GENSRC   = y.tab.c y.tab.h lex.yy.c
 HSSRC    = regexp.c regexp.h regmagic.h regsub.c
-ORIGSRC  = boxes.c boxes.h lexer.l parser.y tools.c tools.h shape.c shape.h generate.c generate.h remove.h remove.c
+ORIGSRC  = boxes.c boxes.h lexer.l parser.y tools.c tools.h shape.c shape.h generate.c generate.h remove.h remove.c parser.h
 ALLSRC   = $(ORIGSRC) $(HSSRC) $(GENSRC)
 ALLOBJ   = y.tab.o lex.yy.o boxes.o shape.o tools.o generate.o remove.o
 
@@ -70,7 +76,13 @@ debug:
 	$(MAKE) CFLAGS_ADDTL=-g boxes
 
 boxes: $(ALLOBJ) libregexp.a
-	$(CC) $(LDFLAGS) $(ALLOBJ) -o boxes -lregexp -lfl
+	$(CC) $(LDFLAGS) $(ALLOBJ) -o boxes -lregexp
+
+y.tab.c y.tab.h: parser.y boxes.h regexp.h
+	$(YACC) -d parser.y
+
+lex.yy.c: lexer.l boxes.h
+	$(LEX) -i lexer.l
 
 libregexp.a: regexp.o regsub.o
 	ar cr libregexp.a regexp.o regsub.o
@@ -85,21 +97,11 @@ tools.o: tools.c tools.h boxes.h shape.h
 shape.o: shape.c shape.h boxes.h
 generate.o: generate.c generate.h boxes.h shape.h tools.h
 remove.o: remove.c remove.h boxes.h shape.h tools.h
+lex.yy.o: lex.yy.c y.tab.h tools.h shape.h parser.h
+y.tab.o: y.tab.c y.tab.h tools.h shape.h parser.h
 
 .c.o:
 	$(CC) $(CFLAGS) -Wall -W -c $<
-
-y.tab.o: y.tab.c y.tab.h tools.h shape.h
-	$(CC) $(CFLAGS) -c y.tab.c
-
-y.tab.c y.tab.h: parser.y boxes.h regexp.h
-	$(YACC) -d parser.y
-
-lex.yy.o: lex.yy.c y.tab.h tools.h shape.h
-	$(CC) $(CFLAGS) -Wall -W -DYY_NO_UNPUT -c lex.yy.c
-
-lex.yy.c: lexer.l boxes.h
-	$(LEX) -i lexer.l
 
 snap: $(ALLSRC) Makefile
 	mkdir $(SNAPFILE)
