@@ -3,11 +3,11 @@
 LEX    = flex
 YACC   = yacc
 CC     = gcc
-CFLAGS = -O
+CFLAGS = -ansi -D_POSIX_C_SOURCE # -O
 
 
 boxes: y.tab.o lex.yy.o boxes.o
-	$(CC) $(CFLAGS) -o boxes y.tab.o lex.yy.o boxes.o -ll
+	$(CC) $(CFLAGS) -Wall -W -o boxes y.tab.o lex.yy.o boxes.o -ll
 
 lex.yy.o: lex.yy.c y.tab.h
 
@@ -24,7 +24,7 @@ lex.yy.c: lexer.l boxes.h
 clean:
 	rm -f lex.yy.c y.tab.c y.tab.h
 	rm -f lex.yy.o y.tab.o
-	rm -f boxes
+	rm -f boxes.o boxes
 
 love:
 	@echo "Not in front of the kids, honey!"
