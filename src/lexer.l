@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.12 1999/07/02 11:58:15 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.13 1999/07/22 12:21:14 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *
@@ -24,6 +24,12 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.13  1999/07/22 12:21:14  tsjensen
+ *    Added GNU GPL disclaimer
+ *    Renamed y.tab.h include to parser.h (same file)
+ *    Renamed parser.h include to lexer.h (same file)
+ *    Added config.h include
+ *
  *    Revision 1.12  1999/07/02 11:58:15  tsjensen
  *    Added begin_speedmode() which is called by parser.y
  *    Added state SPEEDMODE for fast skipping of designs
@@ -45,7 +51,7 @@
  *    Added #include tools.h
  *
  *    Revision 1.8  1999/06/20 14:17:58  tsjensen
- *    Added "padding" keyword and recogintion of numbers (YNUMBER)
+ *    Added "padding" keyword and recognition of numbers (YNUMBER)
  *
  *    Revision 1.7  1999/06/17 19:05:46  tsjensen
  *    Bugfix: Sample block analysis didn't handle empty blocks
@@ -89,7 +95,7 @@
 
 
 static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.12 1999/07/02 11:58:15 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.13 1999/07/22 12:21:14 tsjensen Exp tsjensen $";
 
 
 int yylineno = 1;
@@ -100,8 +106,7 @@ int yyerrcnt = 0;
 %option nounput
 %option noyywrap
 
-%x SAMPLE1
-%x SAMPLE2
+%x SAMPLE
 %x SPEEDMODE
 %s SHAPES
 %s ELASTIC
@@ -112,9 +117,9 @@ PBOX   Box
 
 %%
 
-<SAMPLE1,SHAPES,ELASTIC,INITIAL>[ \r\t] /* ignore whitespace */
+<SHAPES,ELASTIC,INITIAL>[ \r\t] /* ignore whitespace */
 
-<SAMPLE1,SHAPES,ELASTIC,INITIAL>\n ++yylineno;
+<SHAPES,ELASTIC,INITIAL>\n ++yylineno;
 
 \"[^"\n]*$ {
     if (yyerrcnt++ < 5)
@@ -157,79 +162,72 @@ PBOX   Box
     }
 }
 
+
+
 Sample {
     #ifdef LEXER_DEBUG
-        fprintf (stderr, "\n   WORD: %s -- STATE SAMPLE1", yytext);
+        fprintf (stderr, "\nYSAMPLE: %s -- STATE SAMPLE", yytext);
     #endif
-    BEGIN SAMPLE1;
+    BEGIN SAMPLE;
     return YSAMPLE;
 }
 
-<SAMPLE1>\{ {
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, "\n SYMBOL: \'%c\' -- STATE SAMPLE2", yytext[0]);
-    #endif
-    BEGIN SAMPLE2;
-    return yytext[0];
-}
 
-<SAMPLE1>[^\{\n\r\t ]+ {
-    if (yyerrcnt++ < 5)
-        yyerror ("Syntax Error at \"%s\"", yytext);
-    return YUNREC;
-}
-
-<SAMPLE2>\n {
+<SAMPLE>\n {
     ++yylineno;
     if (yyleng > 1)
         yymore();
 }
 
-<SAMPLE2>\} {
-    int bidx = yyleng-2;                 /* backslash index */
 
-    if (bidx >= 0) {
-        while (bidx >= 0 && yytext[bidx] == '\\') bidx--;
+<SAMPLE>^[ \t]*ends[ \t\r]*$ {
+    char *p = yytext + yyleng -1;
+    size_t len;                          /* length of sample */
 
-        if ((yyleng-2-bidx) % 2) {       /* odd number of backslashes */
-            yymore();                    /* append next string */
-        }
-        else {
-            yyless (yyleng-1);           /* have him recognize '}' symbol */
+    while (*p == ' ' || *p == '\t' || *p == '\r')
+        --p;                             /* skip trailing whitespace */
+    p -= 2;                              /* almost skip "ends" statement */
+    *p = '\0';                           /* p now points to 'n' */
+    yylval.s = (char *) strdup (yytext);
+    if (yylval.s == NULL) {
+        perror (PROJECT);
+        exit (EXIT_FAILURE);
+    }
+    *p-- = 'n';
 
-            for (bidx=yyleng-1; yytext[bidx]=='\n'; --bidx) {
-                yytext[bidx] = '\0';    /* remove trailing newlines */
-                --yyleng;
-            }
-            for (bidx=0; bidx<yyleng-1; ++bidx) {
-                if (yytext[bidx] == '\\') {
-                    memmove (yytext+bidx, yytext+bidx+1, yyleng-bidx-1);
-                    yytext[yyleng-1] = '\0';
-                    --yyleng;                   /* inefficient */
-                }
-            }
-            BEGIN INITIAL;
-            #ifdef LEXER_DEBUG
-                fprintf (stderr, "\n SAMPLE: %s -- STATE INITIAL", yytext);
-            #endif
-            yylval.s = (char *) strdup (yytext);
-            if (yylval.s == NULL) {
-                perror (PROJECT);
-                exit (EXIT_FAILURE);
-            }
-            return STRING;
-        }
+    len = p - yytext;                    /* yyless(n): push back all but the first n */
+    yyless (len);                        /* allow him to return YENDSAMPLE */
+
+    yylval.s[len] = '\n';                /* replace 'e' with newline */
+    btrim (yylval.s, &len);
+    if (len > 0) {
+        strcat (yylval.s, "\n");         /* memory was allocated with strdup */
+        #ifdef LEXER_DEBUG
+            fprintf (stderr, "\n STRING: \"%s\" -- STATE INITIAL", yylval.s);
+        #endif
+        BEGIN INITIAL;
+        return STRING;
     }
     else {
         if (yyerrcnt++ < 5)
-            yyerror ("SAMPLE entry must not be empty");
+            yyerror ("SAMPLE block must not be empty");
+        BFREE (yylval.s);
         return YUNREC;
     }
 }
 
-<SAMPLE2>. {
-    yymore();
+
+<SAMPLE>. yymore();
+
+
+ends[ \t\r]*$ {
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "\nYENDSAM: %s", yytext);
+    #endif
+    return YENDSAMPLE;
 }
+
+
 
 Elastic {
     #ifdef LEXER_DEBUG
