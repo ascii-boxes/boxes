@@ -4,7 +4,7 @@
  *  Date created:     June 20, 1999 (Sunday, 16:51h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: tools.c,v 1.3 1999/08/13 23:54:24 tsjensen Exp tsjensen $
+ *  Version:          $Id: tools.c,v 1.4 1999/08/21 16:09:33 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Provide tool functions for error reporting and some
@@ -26,6 +26,9 @@
  *  Revision History:
  *
  *    $Log: tools.c,v $
+ *    Revision 1.4  1999/08/21 16:09:33  tsjensen
+ *    Removed newline check from empty_line() function
+ *
  *    Revision 1.3  1999/08/13 23:54:24  tsjensen
  *    Bugfix: cut&paste error in in strisyes() and strisno(). Thanks Warren Seltzer
  *
@@ -52,7 +55,7 @@
 
 
 static const char rcsid_tools_c[] =
-    "$Id: tools.c,v 1.3 1999/08/13 23:54:24 tsjensen Exp tsjensen $";
+    "$Id: tools.c,v 1.4 1999/08/21 16:09:33 tsjensen Exp tsjensen $";
 
 
 
@@ -64,14 +67,14 @@ int yyerror (const char *fmt, ...)
  */
 {
     va_list ap;
-    char buf[1024];
 
     va_start (ap, fmt);
-    snprintf (buf, 1024-1, "%s: %s: line %d: ", PROJECT,
-            yyfilename? yyfilename: "(null)", yylineno);
-    vsnprintf (buf+strlen(buf), 1024-strlen(buf)-1, fmt, ap);
-    strcat (buf, "\n");
-    fprintf (stderr, buf);
+
+    fprintf  (stderr, "%s: %s: line %d: ", PROJECT,
+              yyfilename? yyfilename: "(null)", yylineno);
+    vfprintf (stderr, fmt, ap);
+    fputc    ('\n', stderr);
+
     va_end (ap);
 
     return 0;
@@ -153,6 +156,70 @@ int strisno (const char *s)
         return 1;
     else
         return 0;
+}
+
+
+
+void concat_strings (char *dst, int max_len, int count, ...)
+/*
+ *  Concatenate a variable number of strings into a fixed-length buffer.
+ *
+ *      dst     Destination array
+ *      max_len Maximum resulting string length (including terminating NULL).
+ *      count   Number of source strings.
+ * 
+ *  The concatenation process terminates when either the destination 
+ *  buffer is full or all 'count' strings are processed.  Null string
+ *  pointers are treated as empty strings.
+ * 
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    va_list     va;
+    const char *src;
+
+    va_start (va, count);
+
+    /*
+     *  Sanity check. 
+     */
+    if (max_len < 1)
+        return;
+
+    if (max_len == 1 || count < 1) {
+        *dst = '\0';
+        return;
+    }
+
+    /*
+     *  Loop over all input strings.
+     */
+    while (count-->0 && max_len > 1) {
+
+        /*
+         * Grab an input string pointer.  If it's NULL, skip it (eg. treat
+         * it as empty.
+         */
+        src = va_arg (va, const char *);
+
+        if (src == NULL) 
+            continue;
+
+        /* 
+         * Concatenate 'src' onto 'dst', as long as we have room.
+         */
+        while (*src && max_len > 1) {
+            *dst++ = *src++;
+            max_len--;
+        }
+    }
+
+    va_end (va);
+
+    /*
+     * Terminate the string with an ASCII NUL.
+     */
+    *dst = '\0';
 }
 
 
