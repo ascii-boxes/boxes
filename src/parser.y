@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.8 1999/06/03 18:54:49 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.9 1999/06/14 12:13:01 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,10 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.9  1999/06/14 12:13:01  tsjensen
+ *    Added YREVERSE token
+ *    Added code for regexp reversion
+ *
  *    Revision 1.8  1999/06/03 18:54:49  tsjensen
  *    *** empty log message ***
  *
@@ -52,7 +56,7 @@
 #include "boxes.h"
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.8 1999/06/03 18:54:49 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.9 1999/06/14 12:13:01 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -381,8 +385,8 @@ entry: KEYWORD STRING
                 designs[design_idx].indentmode = $2[0];
             }
             else {
-                yyerror ("%s: indent keyword must be followed by \"text\", "
-                         "\"box\", or \"none\"\n", PROJECT);
+                yyerror ("indent keyword must be followed by \"text\", "
+                         "\"box\", or \"none\"\n");
                 YYABORT;
             }
         }
@@ -404,11 +408,29 @@ entry: KEYWORD STRING
 
 block: YSAMPLE '{' STRING '}'
     {
+        line_t line;
+
         #ifdef DEBUG
             fprintf (stderr, "SAMPLE block rule fulfilled\n");
         #endif
 
-        designs[design_idx].sample = (char *) strdup ($3);
+        if (designs[design_idx].sample) {
+            yyerror ("Duplicate SAMPLE block");
+            YYABORT;
+        }
+        line.text = (char *) strdup ($3);
+        if (line.text == NULL) {
+            perror (PROJECT);
+            YYABORT;
+        }
+        line.len = strlen (line.text);
+        if (empty_line(&line)) {
+            yyerror ("SAMPLE entry must not be empty");
+            BFREE (line.text);
+            YYABORT;
+        }
+
+        designs[design_idx].sample = line.text;
         ++pflicht;
     }
 
