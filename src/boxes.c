@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.34 2000/03/17 23:44:26 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.35 2000/03/21 14:26:31 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -48,6 +48,9 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.35  2000/03/21 14:26:31  tsjensen
+ *    Minor change to make boxes compile on DEC/OSF, too (S_ISDIR)
+ *
  *    Revision 1.34  2000/03/17 23:44:26  tsjensen
  *    Port to Win32 platform based on patches by Ron Aaron
  *    Changes only affect Win32 version. Win32 behavior differs from the UNIX
@@ -243,7 +246,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.34 2000/03/17 23:44:26 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.35 2000/03/21 14:26:31 tsjensen Exp tsjensen $";
 
 
 
@@ -285,6 +288,7 @@ static void usage (FILE *st)
 {
     fprintf (st, "Usage:  %s [options] [infile [outfile]]\n", PROJECT);
     fprintf (st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
+    fprintf (st, "        -c str   use single shape box design where str is the W shape\n");
     fprintf (st, "        -d name  select box design [default: first one in file]\n");
     fprintf (st, "        -f file  use only file as configuration file\n");
     fprintf (st, "        -h       print usage information\n");
@@ -522,7 +526,7 @@ static int process_commandline (int argc, char *argv[])
      *  Parse Command Line
      */
     do {
-        oc = getopt (argc, argv, "a:d:f:hi:k:lp:rs:t:v");
+        oc = getopt (argc, argv, "a:c:d:f:hi:k:lp:rs:t:v");
 
         switch (oc) {
 
@@ -594,6 +598,28 @@ static int process_commandline (int argc, char *argv[])
                             PROJECT, optarg);
                     return 1;
                 }
+                break;
+
+            case 'c':
+                /*
+                 *  Command line design definition
+                 */
+                opt.cld = (char *) strdup (optarg);
+                if (opt.cld == NULL) {
+                    perror (PROJECT);
+                    return 1;
+                }
+                else {
+                    line_t templine;
+                    templine.len = strlen (opt.cld);
+                    templine.text = opt.cld;
+                    if (empty_line(&templine)) {
+                        fprintf (stderr, "%s: boxes may not consist entirely "
+                                "of whitespace\n", PROJECT);
+                        return 1;
+                    }
+                }
+                opt.design_choice_by_user = 1;
                 break;
 
             case 'd':
@@ -871,9 +897,11 @@ static int process_commandline (int argc, char *argv[])
     /*
      *  If no config file has as yet been specified, try getting it elsewhere.
      */
-    rc = get_config_file();              /* sets yyin and yyfilename     */
-    if (rc)                              /* may change working directory */
-        return rc;
+    if (opt.cld == NULL) {
+        rc = get_config_file();          /* sets yyin and yyfilename     */
+        if (rc)                          /* may change working directory */
+            return rc;
+    }
 
     #if defined(DEBUG) || 0
         fprintf (stderr, "Command line option settings (excerpt):\n");
@@ -889,7 +917,97 @@ static int process_commandline (int argc, char *argv[])
         fprintf (stderr, "- Line justification: \'%c\'\n",
                 opt.justify? opt.justify: '?');
         fprintf (stderr, "- Kill blank lines: %d\n", opt.killblank);
+        fprintf (stderr, "- Design Definition W shape: %s\n",
+                opt.cld? opt.cld: "n/a");
     #endif
+
+    return 0;
+}
+
+
+
+static int build_design (design_t **adesigns, const char *cld)
+/*
+ *  Build a box design.
+ *
+ *      adesigns    Pointer to global designs list
+ *      cld         the W shape as specified on the command line
+ *
+ *  Builds the global design list containing only one design which was
+ *  built from the -c command line definition.
+ *
+ *  RETURNS:  != 0   on error (out of memory)
+ *            == 0   on success
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    design_t *dp;                        /* pointer to design to be created */
+    sentry_t *c;                         /* pointer to current shape */
+    int i;
+    int rc;
+
+    *adesigns = (design_t *) calloc (1, sizeof(design_t));
+    if (*adesigns == NULL) {
+        perror (PROJECT);
+        return 1;
+    }
+    dp = *adesigns;                      /* for readability */
+
+    dp->name = "<Command Line Definition>";
+    dp->created = "now";
+    dp->revision = "1.0";
+    dp->sample = "n/a";
+    dp->indentmode = DEF_INDENTMODE;
+    dp->padding[BLEF] = 1;
+
+    dp->shape[W].height = 1;
+    dp->shape[W].width = strlen(cld);
+    dp->shape[W].elastic = 1;
+    rc = genshape (dp->shape[W].width, dp->shape[W].height, &(dp->shape[W].chars));
+    if (rc)
+        return rc;
+    strcpy (dp->shape[W].chars[0], cld);
+
+    for (i=0; i<ANZ_SHAPES; ++i) {
+        c = dp->shape + i;
+
+        if (i == NNW || i == NNE || i == WNW || i == ENE || i == W
+                || i == WSW || i == ESE || i == SSW || i == SSE)
+            continue;
+
+        switch (i) {
+            case NW:  case SW:
+                c->width = dp->shape[W].width;
+                c->height = 1;
+                c->elastic = 0;
+                break;
+
+            case NE:  case SE:
+                c->width = 1;
+                c->height = 1;
+                c->elastic = 0;
+                break;
+
+            case N:  case S:  case E:
+                c->width = 1;
+                c->height = 1;
+                c->elastic = 1;
+                break;
+
+            default:
+                fprintf (stderr, "%s: internal error\n", PROJECT);
+                return 1;                /* never happens ;-) */
+        }
+
+        rc = genshape (c->width, c->height, &(c->chars));
+        if (rc)
+            return rc;
+    }
+
+    dp->maxshapeheight = 1;
+    dp->minwidth = dp->shape[W].width + 2;
+    dp->minheight = 3;
 
     return 0;
 }
@@ -1445,9 +1563,17 @@ int main (int argc, char *argv[])
     #ifdef DEBUG
         fprintf (stderr, "Parsing Config File ...\n");
     #endif
-    rc = yyparse();
-    if (rc)
-        exit (EXIT_FAILURE);
+    if (opt.cld == NULL) {
+        rc = yyparse();
+        if (rc)
+            exit (EXIT_FAILURE);
+    }
+    else {
+        rc = build_design (&designs, opt.cld);
+        if (rc)
+            exit (EXIT_FAILURE);
+        anz_designs = 1;
+    }
     BFREE (opt.design);
     opt.design = designs;
 
