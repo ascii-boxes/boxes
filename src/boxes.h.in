@@ -1,29 +1,33 @@
-
-
-#ifdef DEBUG
-#ifndef DEBUG_STUFF
-#define DEBUG_STUFF
-
-char *shape_name[] = {
-    "NW", "NNW", "N", "NNE", "NE", "ENE", "E", "ESE",
-    "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW"
-};
-
-char *ofs_name[] =   {
-    "NW_NNW", "NNW_N", "N_NNE", "NNE_NE", "NE_ENE", "ENE_E", "E_ESE", "ESE_SE",
-    "SE_SSE", "SSE_S", "S_SSW", "SSW_SW", "SW_WSW", "WSW_W", "W_WNW", "WNW_NW"
-};
-
-#endif /* DEBUG_STUFF */
-#endif /* DEBUG */
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/*
+ *  File:             boxes.h
+ *  Date created:     March 18, 1999 (Thursday, 15:09h)
+ *  Author:           Thomas Jensen
+ *                    tsjensen@stud.informatik.uni-erlangen.de
+ *  Version:          $Id$
+ *  Language:         ANSI C
+ *  Purpose:          Project-wide globals and data structures
+ *  Remarks:          ---
+ *
+ *  Revision History:
+ *
+ *    $Log$
+ *    Revision 1.1  1999/03/18 15:09:34  tsjensen
+ *    Initial revision
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
 
 #ifndef BOXES_H
 #define BOXES_H
 
 #define PROJECT "boxes"                  /* name of program */
 #define VERSION "1.0"                    /* current release of project */
+
+static const char rcsid_boxes_h[] =
+    "$Id$";
+
+extern char *shape_name[];
+extern char *ofs_name[];
 
 #define ANZ_OFFSETS 16
 
@@ -39,11 +43,23 @@ typedef enum {
     NW, NNW, N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW
 } shape_t;
 
+#define SHAPES_PER_SIDE 5
+#define ANZ_SIDES       4
+#define ANZ_CORNERS     4
+
+extern shape_t north_side[SHAPES_PER_SIDE];  /* groups of shapes, clockwise */
+extern shape_t east_side[SHAPES_PER_SIDE];
+extern shape_t south_side[SHAPES_PER_SIDE];
+extern shape_t west_side[SHAPES_PER_SIDE];
+extern shape_t corners[ANZ_CORNERS];
+extern shape_t *sides[];
+
 
 typedef struct {
     char **chars;
     int    height;
     int    width;
+    int    elastic;
 } sentry_t;
 
 typedef struct {
@@ -55,8 +71,6 @@ typedef struct {
     char    *sample;
     sentry_t shape[ANZ_SHAPES];
     int      offset[ANZ_OFFSETS];
-    shape_t  elastic[ANZ_SHAPES];
-    int      anz_elastic;
 } design_t;
 
 extern design_t *designs;
@@ -65,7 +79,8 @@ extern int design_idx;
 extern int yylineno;
 
 int yyerror (const char *fmt, ...);
-
+shape_t *on_side (const shape_t shape1, const shape_t shape2);
+int shape_distance (const shape_t s1, const shape_t s2);
 
 #endif /* BOXES_H */
 
