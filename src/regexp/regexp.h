@@ -1,7 +1,7 @@
 /*
  * Definitions etc. for regexp(3) routines.
  *
- * Version: $Id: regexp.h,v 1.3 1999/04/12 18:16:52 tsjensen Exp tsjensen $
+ * Version: $Id: regexp.h,v 1.4 1999/06/22 12:12:05 tsjensen Exp tsjensen $
  *
  * Caveat:  this is V8 regexp(3) [actually, a reimplementation thereof],
  * not the System V one.
@@ -26,7 +26,7 @@ extern regexp *regcomp();
 /* extern int regexec();   */
 /* extern size_t regsub(); */
 extern size_t myregsub();
-extern void regerror();
+/* extern void regerror(); */
 
 
 #endif /* REGEXP_H */
