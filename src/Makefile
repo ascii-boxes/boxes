@@ -3,7 +3,7 @@
 #   Creation:    March 18, 1999 (Thursday, 15:10h)
 #   Author:      Thomas Jensen
 #                tsjensen@stud.informatik.uni-erlangen.de
-#   Version:     $Id: Makefile,v 1.4 1999/04/03 12:01:01 tsjensen Exp tsjensen $
+#   Version:     $Id: Makefile,v 1.5 1999/04/04 16:12:40 tsjensen Exp tsjensen $
 #   Format:      GNU make
 #   Web Site:    http://home.pages.de/~jensen/boxes/
 #   Platforms:   sparc/Solaris 2.6
@@ -13,6 +13,11 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.5  1999/04/04 16:12:40  tsjensen
+#     Added rules for new regular expression handling files
+#     Added file header
+#     Straightened out clean commands
+#
 #     Revision 1.4  1999/04/03 12:01:01  tsjensen
 #     Added build target for optimized compilation
 #     Now linking with flex library instead of lex library
@@ -38,6 +43,7 @@ CC      = gcc
 CFLAGS  = -ansi -D_POSIX_C_SOURCE -D__EXTENSIONS__ -I. $(CFLAGS_ADDTL)
 LDFLAGS = -L. -L/local/GNU/lib
 
+SRC     = boxes.c boxes.h lex.yy.c lexer.l parser.y regexp.c regexp.h regmagic.h regsub.c y.tab.c y.tab.h
 
 boxes: y.tab.o lex.yy.o boxes.o libregexp.a
 	$(CC) $(LDFLAGS) -o boxes y.tab.o lex.yy.o boxes.o -lregexp -lfl
@@ -66,6 +72,15 @@ y.tab.c y.tab.h: parser.y boxes.h regexp.h
 
 lex.yy.c: lexer.l boxes.h
 	$(LEX) -i lexer.l
+
+snap: $(SRC) Makefile
+	mkdir boxes-SNAP-`date +%Y%m%d`
+	cp $(SRC) Makefile boxes-SNAP-`date +%Y%m%d`
+	gtar cfvz boxes-SNAP-`date +%Y%m%d`.tar.gz boxes-SNAP-`date +%Y%m%d`/*
+	rm -rf boxes-SNAP-`date +%Y%m%d`/
+	cp boxes-SNAP-`date +%Y%m%d`.tar.gz $(HOME)/d/public_html/software/boxes/
+	rm -f $(HOME)/d/public_html/software/boxes/current-SNAP.tar.gz
+	(cd $(HOME)/d/public_html/software/boxes/; ln -s boxes-SNAP-`date +%Y%m%d`.tar.gz current-SNAP.tar.gz)
 
 clean:
 	rm -f lex.yy.c y.tab.c y.tab.h
