@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.10 1999/06/03 18:54:05 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.11 1999/06/03 19:24:14 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -18,6 +18,9 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.11  1999/06/03 19:24:14  tsjensen
+ *    a few fixes related to box removal (as expected)
+ *
  *    Revision 1.10  1999/06/03 18:54:05  tsjensen
  *    lots of fixes
  *    Added remove box functionality, which remains to be tested
@@ -83,18 +86,11 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.10 1999/06/03 18:54:05 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.11 1999/06/03 19:24:14 tsjensen Exp tsjensen $";
 
 extern FILE *yyin;                       /* lex input file */
 
 
-
-/*  Number of spaces appended to all input lines prior to removing a box.
- *  A greater number takes more space and time, but enables the correct
- *  removal of boxes whose east sides consist of lots of spaces (the given
- *  value).
- */
-#define EAST_PADDING    20
 
 /*  max. allowed tab stop distance
  */
@@ -1956,7 +1952,7 @@ static int output_box (const sentry_t *thebox)
                     thebox[BRIG].chars[j]);
         }
 
-        obuf_len = strlen (obuf);        /* TODO Can't we compute this?! */
+        obuf_len = strlen (obuf);
 
         if (obuf_len > LINE_MAX) {
             size_t newlen = LINE_MAX;
@@ -2493,8 +2489,9 @@ int remove_box()
     size_t textend = 0;              /* index of 1st line of south side */
     size_t boxstart = 0;             /* index of 1st line of box */
     size_t boxend = 0;               /* index of 1st line trailing the box */
-    int m;                           /* true if a match was found */
+    int    m;                        /* true if a match was found */
     size_t j;                        /* loop counter */
+    int    did_something = 0;        /* true if there was something to remove */
 
     #ifdef DEBUG
         fprintf (stderr, "remove_box()\n");
@@ -2512,8 +2509,12 @@ int remove_box()
 
     /*
      *  Add trailing spaces to input lines (needed for recognition)
+     *  Also append a number of spaces to all input lines. A greater number
+     *  takes more space and time, but enables the correct removal of boxes
+     *  whose east sides consist of lots of spaces (the given value). So we
+     *  add a number of spaces equal to the east side width.
      */
-    input.maxline += EAST_PADDING;
+    input.maxline += opt.design->shape[NE].width;
     for (j=0; j<input.anz_lines; ++j) {
         input.lines[j].text = (char *)
             realloc (input.lines[j].text, input.maxline+1);
@@ -2572,7 +2573,6 @@ int remove_box()
     for (j=textstart; j<textend; ++j) {
         char *ws, *we, *es, *ee;         /* west start & end, east start&end */
         char *p;
-        int c;
 
         m = best_match (input.lines+j, &ws, &we, &es, &ee);
         if (m < 0)
@@ -2595,6 +2595,7 @@ int remove_box()
                     es&&ee? (ee-input.lines[j].text-(es-input.lines[j].text)):0);
             #endif
             if (ws && we) {
+                did_something = 1;
                 for (p=ws; p<we; ++p)
                     *p = ' ';
             }
@@ -2603,12 +2604,23 @@ int remove_box()
                     *p = ' ';
             }
         }
-        for (c=0; c<(int)opt.design->shape[NW].width; ++c) {
-            if (input.lines[j].text[c] != ' ')
-                break;
+    }
+
+    /*
+     *  Remove as many spaces from the left side of the line as the west side
+     *  of the box was wide. Don't do it if we never removed anything from the
+     *  west side. Don't harm the line's text if there aren't enough spaces.
+     */
+    if (did_something) {
+        for (j=textstart; j<textend; ++j) {
+            int c;
+            for (c=0; c<(int)opt.design->shape[NW].width; ++c) {
+                if (input.lines[j].text[c] != ' ')
+                    break;
+            }
+            memmove (input.lines[j].text, input.lines[j].text + c,
+                    input.lines[j].len - c);
         }
-        memmove (input.lines[j].text, input.lines[j].text + c,
-                input.lines[j].len - c);
     }
 
     /*
