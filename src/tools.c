@@ -4,7 +4,7 @@
  *  Date created:     June 20, 1999 (Sunday, 16:51h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: tools.c,v 1.1 1999/06/23 11:19:30 tsjensen Exp tsjensen $
+ *  Version:          $Id: tools.c,v 1.2 1999/07/20 18:55:20 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Provide tool functions for error reporting and some
@@ -26,6 +26,11 @@
  *  Revision History:
  *
  *    $Log: tools.c,v $
+ *    Revision 1.2  1999/07/20 18:55:20  tsjensen
+ *    Added GNU GPL disclaimer
+ *    Added functions strisyes() and strisno()
+ *    Added config.h and shape.h include statements
+ *
  *    Revision 1.1  1999/06/23 11:19:30  tsjensen
  *    Initial revision
  *
@@ -44,7 +49,7 @@
 
 
 static const char rcsid_tools_c[] =
-    "$Id: tools.c,v 1.1 1999/06/23 11:19:30 tsjensen Exp tsjensen $";
+    "$Id: tools.c,v 1.2 1999/07/20 18:55:20 tsjensen Exp tsjensen $";
 
 
 
@@ -102,15 +107,15 @@ int strisyes (const char *s)
     if (s == NULL)
         return 0;
 
-    if (!strncasecmp ("on", optarg, 3))
+    if (!strncasecmp ("on", s, 3))
         return 1;
-    else if (!strncasecmp ("yes", optarg, 4))
+    else if (!strncasecmp ("yes", s, 4))
         return 1;
-    else if (!strncasecmp ("true", optarg, 5))
+    else if (!strncasecmp ("true", s, 5))
         return 1;
-    else if (!strncmp ("1", optarg, 2))
+    else if (!strncmp ("1", s, 2))
         return 1;
-    else if (!strncasecmp ("t", optarg, 2))
+    else if (!strncasecmp ("t", s, 2))
         return 1;
     else
         return 0;
@@ -133,15 +138,15 @@ int strisno (const char *s)
     if (s == NULL)
         return 0;
 
-    if (!strncasecmp ("off", optarg, 4))
+    if (!strncasecmp ("off", s, 4))
         return 1;
-    else if (!strncasecmp ("no", optarg, 3))
+    else if (!strncasecmp ("no", s, 3))
         return 1;
-    else if (!strncasecmp ("false", optarg, 6))
+    else if (!strncasecmp ("false", s, 6))
         return 1;
-    else if (!strncmp ("0", optarg, 2))
+    else if (!strncmp ("0", s, 2))
         return 1;
-    else if (!strncasecmp ("f", optarg, 2))
+    else if (!strncasecmp ("f", s, 2))
         return 1;
     else
         return 0;
