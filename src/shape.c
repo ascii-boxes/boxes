@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 13:39h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id$
+ *  Version:          $Id: shape.c,v 1.1 1999/06/23 12:26:59 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Shape handling and information functions
@@ -12,7 +12,10 @@
  *
  *  Revision History:
  *
- *    $Log$
+ *    $Log: shape.c,v $
+ *    Revision 1.1  1999/06/23 12:26:59  tsjensen
+ *    Initial revision
+ *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
@@ -20,11 +23,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "shape.h"
-#include "regexp.h"
 #include "boxes.h"
 
 static const char rcsid_shape_c[] =
-    "$Id$";
+    "$Id: shape.c,v 1.1 1999/06/23 12:26:59 tsjensen Exp tsjensen $";
 
 
 
@@ -346,6 +348,43 @@ shape_t leftmost (const int aside, const int cnt)
     }
 
     return ANZ_SHAPES;
+}
+
+
+
+int empty_side (sentry_t *d, const int aside)
+/*
+ *  Return true if the shapes on the given side consist entirely out of
+ *  spaces - and spaces only, tabs are considered non-empty.
+ *
+ *      d       pointer to shape list of design to check
+ *      aside   the box side (one of BTOP etc.)
+ *
+ *  RETURNS:  == 0   side is not empty
+ *            != 0   side is empty
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int       i;
+    size_t    j;
+    sentry_t *cs;                        /* current shape */
+    char     *p;
+
+    for (i=0; i<SHAPES_PER_SIDE; ++i) {
+        cs = d + sides[aside][i];
+        if (isempty(cs))
+            continue;
+        for (j=0; j<cs->height; ++j) {
+            p = cs->chars[j];
+            while (*p && *p == ' ')
+                ++p;
+            if (*p)
+                return 0;                /* side is not empty */
+        }
+    }
+
+    return 1;                            /* side is empty */
 }
 
 
