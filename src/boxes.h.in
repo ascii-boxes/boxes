@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.11 1999/06/22 12:01:24 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h,v 1.12 1999/06/23 12:33:49 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *  Remarks:          ---
@@ -11,6 +11,10 @@
  *  Revision History:
  *
  *    $Log: boxes.h,v $
+ *    Revision 1.12  1999/06/23 12:33:49  tsjensen
+ *    Moved some data structures and macros related to shapes to shape.h
+ *    Added #ifdef DEBUG around __TJ() macro for convenience
+ *
  *    Revision 1.11  1999/06/22 12:01:24  tsjensen
  *    Added DEF_DESIGN (default design name)
  *    Added opt_t and opt global variable from boxes.c
@@ -57,6 +61,9 @@
 
 /* #define DEBUG */
 /* #define REGEXP_DEBUG */
+
+#include "regexp.h"
+
 
 
 #define PROJECT "boxes"                  /* name of program */
@@ -140,12 +147,8 @@ typedef struct {
     size_t     anz_revrules;
 } design_t;
 
-typedef struct {
-    size_t len;
-    char  *text;
-} line_t;
-
 extern design_t *designs;
+extern int anz_designs;
 extern int design_idx;
 
 
@@ -171,7 +174,29 @@ typedef struct {                         /* Command line options: */
 extern opt_t opt;
 
 
-#endif /* BOXES_H */
+typedef struct {
+    size_t len;
+    char  *text;
+} line_t;
 
+#ifndef FILE_LEXER_L
+typedef struct {
+    line_t *lines;
+    size_t anz_lines;                    /* number of entries in input */
+    size_t maxline;                      /* length of longest input line */
+    size_t indent;                       /* number of leading spaces found */
+} input_t;
+
+#define INPUT_INITIALIZER {NULL, 0, 0, LINE_MAX}
+
+extern input_t input;
+#endif /*!FILE_LEXER_L*/
+
+
+int empty_side (design_t *d, const int aside);
+
+
+
+#endif /* BOXES_H */
 
 /*EOF*/                                          /* vim: set cindent sw=4: */
