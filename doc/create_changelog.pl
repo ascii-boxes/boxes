@@ -1,8 +1,18 @@
 #!/local/bin/perl5 -w
+#
+#  Author:       Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>
+#  Date created: July 12, 1999 (Monday, 13:14h)
+#  Language:     Perl 5
+#  Version:      $Id: create_changelog.pl,v 1.1 1999/07/12 12:28:46 tsjensen Exp tsjensen $
+#
+#  History:
+#
+#    $Log: create_changelog.pl,v $
+#    Revision 1.1  1999/07/12 12:28:46  tsjensen
+#    Initial revision
+#______________________________________________________________________________
+#==============================================================================
 
-# Author: Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>
-# $Id$
-# $Log$
 
 @files = @ARGV;
 $#files >= 0 or die "no input files";
@@ -10,7 +20,7 @@ $#files >= 0 or die "no input files";
 print '<HTML>
 
 <HEAD>
-    <TITLE>boxes - Change Logs</TITLE>
+    <TITLE>boxes - Change Log</TITLE>
     <META NAME="Author" CONTENT="Thomas Jensen">
     <META HTTP-EQUIV="Content-type"
           CONTENT="text/html; charset=iso-8859-1">
@@ -19,57 +29,10 @@ print '<HTML>
 
 <BODY TEXT="#000000" LINK="#0000FF" VLINK="#C00080" BGCOLOR="#FFFFFF">
 
-<H1><TT>Boxes</TT> Change Log</H1>
-
 This page is an automatically generated chronologically sorted change log of
-the files listed below.
+the files listed <A HREF="#flist">below</A>.
 
-<H2>List of Files</H2>
-
-<DL>
-';
-
-
-foreach $dat (sort @files) {
-    next unless -r $dat;
-    @tmp = `rlog $dat`;
-
-    @foo = ();
-    $start = 0;
-    @desc = ();
-
-    @foo = grep /^head: /, @tmp;
-    $rev = $foo[0];
-    $rev =~ s/^head: //;
-    chop $rev;
-    
-    for ($i=0; $i<$#tmp; ++$i) {
-        if ($start) {
-            if ($start == 2) {
-                last;
-            }
-            else {
-                if ($tmp[$i] =~ /^----------------------------$/) {
-                    $start = 2;
-                }
-                else {
-                    push @desc, $tmp[$i];
-                }
-            }
-        }
-        else {
-            $start = 1 if ($tmp[$i] =~ /^description:$/);
-        }
-    }
-
-    print "<DT><TT>$dat</TT> <i>($rev)</i>\n";
-    print "<DD>", @desc;
-}
-
-
-print '</DL>
-
-<H2>Chronological Change Log</H2>
+<H1>Chronological Change Log</H1>
 
 <DL>
 ';
@@ -118,14 +81,17 @@ foreach $dat (sort @files) {
             if ($tmp[$i] =~ /^Initial revision$/) {
                 $tmp[$i] = "<FONT COLOR=\"#C00000\">".$tmp[$i]."</FONT>";
             }
-            push @desc, $tmp[$i]."<BR>\n";
+            if (@desc > 0 && $tmp[$i] !~ /^[a-zäöü]/ && $tmp[$i] !~ /^[-=]{10}/) {
+                $tmp[$i] = "<BR>".$tmp[$i];
+            }
+            push @desc, $tmp[$i]."\n";
         }
 
         if ($tmp[$i] =~ /^----------------------------$/
             || $tmp[$i] =~ /^===============================================/)
         {
             $desc[$#desc] = "";
-            $cl{$datum.";  <STRONG>".$dat." rev. ".$rev."</STRONG>  (".$auth.")"} = [ @desc ];
+            $cl{$datum."; <STRONG>".$dat." ".$rev."</STRONG> (".$auth.")"} = [ @desc ];
             @desc = ();
         }
     }
@@ -138,11 +104,61 @@ foreach $line (reverse sort keys %cl) {
 }
 
 
-print "</DL>\n\n", '<!--#include file="footer.inc.html" -->
+
+print '</DL>
+
+
+<HR>
+<H2><A NAME="flist">List of Files</A></H2>
+
+<DL>
+';
+
+foreach $dat (sort @files) {
+    next unless -r $dat;
+    @tmp = `rlog $dat`;
+
+    @foo = ();
+    $start = 0;
+    @desc = ();
+
+    @foo = grep /^head: /, @tmp;
+    $rev = $foo[0];
+    $rev =~ s/^head: //;
+    chop $rev;
+    
+    for ($i=0; $i<$#tmp; ++$i) {
+        if ($start) {
+            if ($start == 2) {
+                last;
+            }
+            else {
+                if ($tmp[$i] =~ /^----------------------------$/) {
+                    $start = 2;
+                }
+                else {
+                    push @desc, $tmp[$i];
+                }
+            }
+        }
+        else {
+            $start = 1 if ($tmp[$i] =~ /^description:$/);
+        }
+    }
+
+    print "<DT><TT>$dat</TT> <i>($rev)</i>\n";
+    print "<DD>", @desc;
+}
+
+
+print '</DL>
+
+
+<!--#include file="footer.inc.html" -->
 
 </BODY>
 </HTML>
 ';
 
 
-#EOF
+#EOF                                                   vim: set sw=4:
