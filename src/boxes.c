@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.20 1999/06/23 19:17:27 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.21 1999/06/25 18:46:39 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -34,6 +34,12 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.21  1999/06/25 18:46:39  tsjensen
+ *    Bugfix: Mixed up SW and NE in padding calculation (tricky, that one)
+ *    Added indent mode command line option for grammar overrides
+ *    Moved empty_side() to shape.c after small change in signature
+ *    Added text-in-block justification (j) to alignment option (-a)
+ *
  *    Revision 1.20  1999/06/23 19:17:27  tsjensen
  *    Removed snprintf() and vsnprintf() prototypes (why were they in anyway?)
  *    along with stdarg.h include
@@ -156,7 +162,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.20 1999/06/23 19:17:27 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.21 1999/06/25 18:46:39 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
@@ -970,7 +976,6 @@ int main (int argc, char *argv[])
 {
     int       rc;                        /* general return code */
     design_t *tmp;
-    sentry_t *thebox;
     size_t    pad;
     int       i;
 
@@ -978,33 +983,20 @@ int main (int argc, char *argv[])
         fprintf (stderr, "BOXES STARTING ...\n");
     #endif
 
-    thebox = (sentry_t *) calloc (ANZ_SIDES, sizeof(sentry_t));
-    if (thebox == NULL) {
-        perror (PROJECT);
-        exit (EXIT_FAILURE);
-    }
-
+    /*
+     *  Process command line options
+     */
     #ifdef DEBUG
         fprintf (stderr, "Processing Comand Line ...\n");
     #endif
-
     rc = process_commandline (argc, argv);
     if (rc == 42)
         exit (EXIT_SUCCESS);
     if (rc)
         exit (EXIT_FAILURE);
 
-    designs = (design_t *) calloc (1, sizeof(design_t));
-    if (designs == NULL) {
-        perror (PROJECT);
-        exit (EXIT_FAILURE);
-    }
-    designs->indentmode = DEF_INDENTMODE;
-
     /*
-     *  If the following parser is one created by lex, the application must
-     *  be careful to ensure that LC_CTYPE and LC_COLLATE are set to the
-     *  POSIX locale.  [pasted from man page --TJ]
+     *  Parse config file
      */
     #ifdef DEBUG
         fprintf (stderr, "Parsing Config File ...\n");
@@ -1012,17 +1004,10 @@ int main (int argc, char *argv[])
     rc = yyparse();
     if (rc)
         exit (EXIT_FAILURE);
-    --design_idx;
-    tmp = (design_t *) realloc (designs, (design_idx+1)*sizeof(design_t));
-    if (tmp) {
-        designs = tmp;                   /* yyparse() allocates space */
-    }                                    /* for one design too much   */
-    else {
-        perror (PROJECT);
-        exit (EXIT_FAILURE);
-    }
-    anz_designs = design_idx + 1;
 
+    /*
+     *  Select design to use
+     */
     #ifdef DEBUG
         fprintf (stderr, "Selecting Design ...\n");
     #endif
@@ -1131,9 +1116,16 @@ int main (int argc, char *argv[])
         /*
          *  Generate box
          */
+        sentry_t *thebox;
+
         #ifdef DEBUG
             fprintf (stderr, "Generating Box ...\n");
         #endif
+        thebox = (sentry_t *) calloc (ANZ_SIDES, sizeof(sentry_t));
+        if (thebox == NULL) {
+            perror (PROJECT);
+            exit (EXIT_FAILURE);
+        }
         rc = generate_box (thebox);
         if (rc)
             exit (EXIT_FAILURE);
