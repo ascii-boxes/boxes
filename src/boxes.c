@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.26 1999/07/20 18:45:29 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.27 1999/07/21 16:53:17 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -48,6 +48,10 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.27  1999/07/21 16:53:17  tsjensen
+ *    Bugfix: Empty box sides were still counted when -s was specified (so
+ *    -s x5 would get you only three lines).
+ *
  *    Revision 1.26  1999/07/20 18:45:29  tsjensen
  *    Added GNU GPL disclaimer
  *    Added -k option (kill leading/trailing blank lines on removal yes/no)
@@ -199,7 +203,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.26 1999/07/20 18:45:29 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.27 1999/07/21 16:53:17 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
@@ -728,26 +732,198 @@ static int list_styles()
  */
 {
     int i;
-    design_t **list;                     /* temp list for sorting */
 
-    list = (design_t **) calloc (design_idx+1, sizeof(design_t *));
-    if (list == NULL) {
-        perror (PROJECT);
-        return 1;
+    if (opt.design_choice_by_user) {
+
+        design_t *d = opt.design;
+        int until = -1;
+        int sstart = 0;
+        size_t w = 0;
+        size_t j;
+        char space[LINE_MAX+1];
+
+        memset (&space, ' ', LINE_MAX);
+        space[LINE_MAX] = '\0';
+
+
+        fprintf (opt.outfile, "Complete Design Information for \"%s\":\n",
+                d->name);
+        fprintf (opt.outfile, "-----------------------------------");
+        for (i=strlen(d->name); i>0; --i)
+            fprintf (opt.outfile, "-");
+        fprintf (opt.outfile, "\n");
+
+
+        fprintf (opt.outfile, "Author:                 %s\n",
+                d->author? d->author: "(unknown artist)");
+        fprintf (opt.outfile, "Creation Date:          %s\n",
+                d->created? d->created: "(unknown)");
+        fprintf (opt.outfile, "Current Revision:       %s%s%s\n",
+                d->revision? d->revision: "",
+                d->revision && d->revdate? " as of ": "",
+                d->revdate? d->revdate: (d->revision? "": "(unknown)"));
+        fprintf (opt.outfile, "Indentation Mode:       ");
+        switch (d->indentmode) {
+            case 'b':
+                fprintf (opt.outfile, "box - indent box\n");
+                break;
+            case 't':
+                fprintf (opt.outfile, "text - retain indentation inside of box\n");
+                break;
+            default:
+                fprintf (opt.outfile, "none - discard indentation\n");
+                break;
+        }
+
+        fprintf (opt.outfile, "Replacement Rules:      ");
+        if (d->anz_reprules > 0) {
+            for (i=0; i<(int)d->anz_reprules; ++i) {
+                fprintf (opt.outfile, "%d. (%s) \"%s\" WITH \"%s\"\n", i+1,
+                        d->reprules[i].mode == 'g'? "glob": "once",
+                        d->reprules[i].search, d->reprules[i].repstr);
+                if (i < (int) d->anz_reprules - 1)
+                    fprintf (opt.outfile, "                        ");
+            }
+        }
+        else {
+            fprintf (opt.outfile, "none\n");
+        }
+        fprintf (opt.outfile, "Reversion Rules:        ");
+        if (d->anz_revrules > 0) {
+            for (i=0; i<(int)d->anz_revrules; ++i) {
+                fprintf (opt.outfile, "%d. (%s) \"%s\" TO \"%s\"\n", i+1,
+                        d->revrules[i].mode == 'g'? "glob": "once",
+                        d->revrules[i].search, d->revrules[i].repstr);
+                if (i < (int) d->anz_revrules - 1)
+                    fprintf (opt.outfile, "                        ");
+            }
+        }
+        else {
+            fprintf (opt.outfile, "none\n");
+        }
+
+        fprintf (opt.outfile, "Minimum Box Dimensions: %d x %d  (width x height)\n",
+                d->minwidth, d->minheight);
+        fprintf (opt.outfile, "Default Padding:        ");
+        if (d->padding[BTOP] || d->padding[BRIG]
+                || d->padding[BBOT] || d->padding[BLEF]) {
+            if (d->padding[BLEF]) {
+                fprintf (opt.outfile, "left %d", d->padding[BLEF]);
+                if (d->padding[BTOP] || d->padding[BRIG] || d->padding[BBOT])
+                    fprintf (opt.outfile, ", ");
+            }
+            if (d->padding[BTOP]) {
+                fprintf (opt.outfile, "top %d", d->padding[BTOP]);
+                if (d->padding[BRIG] || d->padding[BBOT])
+                    fprintf (opt.outfile, ", ");
+            }
+            if (d->padding[BRIG]) {
+                fprintf (opt.outfile, "right %d", d->padding[BRIG]);
+                if (d->padding[BBOT])
+                    fprintf (opt.outfile, ", ");
+            }
+            if (d->padding[BBOT])
+                fprintf (opt.outfile, "bottom %d", d->padding[BBOT]);
+            fprintf (opt.outfile, "\n");
+        }
+        else {
+            fprintf (opt.outfile, "none\n");
+        }
+        fprintf (opt.outfile, "Elastic Shapes:         ");
+        sstart = 0;
+        for (i=0; i<ANZ_SHAPES; ++i) {
+            if (isempty(d->shape+i))
+                continue;
+            if (d->shape[i].elastic) {
+                fprintf (opt.outfile, "%s%s", sstart? ", ": "", shape_name[i]);
+                sstart = 1;
+            }
+        }
+        fprintf (opt.outfile, "\n");
+
+        /*
+         *  Display all shapes
+         */
+        fprintf (opt.outfile, "Defined Shapes:       ");
+        until = -1;
+        sstart = 0;
+        do {
+            sstart = until + 1;
+            for (w=0, i=sstart; i<ANZ_SHAPES; ++i) {
+                if (isempty(d->shape+i))
+                    continue;
+                w += 6;
+                w += d->shape[i].width;
+                w += strlen(shape_name[i]);
+                if (i == 0)
+                    w -= 2;
+                else if (w > 56) {       /* assuming an 80 character screen */
+                    until = i - 1;
+                    break;
+                }
+            }
+            if (i == ANZ_SHAPES)
+                until = ANZ_SHAPES - 1;
+            for (w=0, i=sstart; i<=until; ++i) {
+                if (d->shape[i].height > w)
+                    w = d->shape[i].height;
+            }
+            for (j=0; j<w; ++j) {
+                if (j > 0 || sstart > 0)
+                    fprintf (opt.outfile, "                      ");
+                for (i=sstart; i<=until; ++i) {
+                    if (isempty(d->shape+i))
+                        continue;
+                    fprintf (opt.outfile, "  ");
+                    if (j == 0)
+                        fprintf (opt.outfile, "%s: ", shape_name[i]);
+                    else {
+                        space[strlen(shape_name[i])+2] = '\0';
+                        fprintf (opt.outfile, space);
+                        space[strlen(shape_name[i])+2] = ' ';
+                    }
+                    if (j < d->shape[i].height) {
+                        fprintf (opt.outfile, "\"%s\"", d->shape[i].chars[j]);
+                    }
+                    else {
+                        space[d->shape[i].width+2] = '\0';
+                        fprintf (opt.outfile, space);
+                        space[d->shape[i].width+2] = ' ';
+                    }
+                }
+                fprintf (opt.outfile, "\n");
+            }
+            if (until < ANZ_SHAPES-1 && d->maxshapeheight > 2)
+                fprintf (opt.outfile, "\n");
+        } while (until < ANZ_SHAPES-1);
     }
 
-    for (i=0; i<=design_idx; ++i)
-        list[i] = &(designs[i]);
-    qsort (list, design_idx+1, sizeof(design_t *), style_sort);
 
-    fprintf (opt.outfile, "Available Styles:\n");
-    fprintf (opt.outfile, "-----------------\n\n");
-    for (i=0; i<=design_idx; ++i)
-        fprintf (opt.outfile, "%s (%s):\n\n%s\n\n", list[i]->name,
-                list[i]->author? list[i]->author: "unknown artist",
-                list[i]->sample);
+    else {
+        design_t **list;                 /* temp list for sorting */
 
-    BFREE (list);
+        list = (design_t **) calloc (design_idx+1, sizeof(design_t *));
+        if (list == NULL) {
+            perror (PROJECT);
+            return 1;
+        }
+
+        for (i=0; i<anz_designs; ++i)
+            list[i] = &(designs[i]);
+        qsort (list, design_idx+1, sizeof(design_t *), style_sort);
+
+        fprintf (opt.outfile, "Available Styles In \"%s\":\n", yyfilename);
+        fprintf (opt.outfile, "-----------------------");
+        for (i=strlen(yyfilename); i>0; --i)
+            fprintf (opt.outfile, "-");
+        fprintf (opt.outfile, "\n\n");
+        for (i=0; i<anz_designs; ++i)
+            fprintf (opt.outfile, "%s (%s):\n\n%s\n\n", list[i]->name,
+                    list[i]->author? list[i]->author: "unknown artist",
+                    list[i]->sample);
+
+        BFREE (list);
+    }
 
     return 0;
 }
