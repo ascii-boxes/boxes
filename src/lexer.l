@@ -2,16 +2,34 @@
 /*
  *  File:             lexer.l
  *  Date created:     March 15, 1999 (Monday, 17:16h)
- *  Author:           Thomas Jensen
+ *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.11 1999/06/28 18:37:38 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.12 1999/07/02 11:58:15 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
- *  Remarks:          ---
+ *
+ *  Remarks: o This program is free software; you can redistribute it and/or
+ *             modify it under the terms of the GNU General Public License as
+ *             published by the Free Software Foundation; either version 2 of
+ *             the License, or (at your option) any later version.
+ *           o This program is distributed in the hope that it will be useful,
+ *             but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *             MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *             GNU General Public License for more details.
+ *           o You should have received a copy of the GNU General Public
+ *             License along with this program; if not, write to the Free
+ *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *             MA 02111-1307  USA
  *
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.12  1999/07/02 11:58:15  tsjensen
+ *    Added begin_speedmode() which is called by parser.y
+ *    Added state SPEEDMODE for fast skipping of designs
+ *    Introduced definitions for PWORD, PBOX, and PWHITE (whitespace)
+ *    Added %options nounput and noyywrap for easier compilation/linking
+ *
  *    Revision 1.11  1999/06/28 18:37:38  tsjensen
  *    Replaced DEBUG macro with LEXER_DEBUG, which is now activated in boxes.h
  *    New tokens to, with, global, once
@@ -55,14 +73,15 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
+#include "config.h"
 #include <string.h>
 #include "shape.h"
 #define FILE_LEXER_L
 #include "boxes.h"
 #undef FILE_LEXER_L
 #include "tools.h"
-#include "y.tab.h"
 #include "parser.h"
+#include "lexer.h"
 
 
 
@@ -70,7 +89,7 @@
 
 
 static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.11 1999/06/28 18:37:38 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.12 1999/07/02 11:58:15 tsjensen Exp tsjensen $";
 
 
 int yylineno = 1;
