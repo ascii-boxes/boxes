@@ -3,7 +3,7 @@
 #   Creation:   March 18, 1999 (Thursday, 15:10h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.11 1999/07/12 18:28:53 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.12 1999/07/20 18:49:58 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,11 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.12  1999/07/20 18:49:58  tsjensen
+#     Added GNU GPL disclaimer
+#     Now evaluating date command from SNAPFILE only once
+#     Changed order of files in snapshot archive (who cares)
+#
 #     Revision 1.11  1999/07/12 18:28:53  tsjensen
 #     Removed --yacc option from bison call
 #     Added logpage target to generate the chronologically sorted global change
@@ -87,23 +92,27 @@
 #============================================================================
 
 
-LEX      = flex
-YACC     = bison
-CC       = gcc
-CFLAGS   = -ansi -I. -Iregexp $(CFLAGS_ADDTL)
-LDFLAGS  = -Lregexp
+LEX        = flex
+YACC       = bison
+CC         = gcc
+CFLAGS     = -ansi -I. -Iregexp $(CFLAGS_ADDTL)
+LDFLAGS    = -Lregexp
 
-SNAPFILE = boxes-SNAP-$(shell date +%Y%m%d)
-CLOGFILE = $(HOME)/d/public_html/software/boxes/changelogs.html
+GEN_HDR    = parser.h
+GEN_SRC    = parser.c lex.yy.c
+GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
+ORIG_HDRCL = boxes.h
+ORIG_HDR   = $(ORIG_HDRCL) lexer.h tools.h shape.h generate.h remove.h config.h
+ORIG_GEN   = lexer.l parser.y
+ORIG_NORM  = boxes.c tools.c shape.c generate.c remove.c
+ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
+ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
+OTH_FILES  = Makefile
 
-GENSRC   = parser.c parser.h lex.yy.c
-HS_CL    = regexp/regexp.c regexp/regsub.c
-HSSRC    = $(HS_CL) regexp/regexp.h regexp/regmagic.h
-ORIG_CL  = boxes.c boxes.h lexer.l parser.y tools.c shape.c generate.c remove.c lexer.h
-ORIGSRC  = $(ORIG_CL) tools.h shape.h generate.h remove.h config.h
-ALL_CL   = $(ORIG_CL) $(HS_CL) Makefile boxes-config
-ALLSRC   = $(ORIGSRC) $(HSSRC) $(GENSRC)
-ALLOBJ   = parser.o lex.yy.o boxes.o shape.o tools.o generate.o remove.o
+ALL_CL     = $(ORIG_SRC) $(ORIG_HDRCL) $(OTH_FILES)
+ALL_FILES  = $(ORIG_FILES) $(GEN_FILES) $(OTH_FILES)
+ALL_OBJ    = $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o)
+
 
 build:
 	$(MAKE) CFLAGS_ADDTL=-O boxes
@@ -111,8 +120,9 @@ build:
 debug:
 	$(MAKE) CFLAGS_ADDTL=-g boxes
 
-boxes: $(ALLOBJ) regexp/libregexp.a
-	$(CC) $(LDFLAGS) $(ALLOBJ) -o boxes -lregexp
+boxes: $(ALL_OBJ)
+	$(MAKE) -C regexp CC=$(CC) libregexp.a
+	$(CC) $(LDFLAGS) $(ALL_OBJ) -o boxes -lregexp
 
 parser.c parser.h: parser.y boxes.h regexp/regexp.h
 	$(YACC) -o parser.c -d parser.y
@@ -123,17 +133,9 @@ lex.yy.c: lexer.l boxes.h
 	cat lexer.tmp.c >> lex.yy.c
 	rm lexer.tmp.c
 
-regexp/libregexp.a: regexp/regexp.o regexp/regsub.o
-	ar cr regexp/libregexp.a regexp/regexp.o regexp/regsub.o
-
-regexp/regexp.o: regexp/regexp.c regexp/regmagic.h regexp/regexp.h config.h
-	gcc -traditional -O -Iregexp -I. -o regexp/regexp.o -c regexp/regexp.c
-regexp/regsub.o: regexp/regsub.c regexp/regmagic.h regexp/regexp.h config.h
-	gcc -traditional -O -Iregexp -I. -o regexp/regsub.o -c regexp/regsub.c
-
 boxes.o: boxes.c boxes.h regexp/regexp.h shape.h tools.h generate.h remove.h config.h
 tools.o: tools.c tools.h boxes.h shape.h config.h
-shape.o: shape.c shape.h boxes.h config.h
+shape.o: shape.c shape.h boxes.h config.h tools.h
 generate.o: generate.c generate.h boxes.h shape.h tools.h config.h
 remove.o: remove.c remove.h boxes.h shape.h tools.h config.h
 lex.yy.o: lex.yy.c parser.h tools.h shape.h lexer.h config.h
@@ -142,24 +144,25 @@ parser.o: parser.c parser.h tools.h shape.h lexer.h config.h
 .c.o:
 	$(CC) $(CFLAGS) -Wall -W -c $<
 
-snap: COPYING Makefile boxes-config $(ALLSRC)
-	mkdir $(SNAPFILE)
-	cp $(ALLSRC) Makefile $(SNAPFILE)
-	gtar cfvz $(SNAPFILE).tar.gz $(SNAPFILE)/*
-	rm -rf $(SNAPFILE)/
-	cp $(SNAPFILE).tar.gz $(HOME)/d/public_html/software/boxes/download/
-	rm -f $(HOME)/d/public_html/software/boxes/download/current-SNAP.tar.gz
-	(cd $(HOME)/d/public_html/software/boxes/download/; ln -s $(SNAPFILE).tar.gz current-SNAP.tar.gz)
+snap: $(ALL_FILES)
+	if [ -z "$(SNAPFILE)" ] ; then exit 1 ; fi
+	mkdir $(SNAPFILE)/src
+	cp $(ALL_FILES) $(SNAPFILE)/src
+	touch $(patsubst %,$(SNAPFILE)/src/%,$(GEN_FILES))
+	$(MAKE) -C regexp SNAPFILE=../$(SNAPFILE) snap
 
 rcstest:
-	-for i in $(ALLSRC) Makefile boxes-config ; do rcsdiff $$i ; done
+	-for i in $(ORIG_FILES) $(OTH_FILES) ; do rcsdiff $$i ; done
+	$(MAKE) -C regexp rcstest
 
 logpage: $(ALL_CL)
-	doc/create_changelog.pl $(ALL_CL) > $(CLOGFILE)
+	@echo $(ALL_CL) $(shell $(MAKE) -C regexp -s logpage)
 
 clean:
-	rm -f $(ALLOBJ)
-	rm -f core regexp/libregexp.a boxes
+	rm -f $(ALL_OBJ)
+	rm -f $(GEN_FILES)
+	rm -f core boxes
+	$(MAKE) -C regexp clean
 
 love:
 	@echo "Not in front of the kids, honey!"
