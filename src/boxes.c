@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id$
+ *  Version:          $Id: boxes.c,v 1.2 1999/03/19 17:44:47 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -13,28 +13,61 @@
  *
  *  Revision History:
  *
- *    $Log$
- *    Revision 1.1  1999/03/18  15:09:17  tsjensen
+ *    $Log: boxes.c,v $
+ *    Revision 1.2  1999/03/19 17:44:47  tsjensen
+ *    ... still programming ...
+ *
+ *    Revision 1.1  1999/03/18 15:09:17  tsjensen
  *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
+/* #define DEBUG */
 
 #include <limits.h>
-#include <locale.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "boxes.h"
 
-
+extern int snprintf (char *, size_t, const char *, ...);        /* stdio.h */
+extern int vsnprintf (char *, size_t, const char *, __va_list); /* stdio.h */
 extern char *optarg;                     /* for getopt() */
-extern int optind, opterr, optopt;
+extern int optind, opterr, optopt;       /* for getopt() */
+
+
+#ident "$Id: boxes.c,v 1.2 1999/03/19 17:44:47 tsjensen Exp tsjensen $"
 
 extern FILE *yyin;                       /* lex input file */
 
-const char rcsid[] = "$Id$";
+
+/*
+ *  default settings for command line options (MAY BE EDITED)
+ */
+#define DEF_TABSTOP     8                /* default tab stop distance (-t) */
+
+
+
+/*  max. allowed tab stop distance
+ */
+#define MAX_TABSTOP     16
+
+/*  max. supported line length
+ *  This is how many characters of a line will be read. Anything beyond
+ *  will be discarded. Output may be longer though. The line feed character
+ *  at the end does not count.
+ *  (This should have been done via sysconf(), but I didn't do it in order
+ *  to ease porting to non-unix platforms.)
+ */
+#if defined(LINE_MAX) && (LINE_MAX < 1024)
+#undef LINE_MAX
+#endif
+#ifndef LINE_MAX
+#define LINE_MAX        2048
+#endif
+
 
 char *yyfilename = NULL;                 /* file name of config file used */
 
@@ -62,14 +95,34 @@ shape_t corners[ANZ_CORNERS] = { NW, NE, SE, SW };
 shape_t *sides[] = { north_side, east_side, south_side, west_side };
 
 
-struct {                                 /* command line options */
-    int l;                               /* list available designs */
+struct {                                 /* Command line options */
+    int       l;                         /* list available designs */
+    int       tabstop;                   /* tab stop distance */
+    design_t *design;                    /* currently used box design */
 } opt;
+
+
+typedef struct {
+    size_t len;
+    char  *text;
+} line_t;
+
+struct {
+    line_t *lines;
+    size_t anz_lines;                    /* number of entries in input */
+    size_t maxline;                      /* length of longest input line */
+    size_t indent;                       /* number of leading spaces found */
+} input = {NULL, 0, 0, LINE_MAX};
 
 
 
 
 int yyerror (const char *fmt, ...)
+/*
+ *  Print configuration file parser errors.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
 {
     va_list ap;
     char buf[1024];
@@ -87,7 +140,116 @@ int yyerror (const char *fmt, ...)
 
 
 
-shape_t *on_side (const shape_t shape1, const shape_t shape2)
+int iscorner (const shape_t s)
+/*
+ *  Return true if shape s is a corner.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int i;
+    shape_t *p;
+
+    for (i=0, p=corners; i<ANZ_CORNERS; ++i, ++p) {
+        if (*p == s)
+            return 1;
+    }
+
+    return 0;
+}
+
+
+
+shape_t *on_side (const shape_t s, const int idx)
+/*
+ *  Compute the side that shape s is on.
+ *
+ *      s    shape to look for
+ *      idx  which occurence to return (0 == first, 1 == second (for corners)
+ *
+ *  RETURNS: pointer to a side list  on success
+ *           NULL                    on error (e.g. idx==1 && s no corner)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int       side;
+    int       i;
+    shape_t **sp;
+    shape_t  *p;
+    int       found = 0;
+
+    for (side=0,sp=sides; side<ANZ_SIDES; ++side,++sp) {
+        for (i=0,p=*sp; i<SHAPES_PER_SIDE; ++i,++p) {
+            if (*p == s) {
+                if (found == idx)
+                    return *sp;
+                else
+                    ++found;
+            }
+        }
+    }
+
+    return NULL;
+}
+
+
+
+int isempty (const sentry_t *shape)
+/*
+ *  Return true if shape is empty.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    if (shape == NULL)
+        return 1;
+    else if (shape->chars == NULL)
+        return 1;
+    else if (shape->width == 0 || shape->height == 0)
+        return 1;
+    else
+        return 0;
+}
+
+
+
+int shapecmp (const sentry_t *shape1, const sentry_t *shape2)
+/*
+ *  Compare two shapes.
+ *
+ *  RETURNS: == 0   if shapes are equal
+ *           != 0   if shapes differ
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int    e1 = isempty (shape1);
+    int    e2 = isempty (shape2);
+    size_t i;
+
+    if ( e1 &&  e2) return 0;
+    if (!e1 &&  e2) return 1;
+    if ( e1 && !e2) return -1;
+
+    if (shape1->width != shape2->width || shape1->height != shape2->height) {
+        if (shape1->width * shape1->height > shape2->width * shape2->height)
+            return 1;
+        else
+            return -1;
+    }
+
+    for (i=0; i<shape1->height; ++i) {
+        int c = strcmp (shape1->chars[i], shape2->chars[i]);  /* no casecmp! */
+        if (c) return c;
+    }
+
+    return 0;
+}
+
+
+
+shape_t *both_on_side (const shape_t shape1, const shape_t shape2)
 /*
  *  Compute the side that *both* shapes are on.
  *
@@ -134,7 +296,7 @@ int shape_distance (const shape_t s1, const shape_t s2)
 {
     int i;
     int distance = -1;
-    shape_t *workside = on_side (s1, s2);
+    shape_t *workside = both_on_side (s1, s2);
 
     if (!workside) return -1;
     if (s1 == s2) return 0;
@@ -163,14 +325,21 @@ int shape_distance (const shape_t s1, const shape_t s2)
 
 
 void usage (FILE *st)
+/*
+ *  Print usage information on stream st.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
 {
     fprintf (st, "Usage: %s [options] [infile [outfile]]\n", PROJECT);
     fprintf (st, "       -c box   exchange current box for new box\n");
+    fprintf (st, "       -d name  select box design\n");
     fprintf (st, "       -f file  use only file as configuration file\n");
     fprintf (st, "       -h       usage information\n");
     fprintf (st, "       -l       generate listing of available box designs w/ samples\n");
     fprintf (st, "       -r       repair broken box\n");
     fprintf (st, "       -s wxh   resize box to width w and/or height h\n");
+    fprintf (st, "       -t uint  tab stop distance [default: %d]\n", DEF_TABSTOP);
     fprintf (st, "       -v       print version information\n");
     fprintf (st, "       -x       remove box from text\n");
 }
@@ -178,17 +347,35 @@ void usage (FILE *st)
 
 
 int process_commandline (int argc, char *argv[])
+/*
+ *
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
 {
     int oc;                              /* option character */
     FILE *f;                             /* potential input file */
+    int idummy;
 
     memset (&opt, 0, sizeof(opt));
+    opt.tabstop = DEF_TABSTOP;
     yyin = stdin;
 
     do {
-        oc = getopt (argc, argv, "f:hlv");
+        oc = getopt (argc, argv, "d:f:hlt:v");
 
         switch (oc) {
+
+            case 'd':
+                /*
+                 *  Box design selection
+                 */
+                opt.design = (design_t *) ((char *) strdup (optarg));
+                if (opt.design == NULL) {
+                    perror (PROJECT);
+                    return 1;
+                }
+                break;
 
             case 'f':
                 /*
@@ -201,6 +388,10 @@ int process_commandline (int argc, char *argv[])
                     return 1;
                 }
                 yyfilename = (char *) strdup (optarg);
+                if (yyfilename == NULL) {
+                    perror (PROJECT);
+                    return 1;
+                }
                 yyin = f;
                 break;
 
@@ -219,6 +410,19 @@ int process_commandline (int argc, char *argv[])
                  *  List available box styles
                  */
                 opt.l = 1;
+                break;
+
+            case 't':
+                /*
+                 *  Tab stop distance
+                 */
+                idummy = (int) strtol (optarg, NULL, 10);
+                if (idummy < 1 || idummy > MAX_TABSTOP) {
+                    fprintf (stderr, "%s: invalid tab stop distance -- %d\n",
+                            PROJECT, idummy);
+                    return 1;
+                }
+                opt.tabstop = idummy;
                 break;
 
             case 'v':
@@ -302,9 +506,18 @@ int style_sort (const void *p1, const void *p2)
 }
 
 int list_styles()
+/*
+ *  Generate sorted listing of available box styles.
+ *  Uses design name from BOX spec and sample picture plus author.
+ *
+ *  RETURNS:  != 0   on error (out of memory)
+ *            == 0   on success
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
 {
     int i;
-    design_t **list;
+    design_t **list;                     /* temp list for sorting */
 
     list = (design_t **) calloc (design_idx+1, sizeof(design_t *));
     if (list == NULL) return 1;
@@ -320,10 +533,1071 @@ int list_styles()
                 list[i]->author? list[i]->author: "unknown artist",
                 list[i]->sample);
 
-    free (list);
-    list = NULL;
+    BFREE (list);
 
     return 0;
+}
+
+
+
+static size_t expand_tabs_into (const char *input_buffer, const int in_len,
+      const int tabstop, char **text)
+/*
+ *  Expand tab chars in input_buffer and store result in text.
+ *
+ *  input_buffer   Line of text with tab chars
+ *  in_len         length of the string in input_buffer
+ *  tabstop        tab stop distance
+ *  text           address of the pointer that will take the result
+ *
+ *  Memory will be allocated for the result.
+ *  Should only be called for lines of length > 0;
+ *
+ *  RETURNS:  Success: Length of the result line in characters (> 0)
+ *            Error:   0       (e.g. out of memory)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+   static char temp [LINE_MAX*MAX_TABSTOP+1];  /* work string */
+   int ii;                               /* position in input string */
+   int io;                               /* position in work string */
+   int jp;                               /* tab expansion jump point */
+
+   *text = NULL;
+
+   for (ii=0, io=0; ii<in_len && io<(LINE_MAX*tabstop-1); ++ii) {
+      if (input_buffer[ii] == '\t') {
+         for (jp=io+tabstop-(io%tabstop); io<jp; ++io)
+            temp[io] = ' ';
+      }
+      else {
+         temp[io] = input_buffer[ii];
+         ++io;
+      }
+   }
+   temp[io] = '\0';
+
+   *text = (char *) strdup (temp);
+   if (*text == NULL) return 0;
+
+   return io;
+}
+
+
+
+int read_all_input()
+/*
+ *  Read entire input from stdin and store it in 'input' array.
+ *
+ *  Tabs are expanded.
+ *  Might allocate slightly more memory than it needs. Trade-off for speed.
+ *
+ *  RETURNS:  != 0   on error (out of memory)
+ *            == 0   on success
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    char buf[LINE_MAX+2];                /* input buffer */
+    size_t input_size = 0;               /* number of elements allocated */
+    line_t *tmp = NULL;
+    char *temp = NULL;                   /* string resulting from tab exp. */
+    size_t newlen;                       /* line length after tab expansion */
+    size_t i;
+
+    input.anz_lines = 0;
+    input.indent = LINE_MAX;
+    input.maxline = 0;
+
+    while (fgets (buf, LINE_MAX+1, stdin))
+    {
+        if (input_size % 100 == 0) {
+            input_size += 100;
+            tmp = (line_t *) realloc (input.lines, input_size*sizeof(line_t));
+            if (tmp == NULL) {
+                perror (PROJECT);
+                BFREE (input.lines);
+                return 1;
+            }
+            input.lines = tmp;
+        }
+
+        input.lines[input.anz_lines].len = strlen (buf);
+
+        while (input.lines[input.anz_lines].len > 0 &&
+              (buf[input.lines[input.anz_lines].len-1] == '\n'
+            || buf[input.lines[input.anz_lines].len-1] == '\r'
+            || buf[input.lines[input.anz_lines].len-1] == ' '
+            || buf[input.lines[input.anz_lines].len-1] == '\t'))
+        {
+            buf[input.lines[input.anz_lines].len-1] = '\0';
+            input.lines[input.anz_lines].len -= 1;
+        }
+
+        if (input.lines[input.anz_lines].len > 0) {
+            newlen = expand_tabs_into (buf,
+                    input.lines[input.anz_lines].len, opt.tabstop, &temp);
+            if (newlen == 0) {
+                perror (PROJECT);
+                BFREE (input.lines);
+                return 1;
+            }
+            input.lines[input.anz_lines].text = temp;
+            input.lines[input.anz_lines].len = newlen;
+            temp = NULL;
+        }
+        else {
+            input.lines[input.anz_lines].text = (char *) strdup (buf);
+        }
+
+        if (input.lines[input.anz_lines].len > input.maxline)
+            input.maxline = input.lines[input.anz_lines].len;
+
+        if (input.lines[input.anz_lines].len > 0) {
+            size_t ispc;
+            ispc = strspn (input.lines[input.anz_lines].text, " ");
+            if (ispc < input.indent)
+                input.indent = ispc;
+        }
+
+        ++input.anz_lines;
+    }
+
+    if (ferror (stdin)) {
+        perror (PROJECT);
+        BFREE (input.lines);
+        return 1;
+    }
+
+    /*
+     *  Remove indentation
+     */
+    for (i=0; i<input.anz_lines; ++i) {
+        if (input.lines[i].len >= input.indent) {
+            memmove (input.lines[i].text, input.lines[i].text+input.indent,
+                    input.lines[i].len-input.indent+1);
+            input.lines[i].len -= input.indent;
+        }
+    }
+    input.maxline -= input.indent;
+
+#if 0
+    /*
+     *  Debugging Code: Display contents of input structure
+     */
+    for (i=0; i<input.anz_lines; ++i) {
+        fprintf (stderr, "%3d [%02d] \"%s\"\n", i, input.lines[i].len,
+                input.lines[i].text);
+    }
+    fprintf (stderr, "\nLongest line: %d characters.\n", input.maxline);
+    fprintf (stderr, " Indentation: %2d spaces.\n", input.indent);
+#endif
+
+    return 0;
+}
+
+
+
+size_t highest (const sentry_t *sarr, const int n, ...)
+/*
+ *  Return height (vert.) of highest shape in given list.
+ *
+ *  sarr         array of shapes to examine
+ *  n            number of shapes following
+ *  ...          the shapes to consider
+ *
+ *  RETURNS:     height in lines (may be zero)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    va_list ap;
+    int i;
+    size_t max = 0;                      /* current maximum height */
+
+    #if defined(DEBUG) && 1
+        fprintf (stderr, "highest (%d, ...)\n", n);
+    #endif
+
+    va_start (ap, n);
+
+    for (i=0; i<n; ++i) {
+        shape_t r = va_arg (ap, shape_t);
+        if (!isempty (sarr + r)) {
+            if (sarr[r].height > max)
+                max = sarr[r].height;
+        }
+    }
+
+    va_end (ap);
+
+    return max;
+}
+
+
+
+size_t widest (const sentry_t *sarr, const int n, ...)
+/*
+ *  Return width (horiz.) of widest shape in given list.
+ *
+ *  sarr         array of shapes to examine
+ *  n            number of shapes following
+ *  ...          the shapes to consider
+ *
+ *  RETURNS:     width in chars (may be zero)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    va_list ap;
+    int i;
+    size_t max = 0;                      /* current maximum width */
+
+    #if defined(DEBUG) && 0
+        fprintf (stderr, "widest (%d, ...)\n", n);
+    #endif
+
+    va_start (ap, n);
+
+    for (i=0; i<n; ++i) {
+        shape_t r = va_arg (ap, shape_t);
+        if (!isempty (sarr + r)) {
+            if (sarr[r].width > max)
+                max = sarr[r].width;
+        }
+    }
+    
+    va_end (ap);
+
+    return max;
+}
+
+
+#if 0
+static int shape_to_use (const shape_t s, shape_t *result)
+/*
+ *  Determine shape to use for a particular shape.
+ *  This is only interesting if shape is not defined. :-)
+ *
+ *  The resulting shape may not be elastic! Should be checked by caller.
+ *
+ *  RETURNS:  == 0  on success  (result points to the shape to use)
+ *            != 0  on error    (result is undefined)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    shape_t *seite;
+    int i;
+    shape_t cand1, cand2;                /* candidate shapes */
+    int dist1, dist2;                    /* distances of cands to corner */
+    int idx;                             /* index of shape in side */
+
+    if (isempty (&(opt.design->shape[s])))
+    {
+        seite = on_side (s, 0);
+
+        if (iscorner(s))
+        {
+            if (seite[0] == s) {
+                for (i=1; i<SHAPES_PER_SIDE; ++i) {
+                    if (!isempty(&(opt.design->shape[seite[i]]))) {
+                        cand1 = seite[i];
+                        break;
+                    }
+                }
+            }
+            else {
+                for (i=SHAPES_PER_SIDE-2; i>=0; --i) {
+                    if (!isempty(&(opt.design->shape[seite[i]]))) {
+                        cand1 = seite[i];
+                        break;
+                    }
+                }
+            }
+
+            seite = on_side (s, 1);
+            if (seite[0] == s) {
+                for (i=1; i<SHAPES_PER_SIDE; ++i) {
+                    if (!isempty(&(opt.design->shape[seite[i]]))) {
+                        cand2 = seite[i];
+                        break;
+                    }
+                }
+            }
+            else {
+                for (i=SHAPES_PER_SIDE-2; i>=0; --i) {
+                    if (!isempty(&(opt.design->shape[seite[i]]))) {
+                        cand2 = seite[i];
+                        break;
+                    }
+                }
+            }
+        }
+
+        else {
+            for (i=0; i<SHAPES_PER_SIDE; ++i) {
+                if (seite[i] == s) {
+                    idx = i;
+                    break;
+                }
+            }
+
+            cand1 = cand2 = s;
+            for (i=idx+1; i<SHAPES_PER_SIDE; ++i) {
+                if (!isempty(&(opt.design->shape[seite[i]]))) {
+                    cand1 = seite[i];
+                    break;
+                }
+            }
+            for (i=idx-1; i>=0; --i) {
+                if (!isempty(&(opt.design->shape[seite[i]]))) {
+                    cand2 = seite[i];
+                    break;
+                }
+            }
+
+            if (cand1 == s && cand2 != s) {
+                *result = cand2;
+                return 0;
+            }
+            if (cand1 != s && cand2 == s) {
+                *result = cand1;
+                return 0;
+            }
+        }
+
+        if (opt.design->shape[cand1].elastic
+            && !(opt.design->shape[cand2].elastic)) {
+            *result = cand1;
+            return 0;
+        }
+        if (opt.design->shape[cand2].elastic
+            && !(opt.design->shape[cand1].elastic)) {
+            *result = cand2;
+            return 0;
+        }
+        /*
+         *  at this point, both candidates must be elastic unless we
+         *  have an error in the parser's sensibility checks
+         */
+        dist1 = shape_distance (s, cand1);
+        dist2 = shape_distance (s, cand2);
+        if (dist1 < dist2) {
+            *result = cand1;
+            return 0;
+        }
+        else if (dist1 > dist2) {
+            *result = cand2;
+            return 0;
+        }
+        if (shapecmp (&(opt.design->shape[cand1]),
+                    &(opt.design->shape[cand2])) == 0) {
+            *result = cand1;         /* either one */
+            return 0;
+        }
+        else {
+            /*
+             *  Two different elastic shapes at the same distance to
+             *  the corner -> no way we can say which one to use.
+             */
+            return 1;
+        }
+    }
+
+    else {
+        *result = s;
+        return 0;                        /* it is there, so use it */
+    }
+}
+#endif
+
+
+
+static int vert_precalc (const sentry_t *sarr, const shape_t *seite,
+        size_t *iltf, size_t *hspace)
+/*
+ *  Calculate data for horizontal box side generation.
+ *
+ *  sarr     Array of shapes from the current design
+ *  seite    the side to work on (e.g. north_side)
+ *  iltf     RESULT: individual lines (columns) to fill by shapes 1, 2, and 3
+ *  hspace   RESULT: number of columns excluding corners (sum over iltf)
+ * 
+ *  RETURNS:  == 0   on success  (result values are set)
+ *            != 0   on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int    numshapes = 0;
+    size_t res_hspace = 0;
+    int    i;
+    size_t j;
+
+    memset (iltf, 0, (SHAPES_PER_SIDE-2) * sizeof(size_t));
+    *hspace = 0;
+
+    for (i=1; i<SHAPES_PER_SIDE-1; ++i)
+        if (!isempty(sarr+seite[i]))
+            numshapes++;
+
+    switch (numshapes) {
+
+        case 1:
+            /*
+             *  only one shape -> it must be elastic
+             */
+            for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
+                if (!isempty(&(sarr[seite[i]]))) {
+                    iltf[i-1] = 0;
+                    for (j=0; !j||res_hspace<input.maxline; ++j) {
+                        iltf[i-1] += sarr[seite[i]].width;
+                        res_hspace += sarr[seite[i]].width;
+                    }
+                    break;
+                }
+            }
+            break;
+
+        case 2:
+            /*
+             *  two shapes -> one must be elastic, the other must not
+             */
+            for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
+                if (!isempty (sarr+seite[i]) && !(sarr[seite[i]].elastic)) {
+                    iltf[i-1] += sarr[seite[i]].width;
+                    res_hspace += sarr[seite[i]].width;
+                    break;
+                }
+            }
+            for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
+                if (!isempty (sarr+seite[i]) && sarr[seite[i]].elastic) {
+                    for (j=0; !j||res_hspace<input.maxline; ++j) {
+                        iltf[i-1] += sarr[seite[i]].width;
+                        res_hspace += sarr[seite[i]].width;
+                    }
+                    break;
+                }
+            }
+            break;
+
+        case 3:
+            /*
+             *  three shapes -> one or two of them must be elastic
+             *  If two are elastic, they are the two outer ones.
+             */
+            for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
+                if (!(sarr[seite[i]].elastic)) {
+                    iltf[i-1] += sarr[seite[i]].width;
+                    res_hspace += sarr[seite[i]].width;
+                }
+            }
+            if (sarr[seite[1]].elastic && sarr[seite[3]].elastic) {
+                size_t vtmp;
+                size_t space_to_fill;
+                if (res_hspace > input.maxline)
+                    space_to_fill = 0;
+                else
+                    space_to_fill = input.maxline - res_hspace;
+                for (j=0,vtmp=0; !j||vtmp<space_to_fill/2+(space_to_fill%2?1:0); ++j)
+                    vtmp += sarr[seite[3]].width;
+                iltf[2] += vtmp;
+                res_hspace += vtmp;
+                for (j=0,vtmp=0; !j||vtmp<space_to_fill/2; ++j)
+                    vtmp += sarr[seite[1]].width;
+                iltf[0] += vtmp;
+                res_hspace += vtmp;
+            }
+            else {
+                for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
+                    if (sarr[seite[i]].elastic) {
+                        for (j=0; !j||res_hspace<input.maxline; ++j) {
+                            iltf[i-1] += sarr[seite[i]].width;
+                            res_hspace += sarr[seite[i]].width;
+                        }
+                        break;
+                    }
+                }
+            }
+            break;
+
+        default:
+            fprintf (stderr, "%s: internal error in horiz_precalc()\n", PROJECT);
+            return 1;
+    }
+
+    *hspace = res_hspace;
+    return 0;                            /* all clear */
+}
+
+
+
+static int horiz_precalc (const sentry_t *sarr, const shape_t *seite,
+        size_t *iltf, size_t *vspace)
+/*
+ *  Calculate data for vertical box side generation.
+ *
+ *  sarr     Array of shapes from the current design
+ *  seite    the side to work on (e.g. west_side)
+ *  iltf     RESULT: individual lines to fill by shapes 1, 2, and 3
+ *  vspace   RESULT: number of lines excluding corners (sum over iltf)
+ * 
+ *  RETURNS:  == 0   on success  (result values are set)
+ *            != 0   on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int    numshapes = 0;
+    size_t res_vspace = 0;
+    int    i;
+    size_t j;
+
+    memset (iltf, 0, (SHAPES_PER_SIDE-2) * sizeof(size_t));
+    *vspace = 0;
+
+    for (i=1; i<SHAPES_PER_SIDE-1; ++i)
+        if (!isempty(sarr+seite[i]))
+            numshapes++;
+
+    switch (numshapes) {
+
+        case 1:
+            /*
+             *  only one shape -> it must be elastic
+             */
+            for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
+                if (!isempty(&(sarr[seite[i]]))) {
+                    iltf[i-1] = 0;
+                    for (j=0; !j||res_vspace<input.anz_lines; ++j) {
+                        iltf[i-1] += sarr[seite[i]].height;
+                        res_vspace += sarr[seite[i]].height;
+                    }
+                    break;
+                }
+            }
+            break;
+
+        case 2:
+            /*
+             *  two shapes -> one must be elastic, the other must not
+             */
+            for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
+                if (!isempty (sarr+seite[i])
+                        && !(sarr[seite[i]].elastic)) {
+                    iltf[i-1] += sarr[seite[i]].height;
+                    res_vspace += sarr[seite[i]].height;
+                    break;
+                }
+            }
+            for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
+                if (!isempty (sarr+seite[i])
+                        && sarr[seite[i]].elastic) {
+                    for (j=0; !j||res_vspace<input.anz_lines; ++j) {
+                        iltf[i-1] += sarr[seite[i]].height;
+                        res_vspace += sarr[seite[i]].height;
+                    }
+                    break;
+                }
+            }
+            break;
+
+        case 3:
+            /*
+             *  three shapes -> one or two of them must be elastic
+             *  If two are elastic, they are the two outer ones.
+             */
+            for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
+                if (!(sarr[seite[i]].elastic)) {
+                    iltf[i-1] += sarr[seite[i]].height;
+                    res_vspace += sarr[seite[i]].height;
+                }
+            }
+            if (sarr[seite[1]].elastic && sarr[seite[3]].elastic) {
+                size_t vtmp;
+                size_t space_to_fill;
+                if (res_vspace > input.anz_lines)
+                    space_to_fill = 0;
+                else
+                    space_to_fill = input.anz_lines - res_vspace;
+                for (j=0,vtmp=0; !j||vtmp<space_to_fill/2+(space_to_fill%2?1:0); ++j)
+                    vtmp += sarr[seite[3]].height;
+                iltf[2] += vtmp;
+                res_vspace += vtmp;
+                for (j=0,vtmp=0; !j||vtmp<space_to_fill/2; ++j)
+                    vtmp += sarr[seite[1]].height;
+                iltf[0] += vtmp;
+                res_vspace += vtmp;
+            }
+            else {
+                for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
+                    if (sarr[seite[i]].elastic) {
+                        for (j=0; !j||res_vspace<input.anz_lines; ++j) {
+                            iltf[i-1] += sarr[seite[i]].height;
+                            res_vspace += sarr[seite[i]].height;
+                        }
+                        break;
+                    }
+                }
+            }
+            break;
+
+        default:
+            fprintf (stderr, "%s: internal error in horiz_precalc()\n", PROJECT);
+            return 1;
+    }
+
+    *vspace = res_vspace;
+    return 0;                            /* all clear */
+}
+
+
+
+static int vert_assemble (const sentry_t *sarr, const shape_t *seite,
+        size_t *iltf, sentry_t *result)
+/*
+ *
+ *  RETURNS:  == 0   on success  (result values are set)
+ *            != 0   on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t  j;
+    size_t  line;
+    int     cshape;                      /* current shape (idx to iltf) */
+
+    for (line=0; line<result->height; ++line) {
+        result->chars[line] = (char *) calloc (1, result->width+1);
+        if (result->chars[line] == NULL) {
+            perror (PROJECT);
+            if ((long)--line >= 0) do {
+                BFREE (result->chars[line--]);
+            } while ((long)line >= 0);
+            return 1;                    /* out of memory */
+        }
+    }
+
+    cshape = (seite == north_side)? 0 : 2;
+
+    for (j=0; j<result->width; j+=sarr[seite[cshape+1]].width) {
+        while (iltf[cshape] == 0)
+            cshape += (seite == north_side)? 1 : -1;
+        for (line=0; line<result->height; ++line)
+            strcat (result->chars[line], sarr[seite[cshape+1]].chars[line]);
+        iltf[cshape] -= sarr[seite[cshape+1]].width;
+    }
+
+    return 0;                            /* all clear */
+}
+
+
+
+static void horiz_assemble (const sentry_t *sarr, const shape_t *seite,
+        size_t *iltf, sentry_t *result)
+{
+    size_t  j;
+    size_t  sc;                          /* index to shape chars (lines) */
+    int     cshape;                      /* current shape (idx to iltf) */
+    shape_t ctop, cbottom;
+
+    if (seite == east_side) {
+        ctop = seite[0];
+        cbottom = seite[SHAPES_PER_SIDE-1];
+        cshape = 0;
+    }
+    else {
+        ctop = seite[SHAPES_PER_SIDE-1];
+        cbottom = seite[0];
+        cshape = 2;
+    }
+
+    for (j=0; j<sarr[ctop].height; ++j)
+        result->chars[j] = sarr[ctop].chars[j];
+    for (j=0; j<sarr[cbottom].height; ++j)
+        result->chars[result->height-sarr[cbottom].height+j] =
+            sarr[cbottom].chars[j];
+
+    sc = 0;
+    for (j=sarr[ctop].height; j < result->height-sarr[cbottom].height; ++j)
+    {
+        while (iltf[cshape] == 0) {
+            if (seite == east_side)
+                ++cshape;
+            else
+                --cshape;
+            sc = 0;
+        }
+        if (sc == sarr[seite[cshape+1]].height)
+            sc = 0;
+        result->chars[j] = sarr[seite[cshape+1]].chars[sc];
+        ++sc;
+        iltf[cshape] -= 1;
+    }
+}
+
+
+
+static int generate_left (sentry_t *result)
+/*
+ *  Generate left side of box.
+ *
+ *  RETURNS:  == 0   on success  (resulting char array is stored in result)
+ *            != 0   on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t vspace = 0;
+    size_t iltf[SHAPES_PER_SIDE-2];      /* individual lines to fill */
+    int    rc;                           /* received return code */
+
+    result->width = widest (opt.design->shape,
+            SHAPES_PER_SIDE, SW, WSW, W, WNW, NW);
+
+    rc = horiz_precalc (opt.design->shape, west_side, iltf, &vspace);
+    if (rc) return rc;
+
+    result->height = vspace +
+        opt.design->shape[NW].height + opt.design->shape[SW].height;
+
+    #ifdef DEBUG
+        fprintf (stderr, "Left side box rect width %d, height %d, vspace %d.\n",
+                result->width, result->height, vspace);
+        fprintf (stderr, "Left lines to fill: %s %d, %s %d, %s %d.\n",
+                shape_name[west_side[1]], iltf[0],
+                shape_name[west_side[2]], iltf[1],
+                shape_name[west_side[3]], iltf[2]);
+    #endif
+
+    result->chars = (char **) calloc (result->height, sizeof(char *));
+    if (result->chars == NULL) return 1;
+
+    horiz_assemble (opt.design->shape, west_side, iltf, result);
+
+    #if defined(DEBUG) && 1
+    {
+        /*
+         *  Debugging code - Output left side of box
+         */
+        size_t j;
+        fprintf (stderr, "LEFT SIDE:\n");
+        for (j=0; j<result->height; ++j) {
+            fprintf (stderr, "  %2d: \'%s\'\n", j,
+                    result->chars[j]? result->chars[j] : "(null)");
+        }
+    }
+    #endif
+
+    return 0;                            /* all clear */
+}
+
+
+
+static int generate_mtop (sentry_t *result)
+/*
+ *  Generate top part of box (excluding corners).
+ *
+ *  RETURNS:  == 0  if successful (resulting char array is stored in result)
+ *            != 0  on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t iltf[SHAPES_PER_SIDE-2];      /* individual lines to fill */
+    int    rc;                           /* received return code */
+
+    result->height = highest (opt.design->shape,
+            SHAPES_PER_SIDE, NW, NNW, N, NNE, NE);
+
+    rc = vert_precalc (opt.design->shape, north_side, iltf, &(result->width));
+    if (rc) return rc;
+
+    #ifdef DEBUG
+        fprintf (stderr, "Top side box rect width %d, height %d.\n",
+                result->width, result->height);
+        fprintf (stderr, "Top lines to fill: %s %d, %s %d, %s %d.\n",
+                shape_name[north_side[1]], iltf[0],
+                shape_name[north_side[2]], iltf[1],
+                shape_name[north_side[3]], iltf[2]);
+    #endif
+
+    result->chars = (char **) calloc (result->height, sizeof(char *));
+    if (result->chars == NULL) return 1;
+
+    rc = vert_assemble (opt.design->shape, north_side, iltf, result);
+    if (rc) return rc;
+
+    #if defined(DEBUG) && 1
+    {
+        /*
+         *  Debugging code - Output top side of box
+         */
+        size_t j;
+        fprintf (stderr, "TOP SIDE:\n");
+        for (j=0; j<result->height; ++j) {
+            fprintf (stderr, "  %2d: \'%s\'\n", j,
+                    result->chars[j]? result->chars[j] : "(null)");
+        }
+    }
+    #endif
+
+    return 0;                            /* all clear */
+}
+
+
+
+static int generate_right (sentry_t *result)
+/*
+ *  Generate right side of box.
+ *
+ *  RETURNS:  == 0  if successful
+ *            != 0  on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t vspace = 0;
+    size_t iltf[SHAPES_PER_SIDE-2];      /* individual lines to fill */
+    int    rc;                           /* received return code */
+
+    result->width = widest (opt.design->shape,
+            SHAPES_PER_SIDE, SE, ESE, E, ENE, NE);
+
+    rc = horiz_precalc (opt.design->shape, east_side, iltf, &vspace);
+    if (rc) return rc;
+
+    result->height = vspace +
+        opt.design->shape[NE].height + opt.design->shape[SE].height;
+
+    #ifdef DEBUG
+        fprintf (stderr, "Right side box rect width %d, height %d, vspace %d.\n",
+                result->width, result->height, vspace);
+        fprintf (stderr, "Right lines to fill: %s %d, %s %d, %s %d.\n",
+                shape_name[east_side[1]], iltf[0],
+                shape_name[east_side[2]], iltf[1],
+                shape_name[east_side[3]], iltf[2]);
+    #endif
+
+    result->chars = (char **) calloc (result->height, sizeof(char *));
+    if (result->chars == NULL) return 1;
+
+    horiz_assemble (opt.design->shape, east_side, iltf, result);
+
+    #if defined(DEBUG) && 1
+    {
+        /*
+         *  Debugging code - Output right side of box
+         */
+        size_t j;
+        fprintf (stderr, "RIGHT SIDE:\n");
+        for (j=0; j<result->height; ++j) {
+            fprintf (stderr, "  %2d: \'%s\'\n", j,
+                    result->chars[j]? result->chars[j] : "(null)");
+        }
+    }
+    #endif
+
+    return 0;                            /* all clear */
+}
+
+
+
+static int generate_mbottom (sentry_t *result)
+/*
+ *  Generate bottom part of box (excluding corners).
+ *
+ *  RETURNS:  == 0  if successful
+ *            != 0  on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t iltf[SHAPES_PER_SIDE-2];      /* individual lines to fill */
+    int    rc;                           /* received return code */
+
+    result->height = highest (opt.design->shape,
+            SHAPES_PER_SIDE, SW, SSW, S, SSE, SE);
+
+    rc = vert_precalc (opt.design->shape, south_side, iltf, &(result->width));
+    if (rc) return rc;
+
+    #ifdef DEBUG
+        fprintf (stderr, "Bottom side box rect width %d, height %d.\n",
+                result->width, result->height);
+        fprintf (stderr, "Bottom lines to fill: %s %d, %s %d, %s %d.\n",
+                shape_name[south_side[1]], iltf[0],
+                shape_name[south_side[2]], iltf[1],
+                shape_name[south_side[3]], iltf[2]);
+    #endif
+
+    result->chars = (char **) calloc (result->height, sizeof(char *));
+    if (result->chars == NULL) {
+        perror (PROJECT);
+        return 1;
+    }
+
+    rc = vert_assemble (opt.design->shape, south_side, iltf, result);
+    if (rc) return rc;
+
+    #if defined(DEBUG) && 1
+    {
+        /*
+         *  Debugging code - Output bottom side of box
+         */
+        size_t j;
+        fprintf (stderr, "BOTTOM SIDE:\n");
+        for (j=0; j<result->height; ++j) {
+            fprintf (stderr, "  %2d: \'%s\'\n", j,
+                    result->chars[j]? result->chars[j] : "(null)");
+        }
+    }
+    #endif
+
+    return 0;                            /* all clear */
+}
+
+
+
+static int generate_box (sentry_t *thebox)
+/*
+ *
+ *  RETURNS:  == 0  if successful  (thebox is set)
+ *            != 0  on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int rc;
+    int i;
+
+    rc = generate_mtop (&(thebox[0]));
+    if (rc) goto err;
+
+    rc = generate_right (&(thebox[1]));
+    if (rc) goto err;
+
+    rc = generate_mbottom (&(thebox[2]));
+    if (rc) goto err;
+
+    rc = generate_left (&(thebox[3]));
+    if (rc) goto err;
+
+    return 0;                            /* all clear */
+
+err:
+    for (i=0; i<ANZ_SIDES; ++i) {
+        if (!isempty(&(thebox[i]))) {
+            BFREE (thebox[i].chars);     /* free only pointer array */
+            memset (thebox+i, 0, sizeof(sentry_t));
+        }
+    }
+    return rc;                           /* error */
+}
+
+
+
+static design_t *select_design (design_t *darr, char *sel)
+/*
+ *  Select a design to use for our box.
+ *
+ *  darr      design array as read from config file
+ *  sel       name of the desired design
+ *
+ *  If the specified name is not found, defaults to "C" design;
+ *  If "C" design is not found, default to design number 0;
+ *  If there are no designs, print error message and return error.
+ *
+ *  RETURNS:  pointer to current design   on success
+ *            NULL                        on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int i;
+
+    if (sel) {
+        for (i=0; i<anz_designs; ++i) {
+            if (strcasecmp (darr[i].name, sel) == 0)
+                return &(darr[i]);
+        }
+        fprintf (stderr, "%s: unknown box design -- %s\n", PROJECT, sel);
+        return NULL;
+    }
+
+    for (i=0; i<anz_designs; ++i) {
+        if (strcasecmp (darr[i].name, "C") == 0)
+            return &(darr[i]);
+    }
+
+    if (darr[0].name != NULL)
+        return darr;
+
+    fprintf (stderr, "%s: Internal error -- no box designs found\n", PROJECT);
+    return NULL;
+}
+
+
+
+static int output_box (const sentry_t *thebox)
+/*
+ *
+ *  RETURNS:  == 0  if successful
+ *            != 0  on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t j;
+    size_t nol = thebox[BRIG].height;    /* number of output lines */
+    char   trailspc[LINE_MAX+1];
+    char  *indentspc;
+
+    indentspc = (char *) malloc (input.indent+1);
+    if (indentspc == NULL) {
+        perror (PROJECT);
+        return 1;
+    }
+    memset (indentspc, (int)' ', input.indent);
+    indentspc[input.indent] = '\0';
+
+    memset (trailspc, (int)' ', LINE_MAX);
+    trailspc[LINE_MAX] = '\0';
+
+    for (j=0; j<nol; ++j) {
+        if (j < thebox[BTOP].height) {
+            printf ("%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
+                    thebox[BTOP].chars[j], thebox[BRIG].chars[j]);
+        }
+        else if (j < nol-thebox[BBOT].height) {
+            size_t r;
+            long ti = j - thebox[BTOP].height;
+            if (ti < (long) input.anz_lines) {
+                r = thebox[BTOP].width - input.lines[ti].len;
+                trailspc[r] = '\0';
+                printf ("%s%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
+                        ti >= 0? input.lines[j-thebox[BTOP].height].text : "",
+                        trailspc, thebox[BRIG].chars[j]);
+            }
+            else {
+                r = thebox[BTOP].width;
+                trailspc[r] = '\0';
+                printf ("%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
+                        trailspc, thebox[BRIG].chars[j]);
+            }
+            trailspc[r] = ' ';
+        }
+        else {
+            printf ("%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
+                    thebox[BBOT].chars[j-(nol-thebox[BBOT].height)],
+                    thebox[BRIG].chars[j]);
+        }
+    }
+
+    BFREE (indentspc);
+    return 0;                            /* all clear */
 }
 
 
@@ -332,13 +1606,18 @@ int main (int argc, char *argv[])
 {
     extern int yyparse();
     int rc;                              /* general return code */
-    design_t *tmp = (design_t *) rcsid;  /* make rcsid stay */
+    design_t *tmp;
+    sentry_t *thebox;
+
+    thebox = (sentry_t *) calloc (ANZ_SIDES, sizeof(sentry_t));
+    if (thebox == NULL) {
+        perror (PROJECT);
+        exit (EXIT_FAILURE);
+    }
 
     rc = process_commandline (argc, argv);
     if (rc == 42) exit (EXIT_SUCCESS);
     if (rc) exit (EXIT_FAILURE);
-
-    setlocale (LC_ALL, "");              /* muﬂ des sein? TODO */
 
     designs = (design_t *) calloc (1, sizeof(design_t));
     if (designs == NULL) {
@@ -353,10 +1632,7 @@ int main (int argc, char *argv[])
      */
     rc = yyparse();
     if (rc) exit (EXIT_FAILURE);
-    if (yyfilename) {
-        free (yyfilename);
-        yyfilename = NULL;
-    }
+    BFREE (yyfilename);
     --design_idx;
     tmp = (design_t *) realloc (designs, (design_idx+1)*sizeof(design_t));
     if (tmp) {
@@ -368,6 +1644,10 @@ int main (int argc, char *argv[])
     }
     anz_designs = design_idx + 1;
 
+    tmp = select_design (designs, (char *) opt.design);
+    if (tmp == NULL) exit (EXIT_FAILURE);
+    BFREE (opt.design);
+    opt.design = tmp;
 
     if (opt.l) {
         rc = list_styles();
@@ -378,6 +1658,13 @@ int main (int argc, char *argv[])
         exit (EXIT_SUCCESS);
     }
 
+    rc = read_all_input();
+    if (rc) exit (EXIT_FAILURE);
+
+    rc = generate_box (thebox);
+    if (rc) exit (EXIT_FAILURE);
+
+    output_box (thebox);
 
     return EXIT_SUCCESS;
 }
