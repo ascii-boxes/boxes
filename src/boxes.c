@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.23 1999/06/30 12:16:38 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.24 1999/06/30 12:37:25 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -34,6 +34,9 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.24  1999/06/30 12:37:25  tsjensen
+ *    Added [lcr] "shorthand" to -a option
+ *
  *    Revision 1.23  1999/06/30 12:16:38  tsjensen
  *    Removed entire select_design stuff, because the parser now returns much
  *    smaller data structures. The first design pointed to by designs is always
@@ -154,6 +157,7 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
+#include "config.h"
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -172,7 +176,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.23 1999/06/30 12:16:38 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.24 1999/06/30 12:37:25 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
