@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.2 1999/03/19 17:44:47 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.3 1999/03/30 09:36:23 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -14,6 +14,10 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.3  1999/03/30 09:36:23  tsjensen
+ *    ... still programming ...
+ *    (removed setlocale() call and locale.h include)
+ *
  *    Revision 1.2  1999/03/19 17:44:47  tsjensen
  *    ... still programming ...
  *
@@ -38,7 +42,7 @@ extern char *optarg;                     /* for getopt() */
 extern int optind, opterr, optopt;       /* for getopt() */
 
 
-#ident "$Id: boxes.c,v 1.2 1999/03/19 17:44:47 tsjensen Exp tsjensen $"
+#ident "$Id: boxes.c,v 1.3 1999/03/30 09:36:23 tsjensen Exp tsjensen $"
 
 extern FILE *yyin;                       /* lex input file */
 
@@ -671,6 +675,13 @@ int read_all_input()
     }
 
     /*
+     *  Exit if there was no input at all
+     */
+    if (input.lines == NULL || input.lines[0].text == NULL) {
+        return 0;
+    }
+
+    /*
      *  Remove indentation
      */
     for (i=0; i<input.anz_lines; ++i) {
@@ -716,7 +727,7 @@ size_t highest (const sentry_t *sarr, const int n, ...)
     int i;
     size_t max = 0;                      /* current maximum height */
 
-    #if defined(DEBUG) && 1
+    #if defined(DEBUG) && 0
         fprintf (stderr, "highest (%d, ...)\n", n);
     #endif
 
@@ -935,9 +946,19 @@ static int vert_precalc (const sentry_t *sarr, const shape_t *seite,
     size_t res_hspace = 0;
     int    i;
     size_t j;
+    size_t target_width;
 
     memset (iltf, 0, (SHAPES_PER_SIDE-2) * sizeof(size_t));
     *hspace = 0;
+
+    if (input.maxline >= (opt.design->minwidth - sarr[seite[0]].width -
+            sarr[seite[SHAPES_PER_SIDE-1]].width)) {
+        target_width = input.maxline;
+    }
+    else {
+        target_width = opt.design->minwidth - sarr[seite[0]].width -
+            sarr[seite[SHAPES_PER_SIDE-1]].width;
+    }
 
     for (i=1; i<SHAPES_PER_SIDE-1; ++i)
         if (!isempty(sarr+seite[i]))
@@ -952,7 +973,7 @@ static int vert_precalc (const sentry_t *sarr, const shape_t *seite,
             for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
                 if (!isempty(&(sarr[seite[i]]))) {
                     iltf[i-1] = 0;
-                    for (j=0; !j||res_hspace<input.maxline; ++j) {
+                    for (j=0; !j||res_hspace<target_width; ++j) {
                         iltf[i-1] += sarr[seite[i]].width;
                         res_hspace += sarr[seite[i]].width;
                     }
@@ -974,7 +995,7 @@ static int vert_precalc (const sentry_t *sarr, const shape_t *seite,
             }
             for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
                 if (!isempty (sarr+seite[i]) && sarr[seite[i]].elastic) {
-                    for (j=0; !j||res_hspace<input.maxline; ++j) {
+                    for (j=0; !j||res_hspace<target_width; ++j) {
                         iltf[i-1] += sarr[seite[i]].width;
                         res_hspace += sarr[seite[i]].width;
                     }
@@ -997,10 +1018,10 @@ static int vert_precalc (const sentry_t *sarr, const shape_t *seite,
             if (sarr[seite[1]].elastic && sarr[seite[3]].elastic) {
                 size_t vtmp;
                 size_t space_to_fill;
-                if (res_hspace > input.maxline)
+                if (res_hspace > target_width)
                     space_to_fill = 0;
                 else
-                    space_to_fill = input.maxline - res_hspace;
+                    space_to_fill = target_width - res_hspace;
                 for (j=0,vtmp=0; !j||vtmp<space_to_fill/2+(space_to_fill%2?1:0); ++j)
                     vtmp += sarr[seite[3]].width;
                 iltf[2] += vtmp;
@@ -1013,7 +1034,7 @@ static int vert_precalc (const sentry_t *sarr, const shape_t *seite,
             else {
                 for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
                     if (sarr[seite[i]].elastic) {
-                        for (j=0; !j||res_hspace<input.maxline; ++j) {
+                        for (j=0; !j||res_hspace<target_width; ++j) {
                             iltf[i-1] += sarr[seite[i]].width;
                             res_hspace += sarr[seite[i]].width;
                         }
@@ -1054,9 +1075,18 @@ static int horiz_precalc (const sentry_t *sarr, const shape_t *seite,
     size_t res_vspace = 0;
     int    i;
     size_t j;
+    size_t text_height;
 
     memset (iltf, 0, (SHAPES_PER_SIDE-2) * sizeof(size_t));
     *vspace = 0;
+
+    if (input.anz_lines >= (opt.design->minheight - sarr[seite[0]].height -
+                sarr[seite[SHAPES_PER_SIDE-1]].height))
+        text_height = input.anz_lines;
+    else {
+        text_height = opt.design->minheight - sarr[seite[0]].height -
+            sarr[seite[SHAPES_PER_SIDE-1]].height;
+    }
 
     for (i=1; i<SHAPES_PER_SIDE-1; ++i)
         if (!isempty(sarr+seite[i]))
@@ -1071,7 +1101,7 @@ static int horiz_precalc (const sentry_t *sarr, const shape_t *seite,
             for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
                 if (!isempty(&(sarr[seite[i]]))) {
                     iltf[i-1] = 0;
-                    for (j=0; !j||res_vspace<input.anz_lines; ++j) {
+                    for (j=0; !j||res_vspace<text_height; ++j) {
                         iltf[i-1] += sarr[seite[i]].height;
                         res_vspace += sarr[seite[i]].height;
                     }
@@ -1095,7 +1125,7 @@ static int horiz_precalc (const sentry_t *sarr, const shape_t *seite,
             for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
                 if (!isempty (sarr+seite[i])
                         && sarr[seite[i]].elastic) {
-                    for (j=0; !j||res_vspace<input.anz_lines; ++j) {
+                    for (j=0; !j||res_vspace<text_height; ++j) {
                         iltf[i-1] += sarr[seite[i]].height;
                         res_vspace += sarr[seite[i]].height;
                     }
@@ -1118,10 +1148,10 @@ static int horiz_precalc (const sentry_t *sarr, const shape_t *seite,
             if (sarr[seite[1]].elastic && sarr[seite[3]].elastic) {
                 size_t vtmp;
                 size_t space_to_fill;
-                if (res_vspace > input.anz_lines)
+                if (res_vspace > text_height)
                     space_to_fill = 0;
                 else
-                    space_to_fill = input.anz_lines - res_vspace;
+                    space_to_fill = text_height - res_vspace;
                 for (j=0,vtmp=0; !j||vtmp<space_to_fill/2+(space_to_fill%2?1:0); ++j)
                     vtmp += sarr[seite[3]].height;
                 iltf[2] += vtmp;
@@ -1134,7 +1164,7 @@ static int horiz_precalc (const sentry_t *sarr, const shape_t *seite,
             else {
                 for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
                     if (sarr[seite[i]].elastic) {
-                        for (j=0; !j||res_vspace<input.anz_lines; ++j) {
+                        for (j=0; !j||res_vspace<text_height; ++j) {
                             iltf[i-1] += sarr[seite[i]].height;
                             res_vspace += sarr[seite[i]].height;
                         }
@@ -1660,6 +1690,8 @@ int main (int argc, char *argv[])
 
     rc = read_all_input();
     if (rc) exit (EXIT_FAILURE);
+    if (input.anz_lines == 0)
+        exit (EXIT_SUCCESS);
 
     rc = generate_box (thebox);
     if (rc) exit (EXIT_FAILURE);
