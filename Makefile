@@ -3,7 +3,7 @@
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.2 1999/08/14 19:01:31 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.3 1999/08/21 23:39:01 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,14 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.3  1999/08/21 23:39:01  tsjensen
+#     Added GLOBALCONF and BVERSION macros whose values are put into boxes.h and
+#     boxes.1
+#     Added locsnap target for generation of archives without posting to the Web
+#     page
+#     Added README file
+#     Added rules to generate boxes.h and boxes.1 from boxes.1.in and boxes.h.in
+#
 #     Revision 1.2  1999/08/14 19:01:31  tsjensen
 #     After taking a snapshot, put it in the author's archives, too.
 #
@@ -34,6 +42,7 @@
 #============================================================================
 
 
+# The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/local/share/boxes
 BVERSION   = 1.0
 
