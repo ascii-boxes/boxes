@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.15 1999/08/18 15:40:10 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.16 1999/08/18 18:23:41 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *
@@ -26,6 +26,12 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.16  1999/08/18 18:23:41  tsjensen
+ *    Declared yyerrcnt to be static
+ *    Added YY_USER_INIT macro to set the input buffer size to the config file
+ *    size (plus a bit). This is supposed to be a workaround for the REJECT
+ *    problem.
+ *
  *    Revision 1.15  1999/08/18 15:40:10  tsjensen
  *    Added %options never-interactive and caseless
  *    Added code for DELIMITER statements
@@ -103,7 +109,7 @@
 
 
 static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.15 1999/08/18 15:40:10 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.16 1999/08/18 18:23:41 tsjensen Exp tsjensen $";
 
 
 int yylineno = 1;
@@ -114,34 +120,28 @@ static char sesc = '\\';
 
 
 /*
- *  Since this scanner must use REJECT in order to be able to process the
- *  string delimiter commands, it cannot dynamically enlarge its input
- *  buffer to accomodate larger tokens. Thus, we simply set the buffer size
- *  to the input file size plus 10 bytes margin-of-error.
+ *  User-defined initializations for the lexer
  */
-#define YY_USER_INIT {                                            \
-    struct stat sinf;                                             \
-                                                                  \
-    if (stat(yyfilename, &sinf)) {                                \
-        perror (PROJECT);                                         \
-        exit (EXIT_FAILURE);                                      \
-    }                                                             \
-    yy_delete_buffer (YY_CURRENT_BUFFER);                         \
-    YY_CURRENT_BUFFER = yy_create_buffer (yyin, sinf.st_size+10); \
-}
+static void inflate_inbuf();
+#define YY_USER_INIT  inflate_inbuf()
+
 
 %}
+
+
 
 %option nounput
 %option noyywrap
 %option never-interactive
 %option caseless
 
+
 %x SAMPLE
 %x SPEEDMODE
 %x DELWORD
 %s SHAPES
 %s ELASTIC
+
 
 PWORD  [a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*
 PWHITE [\n \r\t]
@@ -150,6 +150,7 @@ SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
 
 
 %%
+
 
 
 <DELWORD,SHAPES,ELASTIC,INITIAL>[ \r\t] /* ignore whitespace */
@@ -442,6 +443,30 @@ Delimiter|Delim {
 
 
 %%
+
+
+static void inflate_inbuf()
+/*
+ *  User-defined initializations for the lexer.
+ *
+ *  Since this scanner must use REJECT in order to be able to process the
+ *  string delimiter commands, it cannot dynamically enlarge its input
+ *  buffer to accomodate larger tokens. Thus, we simply set the buffer size
+ *  to the input file size plus 10 bytes margin-of-error.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    struct stat sinf;
+
+    if (stat(yyfilename, &sinf)) {
+        perror (PROJECT);
+        exit (EXIT_FAILURE);
+    }
+    yy_delete_buffer (YY_CURRENT_BUFFER);
+    YY_CURRENT_BUFFER = yy_create_buffer (yyin, sinf.st_size+10);
+}
+
 
 
 void begin_speedmode()
