@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.12 1999/06/04 18:13:26 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.13 1999/06/13 15:28:31 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -17,7 +17,7 @@
  *                  - The decision to number box shapes in clockwise order was
  *                    a major design mistake. Treatment of box parts of the
  *                    same alignment (N-S and E-W) is usually combined in one
- *                    function, which now must deal with the numbering being
+ *                    function, which must now deal with the numbering being
  *                    reversed all the time. This is nasty, but changing the
  *                    shape order would pretty much mean a total rewrite of
  *                    the code, so we'll have to live with it. :-(
@@ -34,6 +34,12 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.13  1999/06/13 15:28:31  tsjensen
+ *    Some error message clean-up
+ *    Regular expression substitutions on input text only if *drawing* a box,
+ *    not if the box is to be removed (requires other substitutions, todo).
+ *    Added code for box design auto-detection when removing a box.
+ *
  *    Revision 1.12  1999/06/04 18:13:26  tsjensen
  *    Don't adjust indentation after removing a box unless something was
  *    removed on the west side
@@ -44,7 +50,7 @@
  *
  *    Revision 1.10  1999/06/03 18:54:05  tsjensen
  *    lots of fixes
- *    Added remove box functionality, which remains to be tested
+ *    Added remove box functionality (-r), which remains to be tested
  *
  *    Revision 1.9  1999/04/09 13:33:24  tsjensen
  *    Removed code related to OFFSET blocks (obsolete)
@@ -98,7 +104,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.12 1999/06/04 18:13:26 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.13 1999/06/13 15:28:31 tsjensen Exp tsjensen $";
 
 extern FILE *yyin;                       /* lex input file */
 
@@ -206,7 +212,7 @@ void regerror (char *msg)
 {
     fprintf (stderr, "%s: %s: line %d: %s\n",
             PROJECT, yyfilename? yyfilename: "(null)",
-            opt.design->current_reprule? opt.design->current_reprule->line: 0,
+            opt.design->current_rule? opt.design->current_rule->line: 0,
             msg);
     errno = EINVAL;
 }
@@ -887,11 +893,11 @@ int read_all_input()
      */
     errno = 0;
     for (i=0; i<opt.design->anz_reprules; ++i) {
-        opt.design->current_reprule = opt.design->reprules + i;
+        opt.design->current_rule = opt.design->reprules + i;
         opt.design->reprules[i].prog =
             regcomp (opt.design->reprules[i].search);
     }
-    opt.design->current_reprule = NULL;
+    opt.design->current_rule = NULL;
     if (errno) return 1;
 
     /*
@@ -942,7 +948,7 @@ int read_all_input()
          */
         if (opt.r == 0) {
             for (i=0; i<opt.design->anz_reprules; ++i) {
-                opt.design->current_reprule = opt.design->reprules + i;
+                opt.design->current_rule = opt.design->reprules + i;
                 errno = 0;
                 #ifdef REGEXP_DEBUG
                     fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
@@ -974,7 +980,7 @@ int read_all_input()
                             input.lines[input.anz_lines].text);
                 #endif
             }
-            opt.design->current_reprule = NULL;
+            opt.design->current_rule = NULL;
         }
 
         /*
@@ -2070,6 +2076,11 @@ int best_match (const line_t *line, char **ws, char **we, char **es, char **ee)
     nume += opt.design->shape[ E ].height;
     nume += opt.design->shape[ESE].height;
 
+    #ifdef DEBUG
+        fprintf (stderr, "Number of WEST side shape lines: %d\n", numw);
+        fprintf (stderr, "Number of EAST side shape lines: %d\n", nume);
+    #endif
+
     /*
      *  Find match for WEST side
      */
@@ -2135,11 +2146,16 @@ int best_match (const line_t *line, char **ws, char **we, char **es, char **ee)
      */
     quality = 0;
     cs = opt.design->shape + ENE;
-    for (j=0,k=0,w=1; j<numw; ++j,++k) {
+    for (j=0,k=0,w=1; j<nume; ++j,++k) {
+        __TJ("b");
         if (k == cs->height) {
             k = 0;
             cs = opt.design->shape + east_side[++w];
         }
+        #ifdef DEBUG
+            fprintf (stderr, "\nj %d, k %d, w %d, cs->chars[k] = \"%s\"\n",
+                    j, k, w, cs->chars[k]?cs->chars[k]:"(null)");
+        #endif
 
         s = (char *) strdup (cs->chars[k]);
         if (s == NULL) {
@@ -2505,16 +2521,16 @@ design_t *detect_design()
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    design_t *d = designs;
-    long      hits;
-    long      maxhits = 0;
-    design_t *res = NULL;
-    int       dcnt;
-    shape_t   scnt;
+    design_t *d = designs;               /* ptr to currently tested design */
+    long      hits;                      /* hit points of the current design */
+    long      maxhits = 0;               /* maximum no. of hits so far */
+    design_t *res = NULL;                /* ptr to design with the most hits */
+    int       dcnt;                      /* design loop counter */
+    shape_t   scnt;                      /* shape loop counter */
     size_t    j, k;
     char     *p;
     char     *s;
-    line_t    shpln;
+    line_t    shpln;                     /* a line which is part of a shape */
     size_t    a;
 
     for (dcnt=0; dcnt<anz_designs; ++dcnt, ++d) {
@@ -2842,7 +2858,10 @@ int remove_box()
     for (j=textstart; j<textend; ++j) {
         char *ws, *we, *es, *ee;         /* west start & end, east start&end */
         char *p;
-
+        
+        #ifdef DEBUG
+            fprintf (stderr, "Calling best_match() for line %d:\n", j);
+        #endif
         m = best_match (input.lines+j, &ws, &we, &es, &ee);
         if (m < 0) {
             fprintf (stderr, "%s: internal error\n", PROJECT);
@@ -2973,6 +2992,93 @@ void output_input()
 
 
 
+int apply_substitutions (const int mode)
+/*
+ *  Apply regular expression substitutions to input text.
+ *
+ *    mode == 0   use replacement rules (box is being *drawn*)
+ *         == 1   use reversion rules (box is being *removed*)
+ *
+ *  RETURNS:  == 0   success
+ *            != 0   error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t     anz_rules;
+    reprule_t *rules;
+    size_t     j, k;
+    char       buf[LINE_MAX*2];
+    size_t     buf_len;                  /* length of string in buf */
+
+    if (opt.design == NULL)
+        return 1;
+
+    if (mode == 0) {
+        anz_rules = opt.design->anz_reprules;
+        rules = opt.design->reprules;
+    }
+    else if (mode == 1) {
+        anz_rules = opt.design->anz_revrules;
+        rules = opt.design->revrules;
+    }
+    else {
+        fprintf (stderr, "%s: internal error\n", PROJECT);
+        return 2;
+    }
+
+    /*
+     *  Compile regular expressions
+     */
+    errno = 0;
+    opt.design->current_rule = rules;
+    for (j=0; j<anz_rules; ++j, ++(opt.design->current_rule)) {
+        rules[j].prog = regcomp (rules[j].search);
+    }
+    opt.design->current_rule = NULL;
+    if (errno) return 3;
+
+    /*
+     *  Apply regular expression substitutions to input lines
+     */
+    for (k=0; k<input.anz_lines; ++k) {
+        opt.design->current_rule = rules;
+        for (j=0; j<anz_rules; ++j, ++(opt.design->current_rule)) {
+            #ifdef REGEXP_DEBUG
+                fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
+                        rules[j].prog, input.lines[k].text,
+                        input.lines[k].len, rules[j].repstr, LINE_MAX*2,
+                        rules[j].mode);
+            #endif
+            errno = 0;
+            buf_len = myregsub (rules[j].prog, input.lines[k].text,
+                    input.lines[k].len, rules[j].repstr, buf, LINE_MAX*2,
+                    rules[j].mode);
+            #ifdef REGEXP_DEBUG
+                fprintf (stderr, "%d\n", buf_len);
+            #endif
+            if (errno) return 1;
+
+            BFREE (input.lines[k].text);
+            input.lines[k].text = (char *) strdup (buf);
+            if (input.lines[k].text == NULL) {
+                perror (PROJECT);
+                return 1;
+            }
+            input.lines[k].len = buf_len;
+            #ifdef REGEXP_DEBUG
+                fprintf (stderr, "input.lines[%d] == {%d, \"%s\"}\n", k,
+                        input.lines[k].len, input.lines[k].text);
+            #endif
+        }
+        opt.design->current_rule = NULL;
+    }
+
+    return 0;
+}
+
+
+
 int main (int argc, char *argv[])
 {
     extern int yyparse();
@@ -3047,7 +3153,6 @@ int main (int argc, char *argv[])
         fprintf (stderr, "Reading all input ...\n");
     #endif
     rc = read_all_input();
-    BFREE (yyfilename);
     if (rc) exit (EXIT_FAILURE);
     if (input.anz_lines == 0)
         exit (EXIT_SUCCESS);
@@ -3060,6 +3165,9 @@ int main (int argc, char *argv[])
     if (opt.r) {
         rc = remove_box();
         if (rc == 0) {
+            rc = apply_substitutions (1);
+            if (rc)
+                exit (EXIT_FAILURE);
             output_input();
             exit (EXIT_SUCCESS);
         }
