@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.9 1999/04/09 13:33:24 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.10 1999/06/03 18:54:05 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -18,6 +18,10 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.10  1999/06/03 18:54:05  tsjensen
+ *    lots of fixes
+ *    Added remove box functionality, which remains to be tested
+ *
  *    Revision 1.9  1999/04/09 13:33:24  tsjensen
  *    Removed code related to OFFSET blocks (obsolete)
  *
@@ -79,7 +83,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.9 1999/04/09 13:33:24 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.10 1999/06/03 18:54:05 tsjensen Exp tsjensen $";
 
 extern FILE *yyin;                       /* lex input file */
 
@@ -2399,21 +2403,23 @@ int detect_horiz (const int aside, size_t *hstart, size_t *hend)
             /*
              *  Look for east corner shape
              */
-            cs = opt.design->shape + sides[aside][aside==BTOP?SHAPES_PER_SIDE-1:0];
-            ecs_save = ecs;
-            ecs = strrstr (p, cs->chars[follow], cs->width, goeast);
-            if (ecs) {
-                for (q=ecs+cs->width; *q; ++q) {
-                    if (*q != ' ' && *q != '\t')
-                        break;
+            if (wcs) {
+                cs = opt.design->shape + sides[aside][aside==BTOP?SHAPES_PER_SIDE-1:0];
+                ecs_save = ecs;
+                ecs = strrstr (p, cs->chars[follow], cs->width, goeast);
+                if (ecs) {
+                    for (q=ecs+cs->width; *q; ++q) {
+                        if (*q != ' ' && *q != '\t')
+                            break;
+                    }
+                    if (*q)
+                        ecs = NULL;
                 }
-                if (*q)
-                    ecs = NULL;
-            }
-            if (!ecs) {
-                gowest = 1;
-                goeast = 0;
-                ecs = ecs_save;
+                if (!ecs) {
+                    gowest = 1;
+                    goeast = 0;
+                    ecs = ecs_save;
+                }
             }
             #ifdef DEBUG
                 if (ecs)
@@ -2551,6 +2557,10 @@ int remove_box()
     textend = 0;
     boxend = 0;
     detect_horiz (BBOT, &textend, &boxend);
+    if (textend == 0 && boxend == 0) {
+        textend = input.anz_lines; 
+        boxend = input.anz_lines;
+    }
     #ifdef DEBUG
         fprintf (stderr, "----> Last line of box body (text) is %d, ", textend-1);
         fprintf (stderr, "last line of box is %d.\n", boxend-1);
@@ -2569,7 +2579,7 @@ int remove_box()
             return 1;                    /* internal error */
         if (m == 0) {
             #ifdef DEBUG
-                fprintf (stderr, "line %d: no side match\n", j);
+                fprintf (stderr, "line %2d: no side match\n", j);
             #endif
         }
         if (m > 0) {
