@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.13 1999/06/13 15:28:31 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.14 1999/06/14 12:08:49 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -34,6 +34,13 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.14  1999/06/14 12:08:49  tsjensen
+ *    Bugfix: best_match() box side detection used numw instead of nume
+ *    Added apply_substitutions() routine for central regexp handling
+ *    Added regexp reversion code for box removal
+ *    Unified use of current_re[pv]rule
+ *    Added a few comments and debugging code
+ *
  *    Revision 1.13  1999/06/13 15:28:31  tsjensen
  *    Some error message clean-up
  *    Regular expression substitutions on input text only if *drawing* a box,
@@ -46,10 +53,10 @@
  *    East Padding made dynamic, i.e. dependant on the east side size
  *
  *    Revision 1.11  1999/06/03 19:24:14  tsjensen
- *    a few fixes related to box removal (as expected)
+ *    A few fixes related to box removal (as expected)
  *
  *    Revision 1.10  1999/06/03 18:54:05  tsjensen
- *    lots of fixes
+ *    Lots of fixes
  *    Added remove box functionality (-r), which remains to be tested
  *
  *    Revision 1.9  1999/04/09 13:33:24  tsjensen
@@ -72,7 +79,7 @@
  *
  *    Revision 1.4  1999/03/30 13:30:19  tsjensen
  *    Added minimum width/height for a design. Fixed screwed tiny boxes.
- *    Did not handle zero input.
+ *    Bugfix: Did not handle zero input.
  *
  *    Revision 1.3  1999/03/30 09:36:23  tsjensen
  *    ... still programming ...
@@ -104,8 +111,9 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.13 1999/06/13 15:28:31 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.14 1999/06/14 12:08:49 tsjensen Exp tsjensen $";
 
+extern int yyparse();
 extern FILE *yyin;                       /* lex input file */
 
 
@@ -552,7 +560,7 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Display usage information and terminate
                  */
-                printf ("%s - draws boxes around your text\n", PROJECT);
+                printf ("%s - draws boxes around your text (and removes them)\n", PROJECT);
                 printf ("        (c) Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>\n");
                 printf ("        Web page: http://home.pages.de/~jensen/%s/\n", PROJECT);
                 usage (stdout);
@@ -864,6 +872,97 @@ void btrim (char *text, size_t *len)
 
 
 
+int apply_substitutions (const int mode)
+/*
+ *  Apply regular expression substitutions to input text.
+ *
+ *    mode == 0   use replacement rules (box is being *drawn*)
+ *         == 1   use reversion rules (box is being *removed*)
+ *
+ *  Attn: This modifies the actual input array!
+ *
+ *  RETURNS:  == 0   success
+ *            != 0   error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t     anz_rules;
+    reprule_t *rules;
+    size_t     j, k;
+    char       buf[LINE_MAX*2];
+    size_t     buf_len;                  /* length of string in buf */
+
+    if (opt.design == NULL)
+        return 1;
+
+    if (mode == 0) {
+        anz_rules = opt.design->anz_reprules;
+        rules = opt.design->reprules;
+    }
+    else if (mode == 1) {
+        anz_rules = opt.design->anz_revrules;
+        rules = opt.design->revrules;
+    }
+    else {
+        fprintf (stderr, "%s: internal error\n", PROJECT);
+        return 2;
+    }
+
+    /*
+     *  Compile regular expressions
+     */
+    errno = 0;
+    opt.design->current_rule = rules;
+    for (j=0; j<anz_rules; ++j, ++(opt.design->current_rule)) {
+        rules[j].prog = regcomp (rules[j].search);
+    }
+    opt.design->current_rule = NULL;
+    if (errno) return 3;
+
+    /*
+     *  Apply regular expression substitutions to input lines
+     */
+    for (k=0; k<input.anz_lines; ++k) {
+        opt.design->current_rule = rules;
+        for (j=0; j<anz_rules; ++j, ++(opt.design->current_rule)) {
+            #ifdef REGEXP_DEBUG
+                fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
+                        rules[j].prog, input.lines[k].text,
+                        input.lines[k].len, rules[j].repstr, LINE_MAX*2,
+                        rules[j].mode);
+            #endif
+            errno = 0;
+            buf_len = myregsub (rules[j].prog, input.lines[k].text,
+                    input.lines[k].len, rules[j].repstr, buf, LINE_MAX*2,
+                    rules[j].mode);
+            #ifdef REGEXP_DEBUG
+                fprintf (stderr, "%d\n", buf_len);
+            #endif
+            if (errno) return 1;
+
+            BFREE (input.lines[k].text);
+            input.lines[k].text = (char *) strdup (buf);
+            if (input.lines[k].text == NULL) {
+                perror (PROJECT);
+                return 1;
+            }
+            input.lines[k].len = buf_len;
+            if (input.lines[k].len > input.maxline)
+                input.maxline = input.lines[k].len;
+            #ifdef REGEXP_DEBUG
+                fprintf (stderr, "input.lines[%d] == {%d, \"%s\"}\n", k,
+                        input.lines[k].len, input.lines[k].text);
+            #endif
+        }
+        opt.design->current_rule = NULL;
+    }
+
+    return 0;
+}
+
+
+
 int read_all_input()
 /*
  *  Read entire input from stdin and store it in 'input' array.
@@ -887,18 +986,6 @@ int read_all_input()
     input.anz_lines = 0;
     input.indent = LINE_MAX;
     input.maxline = 0;
-
-    /*
-     *  Compile regular expressions
-     */
-    errno = 0;
-    for (i=0; i<opt.design->anz_reprules; ++i) {
-        opt.design->current_rule = opt.design->reprules + i;
-        opt.design->reprules[i].prog =
-            regcomp (opt.design->reprules[i].search);
-    }
-    opt.design->current_rule = NULL;
-    if (errno) return 1;
 
     /*
      *  Start reading
@@ -944,46 +1031,6 @@ int read_all_input()
         }
 
         /*
-         *  Apply regular expression substitutions to line
-         */
-        if (opt.r == 0) {
-            for (i=0; i<opt.design->anz_reprules; ++i) {
-                opt.design->current_rule = opt.design->reprules + i;
-                errno = 0;
-                #ifdef REGEXP_DEBUG
-                    fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
-                            opt.design->reprules[i].prog,
-                            input.lines[input.anz_lines].text,
-                            input.lines[input.anz_lines].len,
-                            opt.design->reprules[i].repstr, LINE_MAX+2,
-                            opt.design->reprules[i].mode);
-                #endif
-                input.lines[input.anz_lines].len =
-                    myregsub (opt.design->reprules[i].prog,
-                            input.lines[input.anz_lines].text,
-                            input.lines[input.anz_lines].len,
-                            opt.design->reprules[i].repstr,
-                            buf, LINE_MAX+2, opt.design->reprules[i].mode);
-                #ifdef REGEXP_DEBUG
-                    fprintf (stderr, "%d\n", input.lines[input.anz_lines].len);
-                #endif
-                if (errno) return 1;
-                BFREE (input.lines[input.anz_lines].text);
-                input.lines[input.anz_lines].text = (char *) strdup (buf);
-                if (input.lines[input.anz_lines].text == NULL) {
-                    perror (PROJECT);
-                    return 1;
-                }
-                #ifdef REGEXP_DEBUG
-                    fprintf (stderr, "input.lines[input.anz_lines] == {%d, \"%s\"}\n",
-                            input.lines[input.anz_lines].len,
-                            input.lines[input.anz_lines].text);
-                #endif
-            }
-            opt.design->current_rule = NULL;
-        }
-
-        /*
          *  Update length of longest line
          */
         if (input.lines[input.anz_lines].len > input.maxline)
@@ -1016,6 +1063,14 @@ int read_all_input()
      */
     if (input.lines == NULL || input.lines[0].text == NULL) {
         return 0;
+    }
+
+    /*
+     *  Apply regular expression substitutions
+     */
+    if (opt.r == 0) {
+        if (apply_substitutions(0) != 0)
+            return 1;
     }
 
     /*
@@ -2147,7 +2202,6 @@ int best_match (const line_t *line, char **ws, char **we, char **es, char **ee)
     quality = 0;
     cs = opt.design->shape + ENE;
     for (j=0,k=0,w=1; j<nume; ++j,++k) {
-        __TJ("b");
         if (k == cs->height) {
             k = 0;
             cs = opt.design->shape + east_side[++w];
@@ -2979,6 +3033,12 @@ int remove_box()
 
 
 void output_input()
+/*
+ *  Output contents of input line list "as is" to standard output, except
+ *  for removal of trailing spaces (trimming).
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
 {
     size_t j;
 
@@ -2992,96 +3052,8 @@ void output_input()
 
 
 
-int apply_substitutions (const int mode)
-/*
- *  Apply regular expression substitutions to input text.
- *
- *    mode == 0   use replacement rules (box is being *drawn*)
- *         == 1   use reversion rules (box is being *removed*)
- *
- *  RETURNS:  == 0   success
- *            != 0   error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    size_t     anz_rules;
-    reprule_t *rules;
-    size_t     j, k;
-    char       buf[LINE_MAX*2];
-    size_t     buf_len;                  /* length of string in buf */
-
-    if (opt.design == NULL)
-        return 1;
-
-    if (mode == 0) {
-        anz_rules = opt.design->anz_reprules;
-        rules = opt.design->reprules;
-    }
-    else if (mode == 1) {
-        anz_rules = opt.design->anz_revrules;
-        rules = opt.design->revrules;
-    }
-    else {
-        fprintf (stderr, "%s: internal error\n", PROJECT);
-        return 2;
-    }
-
-    /*
-     *  Compile regular expressions
-     */
-    errno = 0;
-    opt.design->current_rule = rules;
-    for (j=0; j<anz_rules; ++j, ++(opt.design->current_rule)) {
-        rules[j].prog = regcomp (rules[j].search);
-    }
-    opt.design->current_rule = NULL;
-    if (errno) return 3;
-
-    /*
-     *  Apply regular expression substitutions to input lines
-     */
-    for (k=0; k<input.anz_lines; ++k) {
-        opt.design->current_rule = rules;
-        for (j=0; j<anz_rules; ++j, ++(opt.design->current_rule)) {
-            #ifdef REGEXP_DEBUG
-                fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
-                        rules[j].prog, input.lines[k].text,
-                        input.lines[k].len, rules[j].repstr, LINE_MAX*2,
-                        rules[j].mode);
-            #endif
-            errno = 0;
-            buf_len = myregsub (rules[j].prog, input.lines[k].text,
-                    input.lines[k].len, rules[j].repstr, buf, LINE_MAX*2,
-                    rules[j].mode);
-            #ifdef REGEXP_DEBUG
-                fprintf (stderr, "%d\n", buf_len);
-            #endif
-            if (errno) return 1;
-
-            BFREE (input.lines[k].text);
-            input.lines[k].text = (char *) strdup (buf);
-            if (input.lines[k].text == NULL) {
-                perror (PROJECT);
-                return 1;
-            }
-            input.lines[k].len = buf_len;
-            #ifdef REGEXP_DEBUG
-                fprintf (stderr, "input.lines[%d] == {%d, \"%s\"}\n", k,
-                        input.lines[k].len, input.lines[k].text);
-            #endif
-        }
-        opt.design->current_rule = NULL;
-    }
-
-    return 0;
-}
-
-
-
 int main (int argc, char *argv[])
 {
-    extern int yyparse();
     int rc;                              /* general return code */
     design_t *tmp;
     sentry_t *thebox;
