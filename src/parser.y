@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.19 1999/08/14 19:19:25 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.20 1999/08/16 16:29:25 tsjensen Exp tsjensen $
  *  Language:         GNU bison (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *
@@ -24,6 +24,11 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.20  1999/08/16 16:29:25  tsjensen
+ *    Changed SAMPLE block syntax to get rid of all the quoting sh*t in SAMPLE
+ *    blocks. Samples now look authentic even in the config file. Very simple now.
+ *    Added new token YENDSAMPLE in the process.
+ *
  *    Revision 1.19  1999/08/14 19:19:25  tsjensen
  *    Added anz_shapespec variable to count non-deepempty user-specified shapes
  *    (must at least be 1)
@@ -121,7 +126,7 @@
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.19 1999/08/14 19:19:25 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.20 1999/08/16 16:29:25 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -349,6 +354,7 @@ static void recover()
      pflicht = 0;
      time_for_se_check = 0;
      anz_shapespec = 0;
+     chg_strdelims ('\\', '\"');
 
      /*
       *  Clear current design
@@ -398,13 +404,14 @@ static int design_needed (const char *name, const int design_idx)
 }
 
 %token YSHAPES YELASTIC YPADDING YSAMPLE YENDSAMPLE YBOX YEND YUNREC
-%token YREPLACE YREVERSE YTO YWITH
+%token YREPLACE YREVERSE YTO YWITH YCHGDEL
 %token <s> KEYWORD
 %token <s> WORD
 %token <s> STRING
 %token <shape> SHAPE
 %token <num> YNUMBER
 %token <c> YRXPFLAG
+%token <s> YDELWORD
 
 %type <sentry> shape_def
 %type <sentry> shape_lines
@@ -465,10 +472,9 @@ config_file: config_file design_or_error | design_or_error ;
 
 design_or_error: design | error
     {
-        if (!speeding) {
+        if (!speeding && !skipping) {
             recover();
-            if (!skipping)
-                yyerror ("skipping to next design");
+            yyerror ("skipping to next design");
             skipping = 1;
         }
     }
@@ -477,6 +483,7 @@ design_or_error: design | error
 
 design: YBOX WORD
     {
+        chg_strdelims ('\\', '\"');
         skipping = 0;
         if (!design_needed ($2, design_idx)) {
             speeding = 1;
@@ -607,6 +614,24 @@ entry: KEYWORD STRING
                     "of %s.", $1, __LINE__, __FILE__);
             YYERROR;
         }
+    }
+
+| YCHGDEL YDELWORD
+    {
+        if (strlen($2) != 2) {
+            yyerror ("invalid string delimiter specification -- %s", $2);
+            YYERROR;
+        }
+        if (($2)[0] == ($2)[1]) {
+            yyerror ("string delimiter and escape char may not be the same");
+            YYERROR;
+        }
+        if (strchr (LEX_SDELIM, ($2)[1]) == NULL) {
+            yyerror ("invalid string delimiter -- %c (try one of %s)",
+                    ($2)[1], LEX_SDELIM);
+            YYERROR;
+        }
+        chg_strdelims ($2[0], $2[1]);
     }
 
 | WORD STRING
