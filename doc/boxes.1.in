@@ -1,8 +1,8 @@
-.\" @(#)boxes.1 1.0 08/22/99
+.\" @(#)boxes.1 1.0 04/01/00
 .\"
-.\" $Id: boxes.1,v 1.2 1999/08/18 19:14:08 tsjensen Exp tsjensen $
+.\" $Id: boxes.1.in,v 1.3 1999/08/21 23:41:25 tsjensen Exp tsjensen $
 .\"
-.TH boxes 1 "August 22 1999"
+.TH boxes 1 "April 01 2000"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter
@@ -102,6 +102,28 @@ The factory default setting for
 .B -a
 is
 .B h\fPl\fBv\fPt.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B -c \fIstring\fP
+Command line design definition for simple cases. The argument of this
+option is the definition for the "west" (W) shape. The defined shape must
+consist of exactly one line, i.e. no multi-line shapes are allowed. The
+.B -c
+option is intended as a shortcut for those cases where simple regional
+comments are to be created, which only need a certain character or sequence
+of characters to be placed in front of every line. In such cases, it is
+much more convenient to simply specify
+.B -c
+than to do a complete design definition in one's config file, where the
+only shape defined is the west shape.
+.br
+This option implies a
+.B -d
+and does not access the config file.
+.B -c
+may of course be used in conjuction with any of the other options. By default,
+.B -c
+is not specified.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B -d \fIstring\fP
@@ -262,6 +284,10 @@ Although it is doing great in most cases, imho the design autodetector
 needs some more work.
 .br
 Should you notice any other unspecified behavior, please tell the author!
+.br
+Despite the change date of this document being April 1,
+.I boxes
+is not a joke. At least not intentionally. :-)
 .\" =======================================================================
 .SH ENVIRONMENT
 .TP 15
