@@ -4,7 +4,7 @@
  *  Date created:     July 4, 1999 (Sunday, 21:04h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id$
+ *  Version:          $Id: config.h,v 1.1 1999/07/22 12:26:10 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Please compiler and ease porting
  *
@@ -23,7 +23,10 @@
  *
  *  Revision History:
  *
- *    $Log$
+ *    $Log: config.h,v $
+ *    Revision 1.1  1999/07/22 12:26:10  tsjensen
+ *    Initial revision
+ *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
@@ -31,9 +34,19 @@
 #define CONFIG_H
 
 
+#if defined(__linux__)
+
+#define _GNU_SOURCE
+
+#elif defined(__sun__)
+
 #define _POSIX_SOURCE
-#ifdef __sun__
 #define __EXTENSIONS__
+
+#elif
+
+#define _POSIX_SOURCE
+
 #endif
 
 
