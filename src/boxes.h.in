@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.5 1999/04/04 16:10:51 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h,v 1.6 1999/04/09 13:32:55 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *  Remarks:          ---
@@ -11,6 +11,9 @@
  *  Revision History:
  *
  *    $Log: boxes.h,v $
+ *    Revision 1.6  1999/04/09 13:32:55  tsjensen
+ *    Removed code related to OFFSET blocks (obsolete)
+ *
  *    Revision 1.5  1999/04/04 16:10:51  tsjensen
  *    Added some flags to design structure
  *    Move default settings here from boxes.c
@@ -38,10 +41,10 @@
 #include "regexp.h"
 
 
-#pragma ident "$Id: boxes.h,v 1.5 1999/04/04 16:10:51 tsjensen Exp tsjensen $"
+#pragma ident "$Id: boxes.h,v 1.6 1999/04/09 13:32:55 tsjensen Exp tsjensen $"
 
 #define PROJECT "boxes"                  /* name of program */
-#define VERSION "1.0"                    /* current release of project */
+#define VERSION "1.0 alpha 2"            /* current release of project */
 
 
 /*

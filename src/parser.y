@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.6 1999/04/04 16:07:53 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.7 1999/04/09 13:31:54 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,11 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.7  1999/04/09 13:31:54  tsjensen
+ *    Added checks for duplicate design names
+ *    Added checks for valid design names (no extended ASCII or ctrl chars)
+ *    Removed all code related to OFFSET blocks (obsolete)
+ *
  *    Revision 1.6  1999/04/04 16:07:53  tsjensen
  *    Enforced use of PROJECT macro
  *    Added "indent" directive to grammar
@@ -43,7 +48,8 @@
 #include <string.h>
 #include "boxes.h"
 
-#ident "$Id: parser.y,v 1.6 1999/04/04 16:07:53 tsjensen Exp tsjensen $";
+const char rcsid_parser_y[] =
+    "$Id: parser.y,v 1.7 1999/04/09 13:31:54 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
