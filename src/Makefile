@@ -1,19 +1,21 @@
-# Makefile for boxes
+# Makefile for boxes on Solaris 2.6/sparc
 
 LEX    = flex
 YACC   = yacc
 CC     = gcc
-CFLAGS = -ansi -D_POSIX_C_SOURCE # -O
+CFLAGS = -ansi -D_POSIX_C_SOURCE -D__EXTENSIONS__ # -O
 
 
 boxes: y.tab.o lex.yy.o boxes.o
-	$(CC) $(CFLAGS) -Wall -W -o boxes y.tab.o lex.yy.o boxes.o -ll
+	$(CC) $(LDFLAGS) -o boxes y.tab.o lex.yy.o boxes.o -ll
 
 lex.yy.o: lex.yy.c y.tab.h
+	$(CC) $(CFLAGS) -DYY_NO_UNPUT -Wall -W -c lex.yy.c
 
 y.tab.o: y.tab.c y.tab.h
 
 boxes.o: boxes.c boxes.h
+	$(CC) $(CFLAGS) -Wall -W -c boxes.c
 
 y.tab.c y.tab.h: parser.y boxes.h
 	$(YACC) -d parser.y
