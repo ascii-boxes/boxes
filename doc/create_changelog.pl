@@ -3,11 +3,17 @@
 #  Author:       Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>
 #  Date created: July 12, 1999 (Monday, 13:14h)
 #  Language:     Perl 5
-#  Version:      $Id: create_changelog.pl,v 1.1 1999/07/12 12:28:46 tsjensen Exp tsjensen $
+#  Version:      $Id: create_changelog.pl,v 1.2 1999/07/12 18:03:14 tsjensen Exp tsjensen $
 #
 #  History:
 #
 #    $Log: create_changelog.pl,v $
+#    Revision 1.2  1999/07/12 18:03:14  tsjensen
+#    Moved "List of Files" from top to bottom of page
+#    Many modifications on the page's appearance
+#    In log messages, lines which start with a lower case character are
+#    not preceded by a <BR>, thus concatenating lines which belong together.
+#
 #    Revision 1.1  1999/07/12 12:28:46  tsjensen
 #    Initial revision
 #______________________________________________________________________________
@@ -29,8 +35,10 @@ print '<HTML>
 
 <BODY TEXT="#000000" LINK="#0000FF" VLINK="#C00080" BGCOLOR="#FFFFFF">
 
-This page is an automatically generated chronologically sorted change log of
-the files listed <A HREF="#flist">below</A>.
+This page is automatically updated whenever a few of the <A
+HREF="#flist">files listed below</A> are checked in, so it is very
+up-to-date. It might already show changes which are not even in the <A
+HREF="download/current-SNAP.tar.gz">current snapshot</A> yet.
 
 <H1>Chronological Change Log</H1>
 
@@ -67,6 +75,7 @@ foreach $dat (sort @files) {
         }
         if ($tmp[$i] !~ /^revision ([0-9]\.[0-9]+)/
                 && $tmp[$i] !~ /^date: ([^;]*);/) {
+            $tmp[$i] =~ s/&/\&amp;/g;
             $tmp[$i] =~ s/</\&lt;/g;
             $tmp[$i] =~ s/>/\&gt;/g;
             $tmp[$i] =~ s/ü/\&uuml;/g;
@@ -76,6 +85,7 @@ foreach $dat (sort @files) {
             $tmp[$i] =~ s/Ö/\&Ouml;/g;
             $tmp[$i] =~ s/Ä/\&Auml;/g;
             $tmp[$i] =~ s/ß/\&szlig;/g;
+            $tmp[$i] =~ s/é/\&eacute;/g;
             $tmp[$i] =~ s/"/\&quot;/g;
             chop $tmp[$i];
             if ($tmp[$i] =~ /^Initial revision$/) {
@@ -91,6 +101,7 @@ foreach $dat (sort @files) {
             || $tmp[$i] =~ /^===============================================/)
         {
             $desc[$#desc] = "";
+            $dat =~ s/^.*\///;
             $cl{$datum."; <STRONG>".$dat." ".$rev."</STRONG> (".$auth.")"} = [ @desc ];
             @desc = ();
         }
