@@ -3,7 +3,7 @@
 #   Date created:     March 17, 1999 (Wednesday, 17:02h)
 #   Author:           Thomas Jensen
 #                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id: boxes-config,v 1.8 1999/06/28 18:42:19 tsjensen Exp tsjensen $
+#   Version:          $Id: boxes-config,v 1.9 1999/07/12 18:34:14 tsjensen Exp tsjensen $
 #   Format:           ASCII Text
 #   World Wide Web:   http://home.pages.de/~jensen/boxes/
 #   Purpose:          Example configuration file for the boxes program
@@ -11,6 +11,11 @@
 #   Revision History:
 #
 #     $Log: boxes-config,v $
+#     Revision 1.9  1999/07/12 18:34:14  tsjensen
+#     Added "headline" design to show useful example of regexp backreferences
+#     Fixed small bug in sample block of "stark2" design
+#     Added padding of t1 for design "parchment"
+#
 #     Revision 1.8  1999/06/28 18:42:19  tsjensen
 #     Moved "C" design to first position in file, so it remains the default
 #     Changed netdata design to use padding option and reversion
@@ -729,50 +734,53 @@ END girl
 BOX tjc
 
 author   "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
-revision "1.0"
-revdate  "April 02, 1999 (Friday, 19:26h)"
+revision "1.1"
+revdate  "July 16, 1999 (Friday, 18:55h)"
 created  "April 02, 1999 (Friday, 19:26h)"
 
-SAMple {
-    static size_t expand_tabs_into (const char *input_buffer, const int in_len,
-        const int tabstop, char **text)
+SAmple {
+    static char *foo (const int a, const int b)
     /*
-     *  Expand tab chars in input_buffer and store result in text.
+     *  Do the foo on the bar and around again.
      *
-     *  input_buffer   Line of text with tab chars
-     *  in_len         length of the string in input_buffer
-     *  tabstop        tab stop distance
-     *  text           address of the pointer that will take the result
+     *      a     number of doodlefrobs
+     *      b     barfoo mode (0 == off)
      *
      *  Memory will be allocated for the result.
      *  Should only be called for lines of length > 0;
      *
-     *  RETURNS:  Success: Length of the result line in characters (> 0)
+     *  RETURNS:  Success: Pointer to result line
      *            Error:   0       (e.g. out of memory)
      *
-    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      */
     {
         static char temp ....
         int ii;          ....
 }
 
-indent "none"     # alternatives: "box", "text"
+indent "none"                 # alternatives: "box", "text"
 
-replace "\\*/" with "*\\/"
+replace "\\*/" with "*\\/"    # quote closing comment tags
+reverse "\\*\\\\/" to "*/"
 
 shapes {
-    w  (" *  ")
-    sw (" *  ", "* * ", " */ ")
-    nw ("/*  ")
-    s  ("  ", "* ", "  ")
-    se (" ", "*", " ")
-    ne (" ")
-    n  (" ")
-    e  (" ")
+    wnw ("/*")
+    w   (" *")
+    sw  ("* ", " *")
+    ssw ("*", "/")
+    s   (" *", "  ")
+
+    ne(" ") n(" ") nw("  ")   # empty north side
+    se(" "," ")    e (" ")    # empty east side
 }
 
 elastic (n, e, s, w)
+
+padding {
+    left 2
+    vertical 1
+}
 
 END tjc
 
