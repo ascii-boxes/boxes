@@ -3,7 +3,7 @@
 #   Date created:     March 17, 1999 (Wednesday, 17:02h)
 #   Author:           Thomas Jensen
 #                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id: boxes-config,v 1.4 1999/04/09 18:11:08 tsjensen Exp tsjensen $
+#   Version:          $Id: boxes-config,v 1.5 1999/06/16 10:52:59 tsjensen Exp tsjensen $
 #   Format:           ASCII Text
 #   World Wide Web:   http://home.pages.de/~jensen/boxes/
 #   Purpose:          Example configuration file for the boxes program
@@ -11,6 +11,11 @@
 #   Revision History:
 #
 #     $Log: boxes-config,v $
+#     Revision 1.5  1999/06/16 10:52:59  tsjensen
+#     Added "reverse" entry for testing, more "reverse" entries needed still
+#     Added "peek" design for C funtion headers
+#     Simplified some replacement entries
+#
 #     Revision 1.4  1999/04/09 18:11:08  tsjensen
 #     Added some more designs
 #     Uncommented an unused entry, since boxes no longer generates warnings
@@ -242,6 +247,37 @@ reverse "\\*\\\\/" to "*/"
 elastic (n,e,s,w)
 
 END c
+
+
+# ============================================================================
+
+
+BOX c-cmt
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "June 17, 1999 (Thursday, 19:59h)"
+created "June 17, 1999 (Thursday, 19:59h)"
+
+sample {
+    /*                               */
+    /*     regular C language        */
+    /*     comments                  */
+    /*                               */
+}
+
+shapes {
+    nw ("  ") n (" ") ne ("  ")
+     w ("/*")          e ("*/")
+    sw ("  ") s (" ") se ("  ")
+}
+
+replace "\\*/" with "*\\/"               # quote closing comment tags
+reverse "\\*\\\\/" to "*/"
+
+elastic (n,e,s,w)
+
+END c-cmt
 
 
 # ============================================================================
@@ -1187,6 +1223,145 @@ replace "\\*/" with "*\\/"               # quote closing comment tags
 elastic (n,e,s,w)
 
 END peek
+
+
+# ============================================================================
+
+
+BOX java-cmt
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "June 17, 1999 (Thursday, 19:59h)"
+created "June 17, 1999 (Thursday, 19:59h)"
+
+sample {
+    //
+    // regular Java
+    // comments
+    //
+}
+
+shapes {
+    nw ("  ") n (" ") ne (" ")
+     w ("//")          e (" ")
+    sw ("  ") s (" ") se (" ")
+}
+
+elastic (n,e,s,w)
+
+END java-cmt
+
+
+# ============================================================================
+
+
+BOX pound-cmt
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "June 17, 1999 (Thursday, 19:59h)"
+created "June 17, 1999 (Thursday, 19:59h)"
+
+sample {
+    #
+    #  regular comments used in Perl, Shell scripts, etc.
+    #
+}
+
+shapes {
+    nw (" ") n (" ") ne (" ")
+     w ("#")          e (" ")
+    sw (" ") s (" ") se (" ")
+}
+
+elastic (n,e,s,w)
+
+END pound-cmt
+
+
+# ============================================================================
+
+
+BOX html-cmt
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "June 17, 1999 (Thursday, 19:59h)"
+created "June 17, 1999 (Thursday, 19:59h)"
+
+sample {
+    <!--                                     -->
+    <!-- regular comments used in HTML files -->
+    <!--                                     -->
+}
+
+shapes {
+    nw ("     ") n (" ") ne ("    ")
+     w ("<!-- ")          e (" -->")
+    sw ("     ") s (" ") se ("    ")
+}
+
+elastic (n,e,s,w)
+
+END html-cmt
+
+
+# ============================================================================
+
+
+BOX vim-cmt
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "June 17, 1999 (Thursday, 19:59h)"
+created "June 17, 1999 (Thursday, 19:59h)"
+
+sample {
+    "
+    "  comments used in the vim editor's config file (.vimrc)
+    "
+}
+
+shapes {
+    nw (" ") n (" ") ne (" ")
+     w ("\"")          e (" ")
+    sw (" ") s (" ") se (" ")
+}
+
+elastic (n,e,s,w)
+
+END vim-cmt
+
+
+# ============================================================================
+
+
+BOX right
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "June 17, 1999 (Thursday, 19:59h)"
+created "June 17, 1999 (Thursday, 19:59h)"
+
+sample {
+    This can be used for marking code changes with your initials
+    (I don't like it, but some people work this way):
+
+    for (j=0; j<blank_count; ++j)        /*@TJ@*/
+        fprintf (opt.outfile, "\n");     /*@TJ@*/
+    blank_count = 0;                     /*@TJ@*/
+}
+
+shapes {
+    nw (" ") n (" ") ne ("        ")
+     w (" ")          e ("/*@TJ@*/")
+    sw (" ") s (" ") se ("        ")
+}
+
+elastic (n,e,s,w)
+
+END right
 
 
 # ============================================================================
