@@ -21,8 +21,8 @@ typedef struct regexp {
 } regexp;
 
 extern regexp *regcomp();
-extern int regexec();
-extern size_t regsub();
+/* extern int regexec();   */
+/* extern size_t regsub(); */
 extern size_t myregsub();
 extern void regerror();
 
