@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 13:45h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: shape.h,v 1.2 1999/06/25 18:52:59 tsjensen Exp tsjensen $
+ *  Version:          $Id: shape.h,v 1.3 1999/07/23 16:36:33 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Shape handling and information functions
  *
@@ -24,6 +24,11 @@
  *  Revision History:
  *
  *    $Log: shape.h,v $
+ *    Revision 1.3  1999/07/23 16:36:33  tsjensen
+ *    Added GNU GPL disclaimer
+ *    Removed prototypes of iscorner(), on_side(), shapecmp(), both_on_side(),
+ *    and shape_distance() - nobody was using those anyway.
+ *
  *    Revision 1.2  1999/06/25 18:52:59  tsjensen
  *    Added empty_side() prototype
  *
@@ -68,14 +73,21 @@ typedef struct {
 
 
 
+int genshape (const size_t width, const size_t height, char ***chars);
+void freeshape (sentry_t *shape);
+
+shape_t findshape (const sentry_t *sarr, const int num);
+int on_side (const shape_t s, const int idx);
+
 int isempty (const sentry_t *shape);
+int isdeepempty (const sentry_t *shape);
 
 size_t highest (const sentry_t *sarr, const int n, ...);
 size_t widest (const sentry_t *sarr, const int n, ...);
 
 shape_t leftmost (const int aside, const int cnt);
 
-int empty_side (sentry_t *d, const int aside);
+int empty_side (sentry_t *sarr, const int aside);
 
 
 
