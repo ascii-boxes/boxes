@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.16 1999/06/17 19:07:06 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.17 1999/06/20 14:20:29 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -34,6 +34,10 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.17  1999/06/20 14:20:29  tsjensen
+ *    Added code for padding handling (-p)
+ *    Added BMAX macro (returns maximum of two values)
+ *
  *    Revision 1.16  1999/06/17 19:07:06  tsjensen
  *    Moved line_t to boxes.h
  *    empty_line() now also considers \r and \n whitespace
@@ -103,9 +107,6 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-#define DEBUG
-/* #define REGEXP_DEBUG */
-
 #include <errno.h>
 #include <limits.h>
 #include <stdarg.h>
@@ -115,6 +116,7 @@
 #include <unistd.h>
 #include "regexp.h"
 #include "boxes.h"
+#include "tools.h"
 
 extern int snprintf (char *, size_t, const char *, ...);        /* stdio.h */
 extern int vsnprintf (char *, size_t, const char *, __va_list); /* stdio.h */
@@ -123,32 +125,11 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.16 1999/06/17 19:07:06 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.17 1999/06/20 14:20:29 tsjensen Exp tsjensen $";
 
 extern int yyparse();
 extern FILE *yyin;                       /* lex input file */
 
-
-
-/*  max. allowed tab stop distance
- */
-#define MAX_TABSTOP     16
-
-/*  max. supported line length
- *  This is how many characters of a line will be read. Anything beyond
- *  will be discarded. Output may be longer though. The line feed character
- *  at the end does not count.
- *  (This should have been done via sysconf(), but I didn't do it in order
- *  to ease porting to non-unix platforms.)
- */
-#if defined(LINE_MAX) && (LINE_MAX < 1024)
-#undef LINE_MAX
-#endif
-#ifndef LINE_MAX
-#define LINE_MAX        2048
-#endif
-
-#define BMAX(a,b) ((a)>(b)? (a):(b))     /* return the larger value */
 
 char *yyfilename = NULL;                 /* file name of config file used */
 
@@ -171,20 +152,7 @@ shape_t corners[ANZ_CORNERS] = { NW, NE, SE, SW };
 shape_t *sides[] = { north_side, east_side, south_side, west_side };
 
 
-struct {                                 /* Command line options: */
-    int       l;                         /* list available designs */
-    int       r;                         /* remove box from input */
-    int       tabstop;                   /* tab stop distance */
-    int       padding[ANZ_SIDES];        /* in spaces or lines resp. */
-    design_t *design;                    /* currently used box design */
-    int       design_choice_by_user;     /* true if design was chosen by user */
-    long      reqwidth;                  /* requested box width (-s) */
-    long      reqheight;                 /* requested box height (-s) */
-    char      valign;                    /* text position inside box */
-    char      halign;                    /* ( h[lcr]v[tcb] )         */
-    FILE     *infile;                    /* where we get our input */
-    FILE     *outfile;                   /* where we put our output */
-} opt;
+opt_t opt;
 
 
 struct {
@@ -194,45 +162,6 @@ struct {
     size_t indent;                       /* number of leading spaces found */
 } input = {NULL, 0, 0, LINE_MAX};
 
-
-
-
-int yyerror (const char *fmt, ...)
-/*
- *  Print configuration file parser errors.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    va_list ap;
-    char buf[1024];
-
-    va_start (ap, fmt);
-    snprintf (buf, 1024-1, "%s: %s: line %d: ", PROJECT,
-            yyfilename? yyfilename: "(null)", yylineno);
-    vsnprintf (buf+strlen(buf), 1024-strlen(buf)-1, fmt, ap);
-    strcat (buf, "\n");
-    fprintf (stderr, buf);
-    va_end (ap);
-
-    return 0;
-}
-
-
-
-void regerror (char *msg)
-/*
- *  Print regular expression andling error messages
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    fprintf (stderr, "%s: %s: line %d: %s\n",
-            PROJECT, yyfilename? yyfilename: "(null)",
-            opt.design->current_rule? opt.design->current_rule->line: 0,
-            msg);
-    errno = EINVAL;
-}
 
 
 
@@ -306,32 +235,6 @@ int isempty (const sentry_t *shape)
         return 1;
     else
         return 0;
-}
-
-
-
-int empty_line (const line_t *line)
-/*
- *  Return true if line is empty.
- *
- *  Empty lines either consist entirely of whitespace or don't exist.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    char *p;
-    size_t j;
-
-    if (!line)
-        return 1;
-    if (line->text == NULL || line->len <= 0)
-        return 1;
-
-    for (p=line->text, j=0; *p && j<line->len; ++j, ++p) {
-        if (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n')
-            return 0;
-    }
-    return 1;
 }
 
 
@@ -453,17 +356,17 @@ static void usage (FILE *st)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    fprintf (st, "Usage: %s [options] [infile [outfile]]\n", PROJECT);
-    fprintf (st, "       -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
-    fprintf (st, "       -d name  select box design\n");
-    fprintf (st, "       -f file  use only file as configuration file\n");
-    fprintf (st, "       -h       print usage information\n");
-    fprintf (st, "       -l       list available box designs w/ samples\n");
-    fprintf (st, "       -p fmt   padding (default is design-dependent)\n");
-    fprintf (st, "       -r       remove box from input\n");
-    fprintf (st, "       -s wxh   specify box size (width w and/or height h)\n");
-    fprintf (st, "       -t uint  set tab stop distance [default: %d]\n", DEF_TABSTOP);
-    fprintf (st, "       -v       print version information\n");
+    fprintf (st, " Usage: %s [options] [infile [outfile]]\n", PROJECT);
+    fprintf (st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
+    fprintf (st, "        -d name  select box design\n");
+    fprintf (st, "        -f file  use only file as configuration file\n");
+    fprintf (st, "        -h       print usage information\n");
+    fprintf (st, "        -l       list available box designs w/ samples\n");
+    fprintf (st, "        -p fmt   padding [default: design-dependent]\n");
+    fprintf (st, "        -r       remove box from input\n");
+    fprintf (st, "        -s wxh   specify box size (width w and/or height h)\n");
+    fprintf (st, "        -t uint  set tab stop distance [default: %d]\n", DEF_TABSTOP);
+    fprintf (st, "        -v       print version information\n");
 }
 
 
@@ -489,11 +392,19 @@ static int process_commandline (int argc, char *argv[])
     int   errfl = 0;                     /* true on error */
     int   outfile_existed = 0;           /* true if we overwrite a file */
 
+    /*
+     *  Set default values
+     */
     memset (&opt, 0, sizeof(opt));
     opt.tabstop = DEF_TABSTOP;
     yyin = stdin;
     for (idummy=0; idummy<ANZ_SIDES; ++idummy)
         opt.padding[idummy] = -1;
+    opt.design = (design_t *) ((char *) strdup (DEF_DESIGN));
+    if (opt.design == NULL) {
+        perror (PROJECT);
+        return 1;
+    }
 
     do {
         oc = getopt (argc, argv, "a:d:f:hlp:rs:t:v");
@@ -550,11 +461,13 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Box design selection
                  */
+                BFREE (opt.design);
                 opt.design = (design_t *) ((char *) strdup (optarg));
                 if (opt.design == NULL) {
                     perror (PROJECT);
                     return 1;
                 }
+                opt.design_choice_by_user = 1;
                 break;
 
             case 'f':
@@ -854,7 +767,7 @@ static int process_commandline (int argc, char *argv[])
 
 
 
-int style_sort (const void *p1, const void *p2)
+static int style_sort (const void *p1, const void *p2)
 {
     return strcasecmp ((const char *) ((*((design_t **) p1))->name),
                        (const char *) ((*((design_t **) p2))->name));
@@ -875,7 +788,10 @@ int list_styles()
     design_t **list;                     /* temp list for sorting */
 
     list = (design_t **) calloc (design_idx+1, sizeof(design_t *));
-    if (list == NULL) return 1;
+    if (list == NULL) {
+        perror (PROJECT);
+        return 1;
+    }
 
     for (i=0; i<=design_idx; ++i)
         list[i] = &(designs[i]);
@@ -891,72 +807,6 @@ int list_styles()
     BFREE (list);
 
     return 0;
-}
-
-
-
-static size_t expand_tabs_into (const char *input_buffer, const int in_len,
-      const int tabstop, char **text)
-/*
- *  Expand tab chars in input_buffer and store result in text.
- *
- *  input_buffer   Line of text with tab chars
- *  in_len         length of the string in input_buffer
- *  tabstop        tab stop distance
- *  text           address of the pointer that will take the result
- *
- *  Memory will be allocated for the result.
- *  Should only be called for lines of length > 0;
- *
- *  RETURNS:  Success: Length of the result line in characters (> 0)
- *            Error:   0       (e.g. out of memory)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-   static char temp [LINE_MAX*MAX_TABSTOP+1];  /* work string */
-   int ii;                               /* position in input string */
-   int io;                               /* position in work string */
-   int jp;                               /* tab expansion jump point */
-
-   *text = NULL;
-
-   for (ii=0, io=0; ii<in_len && io<(LINE_MAX*tabstop-1); ++ii) {
-      if (input_buffer[ii] == '\t') {
-         for (jp=io+tabstop-(io%tabstop); io<jp; ++io)
-            temp[io] = ' ';
-      }
-      else {
-         temp[io] = input_buffer[ii];
-         ++io;
-      }
-   }
-   temp[io] = '\0';
-
-   *text = (char *) strdup (temp);
-   if (*text == NULL) return 0;
-
-   return io;
-}
-
-
-
-void btrim (char *text, size_t *len)
-/*
- *  Remove trailing whitespace from line.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    long idx = (long) (*len) - 1;
-
-    while (idx >= 0 && (text[idx] == '\n' || text[idx] == '\r'
-                     || text[idx] == '\t' || text[idx] == ' '))
-    {
-        text[idx--] = '\0';
-    }
-
-    *len = idx + 1;
 }
 
 
@@ -1920,8 +1770,8 @@ static design_t *select_design (design_t *darr, char *sel)
  *  darr      design array as read from config file
  *  sel       name of desired design
  *
- *  If the specified name is not found, defaults to "C" design;
- *  If "C" design is not found, default to design number 0;
+ *  If the specified name is not found, defaults to design DEF_DESIGN;
+ *  If DEF_DESIGN design is not found, default to design number 0;
  *  If there are no designs, print error message and return error.
  *
  *  RETURNS:  pointer to current design   on success
@@ -1932,23 +1782,19 @@ static design_t *select_design (design_t *darr, char *sel)
 {
     int i;
 
-    if (sel) {
-        opt.design_choice_by_user = 1;
+    if (darr) {
         for (i=0; i<anz_designs; ++i) {
             if (strcasecmp (darr[i].name, sel) == 0)
                 return &(darr[i]);
         }
-        fprintf (stderr, "%s: unknown box design -- %s\n", PROJECT, sel);
-        return NULL;
-    }
+        if (opt.design_choice_by_user) {
+            fprintf (stderr, "%s: unknown box design -- %s\n", PROJECT, sel);
+            return NULL;
+        }
 
-    for (i=0; i<anz_designs; ++i) {
-        if (strcasecmp (darr[i].name, "C") == 0)
-            return &(darr[i]);
+        if (darr[0].name != NULL)
+            return darr;
     }
-
-    if (darr[0].name != NULL)
-        return darr;
 
     fprintf (stderr, "%s: Internal error -- no box designs found\n", PROJECT);
     return NULL;
@@ -2203,53 +2049,6 @@ static int output_box (const sentry_t *thebox)
 
 
 
-char *strrstr (const char *s1, const char *s2, const size_t s2_len, int skip)
-/*
- *  Return pointer to last occurrence of string s2 in string s1.
- *
- *      s1       string to search
- *      s2       string to search for in s1
- *      s2_len   length in characters of s2
- *      skip     number of finds to ignore before returning anything
- *
- *  RETURNS: pointer to last occurrence of string s2 in string s1
- *           NULL if not found or error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    char *p;
-    int comp;
-
-    if (!s2 || *s2 == '\0')
-        return (char *) s1;
-    if (!s1 || *s1 == '\0')
-        return NULL;
-    if (skip < 0)
-        skip = 0;
-
-    p = strrchr (s1, s2[0]);
-    if (!p)
-        return NULL;
-
-    while (p >= s1) {
-        comp = strncmp (p, s2, s2_len);
-        if (comp == 0) {
-            if (skip--)
-                --p;
-            else
-                return p;
-        }
-        else {
-            --p;
-        }
-    }
-
-    return NULL;
-}
-
-
-
 int best_match (const line_t *line, char **ws, char **we, char **es, char **ee)
 /*
  *  Find positions of west and east box parts in line.
@@ -2374,7 +2173,7 @@ int best_match (const line_t *line, char **ws, char **we, char **es, char **ee)
         cq = cs->width;
 
         do {
-            p = strrstr (line->text, s, cq, 0);
+            p = my_strnrstr (line->text, s, cq, 0);
             if (p) {
                 q = p + cq;
                 while (*q) {
@@ -2591,18 +2390,15 @@ int detect_horiz (const int aside, size_t *hstart, size_t *hend)
         line = input.lines + input.anz_lines - 1;
     }
 
-    for (lcnt=0; lcnt<mheight; ++lcnt) {
-
+    for (lcnt=0; lcnt<mheight && lcnt<input.anz_lines
+            && line >= input.lines; ++lcnt)
+    {
         goeast = gowest = 0;
 
         #ifdef DEBUG
-            if (aside == BTOP)
-                fprintf (stderr, "----- Processing line index %2d --------------"
-                        "---------------------------------\n", lcnt);
-            else
-                fprintf (stderr, "----- Processing line index %2d -----------"
-                        "------------------------------------\n",
-                        input.anz_lines - lcnt - 1);
+            fprintf (stderr, "----- Processing line index %2d ----------"
+                    "-------------------------------------\n",
+                    aside == BTOP? lcnt: input.anz_lines - lcnt - 1);
         #endif
 
         do {
@@ -2641,7 +2437,7 @@ int detect_horiz (const int aside, size_t *hstart, size_t *hend)
             if (wcs) {
                 cs = opt.design->shape + sides[aside][aside==BTOP?SHAPES_PER_SIDE-1:0];
                 ecs_save = ecs;
-                ecs = strrstr (p, cs->chars[follow], cs->width, goeast);
+                ecs = my_strnrstr (p, cs->chars[follow], cs->width, goeast);
                 if (ecs) {
                     for (q=ecs+cs->width; *q; ++q) {
                         if (*q != ' ' && *q != '\t')
@@ -2975,10 +2771,6 @@ int remove_box()
     size_t j;                        /* loop counter */
     int    did_something = 0;        /* true if there was something to remove */
 
-    #ifdef DEBUG
-        fprintf (stderr, "remove_box()\n");
-    #endif
-
     /*
      *  If the user didn't specify a design to remove, autodetect it.
      *  Since this requires knowledge of all available designs, the entire
@@ -3076,12 +2868,12 @@ int remove_box()
             fprintf (stderr, "%s: internal error\n", PROJECT);
             return 1;                    /* internal error */
         }
-        if (m == 0) {
+        else if (m == 0) {
             #ifdef DEBUG
                 fprintf (stderr, "line %2d: no side match\n", j);
             #endif
         }
-        if (m > 0) {
+        else {
             #ifdef DEBUG
                 fprintf (stderr, "\033[00;33mline %2d: west: %d (\'%c\') to "
                     "%d (\'%c\') [len %d];  east: %d (\'%c\') to %d (\'%c\')"
@@ -3112,13 +2904,20 @@ int remove_box()
      */
     if (did_something) {
         for (j=textstart; j<textend; ++j) {
-            int c;
-            for (c=0; c<(int)opt.design->shape[NW].width; ++c) {
+            size_t c;
+            size_t widz = opt.design->shape[NW].width + opt.design->padding[BLEF];
+            for (c=0; c<widz; ++c) {
                 if (input.lines[j].text[c] != ' ')
                     break;
             }
+            #ifdef DEBUG
+                fprintf (stderr, "memmove (\"%s\", \"%s\", %d);\n",
+                        input.lines[j].text, input.lines[j].text + c,
+                        input.lines[j].len - c + 1);
+            #endif
             memmove (input.lines[j].text, input.lines[j].text + c,
-                    input.lines[j].len - c);
+                    input.lines[j].len - c + 1);        /* +1 for zero byte */
+            input.lines[j].len -= c;
         }
     }
     #ifdef DEBUG
@@ -3229,8 +3028,10 @@ int main (int argc, char *argv[])
     #endif
 
     rc = process_commandline (argc, argv);
-    if (rc == 42) exit (EXIT_SUCCESS);
-    if (rc) exit (EXIT_FAILURE);
+    if (rc == 42)
+        exit (EXIT_SUCCESS);
+    if (rc)
+        exit (EXIT_FAILURE);
 
     designs = (design_t *) calloc (1, sizeof(design_t));
     if (designs == NULL) {
@@ -3248,7 +3049,8 @@ int main (int argc, char *argv[])
         fprintf (stderr, "Parsing Config File ...\n");
     #endif
     rc = yyparse();
-    if (rc) exit (EXIT_FAILURE);
+    if (rc)
+        exit (EXIT_FAILURE);
     --design_idx;
     tmp = (design_t *) realloc (designs, (design_idx+1)*sizeof(design_t));
     if (tmp) {
@@ -3264,7 +3066,8 @@ int main (int argc, char *argv[])
         fprintf (stderr, "Selecting Design ...\n");
     #endif
     tmp = select_design (designs, (char *) opt.design);
-    if (tmp == NULL) exit (EXIT_FAILURE);
+    if (tmp == NULL)
+        exit (EXIT_FAILURE);
     BFREE (opt.design);
     opt.design = tmp;
 
@@ -3273,11 +3076,7 @@ int main (int argc, char *argv[])
      */
     if (opt.l) {
         rc = list_styles();
-        if (rc) {
-            perror (PROJECT);
-            exit (EXIT_FAILURE);
-        }
-        exit (EXIT_SUCCESS);
+        exit (rc);
     }
 
     /*
@@ -3298,21 +3097,6 @@ int main (int argc, char *argv[])
         opt.design->minheight = opt.reqheight;
     if (opt.reqwidth > (long) opt.design->minwidth)
         opt.design->minwidth = opt.reqwidth;
-
-    /*
-     *  Remove box, if the user commands. If not, we'll add a box.
-     */
-    if (opt.r) {
-        rc = remove_box();
-        if (rc == 0) {
-            rc = apply_substitutions (1);
-            if (rc)
-                exit (EXIT_FAILURE);
-            output_input();
-            exit (EXIT_SUCCESS);
-        }
-        exit (EXIT_FAILURE);
-    }
 
     /*
      *  Adjust box size to fit requested padding value
@@ -3363,22 +3147,34 @@ int main (int argc, char *argv[])
         }
     }
 
-    /*
-     *  Generate box
-     */
-    #ifdef DEBUG
-        fprintf (stderr, "Generating Box ...\n");
-    #endif
-    rc = generate_box (thebox);
-    if (rc) exit (EXIT_FAILURE);
+    if (opt.r) {
+        /*
+         *  Remove box
+         */
+        #ifdef DEBUG
+            fprintf (stderr, "Removing Box ...\n");
+        #endif
+        rc = remove_box();
+        if (rc)
+            exit (EXIT_FAILURE);
+        rc = apply_substitutions (1);
+        if (rc)
+            exit (EXIT_FAILURE);
+        output_input();
+    }
 
-    /*
-     *  Generate output
-     */
-    #ifdef DEBUG
-        fprintf (stderr, "Generating Output ...\n");
-    #endif
-    output_box (thebox);
+    else {
+        /*
+         *  Generate box
+         */
+        #ifdef DEBUG
+            fprintf (stderr, "Generating Box ...\n");
+        #endif
+        rc = generate_box (thebox);
+        if (rc)
+            exit (EXIT_FAILURE);
+        output_box (thebox);
+    }
 
     return EXIT_SUCCESS;
 }
