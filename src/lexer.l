@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.2 1999/03/30 09:42:51 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.3 1999/04/04 16:11:39 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,11 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.3  1999/04/04 16:11:39  tsjensen
+ *    Added indent keyword
+ *    Added Replace token
+ *    Some fiddling which will hopefully fix a line counting bug
+ *
  *    Revision 1.2  1999/03/30 09:42:51  tsjensen
  *    Added rcs keywords and standard file header.
  *
@@ -27,7 +32,7 @@
 #include "boxes.h"
 #include "y.tab.h"
 
-#ident "$Id: lexer.l,v 1.2 1999/03/30 09:42:51 tsjensen Exp tsjensen $"
+#ident "$Id: lexer.l,v 1.3 1999/04/04 16:11:39 tsjensen Exp tsjensen $"
 
 int yylineno = 1;
 
@@ -36,14 +41,13 @@ int yylineno = 1;
 %x SAMPLE1
 %x SAMPLE2
 %s SHAPES
-%s OFFSETS
 %s ELASTIC
 
 %%
 
-<SAMPLE1,SHAPES,OFFSETS,ELASTIC,INITIAL>[\r\t ]+ /* ignore whitespace */
+<SAMPLE1,SHAPES,ELASTIC,INITIAL>[\r\t ]+ /* ignore whitespace */
 
-<SAMPLE1,SHAPES,OFFSETS,ELASTIC,INITIAL>\n yylineno++;
+<SAMPLE1,SHAPES,ELASTIC,INITIAL>\n yylineno++;
 
 \"[^"\n]*$ {
     yyerror ("Unterminated String at %s", yytext);
@@ -148,14 +152,6 @@ Sample {
     yymore();
 }
 
-Offsets {
-    #ifdef DEBUG
-        fprintf (stderr, "\nYOFFSET: %s -- STATE OFFSETS", yytext);
-    #endif
-    BEGIN OFFSETS;
-    return YOFFSETS;
-}
-
 elastic {
     #ifdef DEBUG
         fprintf (stderr, "\nYELASTC: %s -- STATE ELASTIC", yytext);
@@ -179,22 +175,6 @@ Replace {
     return YREPLACE;
 }
 
-<OFFSETS>nw-nnw { yylval.offset = NW_NNW; return OFFSET; }
-<OFFSETS>nnw-n  { yylval.offset = NNW_N;  return OFFSET; }
-<OFFSETS>n-nne  { yylval.offset = N_NNE;  return OFFSET; }
-<OFFSETS>nne-ne { yylval.offset = NNE_NE; return OFFSET; }
-<OFFSETS>ne-ene { yylval.offset = NE_ENE; return OFFSET; }
-<OFFSETS>ene-e  { yylval.offset = ENE_E;  return OFFSET; }
-<OFFSETS>e-ese  { yylval.offset = E_ESE;  return OFFSET; }
-<OFFSETS>ese-se { yylval.offset = ESE_SE; return OFFSET; }
-<OFFSETS>se-sse { yylval.offset = SE_SSE; return OFFSET; }
-<OFFSETS>sse-s  { yylval.offset = SSE_S;  return OFFSET; }
-<OFFSETS>s-ssw  { yylval.offset = S_SSW;  return OFFSET; }
-<OFFSETS>ssw-sw { yylval.offset = SSW_SW; return OFFSET; }
-<OFFSETS>sw-wsw { yylval.offset = SW_WSW; return OFFSET; }
-<OFFSETS>wsw-w  { yylval.offset = WSW_W;  return OFFSET; }
-<OFFSETS>w-wnw  { yylval.offset = W_WNW;  return OFFSET; }
-<OFFSETS>wnw-nw { yylval.offset = WNW_NW; return OFFSET; }
 
 <SHAPES,ELASTIC>nw  { yylval.shape = NW;  return SHAPE; }
 <SHAPES,ELASTIC>nnw { yylval.shape = NNW; return SHAPE; }
@@ -221,13 +201,14 @@ Replace {
     return yytext[0];
 }
 
-<SHAPES,OFFSETS>\} {
+<SHAPES>\} {
     #ifdef DEBUG
         fprintf (stderr, "\n SYMBOL: \'%c\' -- STATE INITIAL", yytext[0]);
     #endif
     BEGIN INITIAL;
     return yytext[0];
 }
+
 
 BOX|revision|author|created|indent|revdate|END {
     /*
@@ -240,6 +221,7 @@ BOX|revision|author|created|indent|revdate|END {
     return KEYWORD;
 }
 
+
 [a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*  {
     #ifdef DEBUG
         fprintf (stderr, "\n   WORD: %s", yytext);
@@ -248,6 +230,7 @@ BOX|revision|author|created|indent|revdate|END {
     return WORD;
 }
 
+
 [,(){}] {
     #ifdef DEBUG
         fprintf (stderr, "\n SYMBOL: \'%c\'", yytext[0]);
@@ -255,13 +238,6 @@ BOX|revision|author|created|indent|revdate|END {
     return yytext[0];
 }
 
-\-?[0-9]+ {
-    #ifdef DEBUG
-        fprintf (stderr, "\n NUMBER: %s", yytext);
-    #endif
-    yylval.num = atoi (yytext);
-    return NUMBER;
-}
 
 #.*$ {
     /* ignore comments */
@@ -269,6 +245,7 @@ BOX|revision|author|created|indent|revdate|END {
         fprintf (stderr, "\nCOMMENT: %s", yytext+1);
     #endif
 }
+
 
 . {
     yyerror ("Unrecognized input at %s", yytext);
