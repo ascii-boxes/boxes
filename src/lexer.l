@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.10 1999/06/28 12:17:46 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.11 1999/06/28 18:37:38 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,12 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.11  1999/06/28 18:37:38  tsjensen
+ *    Replaced DEBUG macro with LEXER_DEBUG, which is now activated in boxes.h
+ *    New tokens to, with, global, once
+ *    Added LEX_MAX_WARN macro to limit number of lex errors printed per design
+ *    Replaced exit()s with return YUNREC where errors are not fatal
+ *
  *    Revision 1.10  1999/06/28 12:17:46  tsjensen
  *    Added tokens YBOX and YEND (thus, BOX and END are no longer YKEYWORDs)
  *    Added #define FILE_LEXER_L around #include boxes.h to please compiler
@@ -56,14 +62,15 @@
 #undef FILE_LEXER_L
 #include "tools.h"
 #include "y.tab.h"
+#include "parser.h"
 
 
 
-#define LEX_MAX_WARN 3                   /* number of errors per design */
+#define LEX_MAX_WARN 3                   /* number of lex errors per design */
 
 
 static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.10 1999/06/28 12:17:46 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.11 1999/06/28 18:37:38 tsjensen Exp tsjensen $";
 
 
 int yylineno = 1;
@@ -71,16 +78,24 @@ int yyerrcnt = 0;
 
 %}
 
+%option nounput
+%option noyywrap
+
 %x SAMPLE1
 %x SAMPLE2
+%x SPEEDMODE
 %s SHAPES
 %s ELASTIC
 
+PWORD  [a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*
+PWHITE [\n \r\t]
+PBOX   Box
+
 %%
 
-<SAMPLE1,SHAPES,ELASTIC,INITIAL>[\r\t ]+ /* ignore whitespace */
+<SAMPLE1,SHAPES,ELASTIC,INITIAL>[ \r\t] /* ignore whitespace */
 
-<SAMPLE1,SHAPES,ELASTIC,INITIAL>\n yylineno++;
+<SAMPLE1,SHAPES,ELASTIC,INITIAL>\n ++yylineno;
 
 \"[^"\n]*$ {
     if (yyerrcnt++ < 5)
@@ -139,7 +154,7 @@ Sample {
     return yytext[0];
 }
 
-<SAMPLE1>[^{\n\t\r ]+ {
+<SAMPLE1>[^\{\n\r\t ]+ {
     if (yyerrcnt++ < 5)
         yyerror ("Syntax Error at \"%s\"", yytext);
     return YUNREC;
@@ -213,9 +228,9 @@ Shapes {
     return YSHAPES;
 }
 
-Box {
+{PBOX} {
     #ifdef LEXER_DEBUG
-        fprintf (stderr, "\nYBOX: %s", yytext);
+        fprintf (stderr, "\n   YBOX: %s", yytext);
     #endif
     yyerrcnt = 0;
     return YBOX;
@@ -281,7 +296,7 @@ author|created|revision|revdate|indent {
 }
 
 
-[a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]* {
+{PWORD} {
     #ifdef LEXER_DEBUG
         fprintf (stderr, "\n   WORD: %s", yytext);
     #endif
@@ -321,12 +336,35 @@ author|created|revision|revdate|indent {
 
 . {
     if (yyerrcnt++ < LEX_MAX_WARN)
-        yyerror ("Unrecognized input at %s", yytext);
+        yyerror ("Unrecognized input char \'%s\'", yytext);
     return YUNREC;
 }
 
 
+<SPEEDMODE>{PBOX}{PWHITE}+{PWORD} {
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "\n STATUS: %s -- BEGIN INITIAL", yytext);
+    #endif
+    yyless (0);
+    speeding = 0;
+    BEGIN INITIAL;
+}
+
+<SPEEDMODE>\n ++yylineno;
+
+<SPEEDMODE>. /* ignore anything else */
+
+
 %%
+
+
+void begin_speedmode()
+{
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "\n STATUS: begin_speedmode() -- STATE SPEEDMODE");
+    #endif
+    BEGIN SPEEDMODE;
+}
 
 
 /*EOF*/                                         /* vim: set cindent sw=4: */
