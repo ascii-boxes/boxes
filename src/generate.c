@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: generate.c,v 1.1 1999/06/23 18:52:54 tsjensen Exp tsjensen $
+ *  Version:          $Id: generate.c,v 1.2 1999/06/23 19:23:55 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box generation, i.e. the drawing of boxes
@@ -13,6 +13,9 @@
  *  Revision History:
  *
  *    $Log: generate.c,v $
+ *    Revision 1.2  1999/06/23 19:23:55  tsjensen
+ *    Added output_box() from boxes.c
+ *
  *    Revision 1.1  1999/06/23 18:52:54  tsjensen
  *    Initial revision
  *
@@ -28,7 +31,7 @@
 #include "generate.h"
 
 static const char rcsid_generate_c[] =
-    "$Id: generate.c,v 1.1 1999/06/23 18:52:54 tsjensen Exp tsjensen $";
+    "$Id: generate.c,v 1.2 1999/06/23 19:23:55 tsjensen Exp tsjensen $";
 
 
 
@@ -670,6 +673,122 @@ err:
 
 
 
+static int justify_line (line_t *line, const size_t topwidth, const size_t hpl)
+/*
+ *  Justify input line according to specified justification
+ *
+ *     line      line to justify
+ *     topwidth  width of top box part
+ *     hpl       number of spaces between west box part and text block
+ *
+ *  line is assumed to be already free of trailing whitespace.
+ *
+ *  RETURNS:  == 0  success, input array was modified
+ *            != 0  error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    char  *p;                        /* pointer to first non-whitespace char */
+    char  *newtext;
+    size_t newlen;
+    char  *spaces;
+    size_t shift;
+    size_t oldlen = line->len;
+
+    if (opt.justify == '\0')
+        return 0;
+    if (empty_line(line))
+        return 0;
+
+    for (p=line->text; *p==' ' || *p=='\t'; ++p);
+    newlen = line->len - (p-line->text);
+
+    switch (opt.justify) {
+
+        case 'l':
+            memmove (line->text, p, newlen+1);
+            line->len = newlen;
+            break;
+
+        case 'c':
+            if (opt.halign == 'c') {
+                if (hpl <= ((topwidth - newlen) / 2))
+                    shift = (topwidth - newlen) / 2 - hpl;
+                else
+                    shift = 0;
+            }
+            else {
+                shift = (input.maxline - newlen) / 2;
+            }
+            newtext = (char *) calloc (shift + newlen + 1, sizeof(char));
+            if (newtext == NULL) {
+                perror (PROJECT);
+                return 2;
+            }
+            spaces = (char *) malloc (shift+1);
+            if (spaces == NULL) {
+                perror (PROJECT);
+                BFREE (newtext);
+                return 3;
+            }
+            memset (spaces, ' ', shift);
+            spaces[shift] = '\0';
+            strncpy (newtext, spaces, shift);
+            strncat (newtext, p, newlen);
+            newtext[shift+newlen] = '\0';
+            BFREE (spaces);
+            BFREE (line->text);
+            line->text = newtext;
+            line->len = shift + newlen;
+            break;
+
+        case 'r':
+            shift = input.maxline - newlen;
+            newtext = (char *) calloc (input.maxline+1, sizeof(char));
+            if (newtext == NULL) {
+                perror (PROJECT);
+                return 2;
+            }
+            spaces = (char *) malloc (shift+1);
+            if (spaces == NULL) {
+                perror (PROJECT);
+                BFREE (newtext);
+                return 3;
+            }
+            memset (spaces, ' ', shift);
+            spaces[shift] = '\0';
+            strncpy (newtext, spaces, shift);
+            strncat (newtext, p, newlen);
+            newtext[input.maxline] = '\0';
+            BFREE (spaces);
+            BFREE (line->text);
+            line->text = newtext;
+            line->len = input.maxline;
+            break;
+
+        default:
+            fprintf (stderr, "%s: internal error\n", PROJECT);
+            return 1;
+    }
+
+    /*
+     *  If we might have broken the maxline value, recalculate it.
+     */
+    if (opt.justify != 'r' && oldlen == input.maxline) {
+        size_t k;
+        input.maxline = 0;
+        for (k=0; k<input.anz_lines; ++k) {
+            if (input.lines[k].len > input.maxline)
+                input.maxline = input.lines[k].len;
+        }
+    }
+
+    return 0;
+}
+
+
+
 int output_box (const sentry_t *thebox)
 /*
  *
@@ -686,12 +805,20 @@ int output_box (const sentry_t *thebox)
     size_t vfill, vfill1, vfill2;        /* empty lines/columns in box */
     size_t hfill;
     char  *hfill1, *hfill2;              /* space before/after text */
+    size_t hpl, hpr;
     size_t r;
+    int    rc;
     char   obuf[LINE_MAX+1];             /* final output buffer */
     size_t obuf_len;                     /* length of content of obuf */
     size_t skip_start;                   /* lines to skip for box top */
     size_t skip_end;                     /* lines to skip for box bottom */
     size_t skip_left;                    /* true if left box part is to be skipped */
+
+    #ifdef DEBUG
+        fprintf (stderr, "Padding used: left %d, top %d, right %d, bottom %d\n",
+                opt.design->padding[BLEF], opt.design->padding[BTOP],
+                opt.design->padding[BRIG], opt.design->padding[BBOT]);
+    #endif
 
     /*
      *  Create string of spaces for indentation
@@ -755,47 +882,41 @@ int output_box (const sentry_t *thebox)
     memset (hfill2, (int)' ', hfill+1);
     hfill1[hfill] = '\0';
     hfill2[hfill] = '\0';
-    if (hfill == 0) {
-        hfill1[0] = '\0';
-        hfill2[0] = '\0';
-    }
-    else if (hfill == 1) {
+    hpl = 0;
+    hpr = 0;
+    if (hfill == 1) {
         if (opt.halign == 'r'
                 || opt.design->padding[BLEF] > opt.design->padding[BRIG]) {
-            hfill1[1] = '\0';
-            hfill2[0] = '\0';
+            hpl = 1;
+            hpr = 0;
         }
         else {
-            hfill1[0] = '\0';
-            hfill2[1] = '\0';
+            hpl = 0;
+            hpr = 1;
         }
     }
     else {
-        size_t hpl = opt.design->padding[BLEF];
-        size_t hpr = opt.design->padding[BRIG];
-        hfill -= hpl + hpr;
+        hfill -= opt.design->padding[BLEF] + opt.design->padding[BRIG];
         if (opt.halign == 'c') {
-            hfill1[hpl+hfill/2] = '\0';
-            if (hfill % 2)
-                hfill2[hpr+hfill/2+1] = '\0';
-            else
-                hfill2[hpr+hfill/2] = '\0';
+            hpl = hfill/2 + opt.design->padding[BLEF];
+            hpr = hfill/2 + opt.design->padding[BRIG] + (hfill%2);
         }
         else if (opt.halign == 'r') {
-            hfill1[hfill+hpl] = '\0';
-            hfill2[hpr] = '\0';
+            hpl = hfill + opt.design->padding[BLEF];
+            hpr = opt.design->padding[BRIG];
         }
         else {
-            hfill1[hpl] = '\0';
-            hfill2[hfill+hpr] = '\0';
+            hpl = opt.design->padding[BLEF];
+            hpr = hfill + opt.design->padding[BRIG];
         }
-        hfill += hpl + hpr;
+        hfill += opt.design->padding[BLEF] + opt.design->padding[BRIG];
     }
+    hfill1[hpl] = '\0';
+    hfill2[hpr] = '\0';
 
-    #if defined(DEBUG) || 0
-        fprintf (stderr, "Alignment: hfill %d hfill1 %dx\' \' hfill2 %dx\' \' "
-                "vfill %d vfill1 %d vfill2 %d.\n", hfill, strlen(hfill1),
-                strlen(hfill2), vfill, vfill1, vfill2);
+    #if defined(DEBUG)
+        fprintf (stderr, "Alignment: hfill %d hpl %d hpr %d, vfill %d "
+            "vfill1 %d vfill2 %d.\n", hfill, hpl, hpr, vfill, vfill1, vfill2);
     #endif
 
     /*
@@ -805,11 +926,11 @@ int output_box (const sentry_t *thebox)
     skip_start = 0;
     skip_end   = 0;
     skip_left  = 0;
-    if (empty_side (opt.design, BTOP))
+    if (empty_side (opt.design->shape, BTOP))
         skip_start = opt.design->shape[NW].height;
-    if (empty_side (opt.design, BBOT))
+    if (empty_side (opt.design->shape, BBOT))
         skip_end = opt.design->shape[SW].height;
-    if (empty_side (opt.design, BLEF))
+    if (empty_side (opt.design->shape, BLEF))
         skip_left = opt.design->shape[NW].width; /* could simply be 1, though */
 
     /*
@@ -817,13 +938,13 @@ int output_box (const sentry_t *thebox)
      */
     for (j=skip_start; j<nol-skip_end; ++j) {
 
-        if (j < thebox[BTOP].height) {
+        if (j < thebox[BTOP].height) {   /* box top */
             snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
                     skip_left?"":thebox[BLEF].chars[j], thebox[BTOP].chars[j],
                     thebox[BRIG].chars[j]);
         }
 
-        else if (vfill1) {
+        else if (vfill1) {               /* top vfill */
             r = thebox[BTOP].width;
             trailspc[r] = '\0';
             snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
@@ -835,7 +956,10 @@ int output_box (const sentry_t *thebox)
 
         else if (j < nol-thebox[BBOT].height) {
             long ti = j - thebox[BTOP].height - (vfill-vfill2);
-            if (ti < (long) input.anz_lines) {
+            if (ti < (long) input.anz_lines) {      /* box content (lines) */
+                rc = justify_line (input.lines+ti, thebox[BTOP].width, hpl);
+                if (rc)
+                    return rc;
                 r = input.maxline - input.lines[ti].len;
                 trailspc[r] = '\0';
                 snprintf (obuf, LINE_MAX+1, "%s%s%s%s%s%s%s", indentspc,
@@ -843,7 +967,7 @@ int output_box (const sentry_t *thebox)
                         ti >= 0? input.lines[ti].text : "", hfill2,
                         trailspc, thebox[BRIG].chars[j]);
             }
-            else {
+            else {                       /* bottom vfill */
                 r = thebox[BTOP].width;
                 trailspc[r] = '\0';
                 snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
@@ -853,7 +977,7 @@ int output_box (const sentry_t *thebox)
             trailspc[r] = ' ';
         }
 
-        else {
+        else {                           /* box bottom */
             snprintf (obuf, LINE_MAX+1, "%s%s%s%s", indentspc,
                     skip_left?"":thebox[BLEF].chars[j],
                     thebox[BBOT].chars[j-(nol-thebox[BBOT].height)],
