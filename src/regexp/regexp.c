@@ -26,7 +26,8 @@
 #include <regexp.h>
 #include "regmagic.h"
 
-#ident "$Id"
+char rcsid_regexp_c[] =
+    "$Id$";
 
 /*
  * The "internal use only" fields in regexp.h are present to pass info from

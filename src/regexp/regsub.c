@@ -3,7 +3,7 @@
  *  Date created:     Copyright (c) 1986 by University of Toronto.
  *  Author:           Henry Spencer.
  *                    Extensions and modifications by Thomas Jensen
- *  Version:          $Id: regsub.c,v 1.1 1999/04/04 16:14:46 tsjensen Exp tsjensen $
+ *  Version:          $Id: regsub.c,v 1.2 1999/04/05 19:39:27 tsjensen Exp tsjensen $
  *  Language:         K&R C (traditional)
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Perform substitutions after a regexp match
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: regsub.c,v $
+ *    Revision 1.2  1999/04/05 19:39:27  tsjensen
+ *    Hopefully fixed a potential buffer overrun problem in regsub()
+ *
  *    Revision 1.1  1999/04/04 16:14:46  tsjensen
  *    Initial revision
  *
@@ -35,7 +38,8 @@
 #include <regexp.h>
 #include "regmagic.h"
 
-#ident "$Id"
+char rcsid_regsub_c[] =
+    "$Id$";
 
 
 
