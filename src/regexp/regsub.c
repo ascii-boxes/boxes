@@ -3,7 +3,7 @@
  *  Date created:     Copyright (c) 1986 by University of Toronto.
  *  Author:           Henry Spencer.
  *                    Extensions and modifications by Thomas Jensen
- *  Version:          $Id$
+ *  Version:          $Id: regsub.c,v 1.1 1999/04/04 16:14:46 tsjensen Exp tsjensen $
  *  Language:         K&R C (traditional)
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Perform substitutions after a regexp match
@@ -23,7 +23,10 @@
  *                         original software.
  *  Revision History:
  *
- *    $Log$
+ *    $Log: regsub.c,v $
+ *    Revision 1.1  1999/04/04 16:14:46  tsjensen
+ *    Initial revision
+ *
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
@@ -32,6 +35,10 @@
 #include <regexp.h>
 #include "regmagic.h"
 
+#ident "$Id"
+
+
+
 #ifndef CHARBITS
 #define UCHARAT(p)      ((int)*(unsigned char *)(p))
 #else
@@ -39,8 +46,6 @@
 #endif
 
 
-/* FIXME I think regsub will crash if the generated text *
- * does not fit into buf. No boundary checks performed.  */
 
 /*
  - regsub - perform substitutions after a regexp match
@@ -57,6 +62,7 @@ regsub (prog, source, dest, dest_size)
     register char c;
     register int no;
     register int len;
+    size_t fill;                         /* current number of chars in dest */
     extern char *strncpy();
 
     if (prog == NULL || source == NULL || dest == NULL) {
@@ -70,6 +76,7 @@ regsub (prog, source, dest, dest_size)
 
     src = source;
     dst = dest;
+    fill = 0;
 
     while ((c = *src++) != '\0') {
         if (c == '&')
@@ -83,19 +90,32 @@ regsub (prog, source, dest, dest_size)
             if (c == '\\' && (*src == '\\' || *src == '&'))
                 c = *src++;
             *dst++ = c;
+            ++fill;
         } else if (prog->startp[no] != NULL && prog->endp[no] != NULL) {
             len = prog->endp[no] - prog->startp[no];
-            (void) strncpy(dst, prog->startp[no], len);
-            dst += len;
-            if (len != 0 && *(dst-1) == '\0') { /* strncpy hit NUL. */
-                regerror("damaged match string");
-                return strlen (dest);
+            if (len < dest_size-fill) {
+                (void) strncpy(dst, prog->startp[no], len);
+                dst += len;
+                fill += len;
+                if (len != 0 && *(dst-1) == '\0') { /* strncpy hit NUL. */
+                    regerror("damaged match string");
+                    return fill;
+                }
             }
+            else {
+                (void) strncpy (dst, prog->startp[no], dest_size-fill);
+                dest[dest_size-1] = '\0';
+                return dest_size-1;
+            }
+        }
+        if (fill >= dest_size) {
+            dest[dest_size-1] = '\0';
+            return dest_size-1;
         }
     }
     *dst++ = '\0';
 
-    return strlen (dest);
+    return fill;
 }
 
 
