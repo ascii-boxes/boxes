@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.19 1999/06/23 12:31:26 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.20 1999/06/23 19:17:27 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -34,6 +34,17 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.20  1999/06/23 19:17:27  tsjensen
+ *    Removed snprintf() and vsnprintf() prototypes (why were they in anyway?)
+ *    along with stdarg.h include
+ *    Exported input global data and empty_side() function
+ *    Declared non-exported functions static
+ *    Moved horiz_precalc(), vert_precalc(), horiz_assemble(), vert_assemble(),
+ *    horiz_generate(), vert_generate(), generate_box() and output_box() to a
+ *    new file generate.c
+ *    Moved best_match(), hmm(), detect_horiz(), detect_design(), remove_box()
+ *    and output_input() to a new file remove.c
+ *
  *    Revision 1.19  1999/06/23 12:31:26  tsjensen
  *    Improvements on design detection (could still be better though)
  *    Moved iscorner(), on_side(), isempty(), shapecmp(), both_on_side(),
@@ -145,7 +156,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.19 1999/06/23 12:31:26 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.20 1999/06/23 19:17:27 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
@@ -188,6 +199,7 @@ static void usage (FILE *st)
     fprintf (st, "        -d name  select box design\n");
     fprintf (st, "        -f file  use only file as configuration file\n");
     fprintf (st, "        -h       print usage information\n");
+    fprintf (st, "        -i mode  indentation mode\n");
     fprintf (st, "        -l       list available box designs w/ samples\n");
     fprintf (st, "        -p fmt   padding [default: design-dependent]\n");
     fprintf (st, "        -r       remove box from input\n");
@@ -211,13 +223,14 @@ static int process_commandline (int argc, char *argv[])
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    int   oc;                            /* option character */
-    FILE *f;                             /* potential input file */
-    int   idummy;
-    char *pdummy;
-    char  c;
-    int   errfl = 0;                     /* true on error */
-    int   outfile_existed = 0;           /* true if we overwrite a file */
+    int    oc;                           /* option character */
+    FILE  *f;                            /* potential input file */
+    int    idummy;
+    char  *pdummy;
+    char   c;
+    int    errfl = 0;                    /* true on error */
+    int    outfile_existed = 0;          /* true if we overwrite a file */
+    size_t optlen;
 
     /*
      *  Set default values
@@ -233,8 +246,11 @@ static int process_commandline (int argc, char *argv[])
         return 1;
     }
 
+    /*
+     *  Parse Command Line
+     */
     do {
-        oc = getopt (argc, argv, "a:d:f:hlp:rs:t:v");
+        oc = getopt (argc, argv, "a:d:f:hi:lp:rs:t:v");
 
         switch (oc) {
 
@@ -266,6 +282,15 @@ static int process_commandline (int argc, char *argv[])
                                 case 't': case 'T': opt.valign = 't'; break;
                                 case 'b': case 'B': opt.valign = 'b'; break;
                                 default:            errfl = 1;        break;
+                            }
+                            break;
+                        case 'j':
+                        case 'J':
+                            switch (pdummy[1]) {
+                                case 'l': case 'L': opt.justify = 'l'; break;
+                                case 'c': case 'C': opt.justify = 'c'; break;
+                                case 'r': case 'R': opt.justify = 'r'; break;
+                                default:            errfl = 1;         break;
                             }
                             break;
                         default:
@@ -325,6 +350,23 @@ static int process_commandline (int argc, char *argv[])
                 usage (stdout);
                 return 42;
 
+            case 'i':
+                /*
+                 *  Indentation mode
+                 */
+                optlen = strlen (optarg);
+                if (optlen <= 3 && !strncasecmp ("box", optarg, optlen))
+                    opt.indentmode = 'b';
+                else if (optlen <= 4 && !strncasecmp ("text", optarg, optlen))
+                    opt.indentmode = 't';
+                else if (optlen <= 4 && !strncasecmp ("none", optarg, optlen))
+                    opt.indentmode = 'n';
+                else {
+                    fprintf (stderr, "%s: invalid indentation mode\n", PROJECT);
+                    return 1;
+                }
+                break;
+
             case 'l':
                 /*
                  *  List available box styles
@@ -334,7 +376,7 @@ static int process_commandline (int argc, char *argv[])
 
             case 'p':
                 /*
-                 *  Padding. format is ([ahvbtrl]n)+
+                 *  Padding. format is ([ahvtrbl]n)+
                  */
                 errfl = 0;
                 pdummy = optarg;
@@ -587,6 +629,10 @@ static int process_commandline (int argc, char *argv[])
         fprintf (stderr, "- Tabstop distance: %d\n", opt.tabstop);
         fprintf (stderr, "- Alignment: horiz %c, vert %c\n",
                 opt.halign?opt.halign:'?', opt.valign?opt.valign:'?');
+        fprintf (stderr, "- Indentmode: \'%c\'\n",
+                opt.indentmode? opt.indentmode: '?');
+        fprintf (stderr, "- Line justification: \'%c\'\n",
+                opt.justify? opt.justify: '?');
     #endif
 
     return 0;
@@ -914,44 +960,6 @@ static design_t *select_design (design_t *darr, char *sel)
 }
 
 
-
-int empty_side (design_t *d, const int aside)
-/*
- *  Return true if the shapes on the given side consist entirely out of
- *  spaces - and spaces only, tabs are considered non-empty.
- *
- *      d       pointer to design to check
- *      aside   the box side (one of BTOP etc.)
- *
- *  RETURNS:  == 0   side is not empty
- *            != 0   side is empty
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int       i;
-    size_t    j;
-    sentry_t *cs;
-    char     *p;
-
-    for (i=0; i<SHAPES_PER_SIDE; ++i) {
-        cs = d->shape + sides[aside][i];
-        if (isempty(cs))
-            continue;
-        for (j=0; j<cs->height; ++j) {
-            p = cs->chars[j];
-            while (*p && *p == ' ')
-                ++p;
-            if (*p)
-                return 0;                /* side is not empty */
-        }
-    }
-
-    return 1;                            /* side is empty */
-}
-
-
-
 /*       _\|/_
          (o o)
  +----oOO-{_}-OOo------------------------------------------------------------+
@@ -1033,23 +1041,26 @@ int main (int argc, char *argv[])
     }
 
     /*
+     *  Adjust box size and indentmode to command line specification
+     */
+    if (opt.reqheight > (long) opt.design->minheight)
+        opt.design->minheight = opt.reqheight;
+    if (opt.reqwidth > (long) opt.design->minwidth)
+        opt.design->minwidth = opt.reqwidth;
+    if (opt.indentmode)
+        opt.design->indentmode = opt.indentmode;
+
+    /*
      *  Read input lines
      */
     #ifdef DEBUG
         fprintf (stderr, "Reading all input ...\n");
     #endif
     rc = read_all_input();
-    if (rc) exit (EXIT_FAILURE);
+    if (rc)
+        exit (EXIT_FAILURE);
     if (input.anz_lines == 0)
         exit (EXIT_SUCCESS);
-
-    /*
-     *  Adjust box size to command line specification
-     */
-    if (opt.reqheight > (long) opt.design->minheight)
-        opt.design->minheight = opt.reqheight;
-    if (opt.reqwidth > (long) opt.design->minwidth)
-        opt.design->minwidth = opt.reqwidth;
 
     /*
      *  Adjust box size to fit requested padding value
@@ -1082,7 +1093,7 @@ int main (int argc, char *argv[])
     pad = opt.design->padding[BLEF] + opt.design->padding[BRIG];
     if (pad > 0) {
         pad += input.maxline;
-        pad += opt.design->shape[NW].width + opt.design->shape[SW].width;
+        pad += opt.design->shape[NW].width + opt.design->shape[NE].width;
         if (pad > opt.design->minwidth) {
             if (opt.reqwidth) {
                 for (i=0; i<(int)(pad-opt.design->minwidth); ++i) {
