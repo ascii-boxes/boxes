@@ -3,7 +3,7 @@
 #   Date created:     March 17, 1999 (Wednesday, 17:02h)
 #   Author:           Thomas Jensen
 #                     tsjensen@stud.informatik.uni-erlangen.de
-#   Version:          $Id: boxes-config,v 1.6 1999/06/17 19:03:09 tsjensen Exp tsjensen $
+#   Version:          $Id: boxes-config,v 1.7 1999/06/27 17:59:50 tsjensen Exp tsjensen $
 #   Format:           ASCII Text
 #   World Wide Web:   http://home.pages.de/~jensen/boxes/
 #   Purpose:          Example configuration file for the boxes program
@@ -11,6 +11,11 @@
 #   Revision History:
 #
 #     $Log: boxes-config,v $
+#     Revision 1.7  1999/06/27 17:59:50  tsjensen
+#     Added design c-cmt2
+#     Added padding entries to a few designs
+#     A few cosmetic corrections in sample blocks etc.
+#
 #     Revision 1.6  1999/06/17 19:03:09  tsjensen
 #     Added designs c-cmt, pound-cmt, java-cmt, html-cmt, right, vim-cmt
 #     They have become possible because boxes now checks for empty sides.
@@ -38,6 +43,41 @@
 #     Initial revision
 #____________________________________________________________________________
 #============================================================================
+
+
+BOX c
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "March 18, 1999 (Thursday, 15:25h)"
+created "March 18, 1999 (Thursday, 15:25h)"
+
+sample {
+    /*************/
+    /*           */
+    /*           */
+    /*************/
+}
+
+shapes {
+    nw ("/*") n ("*") ne ("*/")
+     w ("/*")          e ("*/")
+    sw ("/*") s ("*") se ("*/")
+}
+
+replace "\\*/" with "*\\/"               # quote closing comment tags
+reverse "\\*\\\\/" to "*/"
+
+padding {
+    horiz 1             # alternatives: all, vert, lef, rig, bottom, top
+}                       # can be combined, e.g. all 3 top 1
+
+elastic (n,e,s,w)
+
+END c
+
+
+# ============================================================================
 
 
 BOX parchment 
@@ -220,41 +260,6 @@ shapes { nw ("*") ne ("*") sw ("*") se ("*")
 elastic (n,e,s,W)
 
 END simple
-
-
-# ============================================================================
-
-
-BOX c
-
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
-revision "1.0"
-revdate "March 18, 1999 (Thursday, 15:25h)"
-created "March 18, 1999 (Thursday, 15:25h)"
-
-sample {
-    /*************/
-    /*           */
-    /*           */
-    /*************/
-}
-
-shapes {
-    nw ("/*") n ("*") ne ("*/")
-     w ("/*")          e ("*/")
-    sw ("/*") s ("*") se ("*/")
-}
-
-replace "\\*/" with "*\\/"               # quote closing comment tags
-reverse "\\*\\\\/" to "*/"
-
-padding {
-    horiz 1             # alternatives: all, vert, lef, rig, bottom, top
-}                       # can be combined, e.g. all 3 top 1
-
-elastic (n,e,s,w)
-
-END c
 
 
 # ============================================================================
@@ -784,13 +789,14 @@ sample {
 }
 
 shapes {
-    nw ("%{-") ne ("-+ ")
-    sw (" +-") se ("-%}")
-    e  (" | ") w  (" | ")
-    n  ("-")   s  ("-")
+    nw ("%{") ne ("+ ")
+    sw (" +") se ("%}")
+    e  ("| ")  w (" |")
+    n  ("-")   s ("-")
 }
 
 replace "%}" with "%\\}"
+reverse "%\\\\}" to "%}"
 
 padding {
     horizontal 1
