@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.7 1999/06/17 19:05:46 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.8 1999/06/20 14:17:58 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,9 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.8  1999/06/20 14:17:58  tsjensen
+ *    Added "padding" keyword and recogintion of numbers (YNUMBER)
+ *
  *    Revision 1.7  1999/06/17 19:05:46  tsjensen
  *    Bugfix: Sample block analysis didn't handle empty blocks
  *
@@ -38,14 +41,16 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-/* #define DEBUG */
-
 #include <string.h>
 #include "boxes.h"
+#include "tools.h"
 #include "y.tab.h"
 
+#undef DEBUG
+/* #define DEBUG */
+
 const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.7 1999/06/17 19:05:46 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.8 1999/06/20 14:17:58 tsjensen Exp tsjensen $";
 
 int yylineno = 1;
 

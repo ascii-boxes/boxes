@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.10 1999/06/17 19:04:45 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.11 1999/06/20 14:18:51 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,9 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.11  1999/06/20 14:18:51  tsjensen
+ *    Adden YPADDING and YNUMBER tokens plus code for padding blocks
+ *
  *    Revision 1.10  1999/06/17 19:04:45  tsjensen
  *    Added detection of empty sample blocks (we don't want that)
  *    Added detection of duplicate sample blocks
@@ -52,15 +55,17 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-/* #define DEBUG */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "tools.h"
 #include "boxes.h"
 
+#undef DEBUG
+/* #define DEBUG */
+
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.10 1999/06/17 19:04:45 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.11 1999/06/20 14:18:51 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
