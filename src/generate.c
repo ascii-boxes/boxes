@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: generate.c,v 1.5 1999/08/16 18:30:32 tsjensen Exp tsjensen $
+ *  Version:          $Id: generate.c,v 1.6 1999/08/18 15:37:09 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box generation, i.e. the drawing of boxes
@@ -25,6 +25,10 @@
  *  Revision History:
  *
  *    $Log: generate.c,v $
+ *    Revision 1.6  1999/08/18 15:37:09  tsjensen
+ *    Bugfix: justify_line() still didn't work right. It should now. (Man, I got
+ *    a strong sense of déja vu! Weird ...)
+ *
  *    Revision 1.5  1999/08/16 18:30:32  tsjensen
  *    Bugfix: justify_line() still didn't work right. It should now.
  *
@@ -58,7 +62,7 @@
 #include "generate.h"
 
 static const char rcsid_generate_c[] =
-    "$Id: generate.c,v 1.5 1999/08/16 18:30:32 tsjensen Exp tsjensen $";
+    "$Id: generate.c,v 1.6 1999/08/18 15:37:09 tsjensen Exp tsjensen $";
 
 
 
@@ -733,14 +737,29 @@ static int justify_line (line_t *line, const int skew)
     switch (opt.justify) {
 
         case 'l':
-            memmove (line->text, p, newlen+1);
-            line->len = newlen;
+            if (opt.design->indentmode == 't') {
+                memmove (line->text+input.indent, p, newlen+1);
+                line->len = newlen + input.indent;
+            }
+            else {
+                memmove (line->text, p, newlen+1);
+                line->len = newlen;
+            }
             break;
 
         case 'c':
-            shift = (input.maxline - newlen) / 2;
-            if ((input.maxline - newlen) % 2 && skew == 1)
-                ++shift;
+            if (opt.design->indentmode == 't') {
+                shift = (input.maxline-input.indent-newlen) / 2 + input.indent;
+                skew -= input.indent;
+                if ((input.maxline-input.indent-newlen) % 2 && skew == 1)
+                    ++shift;
+            }
+            else {
+                shift = (input.maxline - newlen) / 2;
+                if ((input.maxline - newlen) % 2 && skew == 1)
+                    ++shift;
+            }
+
             newtext = (char *) calloc (shift + newlen + 1, sizeof(char));
             if (newtext == NULL) {
                 perror (PROJECT);
