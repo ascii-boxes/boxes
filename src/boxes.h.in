@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.10 1999/06/20 14:19:31 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h,v 1.11 1999/06/22 12:01:24 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *  Remarks:          ---
@@ -11,6 +11,14 @@
  *  Revision History:
  *
  *    $Log: boxes.h,v $
+ *    Revision 1.11  1999/06/22 12:01:24  tsjensen
+ *    Added DEF_DESIGN (default design name)
+ *    Added opt_t and opt global variable from boxes.c
+ *    Moved BFREE macro and yyerror() and empty_line() prototypes to tools.h
+ *    Added LINE_MAX and MAX_TABSTOP macros from boxes.c
+ *    Added #define DEBUG and REGEXP_DEBUG. This will centrally activate
+ *    debugging.
+ *
  *    Revision 1.10  1999/06/20 14:19:31  tsjensen
  *    Added padding member to design struct
  *
@@ -50,8 +58,6 @@
 /* #define DEBUG */
 /* #define REGEXP_DEBUG */
 
-#include "regexp.h"
-
 
 #define PROJECT "boxes"                  /* name of program */
 #define VERSION "1.0 beta"               /* current release of project */
@@ -63,9 +69,6 @@
 #define DEF_TABSTOP     8                /* default tab stop distance (-t) */
 #define DEF_INDENTMODE  'b'              /* indent box, not text by default */
 #define DEF_DESIGN      "C"              /* default design name */
-
-
-#define __TJ(s) fprintf (stderr, s);
 
 /*
  *  some systems (especially sunos4) do not define EXIT_* constants
@@ -95,38 +98,17 @@
 #endif
 
 
-extern char *shape_name[];
+#ifdef DEBUG
+    #define __TJ(s) fprintf (stderr, s);
+#else
+    #define __TJ(s) /**/
+#endif
 
-#define ANZ_SHAPES 16
 
-typedef enum {
-    NW, NNW, N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW
-} shape_t;
-
-#define SHAPES_PER_SIDE 5
-#define ANZ_SIDES       4
-#define ANZ_CORNERS     4
-
-extern shape_t north_side[SHAPES_PER_SIDE];  /* groups of shapes, clockwise */
-extern shape_t east_side[SHAPES_PER_SIDE];
-extern shape_t south_side[SHAPES_PER_SIDE];
-extern shape_t west_side[SHAPES_PER_SIDE];
-extern shape_t corners[ANZ_CORNERS];
-extern shape_t *sides[ANZ_SIDES];
-
-#define BTOP 0                               /* for use width sides */
+#define BTOP 0                               /* for use with sides */
 #define BRIG 1
 #define BBOT 2
 #define BLEF 3
-
-typedef struct {
-    char **chars;
-    size_t height;
-    size_t width;
-    int    elastic;          /* elastic is used only in orginial definition */
-} sentry_t;
-
-#define SENTRY_INITIALIZER (sentry_t) {NULL, 0, 0, 0}
 
 
 typedef struct {
@@ -166,8 +148,10 @@ typedef struct {
 extern design_t *designs;
 extern int design_idx;
 
+
 extern int yylineno;
 extern char *yyfilename;
+
 
 typedef struct {                         /* Command line options: */
     int       l;                         /* list available designs */
@@ -186,9 +170,6 @@ typedef struct {                         /* Command line options: */
 
 extern opt_t opt;
 
-int isempty (const sentry_t *);
-size_t widest (const sentry_t *, const int, ...);
-size_t highest (const sentry_t *, const int, ...);
 
 #endif /* BOXES_H */
 
