@@ -3,17 +3,26 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.6 1999/04/01 17:26:18 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.7 1999/04/02 18:42:44 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Filter to draw boxes around input text.
  *                    Intended for use with vim(1).
- *  Remarks:          This is not a release.
+ *  Remarks:          - This version is leaking memory. The sizes of the
+ *                      leaks do not depend on the number of lines
+ *                      processed, so the leaks don't matter as long as
+ *                      this program is executed as a single process.
+ *                    - This is not a release.
  *
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.7  1999/04/02 18:42:44  tsjensen
+ *    ... still programming ...
+ *    Added infile/outfile parameter code (pasted from tal, more or less)
+ *    Added code to remove trailing spaces from output lines
+ *
  *    Revision 1.6  1999/04/01 17:26:18  tsjensen
  *    ... still programming ...
  *    Some bug fixes
@@ -43,6 +52,7 @@
  */
 
 /* #define DEBUG */
+/* #define REGEXP_DEBUG */
 
 #include <errno.h>
 #include <limits.h>
@@ -51,6 +61,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include "regexp.h"
 #include "boxes.h"
 
 extern int snprintf (char *, size_t, const char *, ...);        /* stdio.h */
@@ -59,15 +70,9 @@ extern char *optarg;                     /* for getopt() */
 extern int optind, opterr, optopt;       /* for getopt() */
 
 
-#ident "$Id: boxes.c,v 1.6 1999/04/01 17:26:18 tsjensen Exp tsjensen $"
+#ident "$Id: boxes.c,v 1.7 1999/04/02 18:42:44 tsjensen Exp tsjensen $"
 
 extern FILE *yyin;                       /* lex input file */
-
-
-/*
- *  default settings for command line options (MAY BE EDITED)
- */
-#define DEF_TABSTOP     8                /* default tab stop distance (-t) */
 
 
 
@@ -159,10 +164,26 @@ int yyerror (const char *fmt, ...)
             yyfilename? yyfilename: "(null)", yylineno);
     vsnprintf (buf+strlen(buf), 1024-strlen(buf)-1, fmt, ap);
     strcat (buf, "\n");
-    (void) fprintf (stderr, buf);
+    fprintf (stderr, buf);
     va_end (ap);
 
     return 0;
+}
+
+
+
+void regerror (char *msg)
+/*
+ *  Print regular expression andling error messages
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    fprintf (stderr, "%s: %s: line %d: %s\n",
+            PROJECT, yyfilename? yyfilename: "(null)",
+            opt.design->current_reprule? opt.design->current_reprule->line: 0,
+            msg);
+    errno = EINVAL;
 }
 
 
@@ -383,7 +404,7 @@ static int process_commandline (int argc, char *argv[])
     int   idummy;
     char *pdummy;
     int   errfl = 0;                     /* true on error */
-    int   outfile_existed;               /* true if we overwrite a file */
+    int   outfile_existed = 0;           /* true if we overwrite a file */
 
     memset (&opt, 0, sizeof(opt));
     opt.tabstop = DEF_TABSTOP;
@@ -791,17 +812,32 @@ int read_all_input()
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    char buf[LINE_MAX+2];                /* input buffer */
-    size_t input_size = 0;               /* number of elements allocated */
+    char    buf[LINE_MAX+2];             /* input buffer */
+    size_t  input_size = 0;              /* number of elements allocated */
     line_t *tmp = NULL;
-    char *temp = NULL;                   /* string resulting from tab exp. */
-    size_t newlen;                       /* line length after tab expansion */
-    size_t i;
+    char   *temp = NULL;                 /* string resulting from tab exp. */
+    size_t  newlen;                      /* line length after tab expansion */
+    size_t  i;
 
     input.anz_lines = 0;
     input.indent = LINE_MAX;
     input.maxline = 0;
 
+    /*
+     *  Compile regular expressions
+     */
+    errno = 0;
+    for (i=0; i<opt.design->anz_reprules; ++i) {
+        opt.design->current_reprule = opt.design->reprules + i;
+        opt.design->reprules[i].prog =
+            regcomp (opt.design->reprules[i].search);
+    }
+    opt.design->current_reprule = NULL;
+    if (errno) return 1;
+
+    /*
+     *  Start reading
+     */
     while (fgets (buf, LINE_MAX+1, opt.infile))
     {
         if (input_size % 100 == 0) {
@@ -835,9 +871,53 @@ int read_all_input()
             input.lines[input.anz_lines].text = (char *) strdup (buf);
         }
 
+        /*
+         *  Apply regular expression substitutions to line
+         */
+        for (i=0; i<opt.design->anz_reprules; ++i) {
+            opt.design->current_reprule = opt.design->reprules + i;
+            errno = 0;
+            #ifdef REGEXP_DEBUG
+                fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
+                        opt.design->reprules[i].prog,
+                        input.lines[input.anz_lines].text,
+                        input.lines[input.anz_lines].len,
+                        opt.design->reprules[i].repstr, LINE_MAX+2,
+                        opt.design->reprules[i].mode);
+            #endif
+            input.lines[input.anz_lines].len =
+                myregsub (opt.design->reprules[i].prog,
+                        input.lines[input.anz_lines].text,
+                        input.lines[input.anz_lines].len,
+                        opt.design->reprules[i].repstr,
+                        buf, LINE_MAX+2, opt.design->reprules[i].mode);
+            #ifdef REGEXP_DEBUG
+                fprintf (stderr, "%d\n", input.lines[input.anz_lines].len);
+            #endif
+            if (errno) return 1;
+            BFREE (input.lines[input.anz_lines].text);
+            input.lines[input.anz_lines].text = (char *) strdup (buf);
+            if (input.lines[input.anz_lines].text == NULL) {
+                perror (PROJECT);
+                return 1;
+            }
+            #ifdef REGEXP_DEBUG
+                fprintf (stderr, "input.lines[input.anz_lines] == {%d, \"%s\"}\n",
+                        input.lines[input.anz_lines].len,
+                        input.lines[input.anz_lines].text);
+            #endif
+        }
+        opt.design->current_reprule = NULL;
+
+        /*
+         *  Update length of longest line
+         */
         if (input.lines[input.anz_lines].len > input.maxline)
             input.maxline = input.lines[input.anz_lines].len;
 
+        /*
+         *  Update current estimate for text indentation
+         */
         if (input.lines[input.anz_lines].len > 0) {
             size_t ispc;
             ispc = strspn (input.lines[input.anz_lines].text, " ");
@@ -845,6 +925,9 @@ int read_all_input()
                 input.indent = ispc;
         }
 
+        /*
+         *  next please
+         */
         ++input.anz_lines;
     }
 
@@ -864,14 +947,16 @@ int read_all_input()
     /*
      *  Remove indentation
      */
-    for (i=0; i<input.anz_lines; ++i) {
-        if (input.lines[i].len >= input.indent) {
-            memmove (input.lines[i].text, input.lines[i].text+input.indent,
-                    input.lines[i].len-input.indent+1);
-            input.lines[i].len -= input.indent;
+    if (opt.design->indentmode != 't') {
+        for (i=0; i<input.anz_lines; ++i) {
+            if (input.lines[i].len >= input.indent) {
+                memmove (input.lines[i].text, input.lines[i].text+input.indent,
+                        input.lines[i].len-input.indent+1);
+                input.lines[i].len -= input.indent;
+            }
         }
+        input.maxline -= input.indent;
     }
-    input.maxline -= input.indent;
 
 #if 0
     /*
@@ -1671,13 +1756,22 @@ static int output_box (const sentry_t *thebox)
     /*
      *  Create string of spaces for indentation
      */
-    indentspc = (char *) malloc (input.indent+1);
-    if (indentspc == NULL) {
-        perror (PROJECT);
-        return 1;
+    if (opt.design->indentmode == 'b') {
+        indentspc = (char *) malloc (input.indent+1);
+        if (indentspc == NULL) {
+            perror (PROJECT);
+            return 1;
+        }
+        memset (indentspc, (int)' ', input.indent);
+        indentspc[input.indent] = '\0';
     }
-    memset (indentspc, (int)' ', input.indent);
-    indentspc[input.indent] = '\0';
+    else {
+        indentspc = (char *) strdup ("");
+        if (indentspc == NULL) {
+            perror (PROJECT);
+            return 1;
+        }
+    }
 
     /*
      *  Provide string of spaces for filling of space between text and
@@ -1850,6 +1944,7 @@ int main (int argc, char *argv[])
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
+    designs->indentmode = DEF_INDENTMODE;
 
     /*
      *  If the following parser is one created by lex, the application must
@@ -1861,7 +1956,6 @@ int main (int argc, char *argv[])
     #endif
     rc = yyparse();
     if (rc) exit (EXIT_FAILURE);
-    BFREE (yyfilename);
     --design_idx;
     tmp = (design_t *) realloc (designs, (design_idx+1)*sizeof(design_t));
     if (tmp) {
@@ -1894,6 +1988,7 @@ int main (int argc, char *argv[])
         fprintf (stderr, "Reading all input ...\n");
     #endif
     rc = read_all_input();
+    BFREE (yyfilename);
     if (rc) exit (EXIT_FAILURE);
     if (input.anz_lines == 0)
         exit (EXIT_SUCCESS);
