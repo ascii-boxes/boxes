@@ -2,25 +2,38 @@
  *  File:             tools.h
  *  Project Main:     boxes.c
  *  Date created:     June 20, 1999 (Sunday, 16:57h)
- *  Author:           Thomas Jensen
+ *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id$
+ *  Version:          $Id: tools.h,v 1.1 1999/06/23 11:19:59 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Tool functions for error reporting and some string
  *                    handling and other needful things
- *  Remarks:          ---
+ *
+ *  Remarks: o This program is free software; you can redistribute it and/or
+ *             modify it under the terms of the GNU General Public License as
+ *             published by the Free Software Foundation; either version 2 of
+ *             the License, or (at your option) any later version.
+ *           o This program is distributed in the hope that it will be useful,
+ *             but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *             MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *             GNU General Public License for more details.
+ *           o You should have received a copy of the GNU General Public
+ *             License along with this program; if not, write to the Free
+ *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *             MA 02111-1307  USA
  *
  *  Revision History:
  *
- *    $Log$
+ *    $Log: tools.h,v $
+ *    Revision 1.1  1999/06/23 11:19:59  tsjensen
+ *    Initial revision
+ *
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
 #ifndef TOOLS_H
 #define TOOLS_H
-
-#include "boxes.h"
 
 
 #define BMAX(a,b) ((a)>(b)? (a):(b))     /* return the larger value */
@@ -41,6 +54,8 @@ size_t expand_tabs_into (const char *input_buffer, const int in_len,
 void   btrim       (char *text, size_t *len);
 char*  my_strnrstr (const char *s1, const char *s2, const size_t s2_len,
                     int skip);
+int strisyes (const char *s);
+int strisno (const char *s);
 
 #endif
 
