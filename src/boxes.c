@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.4 1999/03/30 13:30:19 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.5 1999/03/31 17:34:21 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -14,6 +14,10 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.5  1999/03/31 17:34:21  tsjensen
+ *    ... still programming ...
+ *    (some bug fixes and restructuring)
+ *
  *    Revision 1.4  1999/03/30 13:30:19  tsjensen
  *    Added minimum width/height for a design. Fixed screwed tiny boxes.
  *    Did not handle zero input.
@@ -33,6 +37,7 @@
 
 /* #define DEBUG */
 
+#include <errno.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -46,7 +51,7 @@ extern char *optarg;                     /* for getopt() */
 extern int optind, opterr, optopt;       /* for getopt() */
 
 
-#ident "$Id: boxes.c,v 1.4 1999/03/30 13:30:19 tsjensen Exp tsjensen $"
+#ident "$Id: boxes.c,v 1.5 1999/03/31 17:34:21 tsjensen Exp tsjensen $"
 
 extern FILE *yyin;                       /* lex input file */
 
@@ -103,10 +108,14 @@ shape_t corners[ANZ_CORNERS] = { NW, NE, SE, SW };
 shape_t *sides[] = { north_side, east_side, south_side, west_side };
 
 
-struct {                                 /* Command line options */
+struct {                                 /* Command line options: */
     int       l;                         /* list available designs */
     int       tabstop;                   /* tab stop distance */
     design_t *design;                    /* currently used box design */
+    long      reqwidth;                  /* requested box width (-s) */
+    long      reqheight;                 /* requested box height (-s) */
+    char      valign;                    /* text position inside box */
+    char      halign;                    /* ('c', 'l', or 'r')       */
 } opt;
 
 
@@ -332,7 +341,7 @@ int shape_distance (const shape_t s1, const shape_t s2)
 
 
 
-void usage (FILE *st)
+static void usage (FILE *st)
 /*
  *  Print usage information on stream st.
  *
@@ -340,39 +349,85 @@ void usage (FILE *st)
  */
 {
     fprintf (st, "Usage: %s [options] [infile [outfile]]\n", PROJECT);
-    fprintf (st, "       -c box   exchange current box for new box\n");
+    fprintf (st, "       -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
     fprintf (st, "       -d name  select box design\n");
     fprintf (st, "       -f file  use only file as configuration file\n");
     fprintf (st, "       -h       usage information\n");
     fprintf (st, "       -l       generate listing of available box designs w/ samples\n");
-    fprintf (st, "       -r       repair broken box\n");
-    fprintf (st, "       -s wxh   resize box to width w and/or height h\n");
+    fprintf (st, "       -s wxh   specify box size (width w and/or height h)\n");
     fprintf (st, "       -t uint  tab stop distance [default: %d]\n", DEF_TABSTOP);
     fprintf (st, "       -v       print version information\n");
-    fprintf (st, "       -x       remove box from text\n");
 }
 
 
 
-int process_commandline (int argc, char *argv[])
+static int process_commandline (int argc, char *argv[])
 /*
  *
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    int oc;                              /* option character */
+    int   oc;                            /* option character */
     FILE *f;                             /* potential input file */
-    int idummy;
+    int   idummy;
+    char *pdummy;
+    int   errfl = 0;                     /* true on error */
 
     memset (&opt, 0, sizeof(opt));
     opt.tabstop = DEF_TABSTOP;
     yyin = stdin;
 
     do {
-        oc = getopt (argc, argv, "d:f:hlt:v");
+        oc = getopt (argc, argv, "a:d:f:hls:t:v");
 
         switch (oc) {
+
+            case 'a':
+                /*
+                 *  Alignment/positioning of text inside box
+                 */
+                errfl = 0;
+                pdummy = optarg;
+                while (*pdummy) {
+                    if (pdummy[1] == '\0') {
+                        errfl = 1;
+                        break;
+                    }
+                    switch (*pdummy) {
+                        case 'h':
+                        case 'H':
+                            switch (pdummy[1]) {
+                                case 'c': case 'C': opt.halign = 'c'; break;
+                                case 'l': case 'L': opt.halign = 'l'; break;
+                                case 'r': case 'R': opt.halign = 'r'; break;
+                                default:            errfl = 1;        break;
+                            }
+                            break;
+                        case 'v':
+                        case 'V':
+                            switch (pdummy[1]) {
+                                case 'c': case 'C': opt.valign = 'c'; break;
+                                case 't': case 'T': opt.valign = 't'; break;
+                                case 'b': case 'B': opt.valign = 'b'; break;
+                                default:            errfl = 1;        break;
+                            }
+                            break;
+                        default:
+                            errfl = 1;
+                            break;
+                    }
+                    if (errfl)
+                        break;
+                    else
+                        pdummy += 2;
+                }
+                if (errfl) {
+                    fprintf (stderr, "%s: Illegal text format -- %s\n",
+                            PROJECT, optarg);
+                    return 1;
+                }
+                break;
 
             case 'd':
                 /*
@@ -418,6 +473,38 @@ int process_commandline (int argc, char *argv[])
                  *  List available box styles
                  */
                 opt.l = 1;
+                break;
+
+            case 's':
+                /*
+                 *  Specify desired box target size
+                 */
+                pdummy = strchr (optarg, 'x');
+                if (!pdummy) pdummy = strchr (optarg, 'X');
+                errno = 0;
+                opt.reqwidth = strtol (optarg, NULL, 10);
+                idummy = errno;
+                if (idummy) {
+                    fprintf (stderr, "%s: invalid box size specification: %s\n",
+                            PROJECT, strerror(idummy));
+                    return 1;
+                }
+                if (pdummy) {
+                    errno = 0;
+                    opt.reqheight = strtol (pdummy+1, NULL, 10);
+                    idummy = errno;
+                    if (idummy) {
+                        fprintf (stderr, "%s: invalid box size specification: %s\n",
+                                PROJECT, strerror(idummy));
+                        return 1;
+                    }
+                }
+                if ((opt.reqwidth == 0 && opt.reqheight == 0)
+                  || opt.reqwidth < 0 || opt.reqheight < 0) {
+                    fprintf (stderr, "%s: invalid box size specification -- %s\n",
+                            PROJECT, optarg);
+                    return 1;
+                }
                 break;
 
             case 't':
@@ -844,6 +931,13 @@ static int horiz_precalc (const sentry_t *sarr,
         if (!isempty(sarr+south_side[i])) bnumsh++;
     }
 
+    #ifdef DEBUG
+        fprintf (stderr, "in horiz_precalc:\n    ");
+        fprintf (stderr, "opt.design->minwidth %d, input.maxline %d, target_width"
+                " %d, tnumsh %d, bnumsh %d\n", opt.design->minwidth,
+                input.maxline, target_width, tnumsh, bnumsh);
+    #endif
+
     twidth = 0;
     bwidth = 0;
 
@@ -856,6 +950,8 @@ static int horiz_precalc (const sentry_t *sarr,
         size_t *res_hspace;              /* ptr to bwidth or twidth */
         int *stoggle;                    /* ptr to btoggle or ttoggle */
         int numsh;                       /* either bnumsh or tnumsh */
+
+        /* FIXME Hier hängt er sich auf "boxes -d parchment -s 1x1") */
 
         /*
          *  Set pointers to the side which is currently shorter,
@@ -1476,7 +1572,14 @@ static int output_box (const sentry_t *thebox)
     size_t nol = thebox[BRIG].height;    /* number of output lines */
     char   trailspc[LINE_MAX+1];
     char  *indentspc;
+    size_t vfill, vfill1, vfill2;        /* empty lines/columns in box */
+    size_t hfill;
+    char  *hfill1, *hfill2;              /* space before/after text */
+    size_t r;
 
+    /*
+     *  Create string of spaces for indentation
+     */
     indentspc = (char *) malloc (input.indent+1);
     if (indentspc == NULL) {
         perror (PROJECT);
@@ -1485,22 +1588,106 @@ static int output_box (const sentry_t *thebox)
     memset (indentspc, (int)' ', input.indent);
     indentspc[input.indent] = '\0';
 
+    /*
+     *  Provide string of spaces for filling of space between text and
+     *  right side of box
+     */
     memset (trailspc, (int)' ', LINE_MAX);
     trailspc[LINE_MAX] = '\0';
 
+    /*
+     *  Compute number of empty lines in box (vfill).
+     */
+    vfill = nol - thebox[BTOP].height - thebox[BBOT].height - input.anz_lines;
+    if (opt.valign == 'c') {
+        vfill1 = vfill / 2;
+        vfill2 = vfill1 + ((vfill % 2)? 1 : 0);
+    }
+    else if (opt.valign == 'b') {
+        vfill1 = vfill;
+        vfill2 = 0;
+    }
+    else {
+        vfill1 = 0;
+        vfill2 = vfill;
+    }
+
+    /*
+     *  Provide strings for horizontal text alignment.
+     */
+    hfill = thebox[BTOP].width - input.maxline;
+    hfill1 = (char *) malloc (hfill+1);
+    hfill2 = (char *) malloc (hfill+1);
+    if (!hfill1 || !hfill2) {
+        perror (PROJECT);
+        return 1;
+    }
+    memset (hfill1, (int)' ', hfill+1);
+    memset (hfill2, (int)' ', hfill+1);
+    hfill1[hfill] = '\0';
+    hfill2[hfill] = '\0';
+    if (hfill == 0) {
+        hfill1[0] = '\0';
+        hfill2[0] = '\0';
+    }
+    else if (hfill == 1) {
+        if (opt.halign == 'r') {
+            hfill1[1] = '\0';
+            hfill2[0] = '\0';
+        }
+        else {
+            hfill1[0] = '\0';
+            hfill2[1] = '\0';
+        }
+    }
+    else {
+        if (opt.halign == 'c') {
+            hfill1[hfill/2] = '\0';
+            if (hfill % 2)
+                hfill2[hfill/2+1] = '\0';
+            else
+                hfill2[hfill/2] = '\0';
+        }
+        else if (opt.halign == 'r') {
+            hfill2[0] = '\0';
+        }
+        else {
+            hfill1[0] = '\0';
+        }
+    }
+
+    #if defined(DEBUG)
+        fprintf (stderr, "Alignment: hfill %d hfill1 %dx\' \' hfill2 %dx\' \' "
+                "vfill %d vfill1 %d vfill2 %d.\n", hfill, strlen(hfill1),
+                strlen(hfill2), vfill, vfill1, vfill2);
+    #endif
+
+    /*
+     *  Generate actual output
+     */
     for (j=0; j<nol; ++j) {
+
         if (j < thebox[BTOP].height) {
             printf ("%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
                     thebox[BTOP].chars[j], thebox[BRIG].chars[j]);
         }
+
+        else if (vfill1) {
+            r = thebox[BTOP].width;
+            trailspc[r] = '\0';
+            printf ("%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
+                    trailspc, thebox[BRIG].chars[j]);
+            trailspc[r] = ' ';
+            --vfill1;
+        }
+
         else if (j < nol-thebox[BBOT].height) {
-            size_t r;
-            long ti = j - thebox[BTOP].height;
+            long ti = j - thebox[BTOP].height - (vfill-vfill2);
             if (ti < (long) input.anz_lines) {
-                r = thebox[BTOP].width - input.lines[ti].len;
+                r = input.maxline - input.lines[ti].len;
                 trailspc[r] = '\0';
-                printf ("%s%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
-                        ti >= 0? input.lines[j-thebox[BTOP].height].text : "",
+                printf ("%s%s%s%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
+                        hfill1, ti >= 0? input.lines[ti].text : "", hfill2,
                         trailspc, thebox[BRIG].chars[j]);
             }
             else {
@@ -1511,6 +1698,7 @@ static int output_box (const sentry_t *thebox)
             }
             trailspc[r] = ' ';
         }
+
         else {
             printf ("%s%s%s%s\n", indentspc, thebox[BLEF].chars[j],
                     thebox[BBOT].chars[j-(nol-thebox[BBOT].height)],
@@ -1519,6 +1707,8 @@ static int output_box (const sentry_t *thebox)
     }
 
     BFREE (indentspc);
+    BFREE (hfill1);
+    BFREE (hfill2);
     return 0;                            /* all clear */
 }
 
@@ -1531,11 +1721,19 @@ int main (int argc, char *argv[])
     design_t *tmp;
     sentry_t *thebox;
 
+    #ifdef DEBUG
+        fprintf (stderr, "BOXES STARTING ...\n");
+    #endif
+
     thebox = (sentry_t *) calloc (ANZ_SIDES, sizeof(sentry_t));
     if (thebox == NULL) {
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
+
+    #ifdef DEBUG
+        fprintf (stderr, "Processing Comand Line ...\n");
+    #endif
 
     rc = process_commandline (argc, argv);
     if (rc == 42) exit (EXIT_SUCCESS);
@@ -1552,6 +1750,9 @@ int main (int argc, char *argv[])
      *  be careful to ensure that LC_CTYPE and LC_COLLATE are set to the
      *  POSIX locale.
      */
+    #ifdef DEBUG
+        fprintf (stderr, "Parsing Config File ...\n");
+    #endif
     rc = yyparse();
     if (rc) exit (EXIT_FAILURE);
     BFREE (yyfilename);
@@ -1566,6 +1767,9 @@ int main (int argc, char *argv[])
     }
     anz_designs = design_idx + 1;
 
+    #ifdef DEBUG
+        fprintf (stderr, "Selecting Design ...\n");
+    #endif
     tmp = select_design (designs, (char *) opt.design);
     if (tmp == NULL) exit (EXIT_FAILURE);
     BFREE (opt.design);
@@ -1580,14 +1784,28 @@ int main (int argc, char *argv[])
         exit (EXIT_SUCCESS);
     }
 
+    #ifdef DEBUG
+        fprintf (stderr, "Reading all input ...\n");
+    #endif
     rc = read_all_input();
     if (rc) exit (EXIT_FAILURE);
     if (input.anz_lines == 0)
         exit (EXIT_SUCCESS);
 
+    if (opt.reqheight > (long) opt.design->minheight)
+        opt.design->minheight = opt.reqheight;
+    if (opt.reqwidth > (long) opt.design->minwidth)
+        opt.design->minwidth = opt.reqwidth;
+
+    #ifdef DEBUG
+        fprintf (stderr, "Generating Box ...\n");
+    #endif
     rc = generate_box (thebox);
     if (rc) exit (EXIT_FAILURE);
 
+    #ifdef DEBUG
+        fprintf (stderr, "Generating Output ...\n");
+    #endif
     output_box (thebox);
 
     return EXIT_SUCCESS;
