@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.8 1999/06/20 14:17:58 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.9 1999/06/22 12:00:05 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,10 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.9  1999/06/22 12:00:05  tsjensen
+ *    Added #undef DEBUG, because DEBUGging is now activated in boxes.h
+ *    Added #include tools.h
+ *
  *    Revision 1.8  1999/06/20 14:17:58  tsjensen
  *    Added "padding" keyword and recogintion of numbers (YNUMBER)
  *
@@ -42,15 +46,20 @@
  */
 
 #include <string.h>
+#include "shape.h"
+#define FILE_LEXER_L
 #include "boxes.h"
+#undef FILE_LEXER_L
 #include "tools.h"
 #include "y.tab.h"
 
 #undef DEBUG
 /* #define DEBUG */
 
-const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.8 1999/06/20 14:17:58 tsjensen Exp tsjensen $";
+
+static const char rcsid_lexer_l[] =
+    "$Id: lexer.l,v 1.9 1999/06/22 12:00:05 tsjensen Exp tsjensen $";
+
 
 int yylineno = 1;
 
@@ -208,6 +217,20 @@ Padding {
     return YPADDING;
 }
 
+Box {
+    #ifdef DEBUG
+        fprintf (stderr, "\nYBOX: %s", yytext);
+    #endif
+    return YBOX;
+}
+
+End {
+    #ifdef DEBUG
+        fprintf (stderr, "\nYEND: %s", yytext);
+    #endif
+    return YEND;
+}
+
 
 <SHAPES,ELASTIC>nw  { yylval.shape = NW;  return SHAPE; }
 <SHAPES,ELASTIC>nnw { yylval.shape = NNW; return SHAPE; }
@@ -243,7 +266,7 @@ Padding {
 }
 
 
-BOX|revision|author|created|indent|revdate|END {
+author|created|revision|revdate|indent {
     /*
      *  general key words
      */
