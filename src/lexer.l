@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.13 1999/07/22 12:21:14 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.14 1999/08/16 16:28:03 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *
@@ -24,6 +24,11 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.14  1999/08/16 16:28:03  tsjensen
+ *    Implemented new SAMPLE block syntax
+ *    Replaced states SAMPLE1 and SAMPLE2 with new state SAMPLE - this is now
+ *    much simpler code
+ *
  *    Revision 1.13  1999/07/22 12:21:14  tsjensen
  *    Added GNU GPL disclaimer
  *    Renamed y.tab.h include to parser.h (same file)
@@ -59,9 +64,6 @@
  *    Revision 1.6  1999/06/14 12:13:41  tsjensen
  *    Added Reverse pattern
  *
- *    Revision 1.5  1999/06/03 18:54:55  tsjensen
- *    *** empty log message ***
- *
  *    Revision 1.4  1999/04/09 13:31:13  tsjensen
  *    Removed all code related to OFFSET blocks (obsolete)
  *
@@ -69,9 +71,6 @@
  *    Added indent keyword
  *    Added Replace token
  *    Some fiddling which will hopefully fix a line counting bug
- *
- *    Revision 1.2  1999/03/30 09:42:51  tsjensen
- *    Added rcs keywords and standard file header.
  *
  *    Revision 1.1  1999/03/18 15:09:48  tsjensen
  *    Initial revision
@@ -95,71 +94,102 @@
 
 
 static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.13 1999/07/22 12:21:14 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.14 1999/08/16 16:28:03 tsjensen Exp tsjensen $";
 
 
 int yylineno = 1;
 int yyerrcnt = 0;
 
+static char sdel = '\"';
+static char sesc = '\\';
+
 %}
 
 %option nounput
 %option noyywrap
+%option never-interactive
+%option caseless
 
 %x SAMPLE
 %x SPEEDMODE
+%x DELWORD
 %s SHAPES
 %s ELASTIC
 
 PWORD  [a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*
 PWHITE [\n \r\t]
 PBOX   Box
+SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
+
 
 %%
 
-<SHAPES,ELASTIC,INITIAL>[ \r\t] /* ignore whitespace */
 
-<SHAPES,ELASTIC,INITIAL>\n ++yylineno;
+<DELWORD,SHAPES,ELASTIC,INITIAL>[ \r\t] /* ignore whitespace */
 
-\"[^"\n]*$ {
-    if (yyerrcnt++ < 5)
-        yyerror ("Unterminated String at %s", yytext);
-    return YUNREC;
+<DELWORD,SHAPES,ELASTIC,INITIAL>\n ++yylineno;
+
+
+<DELWORD>[^ \t\r\n]+ {
+    /*
+     *  String delimiter spec - like WORD, but allow any character
+     */
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "\nYDELWOR: %s -- STATE INITIAL", yytext);
+    #endif
+    yylval.s = (char *) strdup (yytext);
+    if (yylval.s == NULL) {
+        perror (PROJECT);
+        exit (EXIT_FAILURE);
+    }
+    BEGIN INITIAL;
+    return YDELWORD;
 }
 
-\"[^"\n]*\" {
-    int bidx = yyleng-2;                 /* backslash index */
 
-    while (yytext[bidx] == '\\') bidx--;
+{SDELIM}.*$ {
+    /*
+     *  Strings  --  first match everything starting from a potential
+     *  string delimiter until the end of the line. We will give back what
+     *  we don't need and also detect unterminated strings.
+     */
+    char *p;
+    int rest_len = yyleng - 1;           /* length of string pointed to by p */
+    int qcnt = 0;                        /* esc char count in current string */
 
-    if ((yyleng-2-bidx) % 2) {
-        yyless (yyleng-1);               /* give back last quote */
-        yymore();                        /* append next string */
+    if (yytext[0] != sdel) {
+        REJECT;                          /* that was not our delimiter */
     }
-    else {
-        for (bidx=0; bidx<yyleng-1; ++bidx) {
-            if (yytext[bidx] == '\\') {
-                memmove (yytext+bidx, yytext+bidx+1, yyleng-bidx-1);
-                yytext[yyleng-1] = '\0';
-                --yyleng;                /* inefficient */
-            }
-        }
 
-        memmove (yytext, yytext+1, yyleng-1);     /* cut quotes */
-        --yyleng;
-        yytext[yyleng-1] = '\0';
-        --yyleng;
-
-        #ifdef LEXER_DEBUG
-            fprintf (stderr, "\n STRING: \"%s\"", yytext);
-        #endif
-        yylval.s = (char *) strdup (yytext);
-        if (yylval.s == NULL) {
-            perror (PROJECT);
-            exit (EXIT_FAILURE);
-        }
-        return STRING;
+    yylval.s = (char *) strdup (yytext + 1);
+    if (yylval.s == NULL) {
+        perror (PROJECT);
+        exit (EXIT_FAILURE);
     }
+    p = yylval.s;
+
+    while (*p) {
+        if (*p == sesc) {
+            memmove (p, p+1, rest_len);     /* incl. '\0' */
+            ++qcnt;
+            --rest_len;
+            if (*p == '\0')
+                break;
+        }
+        else if (*p == sdel) {
+            *p = '\0';
+            yyless ((p-yylval.s)+2+qcnt);   /* string plus quotes */
+            #ifdef LEXER_DEBUG
+                fprintf (stderr, "\n STRING: \"%s\"", yylval.s);
+            #endif
+            return STRING;
+        }
+        --rest_len;
+        ++p;
+    }
+    if (yyerrcnt++ < 5)
+        yyerror ("Unterminated String -- %s", yytext);
+    return YUNREC;
 }
 
 
@@ -313,6 +343,18 @@ author|created|revision|revdate|indent {
 }
 
 
+Delimiter|Delim {
+    /*
+     *  Change string delimiting characters
+     */
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "\nYCHGDEL: %s -- STATE DELWORD", yytext);
+    #endif
+    BEGIN DELWORD;
+    return YCHGDEL;
+}
+
+
 {PWORD} {
     #ifdef LEXER_DEBUG
         fprintf (stderr, "\n   WORD: %s", yytext);
@@ -360,7 +402,7 @@ author|created|revision|revdate|indent {
 
 <SPEEDMODE>{PBOX}{PWHITE}+{PWORD} {
     #ifdef LEXER_DEBUG
-        fprintf (stderr, "\n STATUS: %s -- BEGIN INITIAL", yytext);
+        fprintf (stderr, "\n STATUS: %s -- STATE INITIAL", yytext);
     #endif
     yyless (0);
     speeding = 0;
@@ -382,6 +424,18 @@ void begin_speedmode()
     #endif
     BEGIN SPEEDMODE;
 }
+
+
+
+void chg_strdelims (const char asesc, const char asdel)
+{
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "\n STATUS: chg_strdelims ('%c', '%c')", asesc, asdel);
+    #endif
+    sesc = asesc;
+    sdel = asdel;
+}
+
 
 
 /*EOF*/                                         /* vim: set cindent sw=4: */
