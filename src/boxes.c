@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.32 1999/08/22 11:34:46 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.33 1999/09/10 19:21:05 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -48,6 +48,13 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.33  1999/09/10 19:21:05  tsjensen
+ *    Eliminated use of PATH_MAX in order to ease porting
+ *    Restructured infile/outfile code to eliminate need for access() function
+ *    and improve readability
+ *    Added file type check before reading config file. boxes used to generate
+ *    a weird error message if the config file is a directory
+ *
  *    Revision 1.32  1999/08/22 11:34:46  tsjensen
  *    Bugfix: no-input-check must take place before indentation computation
  *
@@ -215,12 +222,22 @@
 #include "generate.h"
 #include "remove.h"
 
+#ifdef __MINGW32__
+    #include <windows.h>
+#endif
+
 extern char *optarg;                     /* for getopt() */
 extern int optind, opterr, optopt;       /* for getopt() */
 
+#ifdef __MINGW32__
+    #define BOXES_CONFIG "boxes.cfg"     /* filename of config file in $HOME */
+#else
+    #define BOXES_CONFIG ".boxes"
+#endif
+
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.32 1999/08/22 11:34:46 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.33 1999/09/10 19:21:05 tsjensen Exp tsjensen $";
 
 
 
@@ -283,6 +300,9 @@ static int is_dir (const char *path)
  *
  *      path    file name to check
  *
+ *  On Windows, this check seems unnecessary, because fopen() seems to fail
+ *  when applied to a directory. 
+ *
  *  RETURNS:    ==  0   path is not a directory
  *               >  0   path is a directory
  *              == -1   error in stat() call
@@ -326,6 +346,9 @@ static int get_config_file()
     FILE *new_yyin = NULL;
     char *s;                             /* points to data from environment */
     int   rc;
+    #ifdef __MINGW32__
+    char exepath[256];                   /* for constructing config file path */
+    #endif
 
     if (yyin != stdin)
         return 0;                        /* we're already ok */
@@ -368,14 +391,14 @@ static int get_config_file()
             perror (PROJECT);
             return 1;
         }
-        new_yyin = fopen (".boxes", "r");
+        new_yyin = fopen (BOXES_CONFIG, "r");
         if (new_yyin) {
-            rc = is_dir (".boxes");
+            rc = is_dir (BOXES_CONFIG);
             if (rc == -1)
                 return 1;
             else {
                 if (rc == 0) {
-                    yyfilename = (char *) strdup (".boxes");
+                    yyfilename = (char *) strdup (BOXES_CONFIG);
                     if (yyfilename == NULL) {
                         perror (PROJECT);
                         return 1;
@@ -391,24 +414,55 @@ static int get_config_file()
         }
     }
     else {
+        #ifndef __MINGW32__
+        /* Do not print this warning on windows. */
         fprintf (stderr, "%s: warning: Environment variable HOME not set!\n",
                 PROJECT);
+        #endif
     }
 
     /*
      *  Try reading the system-wide config file
+     *  On UNIX, the global config file must be given by the GLOBALCONF macro.
+     *  On Win32, it is expected to reside in the same directory as the binary
+     *  used, and its name is assumed to be execfilename+".cfg".
      */
-    new_yyin = fopen (GLOBALCONF, "r");
-    if (new_yyin) {
-        rc = is_dir (GLOBALCONF);
-        if (rc == -1)
-            return 1;
-        else if (rc) {
-            fprintf (stderr, "%s: Alleged system-wide config file '%s' "
-                    "is a directory\n", PROJECT, GLOBALCONF);
-            return 1;
+    #ifdef __MINGW32__
+        if (GetModuleFileName (NULL, exepath, 255) != 0) {
+            char *p = strrchr (exepath, '.') + 1;
+            if (p) {
+                /* p is always != NULL, because we get the full path */
+                *p = '\0';
+                if (strlen(exepath) < 253) {
+                    strcat (exepath, "cfg");       /* c:\blah\boxes.cfg */
+                }
+                else {
+                    fprintf (stderr, "%s: path too long. Using C:\\boxes.cfg.\n", PROJECT);
+                    strcpy (exepath, "C:\\boxes.cfg");
+                }
+            }
         }
-        yyfilename = (char *) strdup (GLOBALCONF);
+        else {
+            strcpy (exepath, "C:\\boxes.cfg");
+        }
+        new_yyin = fopen (exepath, "r");
+    #else
+        new_yyin = fopen (GLOBALCONF, "r");
+    #endif
+    if (new_yyin) {
+        #ifdef __MINGW32__
+            yyfilename = (char *) strdup (exepath);
+        #else
+            rc = is_dir (GLOBALCONF);
+            if (rc == -1)
+                return 1;
+            else if (rc) {
+                fprintf (stderr, "%s: Alleged system-wide config file '%s' "
+                        "is a directory\n", PROJECT, GLOBALCONF);
+                return 1;
+            }
+            yyfilename = (char *) strdup (GLOBALCONF);
+        #endif
         if (yyfilename == NULL) {
             perror (PROJECT);
             return 1;
