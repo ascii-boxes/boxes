@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 13:39h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: shape.c,v 1.3 1999/07/22 12:28:25 tsjensen Exp tsjensen $
+ *  Version:          $Id: shape.c,v 1.4 1999/07/23 16:38:02 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Shape handling and information functions
@@ -25,6 +25,10 @@
  *  Revision History:
  *
  *    $Log: shape.c,v $
+ *    Revision 1.4  1999/07/23 16:38:02  tsjensen
+ *    Removed functions iscorner(), on_side(), shapecmp(), both_on_side(), and
+ *    shape_distance() - nobody was using them anyway.
+ *
  *    Revision 1.3  1999/07/22 12:28:25  tsjensen
  *    Added GNU GPL disclaimer
  *    Added include config.h
@@ -43,11 +47,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 #include "shape.h"
 #include "boxes.h"
+#include "tools.h"
 
 static const char rcsid_shape_c[] =
-    "$Id: shape.c,v 1.3 1999/07/22 12:28:25 tsjensen Exp tsjensen $";
+    "$Id: shape.c,v 1.4 1999/07/23 16:38:02 tsjensen Exp tsjensen $";
 
 
 
@@ -66,6 +72,131 @@ shape_t *sides[] = { north_side, east_side, south_side, west_side };
 
 
 
+shape_t findshape (const sentry_t *sarr, const int num)
+/*
+ *  Find a non-empty shape and return its name
+ *
+ *      sarr    the shape array to check
+ *      num     number of entries in sarr to be checked
+ *
+ *  RETURNS: a shape_name  on success
+ *           num           on error (e.g. empty shape array)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int i;
+
+    for (i=0; i<num; ++i) {
+        if (isempty(sarr+i))
+            continue;
+        else
+            break;
+    }
+
+    return (shape_t) i;
+}
+
+
+
+int on_side (const shape_t s, const int idx)
+/*
+ *  Compute the side that shape s is on.
+ *
+ *      s    shape to look for
+ *      idx  which occurence to return (0 == first, 1 == second (for corners)
+ *
+ *  RETURNS: side number (BTOP etc.)  on success
+ *           ANZ_SIDES                on error (e.g. idx==1 && s no corner)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int side;
+    int i;
+    int found = 0;
+
+    for (side=0; side<ANZ_SIDES; ++side) {
+        for (i=0; i<SHAPES_PER_SIDE; ++i) {
+            if (sides[side][i] == s) {
+                if (found == idx)
+                    return side;
+                else
+                    ++found;
+            }
+        }
+    }
+
+    return ANZ_SIDES;
+}
+
+
+
+int genshape (const size_t width, const size_t height, char ***chars)
+/*
+ *  Generate a shape consisting of spaces only.
+ *
+ *      width   desired shape width
+ *      height  desired shape height
+ *      chars   pointer to the shape lines (should be NULL upon call)
+ *
+ *  Memory is allocated for the shape lines which must be freed by the caller.
+ *
+ *  RETURNS:  == 0   on success (memory allocated)
+ *            != 0   on error   (no memory allocated)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t j;
+
+    if (width <= 0 || height <= 0 || width > LINE_MAX) {
+        fprintf (stderr, "%s: internal error\n", PROJECT);
+        return 1;
+    }
+
+    *chars = (char **) calloc (height, sizeof(char *));
+    if (*chars == NULL) {
+        perror (PROJECT);
+        return 2;
+    }
+
+    for (j=0; j<height; ++j) {
+        (*chars)[j] = (char *) calloc (width+1, sizeof(char));
+        if ((*chars)[j] == NULL) {
+            perror (PROJECT);
+            for (/*empty*/; j>0; --j)
+                BFREE ((*chars)[j-1]);
+            BFREE (*chars);
+            return 3;
+        }
+        memset ((*chars)[j], ' ', width);
+    }
+
+    return 0;
+}
+
+
+
+void freeshape (sentry_t *shape)
+/*
+ *  Free all memory allocated by the shape and set the struct to
+ *  SENTRY_INITIALIZER. Do not free memory of the struct.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t j;
+
+    for (j=0; j<shape->height; ++j)
+        BFREE (shape->chars[j]);
+    BFREE (shape->chars);
+
+    *shape = SENTRY_INITIALIZER;
+}
+
+
+
 int isempty (const sentry_t *shape)
 /*
  *  Return true if shape is empty.
@@ -81,6 +212,31 @@ int isempty (const sentry_t *shape)
         return 1;
     else
         return 0;
+}
+
+
+
+int isdeepempty (const sentry_t *shape)
+/*
+ *  Return true if shape is empty, also checking if lines consist of spaces
+ *  only.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t j;
+
+    if (isempty (shape))
+        return 1;
+
+    for (j=0; j<shape->height; ++j) {
+        if (shape->chars[j]) {
+            if (strspn (shape->chars[j], " ") != shape->width)
+                return 0;
+        }
+    }
+
+    return 1;
 }
 
 
@@ -208,12 +364,12 @@ shape_t leftmost (const int aside, const int cnt)
 
 
 
-int empty_side (sentry_t *d, const int aside)
+int empty_side (sentry_t *sarr, const int aside)
 /*
  *  Return true if the shapes on the given side consist entirely out of
  *  spaces - and spaces only, tabs are considered non-empty.
  *
- *      d       pointer to shape list of design to check
+ *      sarr    pointer to shape list of design to check
  *      aside   the box side (one of BTOP etc.)
  *
  *  RETURNS:  == 0   side is not empty
@@ -222,22 +378,13 @@ int empty_side (sentry_t *d, const int aside)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    int       i;
-    size_t    j;
-    sentry_t *cs;                        /* current shape */
-    char     *p;
+    int i;
 
     for (i=0; i<SHAPES_PER_SIDE; ++i) {
-        cs = d + sides[aside][i];
-        if (isempty(cs))
+        if (isdeepempty (sarr + sides[aside][i]))
             continue;
-        for (j=0; j<cs->height; ++j) {
-            p = cs->chars[j];
-            while (*p && *p == ' ')
-                ++p;
-            if (*p)
-                return 0;                /* side is not empty */
-        }
+        else
+            return 0;                    /* side is not empty */
     }
 
     return 1;                            /* side is empty */
