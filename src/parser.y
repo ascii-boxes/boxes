@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.4 1999/03/30 09:37:51 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.5 1999/03/30 13:29:50 tsjensen Exp tsjensen $
  *  Language:         yacc (ANSI C)
  *  Purpose:          Yacc parser for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,9 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.5  1999/03/30 13:29:50  tsjensen
+ *    Added computation of minimum width/height of each design.
+ *
  *    Revision 1.4  1999/03/30 09:37:51  tsjensen
  *    It drew a correct box for the first time!
  *
@@ -35,7 +38,7 @@
 #include <string.h>
 #include "boxes.h"
 
-#ident "$Id: parser.y,v 1.4 1999/03/30 09:37:51 tsjensen Exp tsjensen $";
+#ident "$Id: parser.y,v 1.5 1999/03/30 13:29:50 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -258,12 +261,13 @@ int perform_se_check()
 %union {
     int num;
     char *s;
+    char c;
     shape_t shape;
     soffset_t offset;
     sentry_t sentry;
 }
 
-%token YSHAPES YOFFSETS YELASTIC YSAMPLE
+%token YSHAPES YOFFSETS YELASTIC YSAMPLE YREPLACE
 %token <s> KEYWORD
 %token <s> WORD
 %token <s> STRING
@@ -273,6 +277,7 @@ int perform_se_check()
 
 %type <sentry> slist
 %type <sentry> slist_entries
+%type <c> rflag;
 
 %%
 
@@ -312,9 +317,10 @@ design: KEYWORD WORD layout KEYWORD WORD
         if (tmp) {
             designs = tmp;
             memset (&(designs[design_idx]), 0, sizeof(design_t));
+            designs[design_idx].indentmode = DEF_INDENTMODE;
         }
         else {
-            perror ("boxes");
+            perror (PROJECT);
             YYABORT;
         }
     }
@@ -339,15 +345,28 @@ entry: KEYWORD STRING
         else if (strcasecmp ($1, "revdate") == 0) {
             designs[design_idx].revdate = (char *) strdup ($2);
         }
+        else if (strcasecmp ($1, "indent") == 0) {
+            if (strcasecmp ($2, "text") == 0 ||
+                strcasecmp ($2, "box") == 0 ||
+                strcasecmp ($2, "none") == 0) {
+                designs[design_idx].indentmode = $2[0];
+            }
+            else {
+                yyerror ("%s: indent keyword must be followed by \"text\", "
+                         "\"box\", or \"none\"\n", PROJECT);
+                YYABORT;
+            }
+        }
         else {
-            fprintf (stderr, "boxes: Internal parser error (unrecognized: %s)"
-                    " in line %d of %s.\n", $1, __LINE__, __FILE__);
+            fprintf (stderr, "%s: Internal parser error (unrecognized: %s)"
+                    " in line %d of %s.\n", PROJECT, $1, __LINE__, __FILE__);
             YYABORT;
         }
     }
+
 | WORD STRING
     {
-        fprintf (stderr, "boxes: Discarding entry [%s = %s].\n", $1, $2);
+        fprintf (stderr, "%s: Discarding entry [%s = %s].\n", PROJECT, $1, $2);
     }
 ;
 
@@ -383,7 +402,8 @@ block: YSAMPLE '{' STRING '}'
           && isempty (designs[design_idx].shape +   W)
           && isempty (designs[design_idx].shape + WSW)))
         {
-            yyerror ("Must specify at least one shape per side");
+            yyerror ("Must specify at least one shape per side "
+                     "(corners don\'t count as sides)");
             YYABORT;
         }
 
@@ -433,7 +453,62 @@ block: YSAMPLE '{' STRING '}'
         }
     }
 
+| YREPLACE rflag STRING WORD STRING
+    {
+        int a = designs[design_idx].anz_reprules;
+
+        if (strcasecmp ($4, "with") != 0) {
+            yyerror ("Search pattern and replacement string must be separated"
+                     " by \"with\"");
+            YYABORT;
+        }
+        #ifdef DEBUG
+            fprintf (stderr, "Adding replacement rule: \"%s\" with \"%s\"\n",
+                    $3, $5);
+        #endif
+
+        designs[design_idx].reprules = (reprule_t *) realloc
+            (designs[design_idx].reprules, (a+1) * sizeof(reprule_t));
+        if (designs[design_idx].reprules == NULL) {
+            perror (PROJECT);
+            YYABORT;
+        }
+        memset (&(designs[design_idx].reprules[a]), 0, sizeof(reprule_t));
+        designs[design_idx].reprules[a].search =
+            (char *) strdup ($3);
+        designs[design_idx].reprules[a].repstr =
+            (char *) strdup ($5);
+        if (designs[design_idx].reprules[a].search == NULL
+         || designs[design_idx].reprules[a].repstr == NULL)
+        {
+            perror (PROJECT);
+            YYABORT;
+        }
+        designs[design_idx].reprules[a].line = yylineno;
+        designs[design_idx].reprules[a].mode = $2;
+        designs[design_idx].anz_reprules = a + 1;
+    }
+
 | YOFFSETS '{' the_offsets '}'
+;
+
+
+rflag: WORD
+    {
+        if (strcasecmp ($1, "global") == 0)
+            $$ = 'g';
+        else if (strcasecmp ($1, "once") == 0)
+            $$ = 'o';
+        else {
+            yyerror ("Replace may be modified by \"global\" or \"once\"");
+            YYABORT;
+        }
+    }
+
+|
+    {
+        $$ = 'g';
+    }
 ;
 
 
@@ -563,13 +638,13 @@ slist_entries: slist_entries ',' STRING
         rval.height++;
         tmp = (char **) realloc (rval.chars, rval.height*sizeof(char*));
         if (tmp == NULL) {
-            perror ("boxes: slist_entries11");
+            perror (PROJECT": slist_entries11");
             YYABORT;
         }
         rval.chars = tmp;
         rval.chars[rval.height-1] = (char *) strdup ($3);
         if (rval.chars[rval.height-1] == NULL) {
-            perror ("boxes: slist_entries12");
+            perror (PROJECT": slist_entries12");
             YYABORT;
         }
         $$ = rval;
@@ -587,12 +662,12 @@ slist_entries: slist_entries ',' STRING
         rval.height = 1;
         rval.chars = (char **) malloc (sizeof(char*));
         if (rval.chars == NULL) {
-            perror ("boxes: slist_entries21");
+            perror (PROJECT": slist_entries21");
             YYABORT;
         }
         rval.chars[0] = (char *) strdup ($1);
         if (rval.chars[0] == NULL) {
-            perror ("boxes: slist_entries22");
+            perror (PROJECT": slist_entries22");
             YYABORT;
         }
         $$ = rval;
