@@ -3,21 +3,42 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.11 1999/06/03 19:24:14 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.12 1999/06/04 18:13:26 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
- *  Purpose:          Filter to draw boxes around input text.
+ *  Purpose:          Filter to draw boxes around input text (and remove it).
  *                    Intended for use with vim(1).
- *  Remarks:          - This version is leaking memory. The sizes of the
- *                      leaks do not depend on the number of lines
- *                      processed, so the leaks don't matter as long as
- *                      this program is executed as a single process.
- *                    - This is not a release.
+ *
+ *  Remarks:        - This version is leaking a small bit of memory. The sizes
+ *                    of the leaks do not depend on the number of lines
+ *                    processed, so the leaks don't matter as long as this
+ *                    program is executed as a single process.
+ *                  - The decision to number box shapes in clockwise order was
+ *                    a major design mistake. Treatment of box parts of the
+ *                    same alignment (N-S and E-W) is usually combined in one
+ *                    function, which now must deal with the numbering being
+ *                    reversed all the time. This is nasty, but changing the
+ *                    shape order would pretty much mean a total rewrite of
+ *                    the code, so we'll have to live with it. :-(
+ *                  - All shapes defined in a box design must be used in any
+ *                    box of that design at least once. In other words, there
+ *                    must not be a shape which is defined in the config file
+ *                    but cannot be found in an actual box of that design.
+ *                    This sort of limits how small your boxes can get.
+ *                    However, in practice it is not a problem, because boxes
+ *                    which must be small usually consist of small shapes
+ *                    which can be packed pretty tightly anyway. And again,
+ *                    changing this would pretty much mean a total rewrite.
  *
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.12  1999/06/04 18:13:26  tsjensen
+ *    Don't adjust indentation after removing a box unless something was
+ *    removed on the west side
+ *    East Padding made dynamic, i.e. dependant on the east side size
+ *
  *    Revision 1.11  1999/06/03 19:24:14  tsjensen
  *    a few fixes related to box removal (as expected)
  *
@@ -34,20 +55,14 @@
  *    Some minor fixes
  *
  *    Revision 1.7  1999/04/02 18:42:44  tsjensen
- *    ... still programming ...
  *    Added infile/outfile parameter code (pasted from tal, more or less)
  *    Added code to remove trailing spaces from output lines
  *
  *    Revision 1.6  1999/04/01 17:26:18  tsjensen
- *    ... still programming ...
  *    Some bug fixes
  *    Added size option (-s)
  *    Added Alignment Option (-a)
  *    It seems actually usable for drawing boxes :-)
- *
- *    Revision 1.5  1999/03/31 17:34:21  tsjensen
- *    ... still programming ...
- *    (some bug fixes and restructuring)
  *
  *    Revision 1.4  1999/03/30 13:30:19  tsjensen
  *    Added minimum width/height for a design. Fixed screwed tiny boxes.
@@ -56,9 +71,6 @@
  *    Revision 1.3  1999/03/30 09:36:23  tsjensen
  *    ... still programming ...
  *    (removed setlocale() call and locale.h include)
- *
- *    Revision 1.2  1999/03/19 17:44:47  tsjensen
- *    ... still programming ...
  *
  *    Revision 1.1  1999/03/18 15:09:17  tsjensen
  *    Initial revision
@@ -86,7 +98,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.11 1999/06/03 19:24:14 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.12 1999/06/04 18:13:26 tsjensen Exp tsjensen $";
 
 extern FILE *yyin;                       /* lex input file */
 
@@ -928,40 +940,42 @@ int read_all_input()
         /*
          *  Apply regular expression substitutions to line
          */
-        for (i=0; i<opt.design->anz_reprules; ++i) {
-            opt.design->current_reprule = opt.design->reprules + i;
-            errno = 0;
-            #ifdef REGEXP_DEBUG
-                fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
-                        opt.design->reprules[i].prog,
-                        input.lines[input.anz_lines].text,
-                        input.lines[input.anz_lines].len,
-                        opt.design->reprules[i].repstr, LINE_MAX+2,
-                        opt.design->reprules[i].mode);
-            #endif
-            input.lines[input.anz_lines].len =
-                myregsub (opt.design->reprules[i].prog,
-                        input.lines[input.anz_lines].text,
-                        input.lines[input.anz_lines].len,
-                        opt.design->reprules[i].repstr,
-                        buf, LINE_MAX+2, opt.design->reprules[i].mode);
-            #ifdef REGEXP_DEBUG
-                fprintf (stderr, "%d\n", input.lines[input.anz_lines].len);
-            #endif
-            if (errno) return 1;
-            BFREE (input.lines[input.anz_lines].text);
-            input.lines[input.anz_lines].text = (char *) strdup (buf);
-            if (input.lines[input.anz_lines].text == NULL) {
-                perror (PROJECT);
-                return 1;
+        if (opt.r == 0) {
+            for (i=0; i<opt.design->anz_reprules; ++i) {
+                opt.design->current_reprule = opt.design->reprules + i;
+                errno = 0;
+                #ifdef REGEXP_DEBUG
+                    fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
+                            opt.design->reprules[i].prog,
+                            input.lines[input.anz_lines].text,
+                            input.lines[input.anz_lines].len,
+                            opt.design->reprules[i].repstr, LINE_MAX+2,
+                            opt.design->reprules[i].mode);
+                #endif
+                input.lines[input.anz_lines].len =
+                    myregsub (opt.design->reprules[i].prog,
+                            input.lines[input.anz_lines].text,
+                            input.lines[input.anz_lines].len,
+                            opt.design->reprules[i].repstr,
+                            buf, LINE_MAX+2, opt.design->reprules[i].mode);
+                #ifdef REGEXP_DEBUG
+                    fprintf (stderr, "%d\n", input.lines[input.anz_lines].len);
+                #endif
+                if (errno) return 1;
+                BFREE (input.lines[input.anz_lines].text);
+                input.lines[input.anz_lines].text = (char *) strdup (buf);
+                if (input.lines[input.anz_lines].text == NULL) {
+                    perror (PROJECT);
+                    return 1;
+                }
+                #ifdef REGEXP_DEBUG
+                    fprintf (stderr, "input.lines[input.anz_lines] == {%d, \"%s\"}\n",
+                            input.lines[input.anz_lines].len,
+                            input.lines[input.anz_lines].text);
+                #endif
             }
-            #ifdef REGEXP_DEBUG
-                fprintf (stderr, "input.lines[input.anz_lines] == {%d, \"%s\"}\n",
-                        input.lines[input.anz_lines].len,
-                        input.lines[input.anz_lines].text);
-            #endif
+            opt.design->current_reprule = NULL;
         }
-        opt.design->current_reprule = NULL;
 
         /*
          *  Update length of longest line
@@ -2478,9 +2492,252 @@ int detect_horiz (const int aside, size_t *hstart, size_t *hend)
 
 
 
+design_t *detect_design()
+/*
+ *  Autodetect design used by box in input.
+ *
+ *  This requires knowledge about ALL designs, so the entire config file had
+ *  to be parsed at some earlier time.
+ *
+ *  RETURNS:  != NULL   success, pointer to detected design
+ *            == NULL   on error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    design_t *d = designs;
+    long      hits;
+    long      maxhits = 0;
+    design_t *res = NULL;
+    int       dcnt;
+    shape_t   scnt;
+    size_t    j, k;
+    char     *p;
+    char     *s;
+    line_t    shpln;
+    size_t    a;
+
+    for (dcnt=0; dcnt<anz_designs; ++dcnt, ++d) {
+        #ifdef DEBUG
+            fprintf (stderr, "CONSIDERING DESIGN ---- \"%s\" ---------------\n",
+                    d->name);
+        #endif
+        hits = 0;
+
+        for (scnt=0; scnt<ANZ_SHAPES; ++scnt) {
+            switch (scnt) {
+                case NW: case SW:
+                    /*
+                     *  Try and find west corner shapes. Every non-empty shape
+                     *  line is searched for on every input line. A hit is
+                     *  generated whenever a match is found.
+                     */
+                    for (j=0; j<d->shape[scnt].height; ++j) {
+                        shpln.text = d->shape[scnt].chars[j];
+                        shpln.len = d->shape[scnt].width;
+                        if (empty_line (&shpln))
+                            continue;
+                        for (s=shpln.text; *s==' ' || *s=='\t'; ++s);
+                        for (k=0; k<d->shape[scnt].height; ++k) {
+                            a = k;
+                            if (scnt == SW)
+                                a += input.anz_lines - d->shape[scnt].height;
+                            if (a >= input.anz_lines)
+                                break;
+                            for (p=input.lines[a].text; *p==' '||*p=='\t'; ++p);
+                            if (strncmp (p, s, shpln.len-(s-shpln.text)) == 0)
+                                ++hits;
+                        }
+                    }
+                    #ifdef DEBUG
+                        fprintf (stderr, "After %s corner check:\t%ld hits.\n",
+                                shape_name[scnt], hits);
+                    #endif
+                    break;
+
+                case NE: case SE:
+                    /*
+                     *  Try and find east corner shapes. Every non-empty shape
+                     *  line is searched for on every input line. A hit is
+                     *  generated whenever a match is found.
+                     */
+                    for (j=0; j<d->shape[scnt].height; ++j) {
+                        shpln.text = d->shape[scnt].chars[j];
+                        shpln.len = d->shape[scnt].width;
+                        if (empty_line (&shpln))
+                            continue;
+                        for (s = shpln.text + shpln.len -1;
+                                (*s==' ' || *s=='\t') && shpln.len;
+                                --s, --(shpln.len));
+                        for (k=0; k<d->shape[scnt].height; ++k) {
+                            a = k;
+                            if (scnt == SE)
+                                a += input.anz_lines - d->shape[scnt].height;
+                            if (a >= input.anz_lines)
+                                break;
+                            for (p=input.lines[a].text + input.lines[a].len -1;
+                                    p>=input.lines[a].text && (*p==' ' || *p=='\t');
+                                    --p);
+                            p = p - shpln.len + 1;
+                            if (p < input.lines[a].text)
+                                continue;
+                            if (strncmp (p, shpln.text, shpln.len) == 0)
+                                ++hits;
+                        }
+                    }
+                    #ifdef DEBUG
+                        fprintf (stderr, "After %s corner check:\t%ld hits.\n",
+                                shape_name[scnt], hits);
+                    #endif
+                    break;
+
+                default:
+                    if (isempty (d->shape+scnt))
+                        continue;
+
+                    if ((scnt >= NNW && scnt <= NNE)
+                            || (scnt >= SSE && scnt <= SSW)) {
+                        /*
+                         *  Try and find horizontal shapes between the box
+                         *  corners. Every non-empty shape line is searched for
+                         *  on every input line. Elastic shapes must occur
+                         *  twice in an uninterrupted row to generate a hit.
+                         */
+                        for (j=0; j<d->shape[scnt].height; ++j) {
+                            shpln.text = d->shape[scnt].chars[j];
+                            shpln.len = d->shape[scnt].width;
+                            if (empty_line (&shpln))
+                                continue;
+                            for (k=0; k<d->shape[scnt].height; ++k) {
+                                a = k;
+                                if (scnt >= SSE && scnt <= SSW)
+                                    a += input.anz_lines-d->shape[scnt].height;
+                                if (a >= input.anz_lines)
+                                    break;
+                                for (p=input.lines[a].text;
+                                        *p == ' ' || *p == '\t'; ++p);
+                                p += d->shape[NW].width;
+                                if (p-input.lines[a].text
+                                        >= (long) input.lines[a].len)
+                                    continue;
+                                p = strstr (p, shpln.text);
+                                if (p) {
+                                    if (d->shape[scnt].elastic) {
+                                        p += shpln.len;
+                                        if (p-input.lines[a].text
+                                                >= (long) input.lines[a].len)
+                                            continue;
+                                        if (!strncmp (p, shpln.text, shpln.len))
+                                            ++hits;
+                                    }
+                                    else {
+                                        ++hits;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    else if ((scnt >= ENE && scnt <= ESE)
+                            || (scnt >= WSW && scnt <= WNW)) {
+                        /* handle later */
+                        break;
+                    }
+                    else {
+                        fprintf (stderr, "%s: internal error\n", PROJECT);
+                        return NULL;
+                    }
+                    #ifdef DEBUG
+                        fprintf (stderr, "After %s shape check:\t%ld hits.\n",
+                                shape_name[scnt], hits);
+                    #endif
+            }
+        }
+
+        /*
+         *  Now iterate over all input lines except for potential top and
+         *  bottom box parts. Check if east and west line ends match a
+         *  non-empty shape line. If so, generate a hit.
+         */
+        if (d->shape[NW].height + d->shape[SW].height < input.anz_lines) {
+            for (k=d->shape[NW].height; k<input.anz_lines-d->shape[SW].height; ++k) {
+                for (p=input.lines[k].text; *p==' ' || *p=='\t'; ++p);
+                for (scnt=WSW; scnt<=WNW; ++scnt) {
+                    a = 0;
+                    if (isempty (d->shape + scnt))
+                        continue;
+                    for (j=0; j<d->shape[scnt].height; ++j) {
+                        shpln.text = d->shape[scnt].chars[j];
+                        shpln.len = d->shape[scnt].width;
+                        if (empty_line (&shpln))
+                            continue;
+                        for (s=shpln.text; *s==' ' || *s=='\t'; ++s);
+                        if (strncmp (p, s, shpln.len-(s-shpln.text)) == 0) {
+                            ++hits;
+                            a = 1;
+                            break;
+                        }
+                    }
+                    if (a)
+                        break;
+                }
+
+                for (scnt=ENE; scnt<=ESE; ++scnt) {
+                    a = 0;
+                    if (isempty (d->shape + scnt))
+                        continue;
+                    for (j=0; j<d->shape[scnt].height; ++j) {
+                        shpln.text = d->shape[scnt].chars[j];
+                        shpln.len = d->shape[scnt].width;
+                        if (empty_line (&shpln))
+                            continue;
+                        for (p=input.lines[k].text + input.lines[k].len -1;
+                                p>=input.lines[a].text && (*p==' ' || *p=='\t');
+                                --p);
+                        for (s = shpln.text + shpln.len -1;
+                                (*s==' ' || *s=='\t') && shpln.len;
+                                --s, --(shpln.len));
+                        p = p - shpln.len + 1;
+                        if (strncmp (p, shpln.text, shpln.len) == 0) {
+                            ++hits;
+                            a = 1;
+                            break;
+                        }
+                    }
+                    if (a)
+                        break;
+                }
+            }
+        }
+        #ifdef DEBUG
+            fprintf (stderr, "After side checks:\t%ld hits.\n", hits);
+        #endif
+
+        if (hits > maxhits) {
+            maxhits = hits;
+            res = d;
+        }
+    }
+
+    #ifdef DEBUG
+        if (res)
+            fprintf (stderr, "CHOOSING \"%s\" design (%ld hits).\n",
+                    res->name, maxhits);
+        else
+            fprintf (stderr, "NO DESIGN FOUND WITH EVEN ONE HIT!\n");
+    #endif
+
+    return res;
+}
+
+
+
 int remove_box()
 /*
  *  foo
+ *
+ *  RETURNS:  == 0  success
+ *            != 0  error
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
@@ -2499,17 +2756,29 @@ int remove_box()
 
     /*
      *  If the user didn't specify a design to remove, autodetect it.
+     *  Since this requires knowledge of all available designs, the entire
+     *  config file had to be parsed (earlier).
      */
     if (opt.design_choice_by_user == 0) {
-        /* TODO */
-        fprintf (stderr, "%s: Can\'t autodetect designs yet. Use -d.\n",
-                PROJECT);
-        return 1;
+        design_t *tmp = detect_design();
+        if (tmp) {
+            opt.design = tmp;
+            #ifdef DEBUG
+                fprintf (stderr, "Design autodetection: Removing box of "
+                        "design \"%s\".\n", opt.design->name);
+            #endif
+        }
+        else {
+            fprintf (stderr, "%s: Box design autodetection failed. Use -d "
+                    "option.\n", PROJECT);
+            return 1;
+        }
     }
 
     /*
-     *  Add trailing spaces to input lines (needed for recognition)
-     *  Also append a number of spaces to all input lines. A greater number
+     *  Make all lines the same length by adding trailing spaces (needed
+     *  for recognition).
+     *  Also append a number of spaces to ALL input lines. A greater number
      *  takes more space and time, but enables the correct removal of boxes
      *  whose east sides consist of lots of spaces (the given value). So we
      *  add a number of spaces equal to the east side width.
@@ -2575,8 +2844,10 @@ int remove_box()
         char *p;
 
         m = best_match (input.lines+j, &ws, &we, &es, &ee);
-        if (m < 0)
+        if (m < 0) {
+            fprintf (stderr, "%s: internal error\n", PROJECT);
             return 1;                    /* internal error */
+        }
         if (m == 0) {
             #ifdef DEBUG
                 fprintf (stderr, "line %2d: no side match\n", j);
@@ -2622,6 +2893,11 @@ int remove_box()
                     input.lines[j].len - c);
         }
     }
+    #ifdef DEBUG
+        if (!did_something)
+            fprintf (stderr,
+                    "There is nothing to remove (did_something == 0).\n");
+    #endif
 
     /*
      *  Phase 4: Remove box top and body lines from input
@@ -2783,12 +3059,11 @@ int main (int argc, char *argv[])
 
     if (opt.r) {
         rc = remove_box();
-        if (rc) {
-            perror (PROJECT);
-            exit (EXIT_FAILURE);
+        if (rc == 0) {
+            output_input();
+            exit (EXIT_SUCCESS);
         }
-        output_input();
-        exit (EXIT_SUCCESS);
+        exit (EXIT_FAILURE);
     }
 
     #ifdef DEBUG
