@@ -1,0 +1,257 @@
+.\" @(#)boxes.1 1.0 07/02/99
+.\"
+.\" $Id$
+.\"
+.TH boxes 1 "July 02 1999"
+.UC 4
+.SH NAME
+boxes \- text mode box and comment drawing filter
+.SH SYNOPSIS
+.B boxes
+[-hlrv] [\-a\ format] [\-d\ design] [\-f\ file] [\-i\ indent] [\-p\ padding]
+[\-s\ size] [\-t\ tabs] [infile [outfile]]
+.SH DESCRIPTION
+.I boxes
+is a text filter which can draw ASCII art boxes around its input text.
+Those boxes can also be removed, even if they have been badly damaged by
+editing of the text inside. Since boxes may be open on any side,
+.I boxes
+can also be used to create regional comments in any programming language.
+With the help of an editor macro/mapping, damaged boxes can easily be
+repaired. New box designs of all sorts can easily be added and shared by
+appending to a free format configuration file.
+.br
+.I boxes
+was intended to be used with the
+.I vim(1)
+text editor, but can be tied to any text editor which supports filters.
+.\" =======================================================================
+.SH OPTIONS
+Options offered by
+.I boxes
+are the following:
+.TP 0.6i
+.B -a \fIstring\fP
+Alignment/positioning of text inside box. This option takes a format string
+argument which is read from left to right. The format string may not
+contain whitespace and must consist of one or more of the following
+components:
+.br
+
+.B h\fPx
+- horizontal alignment of the input text block inside a potentially larger
+box. Possible values for
+.I x
+are
+.B l
+(ell, for left alignment),
+.B c
+(center), or
+.B r
+(right). This does not affect the justification of text lines within the
+input text block (use the
+.B j
+argument instead).
+.br
+.B v\fPx
+- vertical alignment of the input text block inside a potentially larger
+box. Possible values for
+.I x
+are
+.B t
+(for top alignment),
+.B c
+(center), or
+.B b
+(bottom).
+.br
+.B j\fPx
+- justification of lines within the input text block. Possible values for
+.I x
+are
+.B l
+(ell, for left justification),
+.B c
+(center), or
+.B r
+(right). This does not affect the alignment of the input text block itself
+within the box. Use the
+.B h
+and
+.B v
+arguments for input text block positioning.
+.br
+
+Short hand notations (can be combined with the above arguments):
+.br
+.B l
+- (ell) short for
+.B h\fPl\fBv\fPc\fBj\fPl
+.br
+.B c
+- short for
+.B h\fPc\fBv\fPc\fBj\fPc
+.br
+.B r
+- short for
+.B h\fPr\fBv\fPc\fBj\fPr
+.br
+
+The factory default setting for
+.B -a
+is
+.B h\fPl\fBv\fPt.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B -d \fIstring\fP
+Design selection. The one argument of this option is the design name to
+use.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B -f \fIstring\fP
+Use alternate config file. The one argument of this option is the name of a
+valid
+.I boxes
+config file, containing new and exciting designs!
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B -h
+Print usage information.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B -i \fIstring\fP
+Indentation mode. Possible arguments are "text" (indent text inside of
+box), "box" (indent box, not text inside of box), or "none" (throw away
+indentation). Arguments may be abbreviated. The default is to indent the
+box, but not the text.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B -l
+(ell) List designs. Produces a listing of all available box designs in the
+config file, along with a sample box and information about it's creator.
+Also checks syntax of the entire config file.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B -p \fIstring\fP
+Padding. Specify padding in spaces around the input text block for all
+sides of the box. The argument string may not contain whitespace and must
+consist of a combination of the following characters, each followed by a
+number indicating the padding in spaces:
+.br
+.B a
+- (all) give padding for all sides at once
+.br
+.B h
+- (horiz) give padding for both horizontal sides
+.br
+.B v
+- (vertical) give padding for both vertical sides
+.br
+.B b
+- (bottom) give padding for bottom (south) side
+.br
+.B l
+- (left) give padding for left (west) side
+.br
+.B t
+- (top) give padding for top (north) side
+.br
+.B r
+- (right) give padding for right (east) side
+.br
+Example:
+.B -p a\fP4\fBt\fP2
+would define the padding to be 4 characters on all sides, except for the
+top of the box, where the input text block will be only 2 lines away from
+the box.
+.br
+By default, unless specified otherwise in the config file, no padding is
+used.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B -r
+Remove box. Removes an existing box instead of drawing it. Which design to
+use is detected automatically. In order to save time or in case the
+detection does not decide correctly, combine with
+.B -d
+to specify the design. The default is to draw a new box.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B -s \fIwidth\fBx\fPheight\fP
+Box size. If a single number is given as argument, this defaults to the box
+width. 'x', followed by a single number specifies the box height. Giving
+both the box width and height is left as an exercise to the reader. :-)
+The actual box size may vary depending on the individual shape sizes.
+By default, the smallest possible box is created around the text.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B -t \fIuint\fP
+Distance between tab stops. It is important that this value is set correctly,
+or tabulator characters will upset your input text. The correct value for
+.B -t
+depends on the settings used for the text you are processing. Usually, a
+value of 8 should be okay. The factory default for
+.B -t
+is 8.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B -v
+Print out current version number.
+.\" =======================================================================
+.SH CONFIGURATION FILES
+The syntax of
+.I boxes
+config files is described on the Web page (see below). They are quite
+self-explanatory, though.
+.\" =======================================================================
+.SH AVAILABILITY
+.I boxes
+is available from its World Wide Web home page at
+http://home.pages.de/~jensen/boxes/. The Web page also features a number of
+examples illustrating this manual page as well as more in-depth
+documentation.
+.PP
+Check out the
+.I vim(1)
+home page at www.vim.org!
+.\" =======================================================================
+.SH AUTHOR
+.I boxes
+was made by Thomas Jensen.
+.br
+Please see the
+.I boxes
+Web page for a current email address.
+.\" =======================================================================
+.SH VERSION
+This is
+.I boxes
+version 1.0 beta.
+.\" =======================================================================
+.SH BUGS
+This is beta software. The design autodetector needs some more work.
+.br
+Should you notice any unspecified behavior, please tell the author!
+.\" =======================================================================
+.SH ENVIRONMENT
+.TP 15
+HOME
+The user's home directory.
+.TP 15
+BOXES
+Name of
+.I boxes
+configuration file, if different from ~/.boxes.
+.\" =======================================================================
+.SH FILES
+.TP 15
+$HOME/.boxes
+.I boxes
+configuration file
+.\" =======================================================================
+.SH "SEE ALSO"
+.I indent(1)
+,
+.I tal(1)
+,
+.I vim(1)
