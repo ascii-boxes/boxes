@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.28 1999/07/23 16:15:48 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.29 1999/08/16 18:29:39 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -48,6 +48,9 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.29  1999/08/16 18:29:39  tsjensen
+ *    Added output of total number of designs for -l
+ *
  *    Revision 1.28  1999/07/23 16:15:48  tsjensen
  *    Added quickinfo mode to list_styles(). Called with -l and -d together.
  *
@@ -206,7 +209,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.28 1999/07/23 16:15:48 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.29 1999/08/16 18:29:39 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
@@ -246,13 +249,13 @@ static void usage (FILE *st)
 {
     fprintf (st, "Usage:  %s [options] [infile [outfile]]\n", PROJECT);
     fprintf (st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
-    fprintf (st, "        -d name  select box design\n");
+    fprintf (st, "        -d name  select box design [default: first one in file]\n");
     fprintf (st, "        -f file  use only file as configuration file\n");
     fprintf (st, "        -h       print usage information\n");
-    fprintf (st, "        -i mode  indentation mode\n");
+    fprintf (st, "        -i mode  indentation mode [default: box]\n");
     fprintf (st, "        -k bool  kill leading/trailing blank lines on removal or not\n");
     fprintf (st, "        -l       list available box designs w/ samples\n");
-    fprintf (st, "        -p fmt   padding [default: design-dependent]\n");
+    fprintf (st, "        -p fmt   padding [default: none]\n");
     fprintf (st, "        -r       remove box from input\n");
     fprintf (st, "        -s wxh   specify box size (width w and/or height h)\n");
     fprintf (st, "        -t uint  set tab stop distance [default: %d]\n", DEF_TABSTOP);
@@ -406,7 +409,7 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Display usage information and terminate
                  */
-                printf ("%s - draws boxes around your text (and removes them)\n", PROJECT);
+                printf ("%s - draws any kind of box around your text (and removes it)\n", PROJECT);
                 printf ("        (c) Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>\n");
                 printf ("        Web page: http://home.pages.de/~jensen/%s/\n", PROJECT);
                 usage (stdout);
@@ -748,7 +751,6 @@ static int list_styles()
         memset (&space, ' ', LINE_MAX);
         space[LINE_MAX] = '\0';
 
-
         fprintf (opt.outfile, "Complete Design Information for \"%s\":\n",
                 d->name);
         fprintf (opt.outfile, "-----------------------------------");
@@ -756,25 +758,26 @@ static int list_styles()
             fprintf (opt.outfile, "-");
         fprintf (opt.outfile, "\n");
 
-
         fprintf (opt.outfile, "Author:                 %s\n",
                 d->author? d->author: "(unknown artist)");
         fprintf (opt.outfile, "Creation Date:          %s\n",
                 d->created? d->created: "(unknown)");
+
         fprintf (opt.outfile, "Current Revision:       %s%s%s\n",
                 d->revision? d->revision: "",
                 d->revision && d->revdate? " as of ": "",
                 d->revdate? d->revdate: (d->revision? "": "(unknown)"));
+
         fprintf (opt.outfile, "Indentation Mode:       ");
         switch (d->indentmode) {
             case 'b':
-                fprintf (opt.outfile, "box - indent box\n");
+                fprintf (opt.outfile, "box (indent box)\n");
                 break;
             case 't':
-                fprintf (opt.outfile, "text - retain indentation inside of box\n");
+                fprintf (opt.outfile, "text (retain indentation inside of box)\n");
                 break;
             default:
-                fprintf (opt.outfile, "none - discard indentation\n");
+                fprintf (opt.outfile, "none (discard indentation)\n");
                 break;
         }
 
@@ -807,6 +810,7 @@ static int list_styles()
 
         fprintf (opt.outfile, "Minimum Box Dimensions: %d x %d  (width x height)\n",
                 d->minwidth, d->minheight);
+
         fprintf (opt.outfile, "Default Padding:        ");
         if (d->padding[BTOP] || d->padding[BRIG]
                 || d->padding[BBOT] || d->padding[BLEF]) {
@@ -832,6 +836,11 @@ static int list_styles()
         else {
             fprintf (opt.outfile, "none\n");
         }
+
+        fprintf (opt.outfile, "Default Killblank:      %s\n",
+                empty_side (opt.design->shape, BTOP) &&
+                empty_side (opt.design->shape, BBOT)? "no": "yes");
+
         fprintf (opt.outfile, "Elastic Shapes:         ");
         sstart = 0;
         for (i=0; i<ANZ_SHAPES; ++i) {
@@ -938,6 +947,50 @@ static int list_styles()
 
 
 
+static int get_indent (const line_t *lines, const size_t lanz)
+/*
+ *  Determine indentation of given lines in spaces.
+ *
+ *      lines   the lines to examine
+ *      lanz    number of lines to examine
+ *
+ *  Lines are assumed to be free of trailing whitespace.
+ *
+ *  RETURNS:    >= 0   indentation in spaces
+ *               < 0   error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t j;
+    int    res = LINE_MAX;               /* result */
+    int    nonblank = 0;                 /* true if one non-blank line found */
+
+    if (lines == NULL) {
+        fprintf (stderr, "%s: internal error\n", PROJECT);
+        return -1;
+    }
+    if (lanz == 0)
+        return 0;
+
+    for (j=0; j<lanz; ++j) {
+        if (lines[j].len > 0) {
+            size_t ispc;
+            nonblank = 1;
+            ispc = strspn (lines[j].text, " ");
+            if ((int) ispc < res)
+                res = ispc;
+        }
+    }
+
+    if (nonblank)
+        return res;                      /* success */
+    else
+        return 0;                        /* success, but only blank lines */
+}
+
+
+
 static int apply_substitutions (const int mode)
 /*
  *  Apply regular expression substitutions to input text.
@@ -1024,6 +1077,19 @@ static int apply_substitutions (const int mode)
         opt.design->current_rule = NULL;
     }
 
+    /*
+     *  If text indentation was part of the lines processed, indentation
+     *  may now be different -> recalculate input.indent.
+     */
+    if (opt.design->indentmode == 't') {
+        int rc;
+        rc = get_indent (input.lines, input.anz_lines);
+        if (rc >= 0)
+            input.indent = (size_t) rc;
+        else
+            return 4;
+    }
+
     return 0;
 }
 
@@ -1048,6 +1114,7 @@ static int read_all_input()
     char   *temp = NULL;                 /* string resulting from tab exp. */
     size_t  newlen;                      /* line length after tab expansion */
     size_t  i;
+    int     rc;
 
     input.anz_lines = 0;
     input.indent = LINE_MAX;
@@ -1103,16 +1170,6 @@ static int read_all_input()
             input.maxline = input.lines[input.anz_lines].len;
 
         /*
-         *  Update current estimate for text indentation
-         */
-        if (input.lines[input.anz_lines].len > 0) {
-            size_t ispc;
-            ispc = strspn (input.lines[input.anz_lines].text, " ");
-            if (ispc < input.indent)
-                input.indent = ispc;
-        }
-
-        /*
          *  next please
          */
         ++input.anz_lines;
@@ -1125,6 +1182,15 @@ static int read_all_input()
     }
 
     /*
+     *  Compute indentation
+     */
+    rc = get_indent (input.lines, input.anz_lines);
+    if (rc >= 0)
+        input.indent = (size_t) rc;
+    else
+        return 1;
+
+    /*
      *  Exit if there was no input at all
      */
     if (input.lines == NULL || input.lines[0].text == NULL) {
@@ -1135,20 +1201,15 @@ static int read_all_input()
      *  Remove indentation, unless we want to preserve it (when removing
      *  a box or if the user wants to retain it inside the box)
      */
-    if (input.indent < LINE_MAX) {
-        if (opt.design->indentmode != 't' && opt.r == 0) {
-            for (i=0; i<input.anz_lines; ++i) {
-                if (input.lines[i].len >= input.indent) {
-                    memmove (input.lines[i].text, input.lines[i].text+input.indent,
-                            input.lines[i].len-input.indent+1);
-                    input.lines[i].len -= input.indent;
-                }
+    if (opt.design->indentmode != 't' && opt.r == 0) {
+        for (i=0; i<input.anz_lines; ++i) {
+            if (input.lines[i].len >= input.indent) {
+                memmove (input.lines[i].text, input.lines[i].text+input.indent,
+                        input.lines[i].len-input.indent+1);
+                input.lines[i].len -= input.indent;
             }
-            input.maxline -= input.indent;
         }
-    }
-    else {
-        input.indent = 0;                /* seems like blank lines only */
+        input.maxline -= input.indent;
     }
 
     /*
