@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.5 1999/06/03 18:54:55 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.6 1999/06/14 12:13:41 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,9 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.6  1999/06/14 12:13:41  tsjensen
+ *    Added Reverse pattern
+ *
  *    Revision 1.5  1999/06/03 18:54:55  tsjensen
  *    *** empty log message ***
  *
@@ -39,7 +42,7 @@
 #include "y.tab.h"
 
 const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.5 1999/06/03 18:54:55 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.6 1999/06/14 12:13:41 tsjensen Exp tsjensen $";
 
 int yylineno = 1;
 
@@ -108,8 +111,8 @@ Sample {
     return yytext[0];
 }
 
-<SAMPLE1>[^{]+ {
-    yyerror ("Syntax Error at %s", yytext);
+<SAMPLE1>[^{\n\t\r ]+ {
+    yyerror ("Syntax Error at \"%s\"", yytext);
     exit (EXIT_FAILURE);
 }
 
@@ -151,7 +154,8 @@ Sample {
         }
     }
     else {
-        yymore();
+        yyerror ("SAMPLE entry must not be empty");
+        exit (EXIT_FAILURE);
     }
 }
 
