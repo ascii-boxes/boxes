@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.3 1999/03/30 09:36:58 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h,v 1.4 1999/03/31 17:34:43 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *  Remarks:          ---
@@ -11,6 +11,10 @@
  *  Revision History:
  *
  *    $Log: boxes.h,v $
+ *    Revision 1.4  1999/03/31 17:34:43  tsjensen
+ *    ... still programming ...
+ *    Added minwidth and minheight to design structure
+ *
  *    Revision 1.3  1999/03/30 09:36:58  tsjensen
  *    ... still programming ...
  *    It drew a correct box for the first time!
@@ -27,10 +31,20 @@
 #ifndef BOXES_H
 #define BOXES_H
 
-#ident "$Id: boxes.h,v 1.3 1999/03/30 09:36:58 tsjensen Exp tsjensen $"
+#include "regexp.h"
+
+
+#pragma ident "$Id: boxes.h,v 1.4 1999/03/31 17:34:43 tsjensen Exp tsjensen $"
 
 #define PROJECT "boxes"                  /* name of program */
 #define VERSION "1.0"                    /* current release of project */
+
+
+/*
+ *  default settings of all kinds (THIS PARAGRAPH MAY BE EDITED)
+ */
+#define DEF_TABSTOP     8                /* default tab stop distance (-t) */
+#define DEF_INDENTMODE  'b'              /* indent box, not text by default */
 
 
 #define __TJ(s) fprintf (stderr, s);
@@ -97,17 +111,31 @@ typedef struct {
 
 #define SENTRY_INITIALIZER (sentry_t) {NULL, 0, 0, 0}
 
+
 typedef struct {
-    char    *name;
-    char    *author;
-    char    *created;
-    char    *revision;
-    char    *revdate;
-    char    *sample;
-    size_t   minwidth;
-    size_t   minheight;
-    sentry_t shape[ANZ_SHAPES];
-    int      offset[ANZ_OFFSETS];
+    char   *search;
+    char   *repstr;
+    regexp *prog;                        /* compiled search pattern */
+    int     line;                        /* line of definition in config file */
+    char    mode;                        /* 'g' or 'o' */
+} reprule_t;
+
+
+typedef struct {
+    char      *name;
+    char      *author;
+    char      *created;
+    char      *revision;
+    char      *revdate;
+    char      *sample;
+    size_t     minwidth;
+    size_t     minheight;
+    char       indentmode;               /* 'b', 't', or 'n' */
+    reprule_t *current_reprule;
+    reprule_t *reprules;
+    size_t     anz_reprules;
+    sentry_t   shape[ANZ_SHAPES];
+    int        offset[ANZ_OFFSETS];
 } design_t;
 
 extern design_t *designs;
