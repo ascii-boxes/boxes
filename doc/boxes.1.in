@@ -1,8 +1,8 @@
-.\" @(#)boxes.1 1.0 08/18/99
+.\" @(#)boxes.1 1.0 08/22/99
 .\"
-.\" $Id: boxes.1,v 1.1 1999/07/12 18:07:46 tsjensen Exp tsjensen $
+.\" $Id: boxes.1,v 1.2 1999/08/18 19:14:08 tsjensen Exp tsjensen $
 .\"
-.TH boxes 1 "August 18 1999"
+.TH boxes 1 "August 22 1999"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter
@@ -12,8 +12,8 @@ boxes \- text mode box and comment drawing filter
 [\-p\ pad] [\-s\ size] [\-t\ tabs] [infile [outfile]]
 .SH DESCRIPTION
 .I boxes
-is a text filter which can draw ASCII art boxes around its input text.
-Those boxes can also be removed, even if they have been badly damaged by
+is a text filter which can draw any kind of ASCII art box around its input
+text. A box can also be removed, even if it has been badly damaged by
 editing of the text inside. Since boxes may be open on any side,
 .I boxes
 can also be used to create regional comments in any programming language.
@@ -24,7 +24,8 @@ appending to a free format configuration file.
 .I boxes
 was intended to be used with the
 .I vim(1)
-text editor, but can be tied to any text editor which supports filters.
+text editor, but can be tied to any text editor which supports filters, as
+well as from the command line as a standalone tool.
 .\" =======================================================================
 .SH OPTIONS
 Options offered by
@@ -104,7 +105,7 @@ is
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B -d \fIstring\fP
-Design selection. The one argument of this option is the design name to
+Design selection. The one argument of this option is the name of the design to
 use.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
@@ -215,6 +216,18 @@ is 8.
 Print out current version number.
 .\" =======================================================================
 .SH CONFIGURATION FILES
+.I Boxes
+will use the configuration file specified on the command line (using
+.B -f\fP).
+If no config file is specified on the command line,
+.I boxes
+will check for the BOXES environment variable, which may contain a filename
+to use. If BOXES is not set,
+.I boxes
+will try to read $HOME/.boxes and use it as a config file. Failing that,
+.I boxes
+will try to read the system-wide config file (see FILES).
+.PP
 The syntax of
 .I boxes
 config files is described on the Web page (see below). They are quite
@@ -242,12 +255,13 @@ Web page for a current email address.
 .SH VERSION
 This is
 .I boxes
-version 1.0 beta.
+version --BVERSION--.
 .\" =======================================================================
 .SH BUGS
-This is beta software. The design autodetector needs some more work.
+Although it is doing great in most cases, imho the design autodetector
+needs some more work.
 .br
-Should you notice any unspecified behavior, please tell the author!
+Should you notice any other unspecified behavior, please tell the author!
 .\" =======================================================================
 .SH ENVIRONMENT
 .TP 15
@@ -264,6 +278,9 @@ configuration file, if different from ~/.boxes.
 $HOME/.boxes
 .I boxes
 configuration file
+.TP 15
+--GLOBALCONF--
+system-wide configuration file
 .\" =======================================================================
 .SH "SEE ALSO"
 .I indent(1)
