@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:59h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id$
+ *  Version:          $Id: remove.c,v 1.1 1999/06/23 19:14:53 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box removal, i.e. the deletion of boxes
@@ -12,7 +12,10 @@
  *
  *  Revision History:
  *
- *    $Log$
+ *    $Log: remove.c,v $
+ *    Revision 1.1  1999/06/23 19:14:53  tsjensen
+ *    Initial revision
+ *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
@@ -25,7 +28,7 @@
 #include "remove.h"
 
 static const char rcsid_remove_c[] =
-    "$Id$";
+    "$Id: remove.c,v 1.1 1999/06/23 19:14:53 tsjensen Exp tsjensen $";
 
 
 
@@ -307,7 +310,7 @@ static int detect_horiz (const int aside, size_t *hstart, size_t *hend)
     char     *wcs = NULL;                /* west corner shape position */
     char     *ecs = NULL;                /* east corner shape position */
     char     *ecs_save;                  /* temp copy of ecs */
-    int       mmok;                      /* true if middle match was ok */
+    int       mmok = 0;                  /* true if middle match was ok */
     size_t    mheight;                   /* regular height of box part */
     int       result_init = 0;           /* true if hstart was set */
     int       goeast, gowest;
@@ -481,7 +484,7 @@ static design_t *detect_design()
         hits = 0;
 
         for (j=0; j<ANZ_SIDES; ++j)
-            empty[j] = empty_side (d, j);
+            empty[j] = empty_side (d->shape, j);
         #ifdef DEBUG
             fprintf (stderr, "Empty sides: TOP %d, LEFT %d, BOTTOM %d, RIGHT %d\n",
                     empty[BTOP], empty[BLEF], empty[BBOT], empty[BRIG]);
