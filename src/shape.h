@@ -4,14 +4,17 @@
  *  Date created:     June 23, 1999 (Wednesday, 13:45h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id$
+ *  Version:          $Id: shape.h,v 1.1 1999/06/23 12:27:06 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Shape handling and information functions
  *  Remarks:          ---
  *
  *  Revision History:
  *
- *    $Log$
+ *    $Log: shape.h,v $
+ *    Revision 1.1  1999/06/23 12:27:06  tsjensen
+ *    Initial revision
+ *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
@@ -66,6 +69,8 @@ size_t highest (const sentry_t *sarr, const int n, ...);
 size_t widest (const sentry_t *sarr, const int n, ...);
 
 shape_t leftmost (const int aside, const int cnt);
+
+int empty_side (sentry_t *d, const int aside);
 
 
 
