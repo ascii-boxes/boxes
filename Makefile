@@ -3,7 +3,7 @@
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id$
+#   Version:    $Id: Makefile,v 1.1 1999/08/13 23:45:34 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -24,7 +24,9 @@
 #
 #   Revision History:
 #
-#     $Log$
+#     $Log: Makefile,v $
+#     Revision 1.1  1999/08/13 23:45:34  tsjensen
+#     Initial revision
 #____________________________________________________________________________
 #============================================================================
 
@@ -50,6 +52,8 @@ snap: $(ALL_FILES)
 	cp $(SNAPFILE).tar.gz $(WEBHOME)/download/
 	rm -f $(WEBHOME)/download/current-SNAP.tar.gz
 	(cd $(WEBHOME)/download; ln -s $(SNAPFILE).tar.gz current-SNAP.tar.gz)
+	mv -i $(SNAPFILE).tar.gz archive/
+	chmod 444 archive/$(SNAPFILE).tar.gz
 
 rcstest:
 	-for i in $(RCS_FILES) ; do rcsdiff $$i ; done
