@@ -3,7 +3,7 @@
 #   Creation:   March 18, 1999 (Thursday, 15:10h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.12 1999/07/20 18:49:58 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.13 1999/08/13 23:55:03 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,12 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.13  1999/08/13 23:55:03  tsjensen
+#     Given regexp stuff its own Makefile in regexp.
+#     Major Makefile overhaul, maily implementation of new directory structure
+#     and consolidation of file macros
+#     Use more GNU make features
+#
 #     Revision 1.12  1999/07/20 18:49:58  tsjensen
 #     Added GNU GPL disclaimer
 #     Now evaluating date command from SNAPFILE only once
@@ -128,7 +134,7 @@ parser.c parser.h: parser.y boxes.h regexp/regexp.h
 	$(YACC) -o parser.c -d parser.y
 
 lex.yy.c: lexer.l boxes.h
-	$(LEX) -i -t lexer.l > lexer.tmp.c
+	$(LEX) -t lexer.l > lexer.tmp.c
 	echo '#include "config.h"' > lex.yy.c
 	cat lexer.tmp.c >> lex.yy.c
 	rm lexer.tmp.c
