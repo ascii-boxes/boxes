@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.12 1999/06/23 12:33:49 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h,v 1.13 1999/06/23 19:21:15 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *  Remarks:          ---
@@ -11,6 +11,10 @@
  *  Revision History:
  *
  *    $Log: boxes.h,v $
+ *    Revision 1.13  1999/06/23 19:21:15  tsjensen
+ *    Now exporting anz_designs, input, and empty_side()
+ *    Added #include regexp.h back
+ *
  *    Revision 1.12  1999/06/23 12:33:49  tsjensen
  *    Moved some data structures and macros related to shapes to shape.h
  *    Added #ifdef DEBUG around __TJ() macro for convenience
@@ -167,6 +171,8 @@ typedef struct {                         /* Command line options: */
     long      reqheight;                 /* requested box height (-s) */
     char      valign;                    /* text position inside box */
     char      halign;                    /* ( h[lcr]v[tcb] )         */
+    char      indentmode;                /* 'b', 't', 'n', or '\0' */
+    char      justify;                   /* 'l', 'c', 'r', or '\0' */
     FILE     *infile;                    /* where we get our input */
     FILE     *outfile;                   /* where we put our output */
 } opt_t;
@@ -191,10 +197,6 @@ typedef struct {
 
 extern input_t input;
 #endif /*!FILE_LEXER_L*/
-
-
-int empty_side (design_t *d, const int aside);
-
 
 
 #endif /* BOXES_H */
