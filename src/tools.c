@@ -2,33 +2,49 @@
  *  File:             tools.c
  *  Project Main:     boxes.c
  *  Date created:     June 20, 1999 (Sunday, 16:51h)
- *  Author:           Thomas Jensen
+ *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id$
+ *  Version:          $Id: tools.c,v 1.1 1999/06/23 11:19:30 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Provide tool functions for error reporting and some
  *                    string handling
- *  Remarks:          ---
+ *
+ *  Remarks: o This program is free software; you can redistribute it and/or
+ *             modify it under the terms of the GNU General Public License as
+ *             published by the Free Software Foundation; either version 2 of
+ *             the License, or (at your option) any later version.
+ *           o This program is distributed in the hope that it will be useful,
+ *             but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *             MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *             GNU General Public License for more details.
+ *           o You should have received a copy of the GNU General Public
+ *             License along with this program; if not, write to the Free
+ *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *             MA 02111-1307  USA
  *
  *  Revision History:
  *
- *    $Log$
+ *    $Log: tools.c,v $
+ *    Revision 1.1  1999/06/23 11:19:30  tsjensen
+ *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
 
+#include "config.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include "shape.h"
 #include "boxes.h"
 #include "tools.h"
 
 
 static const char rcsid_tools_c[] =
-    "$Id$";
+    "$Id: tools.c,v 1.1 1999/06/23 11:19:30 tsjensen Exp tsjensen $";
 
 
 
@@ -67,6 +83,68 @@ void regerror (char *msg)
             opt.design->current_rule? opt.design->current_rule->line: 0,
             msg);
     errno = EINVAL;
+}
+
+
+
+int strisyes (const char *s)
+/*
+ *  Determine if the string s has a contents indicating "yes".
+ *
+ *     s   string to examine
+ *
+ *  RETURNS:  == 0  string does NOT indicate yes (including errors)
+ *            != 0  string indicates yes
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    if (s == NULL)
+        return 0;
+
+    if (!strncasecmp ("on", optarg, 3))
+        return 1;
+    else if (!strncasecmp ("yes", optarg, 4))
+        return 1;
+    else if (!strncasecmp ("true", optarg, 5))
+        return 1;
+    else if (!strncmp ("1", optarg, 2))
+        return 1;
+    else if (!strncasecmp ("t", optarg, 2))
+        return 1;
+    else
+        return 0;
+}
+
+
+
+int strisno (const char *s)
+/*
+ *  Determine if the string s has a contents indicating "no".
+ *
+ *     s   string to examine
+ *
+ *  RETURNS:  == 0  string does NOT indicate no (including errors)
+ *            != 0  string indicates no
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    if (s == NULL)
+        return 0;
+
+    if (!strncasecmp ("off", optarg, 4))
+        return 1;
+    else if (!strncasecmp ("no", optarg, 3))
+        return 1;
+    else if (!strncasecmp ("false", optarg, 6))
+        return 1;
+    else if (!strncmp ("0", optarg, 2))
+        return 1;
+    else if (!strncasecmp ("f", optarg, 2))
+        return 1;
+    else
+        return 0;
 }
 
 
