@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.17 1999/06/20 14:20:29 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.18 1999/06/22 12:03:33 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -34,6 +34,20 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.18  1999/06/22 12:03:33  tsjensen
+ *    DEBUGging is now activated in boxes.h
+ *    Moved MAX_TABSTOP, LINE_MAX macros and struct opt_t to boxes.h
+ *    Moved BMAX, strrstr(), btrim(), yyerror(), expand_tabs_into(),
+ *    regerror(), empty_line() to a new file tools.c, added #include tools.h
+ *    Some cleanup in main()
+ *    Declared style_sort() helper function static
+ *    Renamed strrstr() to my_strnrstr() (now defined in tools.c)
+ *    Default design is now defined by DEF_DESIGN macro
+ *    Changed select_design(), because default design value now set in process_commandline()
+ *    Bugfix: segfaulted if shape was bigger than input when detecting design
+ *    Bugfix: Padding was not removed when box was removed
+ *    Bugfix: Forgot null byte when removing west box side
+ *
  *    Revision 1.17  1999/06/20 14:20:29  tsjensen
  *    Added code for padding handling (-p)
  *    Added BMAX macro (returns maximum of two values)
@@ -115,6 +129,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "regexp.h"
+#include "shape.h"
 #include "boxes.h"
 #include "tools.h"
 
@@ -125,11 +140,11 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.17 1999/06/20 14:20:29 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.18 1999/06/22 12:03:33 tsjensen Exp tsjensen $";
+
 
 extern int yyparse();
 extern FILE *yyin;                       /* lex input file */
-
 
 char *yyfilename = NULL;                 /* file name of config file used */
 
@@ -138,22 +153,7 @@ design_t *designs = NULL;                /* available box designs */
 int design_idx = 0;                      /* anz_designs-1 */
 int anz_designs = 0;                     /* no of designs after parsing */
 
-
-char *shape_name[] = {
-    "NW", "NNW", "N", "NNE", "NE", "ENE", "E", "ESE",
-    "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW"
-};
-
-shape_t north_side[SHAPES_PER_SIDE] = { NW, NNW, N, NNE, NE };  /* clockwise */
-shape_t  east_side[SHAPES_PER_SIDE] = { NE, ENE, E, ESE, SE };
-shape_t south_side[SHAPES_PER_SIDE] = { SE, SSE, S, SSW, SW };
-shape_t  west_side[SHAPES_PER_SIDE] = { SW, WSW, W, WNW, NW };
-shape_t corners[ANZ_CORNERS] = { NW, NE, SE, SW };
-shape_t *sides[] = { north_side, east_side, south_side, west_side };
-
-
 opt_t opt;
-
 
 struct {
     line_t *lines;
@@ -165,190 +165,6 @@ struct {
 
 
 
-int iscorner (const shape_t s)
-/*
- *  Return true if shape s is a corner.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int i;
-    shape_t *p;
-
-    for (i=0, p=corners; i<ANZ_CORNERS; ++i, ++p) {
-        if (*p == s)
-            return 1;
-    }
-
-    return 0;
-}
-
-
-
-shape_t *on_side (const shape_t s, const int idx)
-/*
- *  Compute the side that shape s is on.
- *
- *      s    shape to look for
- *      idx  which occurence to return (0 == first, 1 == second (for corners)
- *
- *  RETURNS: pointer to a side list  on success
- *           NULL                    on error (e.g. idx==1 && s no corner)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int       side;
-    int       i;
-    shape_t **sp;
-    shape_t  *p;
-    int       found = 0;
-
-    for (side=0,sp=sides; side<ANZ_SIDES; ++side,++sp) {
-        for (i=0,p=*sp; i<SHAPES_PER_SIDE; ++i,++p) {
-            if (*p == s) {
-                if (found == idx)
-                    return *sp;
-                else
-                    ++found;
-            }
-        }
-    }
-
-    return NULL;
-}
-
-
-
-int isempty (const sentry_t *shape)
-/*
- *  Return true if shape is empty.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    if (shape == NULL)
-        return 1;
-    else if (shape->chars == NULL)
-        return 1;
-    else if (shape->width == 0 || shape->height == 0)
-        return 1;
-    else
-        return 0;
-}
-
-
-
-int shapecmp (const sentry_t *shape1, const sentry_t *shape2)
-/*
- *  Compare two shapes.
- *
- *  RETURNS: == 0   if shapes are equal
- *           != 0   if shapes differ
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int    e1 = isempty (shape1);
-    int    e2 = isempty (shape2);
-    size_t i;
-
-    if ( e1 &&  e2) return 0;
-    if (!e1 &&  e2) return 1;
-    if ( e1 && !e2) return -1;
-
-    if (shape1->width != shape2->width || shape1->height != shape2->height) {
-        if (shape1->width * shape1->height > shape2->width * shape2->height)
-            return 1;
-        else
-            return -1;
-    }
-
-    for (i=0; i<shape1->height; ++i) {
-        int c = strcmp (shape1->chars[i], shape2->chars[i]);  /* no casecmp! */
-        if (c) return c;
-    }
-
-    return 0;
-}
-
-
-
-shape_t *both_on_side (const shape_t shape1, const shape_t shape2)
-/*
- *  Compute the side that *both* shapes are on.
- *
- *  RETURNS: pointer to a side list  on success
- *           NULL                    on error (e.g. shape on different sides)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int i, j, found;
-
-    for (i=0; i<ANZ_SIDES; ++i) {
-        found = 0;
-        for (j=0; j<SHAPES_PER_SIDE; ++j) {
-            if (sides[i][j] == shape1 || sides[i][j] == shape2)
-                ++found;
-            if (found > 1) {
-                switch (i) {
-                    case 0: return north_side;
-                    case 1: return east_side;
-                    case 2: return south_side;
-                    case 3: return west_side;
-                    default: return NULL;
-                }
-            }
-        }
-    }
-
-    return NULL;
-}
-
-
-
-int shape_distance (const shape_t s1, const shape_t s2)
-/*
- *  Compute distance between two shapes which are located on the same side
- *  of the box. E.g. shape_distance(NW,N) == 2.
- *
- *  RETURNS: distance in steps   if ok
- *           -1                  on error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int i;
-    int distance = -1;
-    shape_t *workside = both_on_side (s1, s2);
-
-    if (!workside) return -1;
-    if (s1 == s2) return 0;
-
-    for (i=0; i<SHAPES_PER_SIDE; ++i) {
-        if (workside[i] == s1 || workside[i] == s2) {
-            if (distance == -1)
-                distance = 0;
-            else if (distance > -1) {
-                ++distance;
-                break;
-            }
-        }
-        else {
-            if (distance > -1)
-                ++distance;
-        }
-    }
-
-    if (distance > 0 && distance < SHAPES_PER_SIDE)
-        return distance;
-    else
-        return -1;
-}
-
-
-
 static void usage (FILE *st)
 /*
  *  Print usage information on stream st.
@@ -356,7 +172,7 @@ static void usage (FILE *st)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    fprintf (st, " Usage: %s [options] [infile [outfile]]\n", PROJECT);
+    fprintf (st, "Usage:  %s [options] [infile [outfile]]\n", PROJECT);
     fprintf (st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
     fprintf (st, "        -d name  select box design\n");
     fprintf (st, "        -f file  use only file as configuration file\n");
@@ -1049,82 +865,6 @@ int read_all_input()
 
 
 
-size_t highest (const sentry_t *sarr, const int n, ...)
-/*
- *  Return height (vert.) of highest shape in given list.
- *
- *  sarr         array of shapes to examine
- *  n            number of shapes following
- *  ...          the shapes to consider
- *
- *  RETURNS:     height in lines (may be zero)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    va_list ap;
-    int i;
-    size_t max = 0;                      /* current maximum height */
-
-    #if defined(DEBUG) && 0
-        fprintf (stderr, "highest (%d, ...)\n", n);
-    #endif
-
-    va_start (ap, n);
-
-    for (i=0; i<n; ++i) {
-        shape_t r = va_arg (ap, shape_t);
-        if (!isempty (sarr + r)) {
-            if (sarr[r].height > max)
-                max = sarr[r].height;
-        }
-    }
-
-    va_end (ap);
-
-    return max;
-}
-
-
-
-size_t widest (const sentry_t *sarr, const int n, ...)
-/*
- *  Return width (horiz.) of widest shape in given list.
- *
- *  sarr         array of shapes to examine
- *  n            number of shapes following
- *  ...          the shapes to consider
- *
- *  RETURNS:     width in chars (may be zero)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    va_list ap;
-    int i;
-    size_t max = 0;                      /* current maximum width */
-
-    #if defined(DEBUG) && 0
-        fprintf (stderr, "widest (%d, ...)\n", n);
-    #endif
-
-    va_start (ap, n);
-
-    for (i=0; i<n; ++i) {
-        shape_t r = va_arg (ap, shape_t);
-        if (!isempty (sarr + r)) {
-            if (sarr[r].width > max)
-                max = sarr[r].width;
-        }
-    }
-    
-    va_end (ap);
-
-    return max;
-}
-
-
-
 static int horiz_precalc (const sentry_t *sarr,
         size_t *topiltf, size_t *botiltf, size_t *hspace)
 /*
@@ -1802,11 +1542,12 @@ static design_t *select_design (design_t *darr, char *sel)
 
 
 
-int empty_side (const int aside)
+int empty_side (design_t *d, const int aside)
 /*
  *  Return true if the shapes on the given side consist entirely out of
  *  spaces - and spaces only, tabs are considered non-empty.
  *
+ *      d       pointer to design to check
  *      aside   the box side (one of BTOP etc.)
  *
  *  RETURNS:  == 0   side is not empty
@@ -1821,7 +1562,7 @@ int empty_side (const int aside)
     char     *p;
 
     for (i=0; i<SHAPES_PER_SIDE; ++i) {
-        cs = opt.design->shape + sides[aside][i];
+        cs = d->shape + sides[aside][i];
         if (isempty(cs))
             continue;
         for (j=0; j<cs->height; ++j) {
@@ -1973,11 +1714,11 @@ static int output_box (const sentry_t *thebox)
     skip_start = 0;
     skip_end   = 0;
     skip_left  = 0;
-    if (empty_side (BTOP))
+    if (empty_side (opt.design, BTOP))
         skip_start = opt.design->shape[NW].height;
-    if (empty_side (BBOT))
+    if (empty_side (opt.design, BBOT))
         skip_end = opt.design->shape[SW].height;
-    if (empty_side (BLEF))
+    if (empty_side (opt.design, BLEF))
         skip_left = opt.design->shape[NW].width; /* could simply be 1, though */
 
     /*
@@ -2215,53 +1956,6 @@ int best_match (const line_t *line, char **ws, char **we, char **es, char **ee)
     }
 
     return *ws || *es ? 1:0;
-}
-
-
-
-shape_t leftmost (const int aside, const int cnt)
-/*
- *  Return leftmost existing shape in specification for side aside
- *  (BTOP or BBOT), skipping cnt shapes. Corners are not considered.
- *
- *  RETURNS:    shape       if shape was found
- *              ANZ_SHAPES  on error (e.g. cnt too high)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int c = 0;
-    int s;
-
-    if (cnt < 0)
-        return ANZ_SHAPES;
-
-    if (aside == BTOP) {
-        s = 0;
-        do {
-            ++s;
-            while (s < SHAPES_PER_SIDE-1 &&
-                    isempty(opt.design->shape + north_side[s]))
-                ++s;
-            if (s == SHAPES_PER_SIDE-1)
-                return ANZ_SHAPES;
-        } while (c++ < cnt);
-        return north_side[s];
-    }
-
-    else if (aside == BBOT) {
-        s = SHAPES_PER_SIDE - 1;
-        do {
-            --s;
-            while (s && isempty(opt.design->shape + south_side[s]))
-                --s;
-            if (!s)
-                return ANZ_SHAPES;
-        } while (c++ < cnt);
-        return south_side[s];
-    }
-
-    return ANZ_SHAPES;
 }
 
 
@@ -2537,6 +2231,7 @@ design_t *detect_design()
     char     *s;
     line_t    shpln;                     /* a line which is part of a shape */
     size_t    a;
+    int       empty[ANZ_SIDES];
 
     for (dcnt=0; dcnt<anz_designs; ++dcnt, ++d) {
         #ifdef DEBUG
@@ -2545,7 +2240,15 @@ design_t *detect_design()
         #endif
         hits = 0;
 
+        for (j=0; j<ANZ_SIDES; ++j)
+            empty[j] = empty_side (d, j);
+        #ifdef DEBUG
+            fprintf (stderr, "Empty sides: TOP %d, LEFT %d, BOTTOM %d, RIGHT %d\n",
+                    empty[BTOP], empty[BLEF], empty[BBOT], empty[BRIG]);
+        #endif
+
         for (scnt=0; scnt<ANZ_SHAPES; ++scnt) {
+
             switch (scnt) {
                 case NW: case SW:
                     /*
@@ -2553,6 +2256,9 @@ design_t *detect_design()
                      *  line is searched for on every input line. A hit is
                      *  generated whenever a match is found.
                      */
+                    if (empty[BLEF] || (empty[BTOP] && scnt == NW)
+                            || (empty[BBOT] && scnt == SW))
+                        break;
                     for (j=0; j<d->shape[scnt].height; ++j) {
                         shpln.text = d->shape[scnt].chars[j];
                         shpln.len = d->shape[scnt].width;
@@ -2582,6 +2288,9 @@ design_t *detect_design()
                      *  line is searched for on every input line. A hit is
                      *  generated whenever a match is found.
                      */
+                    if (empty[BRIG] || (empty[BTOP] && scnt == NE)
+                            || (empty[BBOT] && scnt == SE))
+                        break;
                     for (j=0; j<d->shape[scnt].height; ++j) {
                         shpln.text = d->shape[scnt].chars[j];
                         shpln.len = d->shape[scnt].width;
@@ -2624,6 +2333,11 @@ design_t *detect_design()
                          *  on every input line. Elastic shapes must occur
                          *  twice in an uninterrupted row to generate a hit.
                          */
+                        if ((scnt >= NNW && scnt <= NNE && empty[BTOP])
+                              || (scnt >= SSE && scnt <= SSW && empty[BBOT])) {
+                            ++hits;
+                            break;       /* horizontal box part is empty */
+                        }
                         for (j=0; j<d->shape[scnt].height; ++j) {
                             shpln.text = d->shape[scnt].chars[j];
                             shpln.len = d->shape[scnt].width;
@@ -2680,8 +2394,13 @@ design_t *detect_design()
          *  bottom box parts. Check if east and west line ends match a
          *  non-empty shape line. If so, generate a hit.
          */
-        if (d->shape[NW].height + d->shape[SW].height < input.anz_lines) {
-            for (k=d->shape[NW].height; k<input.anz_lines-d->shape[SW].height; ++k) {
+        if (((empty[BTOP]? 0: d->shape[NW].height)
+                    + (empty[BBOT]? 0: d->shape[SW].height)) < input.anz_lines)
+        {
+            for (k = empty[BTOP]? 0: d->shape[NW].height;
+                    k < input.anz_lines -(empty[BBOT]? 0: d->shape[SW].height);
+                    ++k)
+            {
                 for (p=input.lines[k].text; *p==' ' || *p=='\t'; ++p);
                 for (scnt=WSW; scnt<=WNW; ++scnt) {
                     a = 0;
