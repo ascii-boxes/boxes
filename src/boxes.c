@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.25 1999/07/12 18:16:36 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.26 1999/07/20 18:45:29 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -48,6 +48,12 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.26  1999/07/20 18:45:29  tsjensen
+ *    Added GNU GPL disclaimer
+ *    Added -k option (kill leading/trailing blank lines on removal yes/no)
+ *    Bugfix: REPLACE and indentation conflict. Now applying regexp substitutions
+ *    only after indentation was already handled.
+ *
  *    Revision 1.25  1999/07/12 18:16:36  tsjensen
  *    Added include "config.h" to top of file
  *
@@ -193,7 +199,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.25 1999/07/12 18:16:36 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.26 1999/07/20 18:45:29 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_
@@ -1035,11 +1041,25 @@ int main (int argc, char *argv[])
 
     /*
      *  Adjust box size and indentmode to command line specification
+     *  Increase box width/height by width/height of empty sides in order
+     *  to match appearance of box with the user's expectations (if -s).
      */
     if (opt.reqheight > (long) opt.design->minheight)
         opt.design->minheight = opt.reqheight;
     if (opt.reqwidth > (long) opt.design->minwidth)
         opt.design->minwidth = opt.reqwidth;
+    if (opt.reqwidth) {
+        if (empty_side (opt.design->shape, BRIG))
+            opt.design->minwidth  += opt.design->shape[SE].width;
+        if (empty_side (opt.design->shape, BLEF))
+            opt.design->minwidth  += opt.design->shape[NW].width;
+    }
+    if (opt.reqheight) {
+        if (empty_side (opt.design->shape, BTOP))
+            opt.design->minheight += opt.design->shape[NW].height;
+        if (empty_side (opt.design->shape, BBOT))
+            opt.design->minheight += opt.design->shape[SE].height;
+    }
     if (opt.indentmode)
         opt.design->indentmode = opt.indentmode;
 
