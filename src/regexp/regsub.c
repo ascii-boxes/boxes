@@ -3,7 +3,7 @@
  *  Date created:     Copyright (c) 1986 by University of Toronto.
  *  Author:           Henry Spencer.
  *                    Extensions and modifications by Thomas Jensen
- *  Version:          $Id: regsub.c,v 1.2 1999/04/05 19:39:27 tsjensen Exp tsjensen $
+ *  Version:          $Id: regsub.c,v 1.3 1999/04/12 18:13:57 tsjensen Exp tsjensen $
  *  Language:         K&R C (traditional)
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Perform substitutions after a regexp match
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: regsub.c,v $
+ *    Revision 1.3  1999/04/12 18:13:57  tsjensen
+ *    Added missing '$' to rcs id string, changed from #ident to char
+ *
  *    Revision 1.2  1999/04/05 19:39:27  tsjensen
  *    Hopefully fixed a potential buffer overrun problem in regsub()
  *
@@ -39,7 +42,7 @@
 #include "regmagic.h"
 
 char rcsid_regsub_c[] =
-    "$Id$";
+    "$Id: regsub.c,v 1.3 1999/04/12 18:13:57 tsjensen Exp tsjensen $";
 
 
 
@@ -147,7 +150,6 @@ myregsub (prog, orig, orig_len, repstr, dest, dest_size, mode)
 
     do {
         rc = regexec (prog, sp);
-
         if (!rc) break;
 
         partlen = prog->startp[0] - sp;
@@ -164,6 +166,8 @@ myregsub (prog, orig, orig_len, repstr, dest, dest_size, mode)
             return dest_size - 1;
         }
 
+        /* fprintf (stderr, "regsub (%p, \"%s\", \"%s\", %d);\n", */
+        /*         prog, repstr, dp, rest_size);                  */
         fill += regsub (prog, repstr, dp, rest_size);
         dp = dest + fill;
         sp = prog->endp[0];
@@ -173,6 +177,10 @@ myregsub (prog, orig, orig_len, repstr, dest, dest_size, mode)
             dest[dest_size-1] = '\0';
             return dest_size - 1;
         }
+
+        /* fprintf (stderr, "dest = \"%s\";\n", dest); */
+        if (prog->startp[0] == prog->endp[0])
+            break;                       /* match "^" or "$" only once */
 
     } while (mode == 'g');
 
