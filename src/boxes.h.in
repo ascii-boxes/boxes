@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.7 1999/06/03 18:54:33 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h,v 1.8 1999/06/14 12:11:54 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *  Remarks:          ---
@@ -11,6 +11,10 @@
  *  Revision History:
  *
  *    $Log: boxes.h,v $
+ *    Revision 1.8  1999/06/14 12:11:54  tsjensen
+ *    Added struct members for regexp reversion code
+ *    Renamed current_reprule to current_rule, now used for both directions
+ *
  *    Revision 1.7  1999/06/03 18:54:33  tsjensen
  *    *** empty log message ***
  *
@@ -44,10 +48,8 @@
 #include "regexp.h"
 
 
-#pragma ident "$Id: boxes.h,v 1.7 1999/06/03 18:54:33 tsjensen Exp tsjensen $"
-
 #define PROJECT "boxes"                  /* name of program */
-#define VERSION "1.0 alpha 2"            /* current release of project */
+#define VERSION "1.0 beta"               /* current release of project */
 
 
 /*
@@ -98,7 +100,7 @@ extern shape_t west_side[SHAPES_PER_SIDE];
 extern shape_t corners[ANZ_CORNERS];
 extern shape_t *sides[ANZ_SIDES];
 
-#define BTOP 0                             /* for use width sides */
+#define BTOP 0                               /* for use width sides */
 #define BRIG 1
 #define BBOT 2
 #define BLEF 3
@@ -141,6 +143,11 @@ typedef struct {
     size_t     anz_revrules;
 } design_t;
 
+typedef struct {
+    size_t len;
+    char  *text;
+} line_t;
+
 extern design_t *designs;
 extern int design_idx;
 
@@ -150,6 +157,7 @@ int isempty (const sentry_t *);
 int yyerror (const char *, ...);
 size_t widest (const sentry_t *, const int, ...);
 size_t highest (const sentry_t *, const int, ...);
+int empty_line (const line_t *line);
 
 #endif /* BOXES_H */
 
