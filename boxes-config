@@ -1,0 +1,312 @@
+# boxes-config
+# Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>
+# Date created: March 17, 1999 (Wednesday, 17:02h)
+
+
+BOX parchment 
+
+author   "Test Person <foo@bar.com>"
+created  "March 12, 1999 (Friday, 17:05h)"
+revision "1.0"
+revdate  "March 12, 1999 (Friday, 17:05h)"
+escaped  "aaa\"bbb\\\"ccc#"     # der String aaa"bbb\"ccc#
+#escaped2 "aaa\\"bbb"        	# unterminated
+
+sample {
+     ________________________
+    /\\                       \\
+    \\_|                       |
+      |                       |
+      |                       |
+      |   ____________________|_
+       \\_/_____________________/
+}                               # double all backslashes in sample
+
+offsets {
+    nw-nnw   0          # 0 heißt immer "außen bündig"
+    nnw-n    0          # Verschiebung von n gegenüber nnw
+    n-nne    0
+    nne-ne   0
+    ne-ene   0
+    ene-e    0
+    e-ese    0
+    ese-se  -1          # um 1 weiter nach außen als ese
+    se-sse   0
+    sse-s    0
+    s-ssw    0
+    ssw-sw   0          # Man sollte wohl 0 als Default erlauben
+    sw-wsw   0
+    wsw-w    0
+    w-wnw    0
+    wnw-nw  -2
+}
+
+shapes {
+    nw  (" __", "/\\ ", "\\_|")
+    nnw ()
+    n   ("_")
+    nne ()
+    ne  ("  ", "\\ ")
+    ene ()
+    e   ("|")
+    ese ()
+    se  ("|_","_/")
+    sse ()
+    s   ("_","_")
+    ssw ()
+    sw  (" \\_/")
+    wsw ()
+    w   ("|")
+    wnw ()                     # Man sollte wohl () als Default erlauben
+}
+
+elastic (n,e,s,w)              # Da muß nur pro Seite mind. einer sein
+
+END parchment
+
+
+# ============================================================================
+
+
+BOX columns
+
+revision "1.0"
+revdate  "March 17, 1999 (Wednesday, 15:27h)"
+created  "March 17, 1999 (Wednesday, 15:27h)"
+
+sample {
+     __^__                 __^__
+    ( ___ )---------------( ___ )
+     | / |                 | \\ |
+     | / |                 | \\ |
+     | / |                 | \\ |
+     |___|                 |___|
+    (_____)---------------(_____)
+}
+
+shapes {
+    nw  (" __^__ ", "( ___ )")
+    nnw ("-")
+    ne  (" __^__ ", "( ___ )")
+    e   ("| / |")
+    w   ("| \\ |")
+    wsw ("|___|")
+    ese ("|___|")
+    sw  ("(_____)")
+    s   ("-")
+    se  ("(_____)")
+}
+
+offsets {
+    nw-nnw  1
+    nne-ne -1
+    ne-ene  1
+    ese-se -1
+    sw-wsw  1
+}
+
+elastic (nnw, e, w, s)
+
+END columns
+
+
+# ============================================================================
+
+
+BOX whirly
+
+created "March 17, 1999 (Wednesday, 15:40h)"
+revdate "March 17, 1999 (Wednesday, 15:40h)"
+revision "1.0"
+
+sample {
+     .+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.
+    (                                                             )
+     )                                                           (
+    (                                                             )
+     "+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"
+}
+
+shapes {
+    nw  (" .")
+    n   ("+\"+.")
+    wnw ("(")
+    w   (" )", "( ")
+    ene (")")
+    e   ("( ", " )")
+    sw  (" \"")
+    s   ("+.+\"")
+}
+
+offsets {
+    ne-ene -1
+    ese-se  1
+}
+
+elastic (n, w, s, e)
+
+END whirly
+
+
+# ============================================================================
+
+
+BOX scroll
+
+revision "1.0"
+revdate  "March 17, 1999 (Wednesday, 17:04h)"
+created  "March 17, 1999 (Wednesday, 17:04h)"
+
+sample {
+     / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \\  
+    |   / ~ \\                                           / ~ \\   |
+    |\\  \\    |                                         |    /  /|
+    |  \\    /|                                         |\\    /  |
+    |    ~~  |                                         |  ~~    |
+    |        |                                         |        |
+    |        |                                         |        |
+    |        |                                         |        |
+    |        |                                         |        |
+    |        |                                         |        |
+     \\       |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|       /
+       \\    /                                           \\    /
+         ~~                                               ~~
+}
+
+shapes {
+    nw  ("/ ~~~~~~~")
+    n   ("~")
+    ne  ("~~~~~~~ \\")
+    ene (" / ~ \\   |", "|    /  /|", "|\\    /  |", "|  ~~    |")
+    e   ("|        |")
+    se  ("|       /", " \\    /  ", "   ~~    ")
+    s   ("~")
+    sw  (" \\       |", "   \\    / ", "     ~~   ")
+}
+
+offsets {
+    ne-ene -1
+    ese-se  1
+    sse-s   2
+    ssw-sw -2
+    wnw-nw  1
+}
+
+eLAStic (n, s, e, w)
+
+END scroll
+
+
+# ============================================================================
+
+
+BOX simple
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "March 18, 1999 (Thursday, 15:24h)"
+created "March 18, 1999 (Thursday, 15:24h)"
+
+sample {
+    *************
+    *           *
+    *           *
+    *************
+}
+
+shapes {
+    nw ("*")
+    se ("*")
+}
+
+elastic (ne,sw)
+
+END simple
+
+
+# ============================================================================
+
+
+BOX c
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "March 18, 1999 (Thursday, 15:25h)"
+created "March 18, 1999 (Thursday, 15:25h)"
+
+sample {
+    /*************/
+    /*           */
+    /*           */
+    /*************/
+}
+
+shapes {
+    n ("*")             # ambiguous corners!
+    e ("*/")
+    s ("*")
+    w ("/*")
+}
+
+elastic (n,e,s,w)
+
+END c
+
+
+# ============================================================================
+
+
+BOX html
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "March 18, 1999 (Thursday, 15:26h)"
+created "March 18, 1999 (Thursday, 15:26h)"
+
+sample {
+    <!-- ------------------- -->
+    <!--                     -->
+    <!--                     -->
+    <!--                     -->
+    <!-- ------------------- -->
+}
+
+shapes {
+    n ("-")
+    nw ("<!-- ")
+    se (" -->")
+    s ("-")
+}
+
+elastic (nw,n,se,s)
+
+END html
+
+
+# ============================================================================
+
+
+BOX shell
+
+author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+revision "1.0"
+revdate "March 18, 1999 (Thursday, 15:27h)"
+created "March 18, 1999 (Thursday, 15:27h)"
+
+sample {
+    #############
+    #           #
+    #           #
+    #############
+}
+
+shapes {
+    nw ("#")
+    se ("#")
+}
+
+elastic (ne,sw)
+
+END shell
+
+#EOF                                                  vim: set ai sw=4:
