@@ -8,6 +8,8 @@
 #ifndef REGEXP_H
 #define REGEXP_H
 
+#pragma ident "$Id$"
+
 
 #define NSUBEXP  10
 typedef struct regexp {
