@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.6 1999/06/14 12:13:41 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.7 1999/06/17 19:05:46 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *  Remarks:          ---
@@ -12,6 +12,9 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.7  1999/06/17 19:05:46  tsjensen
+ *    Bugfix: Sample block analysis didn't handle empty blocks
+ *
  *    Revision 1.6  1999/06/14 12:13:41  tsjensen
  *    Added Reverse pattern
  *
@@ -42,7 +45,7 @@
 #include "y.tab.h"
 
 const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.6 1999/06/14 12:13:41 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.7 1999/06/17 19:05:46 tsjensen Exp tsjensen $";
 
 int yylineno = 1;
 
@@ -193,6 +196,13 @@ Reverse {
     return YREVERSE;
 }
 
+Padding {
+    #ifdef DEBUG
+        fprintf (stderr, "\nYPADDING: %s", yytext);
+    #endif
+    return YPADDING;
+}
+
 
 <SHAPES,ELASTIC>nw  { yylval.shape = NW;  return SHAPE; }
 <SHAPES,ELASTIC>nnw { yylval.shape = NNW; return SHAPE; }
@@ -240,12 +250,21 @@ BOX|revision|author|created|indent|revdate|END {
 }
 
 
-[a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*  {
+[a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]* {
     #ifdef DEBUG
         fprintf (stderr, "\n   WORD: %s", yytext);
     #endif
     yylval.s = (char *) strdup (yytext);
     return WORD;
+}
+
+
+[\+-]?[0-9]+ {
+    #ifdef DEBUG
+        fprintf (stderr, "\nYNUMBER: %s", yytext);
+    #endif
+    yylval.num = atoi (yytext);
+    return YNUMBER;
 }
 
 
