@@ -1,15 +1,15 @@
-.\" @(#)boxes.1 1.0 07/02/99
+.\" @(#)boxes.1 1.0 08/18/99
 .\"
-.\" $Id$
+.\" $Id: boxes.1,v 1.1 1999/07/12 18:07:46 tsjensen Exp tsjensen $
 .\"
-.TH boxes 1 "July 02 1999"
+.TH boxes 1 "August 18 1999"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter
 .SH SYNOPSIS
 .B boxes
-[-hlrv] [\-a\ format] [\-d\ design] [\-f\ file] [\-i\ indent] [\-p\ padding]
-[\-s\ size] [\-t\ tabs] [infile [outfile]]
+[-hlrv] [\-a\ format] [\-d\ design] [\-f\ file] [\-i\ indent] [\-k\ bool]
+[\-p\ pad] [\-s\ size] [\-t\ tabs] [infile [outfile]]
 .SH DESCRIPTION
 .I boxes
 is a text filter which can draw ASCII art boxes around its input text.
@@ -126,10 +126,26 @@ indentation). Arguments may be abbreviated. The default is to indent the
 box, but not the text.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
+.B -k \fIbool\fP
+Kill leading/trailing blank lines on removal. The value of
+.I bool
+can be specified as on, yes, true, 1, or t, all meaning yes, or off, no,
+false, 0, or f, which mean no. This is case-insensitive. This option only
+takes effect in connection with
+.B -r\fP.
+If set to yes, leading and trailing blank lines will be removed from the
+output. If set to no, the entire content of the former box is returned.
+The default is no, if both the top and the bottom part of the box are open,
+as is the case with most regional comments. If the box's design defines a
+top part or a bottom part, the default is yes.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
 .B -l
 (ell) List designs. Produces a listing of all available box designs in the
 config file, along with a sample box and information about it's creator.
-Also checks syntax of the entire config file.
+Also checks syntax of the entire config file. If used in connection with
+.B -d\fP,
+displays detailed information about the specified design.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B -p \fIstring\fP
