@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.14 1999/08/16 16:28:03 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.15 1999/08/18 15:40:10 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *
@@ -20,10 +20,17 @@
  *             License along with this program; if not, write to the Free
  *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *             MA 02111-1307  USA
+ *           - We don't use the yylineno %option. It is not only inefficient,
+ *             but also doesn't work. :-| *doh*
  *
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.15  1999/08/18 15:40:10  tsjensen
+ *    Added %options never-interactive and caseless
+ *    Added code for DELIMITER statements
+ *    Rewrote string rules to deal with delimiter statements
+ *
  *    Revision 1.14  1999/08/16 16:28:03  tsjensen
  *    Implemented new SAMPLE block syntax
  *    Replaced states SAMPLE1 and SAMPLE2 with new state SAMPLE - this is now
@@ -80,6 +87,8 @@
 
 #include "config.h"
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "shape.h"
 #define FILE_LEXER_L
 #include "boxes.h"
@@ -94,14 +103,32 @@
 
 
 static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.14 1999/08/16 16:28:03 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.15 1999/08/18 15:40:10 tsjensen Exp tsjensen $";
 
 
 int yylineno = 1;
-int yyerrcnt = 0;
+static int yyerrcnt = 0;
 
 static char sdel = '\"';
 static char sesc = '\\';
+
+
+/*
+ *  Since this scanner must use REJECT in order to be able to process the
+ *  string delimiter commands, it cannot dynamically enlarge its input
+ *  buffer to accomodate larger tokens. Thus, we simply set the buffer size
+ *  to the input file size plus 10 bytes margin-of-error.
+ */
+#define YY_USER_INIT {                                            \
+    struct stat sinf;                                             \
+                                                                  \
+    if (stat(yyfilename, &sinf)) {                                \
+        perror (PROJECT);                                         \
+        exit (EXIT_FAILURE);                                      \
+    }                                                             \
+    yy_delete_buffer (YY_CURRENT_BUFFER);                         \
+    YY_CURRENT_BUFFER = yy_create_buffer (yyin, sinf.st_size+10); \
+}
 
 %}
 
