@@ -3,7 +3,7 @@
 #   Creation:   March 18, 1999 (Thursday, 15:10h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.13 1999/08/13 23:55:03 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.14 1999/08/21 16:10:41 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,9 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.14  1999/08/21 16:10:41  tsjensen
+#     Removed case insensitivity option (-i) from flex call (-> lexer.l)
+#
 #     Revision 1.13  1999/08/13 23:55:03  tsjensen
 #     Given regexp stuff its own Makefile in regexp.
 #     Major Makefile overhaul, maily implementation of new directory structure
@@ -56,42 +59,6 @@
 #     Activated -Wall -W for parser.y
 #     Removed -DYY_NO_UNPUT from lexer compilation (now done via file option)
 #
-#     Revision 1.9  1999/06/28 12:21:34  tsjensen
-#     Added macro SNAPFILE for boxes-SNAP-`date +%Y%m%d`
-#     Added target rcstest
-#     Now builds optimized code by default
-#     Added debug target for non-optimized code w/ debugging info
-#
-#     Revision 1.8  1999/06/23 19:35:17  tsjensen
-#     Added remove.o and generate.o
-#     Introduced implicit rule .c.o, simplifying commands for most sources
-#
-#     Revision 1.7  1999/06/23 12:27:50  tsjensen
-#     Added tools.o and shape.o
-#     Change in snapshot target directory (download)
-#     Added GENSRC, HSSRC, ORIGSRC, ALLSRC, and ALLOBJ macros for more order
-#
-#     Revision 1.6  1999/06/04 12:15:37  tsjensen
-#     Added snap target for automatic snapshot publication
-#
-#     Revision 1.5  1999/04/04 16:12:40  tsjensen
-#     Added rules for new regular expression handling files
-#     Added file header
-#     Straightened out clean commands
-#
-#     Revision 1.4  1999/04/03 12:01:01  tsjensen
-#     Added build target for optimized compilation
-#     Now linking with flex library instead of lex library
-#
-#     Revision 1.3  1999/03/22 10:57:14  tsjensen
-#     Added -D__EXTENSIONS__
-#     Compile everything but the parser with -Wall -W
-#
-#     Revision 1.2  1999/03/19 17:58:14  tsjensen
-#     Added boxes.o to clean target
-#     Switched language to ANSI C / POSIX_SOURCE
-#     Added -Wall -W to boxes core compilation
-#
 #     Revision 1.1  1999/03/18 15:10:41  tsjensen
 #     Initial revision
 #____________________________________________________________________________
@@ -101,13 +68,13 @@
 LEX        = flex
 YACC       = bison
 CC         = gcc
-CFLAGS     = -ansi -I. -Iregexp $(CFLAGS_ADDTL)
+CFLAGS     = -ansi -I. -Iregexp -Wall -W $(CFLAGS_ADDTL)
 LDFLAGS    = -Lregexp
 
-GEN_HDR    = parser.h
+GEN_HDR    = parser.h boxes.h
 GEN_SRC    = parser.c lex.yy.c
 GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
-ORIG_HDRCL = boxes.h
+ORIG_HDRCL = boxes.h.in
 ORIG_HDR   = $(ORIG_HDRCL) lexer.h tools.h shape.h generate.h remove.h config.h
 ORIG_GEN   = lexer.l parser.y
 ORIG_NORM  = boxes.c tools.c shape.c generate.c remove.c
@@ -139,6 +106,7 @@ lex.yy.c: lexer.l boxes.h
 	cat lexer.tmp.c >> lex.yy.c
 	rm lexer.tmp.c
 
+
 boxes.o: boxes.c boxes.h regexp/regexp.h shape.h tools.h generate.h remove.h config.h
 tools.o: tools.c tools.h boxes.h shape.h config.h
 shape.o: shape.c shape.h boxes.h config.h tools.h
@@ -147,8 +115,6 @@ remove.o: remove.c remove.h boxes.h shape.h tools.h config.h
 lex.yy.o: lex.yy.c parser.h tools.h shape.h lexer.h config.h
 parser.o: parser.c parser.h tools.h shape.h lexer.h config.h
 
-.c.o:
-	$(CC) $(CFLAGS) -Wall -W -c $<
 
 snap: $(ALL_FILES)
 	if [ -z "$(SNAPFILE)" ] ; then exit 1 ; fi
