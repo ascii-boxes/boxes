@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.8 1999/04/04 16:09:01 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.9 1999/04/09 13:33:24 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -18,6 +18,9 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.9  1999/04/09 13:33:24  tsjensen
+ *    Removed code related to OFFSET blocks (obsolete)
+ *
  *    Revision 1.8  1999/04/04 16:09:01  tsjensen
  *    Added code for specification of indentation handling of input
  *    Added regular expression substitutions
@@ -75,11 +78,19 @@ extern char *optarg;                     /* for getopt() */
 extern int optind, opterr, optopt;       /* for getopt() */
 
 
-#ident "$Id: boxes.c,v 1.8 1999/04/04 16:09:01 tsjensen Exp tsjensen $"
+static const char rcsid_boxes_c[] =
+    "$Id: boxes.c,v 1.9 1999/04/09 13:33:24 tsjensen Exp tsjensen $";
 
 extern FILE *yyin;                       /* lex input file */
 
 
+
+/*  Number of spaces appended to all input lines prior to removing a box.
+ *  A greater number takes more space and time, but enables the correct
+ *  removal of boxes whose east sides consist of lots of spaces (the given
+ *  value).
+ */
+#define EAST_PADDING    20
 
 /*  max. allowed tab stop distance
  */
@@ -123,14 +134,16 @@ shape_t *sides[] = { north_side, east_side, south_side, west_side };
 
 struct {                                 /* Command line options: */
     int       l;                         /* list available designs */
+    int       r;                         /* remove box from input */
     int       tabstop;                   /* tab stop distance */
     design_t *design;                    /* currently used box design */
+    int       design_choice_by_user;     /* true if design was chosen by user */
     long      reqwidth;                  /* requested box width (-s) */
     long      reqheight;                 /* requested box height (-s) */
     char      valign;                    /* text position inside box */
-    char      halign;                    /* ('c', 'l', or 'r')       */
-    FILE     *infile;
-    FILE     *outfile;
+    char      halign;                    /* ( h[lcr]v[tcb] )         */
+    FILE     *infile;                    /* where we get our input */
+    FILE     *outfile;                   /* where we put our output */
 } opt;
 
 
@@ -262,6 +275,32 @@ int isempty (const sentry_t *shape)
 
 
 
+int empty_line (const line_t *line)
+/*
+ *  Return true if line is empty.
+ *
+ *  Empty lines either consist entirely of whitespace or don't exist.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    char *p;
+    size_t j;
+
+    if (!line)
+        return 1;
+    if (line->text == NULL || line->len <= 0)
+        return 1;
+
+    for (p=line->text, j=0; *p && j<line->len; ++j, ++p) {
+        if (*p != ' ' && *p != '\t')
+            return 0;
+    }
+    return 1;
+}
+
+
+
 int shapecmp (const sentry_t *shape1, const sentry_t *shape2)
 /*
  *  Compare two shapes.
@@ -383,10 +422,11 @@ static void usage (FILE *st)
     fprintf (st, "       -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
     fprintf (st, "       -d name  select box design\n");
     fprintf (st, "       -f file  use only file as configuration file\n");
-    fprintf (st, "       -h       usage information\n");
-    fprintf (st, "       -l       generate listing of available box designs w/ samples\n");
+    fprintf (st, "       -h       print usage information\n");
+    fprintf (st, "       -l       list available box designs w/ samples\n");
+    fprintf (st, "       -r       remove box from input\n");
     fprintf (st, "       -s wxh   specify box size (width w and/or height h)\n");
-    fprintf (st, "       -t uint  tab stop distance [default: %d]\n", DEF_TABSTOP);
+    fprintf (st, "       -t uint  set tab stop distance [default: %d]\n", DEF_TABSTOP);
     fprintf (st, "       -v       print version information\n");
 }
 
@@ -411,7 +451,7 @@ static int process_commandline (int argc, char *argv[])
     yyin = stdin;
 
     do {
-        oc = getopt (argc, argv, "a:d:f:hls:t:v");
+        oc = getopt (argc, argv, "a:d:f:hlrs:t:v");
 
         switch (oc) {
 
@@ -505,6 +545,13 @@ static int process_commandline (int argc, char *argv[])
                  *  List available box styles
                  */
                 opt.l = 1;
+                break;
+
+            case 'r':
+                /*
+                 *  Remove box from input
+                 */
+                opt.r = 1;
                 break;
 
             case 's':
@@ -853,7 +900,14 @@ int read_all_input()
 
         input.lines[input.anz_lines].len = strlen (buf);
 
-        btrim (buf, &(input.lines[input.anz_lines].len));
+        if (opt.r) {
+            input.lines[input.anz_lines].len -= 1;
+            if (buf[input.lines[input.anz_lines].len] == '\n')
+                buf[input.lines[input.anz_lines].len] = '\0';
+        }
+        else {
+            btrim (buf, &(input.lines[input.anz_lines].len));
+        }
 
         if (input.lines[input.anz_lines].len > 0) {
             newlen = expand_tabs_into (buf,
@@ -945,17 +999,23 @@ int read_all_input()
     }
 
     /*
-     *  Remove indentation
+     *  Remove indentation, unless we want to preserve it (when removing
+     *  a box or if the user wants to retain it inside the box)
      */
-    if (opt.design->indentmode != 't') {
-        for (i=0; i<input.anz_lines; ++i) {
-            if (input.lines[i].len >= input.indent) {
-                memmove (input.lines[i].text, input.lines[i].text+input.indent,
-                        input.lines[i].len-input.indent+1);
-                input.lines[i].len -= input.indent;
+    if (input.indent < LINE_MAX) {
+        if (opt.design->indentmode != 't' && opt.r == 0) {
+            for (i=0; i<input.anz_lines; ++i) {
+                if (input.lines[i].len >= input.indent) {
+                    memmove (input.lines[i].text, input.lines[i].text+input.indent,
+                            input.lines[i].len-input.indent+1);
+                    input.lines[i].len -= input.indent;
+                }
             }
+            input.maxline -= input.indent;
         }
-        input.maxline -= input.indent;
+    }
+    else {
+        input.indent = 0;                /* seems like blank lines only */
     }
 
 #if 0
@@ -1694,7 +1754,7 @@ static design_t *select_design (design_t *darr, char *sel)
  *  Select a design to use for our box.
  *
  *  darr      design array as read from config file
- *  sel       name of the desired design
+ *  sel       name of desired design
  *
  *  If the specified name is not found, defaults to "C" design;
  *  If "C" design is not found, default to design number 0;
@@ -1709,6 +1769,7 @@ static design_t *select_design (design_t *darr, char *sel)
     int i;
 
     if (sel) {
+        opt.design_choice_by_user = 1;
         for (i=0; i<anz_designs; ++i) {
             if (strcasecmp (darr[i].name, sel) == 0)
                 return &(darr[i]);
@@ -1912,6 +1973,708 @@ static int output_box (const sentry_t *thebox)
 
 
 
+char *strrstr (const char *s1, const char *s2, const size_t s2_len, int skip)
+/*
+ *  Return pointer to last occurrence of string s2 in string s1.
+ *
+ *      s1       string to search
+ *      s2       string to search for in s1
+ *      s2_len   length in characters of s2
+ *      skip     number of finds to ignore before returning anything
+ *
+ *  RETURNS: pointer to last occurrence of string s2 in string s1
+ *           NULL if not found or error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    char *p;
+    int comp;
+
+    if (!s2 || *s2 == '\0')
+        return (char *) s1;
+    if (!s1 || *s1 == '\0')
+        return NULL;
+    if (skip < 0)
+        skip = 0;
+
+    p = strrchr (s1, s2[0]);
+    if (!p)
+        return NULL;
+
+    while (p >= s1) {
+        comp = strncmp (p, s2, s2_len);
+        if (comp == 0) {
+            if (skip--)
+                --p;
+            else
+                return p;
+        }
+        else {
+            --p;
+        }
+    }
+
+    return NULL;
+}
+
+
+
+int best_match (const line_t *line, char **ws, char **we, char **es, char **ee)
+/*
+ *  Find positions of west and east box parts in line.
+ *
+ *    line      line to examine
+ *    ws etc.   result parameters (west start, west end, east start, east end)
+ *
+ *  RETURNS:    > 0   a match was found (ws etc are set to indicate positions)
+ *             == 0   no match was found
+ *              < 0   internal error (out of memory)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t    numw = 0;                /* number of shape lines on west side */
+    size_t    nume = 0;                /* number of shape lines on east side */
+    size_t    j;                       /* counts number of lines of all shapes tested */
+    size_t    k;                       /* line counter within shape */
+    int       w;                       /* shape counter */
+    sentry_t *cs;                      /* current shape */
+    char     *s;                       /* duplicate of current shape part */
+    char     *p;                       /* position found by strstr */
+    size_t    cq;                      /* current quality */
+    char     *q;                       /* space check rover */
+    size_t    quality;
+
+    *ws = *we = *es = *ee = NULL;
+
+    numw  = opt.design->shape[WNW].height;
+    numw += opt.design->shape[ W ].height;
+    numw += opt.design->shape[WSW].height;
+
+    nume  = opt.design->shape[ENE].height;
+    nume += opt.design->shape[ E ].height;
+    nume += opt.design->shape[ESE].height;
+
+    /*
+     *  Find match for WEST side
+     */
+    quality = 0;
+    cs = opt.design->shape + WNW;
+    for (j=0,k=0,w=3; j<numw; ++j,++k) {
+        if (k == cs->height) {
+            k = 0;
+            cs = opt.design->shape + west_side[--w];
+        }
+
+        s = (char *) strdup (cs->chars[k]);
+        if (s == NULL) {
+            perror (PROJECT);
+            return -1;
+        }
+        cq = cs->width;
+
+        do {
+            p = strstr (line->text, s);
+            if (p) {
+                q = p-1;
+                while (q >= line->text) {
+                    if (*q-- != ' ') {
+                        p = NULL;
+                        break;
+                    }
+                }
+                if (p)
+                    break;
+            }
+            if (!p && cq) {
+                if (*s == ' ')
+                    memmove (s, s+1, cq--);
+                else if (s[cq-1] == ' ')
+                    s[--cq] = '\0';
+                else {
+                    cq = 0;
+                    break;
+                }
+            }
+        } while (cq && !p);
+
+        if (cq == 0) {
+            BFREE (s);
+            continue;
+        }
+
+        /*
+         *  If the current match is the best yet, adjust result values
+         */
+        if (cq > quality) {
+            quality = cq;
+            *ws = p;
+            *we = p + cq;
+        }
+
+        BFREE (s);
+    }
+
+    /*
+     *  Find match for EAST side
+     */
+    quality = 0;
+    cs = opt.design->shape + ENE;
+    for (j=0,k=0,w=1; j<numw; ++j,++k) {
+        if (k == cs->height) {
+            k = 0;
+            cs = opt.design->shape + east_side[++w];
+        }
+
+        s = (char *) strdup (cs->chars[k]);
+        if (s == NULL) {
+            perror (PROJECT);
+            return -1;
+        }
+        cq = cs->width;
+
+        do {
+            p = strrstr (line->text, s, cq, 0);
+            if (p) {
+                q = p + cq;
+                while (*q) {
+                    if (*q++ != ' ') {
+                        p = NULL;
+                        break;
+                    }
+                }
+                if (p)
+                    break;
+            }
+            if (!p && cq) {
+                if (*s == ' ')
+                    memmove (s, s+1, cq--);
+                else if (s[cq-1] == ' ')
+                    s[--cq] = '\0';
+                else {
+                    cq = 0;
+                    break;
+                }
+            }
+        } while (cq && !p);
+
+        if (cq == 0) {
+            BFREE (s);
+            continue;
+        }
+
+        /*
+         *  If the current match is the best yet, adjust result values
+         */
+        if (cq > quality) {
+            quality = cq;
+            *es = p;
+            *ee = p + cq;
+        }
+
+        BFREE (s);
+    }
+
+    return *ws || *es ? 1:0;
+}
+
+
+
+shape_t leftmost (const int aside, const int cnt)
+/*
+ *  Return leftmost existing shape in specification for side aside
+ *  (BTOP or BBOT), skipping cnt shapes. Corners are not considered.
+ *
+ *  RETURNS:    shape       if shape was found
+ *              ANZ_SHAPES  on error (e.g. cnt too high)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int c = 0;
+    int s;
+
+    if (cnt < 0)
+        return ANZ_SHAPES;
+
+    if (aside == BTOP) {
+        s = 0;
+        do {
+            ++s;
+            while (s < SHAPES_PER_SIDE-1 &&
+                    isempty(opt.design->shape + north_side[s]))
+                ++s;
+            if (s == SHAPES_PER_SIDE-1)
+                return ANZ_SHAPES;
+        } while (c++ < cnt);
+        return north_side[s];
+    }
+
+    else if (aside == BBOT) {
+        s = SHAPES_PER_SIDE - 1;
+        do {
+            --s;
+            while (s && isempty(opt.design->shape + south_side[s]))
+                --s;
+            if (!s)
+                return ANZ_SHAPES;
+        } while (c++ < cnt);
+        return south_side[s];
+    }
+
+    return ANZ_SHAPES;
+}
+
+
+
+static int hmm (const int aside, const size_t follow,
+        const char *p, const char *ecs, const int cnt)
+/*
+ *  (horizontal middle match)
+ *
+ *      aside   box part to check (BTOP or BBOT)
+ *      follow  index of line number in shape spec to check
+ *      p       current check position
+ *      ecs     pointer to first char of east corner shape
+ *      cnt     current shape to check (0 == leftmost middle shape)
+ *
+ *  Recursive helper function for detect_horiz()
+ *
+ *  RETURNS:  == 0  success
+ *            != 0  error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int       cmp;
+    sentry_t *cs;
+    shape_t   sh;
+    int       rc;
+
+    #ifdef DEBUG
+        fprintf (stderr, "hmm (%s, %d, \'%c\', \'%c\', %d)\n",
+                aside==BTOP?"BTOP":"BBOT", follow, p[0], *ecs, cnt);
+    #endif
+
+    if (p > ecs)                         /* last shape tried was too long */
+        return 2;
+
+    sh = leftmost (aside, cnt);
+    if (sh == ANZ_SHAPES)
+        return 1;
+
+    cs = opt.design->shape + sh;
+
+    cmp = strncmp (p, cs->chars[follow], cs->width);
+
+    if (cmp == 0) {
+        if (p+cs->width == ecs) {
+            if (leftmost (aside, cnt+1) == ANZ_SHAPES)
+                return 0;                /* good! all clear, it matched */
+            else
+                return 3;                /* didn't use all shapes to do it */
+        }
+        if (cs->elastic) {
+            rc = hmm (aside, follow, p+cs->width, ecs, cnt);
+            #ifdef DEBUG
+                fprintf (stderr, "hmm returned %d\n", rc);
+            #endif
+            if (rc) {
+                rc = hmm (aside, follow, p+cs->width, ecs, cnt+1);
+                #ifdef DEBUG
+                    fprintf (stderr, "hmm returned %d\n", rc);
+                #endif
+            }
+        }
+        else {
+            rc = hmm (aside, follow, p+cs->width, ecs, cnt+1);
+            #ifdef DEBUG
+                fprintf (stderr, "hmm returned %d\n", rc);
+            #endif
+        }
+        if (rc == 0)
+            return 0;                    /* we're on the way back */
+        else
+            return 4;                    /* can't continue on this path */
+    }
+    else {
+        return 5;                        /* no match */
+    }
+}
+
+
+
+int detect_horiz (const int aside, size_t *hstart, size_t *hend)
+/*
+ *  Detect which part of the input belongs to the top of the box
+ *
+ *      aside   part of box to detect (BTOP or BBOT)
+ *      hstart  index of first line of detected box part (result)
+ *      hend    index of first line following detected box part (result)
+ *
+ *  We assume the horizontal parts of the box to be in one piece, i.e. no
+ *  blank lines inserted. Lines may be missing, though. Lines may not be
+ *  duplicated. They may be shifted left and right by inserting whitespace,
+ *  but whitespace which is part of the box must not have been deleted.
+ *  Unfortunately, they may even differ in length as long as each line is
+ *  in itself a valid horizontal box line.
+ *
+ *  RETURNS:  == 0   success (hstart & hend are set)
+ *            != 0   error
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t    follow;                    /* possible box line */
+    sentry_t *cs;                        /* current shape */
+    line_t   *line;                      /* currently processed input line */
+    size_t    lcnt;                      /* index of currently proc.inp.line */
+    char     *p;                         /* middle line part scanner */
+    char     *q;                         /* space check rover */
+    char     *wcs = NULL;                /* west corner shape position */
+    char     *ecs = NULL;                /* east corner shape position */
+    char     *ecs_save;                  /* temp copy of ecs */
+    int       mmok;                      /* true if middle match was ok */
+    size_t    mheight;                   /* regular height of box part */
+    int       result_init = 0;           /* true if hstart was set */
+    int       goeast, gowest;
+
+    *hstart = *hend = 0;
+
+    mheight = opt.design->shape[sides[aside][0]].height;
+    if (aside == BTOP) {
+        follow = 0;
+        line=input.lines;
+    }
+    else {
+        follow = mheight - 1;
+        line = input.lines + input.anz_lines - 1;
+    }
+
+    for (lcnt=0; lcnt<mheight; ++lcnt) {
+
+        goeast = gowest = 0;
+
+        #ifdef DEBUG
+            if (aside == BTOP)
+                fprintf (stderr, "----- Processing line index %2d --------------"
+                        "---------------------------------\n", lcnt);
+            else
+                fprintf (stderr, "----- Processing line index %2d -----------"
+                        "------------------------------------\n",
+                        input.anz_lines - lcnt - 1);
+        #endif
+
+        do {
+            /*
+             *  Look for west corner shape
+             */
+            cs = opt.design->shape + sides[aside][aside==BTOP?0:SHAPES_PER_SIDE-1];
+            if (gowest) {
+                wcs = strstr (wcs+1, cs->chars[follow]);
+                gowest = 0;
+            }
+            else if (!wcs) {
+                wcs = strstr (line->text, cs->chars[follow]);
+            }
+            if (wcs) {
+                for (q=wcs-1; q>=line->text; --q) {
+                    if (*q != ' ' && *q != '\t')
+                        break;
+                }
+                if (q >= line->text)
+                    wcs = NULL;
+            }
+            #ifdef DEBUG
+                if (wcs)
+                    fprintf (stderr, "West corner shape matched at position %d.\n",
+                            wcs - line->text);
+                else
+                    fprintf (stderr, "West corner shape not found.\n");
+            #endif
+
+            p = wcs + cs->width;
+
+            /*
+             *  Look for east corner shape
+             */
+            cs = opt.design->shape + sides[aside][aside==BTOP?SHAPES_PER_SIDE-1:0];
+            ecs_save = ecs;
+            ecs = strrstr (p, cs->chars[follow], cs->width, goeast);
+            if (ecs) {
+                for (q=ecs+cs->width; *q; ++q) {
+                    if (*q != ' ' && *q != '\t')
+                        break;
+                }
+                if (*q)
+                    ecs = NULL;
+            }
+            if (!ecs) {
+                gowest = 1;
+                goeast = 0;
+                ecs = ecs_save;
+            }
+            #ifdef DEBUG
+                if (ecs)
+                    fprintf (stderr, "East corner shape matched at position %d.\n",
+                            ecs-line->text);
+                else
+                    fprintf (stderr, "East corner shape not found.\n");
+            #endif
+
+            /*
+             *  Check if text between corner shapes is valid
+             */
+            if (wcs && ecs) {
+                mmok = !hmm (aside, follow, p, ecs, 0);
+                #ifdef DEBUG
+                    fprintf (stderr, "Text between corner shapes is%s valid.\n",
+                            mmok? "": " NOT");
+                #endif
+                if (!mmok)
+                    ++goeast;
+            }
+
+        } while (!mmok && wcs);
+
+        /*
+         *  Proceed to next line
+         */
+        if (wcs && ecs && mmok) {  /* match found */
+            if (!result_init) {
+                result_init = 1;
+                if (aside == BTOP)
+                    *hstart = lcnt;
+                else
+                    *hend = (input.anz_lines - lcnt - 1) + 1;
+            }
+            if (aside == BTOP)
+                *hend = lcnt + 1;
+            else
+                *hstart = input.anz_lines - lcnt - 1;
+        }
+        else {
+            if (result_init)
+                break;
+        }
+        wcs = NULL;
+        ecs = NULL;
+
+        if (aside == BTOP) {
+            ++follow;
+            ++line;
+        }
+        else {
+            --follow;
+            --line;
+        }
+    }
+
+    return result_init? 0: 1;
+}
+
+
+
+int remove_box()
+/*
+ *  foo
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t textstart = 0;            /* index of 1st line of box body */
+    size_t textend = 0;              /* index of 1st line of south side */
+    size_t boxstart = 0;             /* index of 1st line of box */
+    size_t boxend = 0;               /* index of 1st line trailing the box */
+    int m;                           /* true if a match was found */
+    size_t j;                        /* loop counter */
+
+    #ifdef DEBUG
+        fprintf (stderr, "remove_box()\n");
+    #endif
+
+    /*
+     *  If the user didn't specify a design to remove, autodetect it.
+     */
+    if (opt.design_choice_by_user == 0) {
+        /* TODO */
+        fprintf (stderr, "%s: Can\'t autodetect designs yet. Use -d.\n",
+                PROJECT);
+        return 1;
+    }
+
+    /*
+     *  Add trailing spaces to input lines (needed for recognition)
+     */
+    input.maxline += EAST_PADDING;
+    for (j=0; j<input.anz_lines; ++j) {
+        input.lines[j].text = (char *)
+            realloc (input.lines[j].text, input.maxline+1);
+        if (input.lines[j].text == NULL) {
+            perror (PROJECT);
+            return 1;
+        }
+        memset (input.lines[j].text + input.lines[j].len, ' ',
+                input.maxline - input.lines[j].len);
+        input.lines[j].text[input.maxline] = '\0';
+        input.lines[j].len = input.maxline;
+    }
+
+    /*
+     *  Debugging Code: Display contents of input structure
+     */
+    #if defined(DEBUG) && 1
+        for (j=0; j<input.anz_lines; ++j) {
+            fprintf (stderr, "%3d [%02d] \"%s\"\n", j, input.lines[j].len,
+                    input.lines[j].text);
+        }
+        fprintf (stderr, "\nLongest line: %d characters.\n", input.maxline);
+        fprintf (stderr, " Indentation: %2d spaces.\n", input.indent);
+    #endif
+
+    /*
+     *  Phase 1: Try to find out how many lines belong to the top of the box
+     */
+    boxstart = 0;
+    textstart = 0;
+    detect_horiz (BTOP, &boxstart, &textstart);
+    #ifdef DEBUG
+        fprintf (stderr, "----> First line of box is %d, ", boxstart);
+        fprintf (stderr, "first line of box body (text) is %d.\n", textstart);
+    #endif
+
+
+    /*
+     *  Phase 2: Find out how many lines belong to the bottom of the box
+     */
+    textend = 0;
+    boxend = 0;
+    detect_horiz (BBOT, &textend, &boxend);
+    #ifdef DEBUG
+        fprintf (stderr, "----> Last line of box body (text) is %d, ", textend-1);
+        fprintf (stderr, "last line of box is %d.\n", boxend-1);
+    #endif
+
+    /*
+     *  Phase 3: Iterate over body lines, removing box sides where applicable
+     */
+    for (j=textstart; j<textend; ++j) {
+        char *ws, *we, *es, *ee;         /* west start & end, east start&end */
+        char *p;
+        int c;
+
+        m = best_match (input.lines+j, &ws, &we, &es, &ee);
+        if (m < 0)
+            return 1;                    /* internal error */
+        if (m == 0) {
+            #ifdef DEBUG
+                fprintf (stderr, "line %d: no side match\n", j);
+            #endif
+        }
+        if (m > 0) {
+            #ifdef DEBUG
+                fprintf (stderr, "\033[00;33mline %2d: west: %d (\'%c\') to "
+                    "%d (\'%c\') [len %d];  east: %d (\'%c\') to %d (\'%c\')"
+                    " [len %d]\033[00m\n", j,
+                    ws? ws-input.lines[j].text:0,   ws?ws[0]:'?',
+                    we? we-input.lines[j].text-1:0, we?we[-1]:'?',
+                    ws&&we? (we-input.lines[j].text-(ws-input.lines[j].text)):0,
+                    es? es-input.lines[j].text:0,   es?es[0]:'?',
+                    ee? ee-input.lines[j].text-1:0, ee?ee[-1]:'?',
+                    es&&ee? (ee-input.lines[j].text-(es-input.lines[j].text)):0);
+            #endif
+            if (ws && we) {
+                for (p=ws; p<we; ++p)
+                    *p = ' ';
+            }
+            if (es && ee) {
+                for (p=es; p<ee; ++p)
+                    *p = ' ';
+            }
+        }
+        for (c=0; c<(int)opt.design->shape[NW].width; ++c) {
+            if (input.lines[j].text[c] != ' ')
+                break;
+        }
+        memmove (input.lines[j].text, input.lines[j].text + c,
+                input.lines[j].len - c);
+    }
+
+    /*
+     *  Phase 4: Remove box top and body lines from input
+     */
+    while (empty_line(input.lines+textstart) && textstart < textend) {
+        #ifdef DEBUG
+            fprintf (stderr, "Killing leading blank line in box body.\n");
+        #endif
+        ++textstart;
+    }
+    while (empty_line(input.lines+textend-1) && textend > textstart) {
+        #ifdef DEBUG
+            fprintf (stderr, "Killing trailing blank line in box body.\n");
+        #endif
+        --textend;
+    }
+
+    if (textstart > boxstart) {
+        for (j=boxstart; j<textstart; ++j)
+            BFREE (input.lines[j].text);
+        memmove (input.lines+boxstart, input.lines+textstart,
+                (input.anz_lines-textstart)*sizeof(line_t));
+        input.anz_lines -= textstart - boxstart;
+        textend -= textstart - boxstart;
+        boxend -= textstart - boxstart;
+    }
+    if (boxend > textend) {
+        for (j=textend; j<boxend; ++j)
+            BFREE (input.lines[j].text);
+        if (boxend < input.anz_lines) {
+            memmove (input.lines+textend, input.lines+boxend,
+                    (input.anz_lines-boxend)*sizeof(line_t));
+        }
+        input.anz_lines -= boxend - textend;
+    }
+    input.maxline = 0;
+    for (j=0; j<input.anz_lines; ++j) {
+        if (input.lines[j].len > input.maxline)
+            input.maxline = input.lines[j].len;
+    }
+    memset (input.lines + input.anz_lines, 0,
+            ((textstart - boxstart > 0 ? textstart - boxstart : 0) +
+             (boxend - textend > 0 ? boxend - textend : 0)) * sizeof(line_t));
+
+    #ifdef DEBUG
+        #if 0
+            for (j=0; j<input.anz_lines; ++j) {
+                fprintf (stderr, "%3d [%02d] \"%s\"\n", j, input.lines[j].len,
+                        input.lines[j].text);
+            }
+        #endif
+        fprintf (stderr, "Number of lines shrunk by %d.\n",
+                (textstart - boxstart > 0 ? textstart - boxstart : 0) +
+                (boxend - textend > 0 ? boxend - textend : 0));
+    #endif
+
+    return 0;                            /* all clear */
+}
+
+
+
+void output_input()
+{
+    size_t j;
+
+    for (j=0; j<input.anz_lines; ++j) {
+        if (input.lines[j].text) {
+            btrim (input.lines[j].text, &(input.lines[j].len));
+            printf ("%s\n", input.lines[j].text);
+        }
+    }
+}
+
+
+
 int main (int argc, char *argv[])
 {
     extern int yyparse();
@@ -1995,6 +2758,16 @@ int main (int argc, char *argv[])
         opt.design->minheight = opt.reqheight;
     if (opt.reqwidth > (long) opt.design->minwidth)
         opt.design->minwidth = opt.reqwidth;
+
+    if (opt.r) {
+        rc = remove_box();
+        if (rc) {
+            perror (PROJECT);
+            exit (EXIT_FAILURE);
+        }
+        output_input();
+        exit (EXIT_SUCCESS);
+    }
 
     #ifdef DEBUG
         fprintf (stderr, "Generating Box ...\n");
