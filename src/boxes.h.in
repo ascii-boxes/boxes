@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h,v 1.8 1999/06/14 12:11:54 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h,v 1.9 1999/06/17 19:08:50 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Project-wide globals and data structures
  *  Remarks:          ---
@@ -11,12 +11,14 @@
  *  Revision History:
  *
  *    $Log: boxes.h,v $
+ *    Revision 1.9  1999/06/17 19:08:50  tsjensen
+ *    Removed #pragma ident "string"
+ *    Changed VERSION to 1.0 beta
+ *    Added line_t and empty_line() prototype
+ *
  *    Revision 1.8  1999/06/14 12:11:54  tsjensen
  *    Added struct members for regexp reversion code
  *    Renamed current_reprule to current_rule, now used for both directions
- *
- *    Revision 1.7  1999/06/03 18:54:33  tsjensen
- *    *** empty log message ***
  *
  *    Revision 1.6  1999/04/09 13:32:55  tsjensen
  *    Removed code related to OFFSET blocks (obsolete)
@@ -32,9 +34,6 @@
  *    Revision 1.3  1999/03/30 09:36:58  tsjensen
  *    ... still programming ...
  *    It drew a correct box for the first time!
- *
- *    Revision 1.2  1999/03/19 17:51:19  tsjensen
- *    ... still programming ...
  *
  *    Revision 1.1  1999/03/18 15:09:34  tsjensen
  *    Initial revision
@@ -135,6 +134,7 @@ typedef struct {
     sentry_t   shape[ANZ_SHAPES];
     size_t     minwidth;
     size_t     minheight;
+    int        padding[ANZ_SIDES];
 
     reprule_t *current_rule;
     reprule_t *reprules;                 /* applied when drawing a box */
