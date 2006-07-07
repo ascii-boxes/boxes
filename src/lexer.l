@@ -2,9 +2,8 @@
 /*
  *  File:             lexer.l
  *  Date created:     March 15, 1999 (Monday, 17:16h)
- *  Author:           Copyright (C) 1999 Thomas Jensen
- *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.16 1999/08/18 18:23:41 tsjensen Exp tsjensen $
+ *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
+ *  Version:          $Id: lexer.l,v 1.17 1999/08/20 19:51:12 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *
@@ -26,6 +25,10 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.17  1999/08/20 19:51:12  tsjensen
+ *    Moved contents of YY_USER_INIT definition into a separate function which
+ *    is now called by YY_USER_INIT (better readability)
+ *
  *    Revision 1.16  1999/08/18 18:23:41  tsjensen
  *    Declared yyerrcnt to be static
  *    Added YY_USER_INIT macro to set the input buffer size to the config file
@@ -109,10 +112,9 @@
 
 
 static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.16 1999/08/18 18:23:41 tsjensen Exp tsjensen $";
-
-
+    "$Id: lexer.l,v 1.17 1999/08/20 19:51:12 tsjensen Exp tsjensen $";
 int yylineno = 1;
+
 static int yyerrcnt = 0;
 
 static char sdel = '\"';
@@ -125,15 +127,14 @@ static char sesc = '\\';
 static void inflate_inbuf();
 #define YY_USER_INIT  inflate_inbuf()
 
-
 %}
-
 
 
 %option nounput
 %option noyywrap
 %option never-interactive
 %option caseless
+%option noyylineno
 
 
 %x SAMPLE
@@ -464,7 +465,7 @@ static void inflate_inbuf()
         exit (EXIT_FAILURE);
     }
     yy_delete_buffer (YY_CURRENT_BUFFER);
-    YY_CURRENT_BUFFER = yy_create_buffer (yyin, sinf.st_size+10);
+    yy_switch_to_buffer (yy_create_buffer (yyin, sinf.st_size+10));
 }
 
 
