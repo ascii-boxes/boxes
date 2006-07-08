@@ -1,11 +1,10 @@
 #
 #   File:       Makefile
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
-#   Author:     Copyright (C) 1999 Thomas Jensen
-#               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.6 2000/04/01 18:29:17 tsjensen Exp tsjensen $
+#   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
+#   Version:    $Id: Makefile,v 1.7 2006/07/08 08:56:38 tsjensen Exp tsjensen $
 #   Format:     GNU make
-#   Web Site:   http://home.pages.de/~jensen/boxes/
+#   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6 and others
 #   Purpose:    Makefile for boxes, the box drawing program
 # 
@@ -25,6 +24,10 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.7  2006/07/08 08:56:38  tsjensen
+#     Added reminder of compilation faq
+#     Changed BVERSION to 1.0.2
+#
 #     Revision 1.6  2000/04/01 18:29:17  tsjensen
 #     Added code to add snapshot info to version number for snapshots. This
 #     affects the author only.
