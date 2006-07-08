@@ -1,11 +1,10 @@
 #
 #   File:       Makefile
 #   Creation:   August 13, 1999 (Friday, 22:13h)
-#   Author:     Copyright (C) 1999 Thomas Jensen
-#               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id$
+#   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
+#   Version:    $Id: Makefile,v 1.1 1999/08/13 20:56:09 tsjensen Exp tsjensen $
 #   Format:     GNU make
-#   Web Site:   http://home.pages.de/~jensen/boxes/
+#   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6 and others
 #   Purpose:    Makefile for boxes, the box drawing program
 #               generation of regexp handling library
@@ -25,12 +24,15 @@
 #
 #   Revision History:
 #
-#     $Log$
+#     $Log: Makefile,v $
+#     Revision 1.1  1999/08/13 20:56:09  tsjensen
+#     Initial revision
+#
 #____________________________________________________________________________
 #============================================================================
 
 
-CFLAGS   = -traditional -O -I. $(CFLAGS_ADDTL)
+CFLAGS   = -O -I. $(CFLAGS_ADDTL)
 
 ALL_CL   = regexp/regexp.c regexp/regsub.c
 C_SRC    = $(notdir $(ALL_CL))
