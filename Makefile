@@ -3,7 +3,7 @@
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.5 2000/03/17 23:52:29 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.6 2000/04/01 18:29:17 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,10 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.6  2000/04/01 18:29:17  tsjensen
+#     Added code to add snapshot info to version number for snapshots. This
+#     affects the author only.
+#
 #     Revision 1.5  2000/03/17 23:52:29  tsjensen
 #     Incremented version number to 1.0.1
 #     Renamed snapshot file name to boxes-SNAP-latest
@@ -52,7 +56,7 @@
 
 # The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/local/share/boxes
-BVERSION   = 1.0.1
+BVERSION   = 1.0.2
 
 SNAPFILE   = boxes-SNAP-$(shell date +%Y%m%d)
 WEBHOME    = $(HOME)/d/public_html/software/boxes
@@ -65,6 +69,7 @@ DOC_FILES  = doc/boxes.1 doc/boxes.1.in
 
 
 build debug boxes: src/boxes.h doc/boxes.1
+        @echo For compilation info see the boxes website at http://boxes.thomasjensen.com/
 	$(MAKE) -C src $@
 
 
