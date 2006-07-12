@@ -2,10 +2,10 @@
 /*
  *  File:             parser.y
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
- *  Author:           Copyright (C) 1999 Thomas Jensen
- *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: parser.y,v 1.21 1999/08/18 15:38:44 tsjensen Exp tsjensen $
+ *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
+ *  Version:          $Id: parser.y,v 1.22 1999-08-21 08:53:58-07 tsjensen Exp tsjensen $
  *  Language:         GNU bison (ANSI C)
+ *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Yacc parser for boxes configuration files
  *
  *  Remarks: o This program is free software; you can redistribute it and/or
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.22  1999-08-21 08:53:58-07  tsjensen
+ *    Removed check for empty sample block, which is also done in lexer.l
+ *
  *    Revision 1.21  1999/08/18 15:38:44  tsjensen
  *    Added new tokens YCHGDEL and YDELWORD
  *    Added code for DELIMITER statements
@@ -130,7 +133,7 @@
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.21 1999/08/18 15:38:44 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.22 1999-08-21 08:53:58-07 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
