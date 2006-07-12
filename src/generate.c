@@ -2,11 +2,10 @@
  *  File:             generate.c
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
- *  Author:           Copyright (C) 1999 Thomas Jensen
- *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: generate.c,v 1.8 1999/08/22 11:36:45 tsjensen Exp tsjensen $
+ *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
+ *  Version:          $Id: generate.c,v 1.9 1999-08-31 08:37:01-07 tsjensen Exp tsjensen $
  *  Language:         ANSI C
- *  World Wide Web:   http://home.pages.de/~jensen/boxes/
+ *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Box generation, i.e. the drawing of boxes
  *
  *  Remarks: o This program is free software; you can redistribute it and/or
@@ -25,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: generate.c,v $
+ *    Revision 1.9  1999-08-31 08:37:01-07  tsjensen
+ *    Applied Joe Zbiciak's patches to remove all snprintf()s and variants
+ *    Replaced snprintf() calls with calls to concat_strings() in the process
+ *
  *    Revision 1.8  1999/08/22 11:36:45  tsjensen
  *    Removed const from 2nd parameter of justify_line() function
  *
@@ -70,7 +73,7 @@
 
 
 static const char rcsid_generate_c[] =
-    "$Id: generate.c,v 1.8 1999/08/22 11:36:45 tsjensen Exp tsjensen $";
+    "$Id: generate.c,v 1.9 1999-08-31 08:37:01-07 tsjensen Exp tsjensen $";
 
 
 
