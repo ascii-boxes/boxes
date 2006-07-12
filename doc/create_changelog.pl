@@ -1,13 +1,17 @@
 #!/local/bin/perl5 -w
 #
-#  Author:       Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>
+#  Author:       Thomas Jensen <boxes@thomasjensen.com>
 #  Date created: July 12, 1999 (Monday, 13:14h)
 #  Language:     Perl 5
-#  Version:      $Id: create_changelog.pl,v 1.3 1999/08/18 18:41:41 tsjensen Exp tsjensen $
+#  Version:      $Id: create_changelog.pl,v 1.4 1999-09-10 10:33:32-07 tsjensen Exp tsjensen $
 #
 #  History:
 #
 #    $Log: create_changelog.pl,v $
+#    Revision 1.4  1999-09-10 10:33:32-07  tsjensen
+#    Renamed current snapshot archive file to boxes-SNAP-latest.tar.gz
+#    Added "milestones": Draw horizontal ruler at particular times (v1 out etc.)
+#
 #    Revision 1.3  1999/08/18 18:41:41  tsjensen
 #    Added HTML conversions for '&' and eacute
 #    Removing path from file name
