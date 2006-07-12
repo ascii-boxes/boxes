@@ -2,11 +2,10 @@
  *  File:             remove.c
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 20:59h)
- *  Author:           Copyright (C) 1999 Thomas Jensen
- *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: remove.c,v 1.5 1999/11/07 17:46:26 tsjensen Exp tsjensen $
+ *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
+ *  Version:          $Id: remove.c,v 1.6 1999-11-08 02:51:41-08 tsjensen Exp tsjensen $
  *  Language:         ANSI C
- *  World Wide Web:   http://home.pages.de/~jensen/boxes/
+ *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Box removal, i.e. the deletion of boxes
  *
  *  Remarks: o This program is free software; you can redistribute it and/or
@@ -25,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: remove.c,v $
+ *    Revision 1.6  1999-11-08 02:51:41-08  tsjensen
+ *    Bugfix: For non-empty left box sides, spaces belonging to "empty" shape
+ *    lines were not properly removed in some cases
+ *
  *    Revision 1.5  1999/11/07 17:46:26  tsjensen
  *    Bugfix: Horizontal box parts were not correctly detected if the west box
  *    side was empty (reported: Tobias Buchal)
@@ -58,7 +61,7 @@
 #include "remove.h"
 
 static const char rcsid_remove_c[] =
-    "$Id: remove.c,v 1.5 1999/11/07 17:46:26 tsjensen Exp tsjensen $";
+    "$Id: remove.c,v 1.6 1999-11-08 02:51:41-08 tsjensen Exp tsjensen $";
 
 
 
@@ -1036,7 +1039,7 @@ int remove_box()
 
 
 
-void output_input()
+void output_input (const int trim_only)
 /*
  *  Output contents of input line list "as is" to standard output, except
  *  for removal of trailing spaces (trimming).
@@ -1046,10 +1049,15 @@ void output_input()
 {
     size_t j;
 
+    #ifdef DEBUG
+        fprintf (stderr, "output_input() - enter (trim_only=%d)\n", trim_only);
+    #endif
     for (j=0; j<input.anz_lines; ++j) {
         if (input.lines[j].text) {
             btrim (input.lines[j].text, &(input.lines[j].len));
-            printf ("%s\n", input.lines[j].text);
+            if (!trim_only) {
+                printf ("%s\n", input.lines[j].text);
+            }
         }
     }
 }
