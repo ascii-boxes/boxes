@@ -1,14 +1,14 @@
-#!/local/bin/perl5 -w
+#!/usr/bin/perl -w
 #
 #  Author:       Thomas Jensen <boxes@thomasjensen.com>
 #  Date created: July 12, 1999 (Monday, 13:14h)
 #  Language:     Perl 5
-#  Version:      $Id: create_changelog.pl,v 1.4 1999-09-10 10:33:32-07 tsjensen Exp tsjensen $
+#  Version:      $Id: create_changelog.pl,v 1.4 1999/09/10 17:33:32 tsjensen Exp tsjensen $
 #
 #  History:
 #
 #    $Log: create_changelog.pl,v $
-#    Revision 1.4  1999-09-10 10:33:32-07  tsjensen
+#    Revision 1.4  1999/09/10 17:33:32  tsjensen
 #    Renamed current snapshot archive file to boxes-SNAP-latest.tar.gz
 #    Added "milestones": Draw horizontal ruler at particular times (v1 out etc.)
 #
@@ -33,8 +33,9 @@
 $#files >= 0 or die "no input files";
 
 %milestones = (
-    "1999/08/22 11:37:27" => "VERSION 1.0 RELEASED",
-    "1999/06/25 18:52:28" => "FIRST BETA RELEASED"
+    "2000-03-17 23:51:43" => "VERSION 1.0.1 RELEASED",
+    "1999-08-22 11:37:27" => "VERSION 1.0 RELEASED",
+    "1999-06-25 18:52:28" => "FIRST BETA RELEASED"
 );
 
 print '<HTML>
