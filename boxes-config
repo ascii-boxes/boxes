@@ -1,24 +1,23 @@
 #
 #   File:           boxes-config
 #   Date created:   March 17, 1999 (Wednesday, 17:02h)
-#   Author:         Thomas Jensen
-#                   tsjensen@stud.informatik.uni-erlangen.de
-#   Version:        $Id: boxes-config,v 1.15 1999/08/22 11:37:27 tsjensen Exp tsjensen $
+#   Author:         Thomas Jensen <boxes(at)thomasjensen(dot)com>
+#   Version:        $Id: boxes-config,v 1.16 2000/03/17 23:39:34 tsjensen Exp tsjensen $
 #   Format:         ASCII Text
-#   World Wide Web: http://home.pages.de/~jensen/boxes/
+#   World Wide Web: http://boxes.thomasjensen.com/
 #   Purpose:        Example configuration file for the boxes program
 #
 #   Remarks:        Extensive documentation may be found on the Web at
-#                      http://home.pages.de/~jensen/boxes/docs/
+#                      http://boxes.thomasjensen.com/docs/
 #                   The config file syntax in particular is described in
-#                      http://home.pages.de/~jensen/boxes/docs/config-syntax.html
+#                      http://boxes.thomasjensen.com/docs/config-syntax.shtml
 #____________________________________________________________________________
 #============================================================================
 
 
 BOX c
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:25h)"
 created "March 18, 1999 (Thursday, 15:25h)"
@@ -235,7 +234,7 @@ END scroll
 
 BOX simple
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.1"
 revdate "August 22, 1999 (Sunday, 12:44h)"
 created "March 18, 1999 (Thursday, 15:24h)"
@@ -263,7 +262,7 @@ END simple
 
 BOX c-cmt
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
@@ -295,7 +294,7 @@ END c-cmt
 
 BOX c-cmt2
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.1"
 revdate "August 18, 1999 (Wednesday, 17:01h)"
 created "June 17, 1999 (Thursday, 19:59h)"
@@ -322,6 +321,44 @@ reverse "\*\\/" to "*/"
 elastic (s, w)
 
 END c-cmt2
+
+
+# ============================================================================
+
+
+BOX c-cmt3
+
+author "AlpT (@freaknet.org)"
+revision "1.0"
+revdate "Fri Jun  9 11:04:42 CEST 2006"
+created "Fri Jun  9 11:04:42 CEST 2006"
+
+sample
+    /**
+     *
+     */
+    code(here); a++;
+    /**/
+ends
+
+shapes {
+    nnw ("/** ",
+         " *  ",
+         " */ ")
+      n (" ",
+         " ",
+         " ")
+    ssw ("/**/")
+      s (" ")
+}
+
+delimiter ?"
+replace "\*/" with "*\/"                 # quote closing comment tags
+reverse "\*\\/" to "*/"
+
+elastic (n,s)
+
+END c-cmt3
 
 
 # ============================================================================
@@ -363,7 +400,7 @@ END javadoc
 
 BOX html
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.1"
 revdate "August 22, 1999 (Sunday, 12:48h)"
 created "March 18, 1999 (Thursday, 15:26h)"
@@ -398,7 +435,7 @@ END html
 
 BOX shell
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:27h)"
 created "March 18, 1999 (Thursday, 15:27h)"
@@ -795,7 +832,7 @@ END girl
 
 BOX tjc
 
-author   "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.1"
 revdate  "July 16, 1999 (Friday, 18:55h)"
 created  "April 02, 1999 (Friday, 19:26h)"
@@ -848,7 +885,7 @@ END tjc
 
 BOX netdata
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate "April 09, 1999 (Friday, 19:06h)"
 created "April 09, 1999 (Friday, 19:06h)"
@@ -1361,7 +1398,7 @@ END peek
 
 BOX java-cmt
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
@@ -1389,7 +1426,7 @@ END java-cmt
 
 BOX pound-cmt
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
@@ -1416,7 +1453,7 @@ END pound-cmt
 
 BOX html-cmt
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
@@ -1442,7 +1479,7 @@ END html-cmt
 
 BOX vim-cmt
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
@@ -1471,7 +1508,7 @@ END vim-cmt
 
 BOX right
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate "June 17, 1999 (Thursday, 19:59h)"
 created "June 17, 1999 (Thursday, 19:59h)"
@@ -1559,9 +1596,110 @@ END ada-box
 # ============================================================================
 
 
+BOX boxquote
+
+author "Christian Molls <CMolls@gmx.net>"
+revdate "Die Aug 15 23:02:02 CEST 2000"
+created "Die Aug 15 23:01:50 CEST 2000"
+revision "1.0"
+
+sample
+    ,----[ mp3-wav ]
+    | #!/bin/sh
+    | # konvertiert im aktuellen Verzeichnis .mp3 in .wav
+    | for i in *.mp3; do
+    |   mpg123 -v  --stereo --rate 44100 -w "`basename "$i" .mp3`".wav "$i"
+    | done
+    `----
+ends
+
+shapes {
+    nw (",")  nnw ("---- [  ]")  n (" ")
+    w  ("|")
+    sw ("`")  ssw ("----    ")   s (" ")
+}
+
+padding {
+    horiz 1
+}
+
+elastic (w,n,s)
+
+END boxquote
+
+
+# ============================================================================
+
+
+BOX cc
+
+author "Bas van Gils <bvg@linuxfan.com>"
+revision "1.0"
+revdate "Tue Sep 19 12:06:51 CEST 2000"
+created "Tue Sep 19 12:06:51 CEST 2000"
+
+sample
+    /****************
+     *              *
+     *              *
+     ****************/
+ends
+
+shapes {
+    nw ("/*") n ("*") ne ("* ")
+     w (" *")          e ("* ")
+    sw (" *") s ("*") se ("*/")
+}
+
+delim ?"
+replace "\*/" with "*\/"               # quote closing comment tags
+reverse "\*\\/" to "*/"
+
+padding {
+    horiz 1
+}
+
+elastic (n,e,s,w)
+
+END cc
+
+
+# ============================================================================
+
+
+BOX stone
+
+author "Fredrik Steen <fsteen@stone.nu>"
+revision "1.0"
+created "April 25, 2001 (Wed 11:00)"
+
+sample
+    +-------------+
+    |    stone    |
+    +-------------+
+ends
+
+shapes {
+    nw ("+") n ("-") ne ("+")
+     w ("|")          e ("|")
+    sw ("+") s ("-") se ("+")
+}
+
+padding {
+    horiz 1
+}
+
+elastic (n,e,s,w)
+
+END stone
+
+
+# ============================================================================
+
+
 BOX test1
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample test1
 ends
@@ -1584,7 +1722,7 @@ END test1
 
 BOX test2
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample test2
 ends
@@ -1608,7 +1746,7 @@ END test2
 
 BOX test3
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample test3
 ends
@@ -1634,7 +1772,7 @@ END test3
 
 BOX test4
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample test4
 ends
@@ -1656,7 +1794,7 @@ END test4
 
 BOX test5
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample   test5
                ends
@@ -1680,7 +1818,7 @@ END test5
 
 BOX test6
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample test6
 ends   
@@ -1706,7 +1844,7 @@ END test6
 
 BOX retest
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.1"
 revdate "August 18, 1999 (Wednesday, 17:07h)"
 created "April 04, 1999 (Sunday, 18:00h)"
@@ -1736,7 +1874,7 @@ END retest
 
 BOX headline
 
-author "Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>"
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.2"
 revdate "August 22, 1999 (Sunday, 13:22h)"
 created "March 18, 1999 (Thursday, 15:25h)"
@@ -1767,6 +1905,87 @@ padding {
 elastic (n,e,s,w)
 
 END headline
+
+
+# ============================================================================
+
+
+BOX lisp-cmt
+
+author "Vijay Lakshminarayanan <liyer.vijay@gmail.com>"
+revision "1.0"
+revdate "February 20, 2006 (Monday, 20:36h)"
+created "February 20, 2006 (Monday, 20:36h)"
+
+sample
+    ;;
+    ;;  regular comments used in Lisp
+    ;;
+ends
+
+shapes {
+     w (";;")
+}
+
+padding { left 1 }
+
+elastic (w)
+
+END lisp-cmt
+
+
+#============================================================================
+
+
+BOX ccel
+
+author "Elmar Loos <elInfo@gmx.net>"
+revision "1.0"
+
+sample
+    ///////////////
+    text         //
+    here         //
+    ///////////////
+ends
+
+shapes {
+    nnw ("/") n ("/")  ne ("//")
+                        e ("//")
+    ssw ("//") s ("/") se ("//")
+}
+
+padding {
+    right 1
+}
+
+elastic (n,e,s)
+
+END ccel
+
+
+#============================================================================
+
+
+BOX underline
+
+author "Elmar Loos <elInfo@gmx.net>"
+revision "1.0"
+
+sample
+    // Bla, foo bar!
+    // ~~~~~~~~~~~~~
+ends
+
+shapes {
+     w ("// ")
+    sw ("// ") s ("~")
+}
+
+
+elastic (s,w)
+
+END underline
 
 
 
