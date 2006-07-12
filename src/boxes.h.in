@@ -1,10 +1,10 @@
 /*
  *  File:             boxes.h
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
- *  Author:           Copyright (C) 1999 Thomas Jensen
- *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.h.in,v 1.19 2000/03/17 23:43:13 tsjensen Exp tsjensen $
+ *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
+ *  Version:          $Id: boxes.h.in,v 1.20 2000-04-01 10:28:18-08 tsjensen Exp tsjensen $
  *  Language:         ANSI C
+ *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Project-wide globals and data structures
  *
  *  Remarks: o This program is free software; you can redistribute it and/or
@@ -23,6 +23,9 @@
  *  Revision History:
  *
  *    $Log: boxes.h.in,v $
+ *    Revision 1.20  2000-04-01 10:28:18-08  tsjensen
+ *    Added cld member to command line option struct (-c option)
+ *
  *    Revision 1.19  2000/03/17 23:43:13  tsjensen
  *    Added vim autocommand to set syntax highlighting to C
  *
@@ -194,6 +197,7 @@ extern char *yyfilename;                 /* name of config file */
 
 typedef struct {                         /* Command line options: */
     int       l;                         /* list available designs */
+    int       mend;                      /* 1 if -m is given, 2 in 2nd loop */
     int       r;                         /* remove box from input */
     int       tabstop;                   /* tab stop distance */
     int       padding[ANZ_SIDES];        /* in spaces or lines resp. */
