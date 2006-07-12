@@ -2,7 +2,7 @@
 #   File:       Makefile
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.7 2006/07/08 08:56:38 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.8 2006-07-08 01:58:08-07 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -24,6 +24,9 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.8  2006-07-08 01:58:08-07  tsjensen
+#     Updated email and web addresses
+#
 #     Revision 1.7  2006/07/08 08:56:38  tsjensen
 #     Added reminder of compilation faq
 #     Changed BVERSION to 1.0.2
@@ -72,7 +75,7 @@ DOC_FILES  = doc/boxes.1 doc/boxes.1.in
 
 
 build debug boxes: src/boxes.h doc/boxes.1
-        @echo For compilation info see the boxes website at http://boxes.thomasjensen.com/
+	@echo For compilation info see the boxes website at http://boxes.thomasjensen.com/
 	$(MAKE) -C src $@
 
 
