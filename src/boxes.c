@@ -1,12 +1,11 @@
 /*
  *  File:             boxes.c
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
- *  Author:           Copyright (C) 1999 Thomas Jensen
- *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.35 2000/03/21 14:26:31 tsjensen Exp tsjensen $
+ *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
+ *  Version:          $Id: boxes.c,v 1.36 2000-04-01 10:27:17-08 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
- *  World Wide Web:   http://home.pages.de/~jensen/boxes/
+ *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Filter to draw boxes around input text (and remove it).
  *                    Intended for use with vim(1).
  *
@@ -48,6 +47,9 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.36  2000-04-01 10:27:17-08  tsjensen
+ *    Added -c option (simple comment definition)
+ *
  *    Revision 1.35  2000/03/21 14:26:31  tsjensen
  *    Minor change to make boxes compile on DEC/OSF, too (S_ISDIR)
  *
@@ -246,7 +248,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.35 2000/03/21 14:26:31 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.36 2000-04-01 10:27:17-08 tsjensen Exp tsjensen $";
 
 
 
@@ -295,6 +297,7 @@ static void usage (FILE *st)
     fprintf (st, "        -i mode  indentation mode [default: box]\n");
     fprintf (st, "        -k bool  kill leading/trailing blank lines on removal or not\n");
     fprintf (st, "        -l       list available box designs w/ samples\n");
+    fprintf (st, "        -m       mend box, i.e. remove it and redraw it afterwards\n");
     fprintf (st, "        -p fmt   padding [default: none]\n");
     fprintf (st, "        -r       remove box from input\n");
     fprintf (st, "        -s wxh   specify box size (width w and/or height h)\n");
@@ -526,7 +529,7 @@ static int process_commandline (int argc, char *argv[])
      *  Parse Command Line
      */
     do {
-        oc = getopt (argc, argv, "a:c:d:f:hi:k:lp:rs:t:v");
+        oc = getopt (argc, argv, "a:c:d:f:hi:k:lmp:rs:t:v");
 
         switch (oc) {
 
@@ -666,8 +669,8 @@ static int process_commandline (int argc, char *argv[])
                  *  Display usage information and terminate
                  */
                 printf ("%s - draws any kind of box around your text (and removes it)\n", PROJECT);
-                printf ("        (c) Thomas Jensen <tsjensen@stud.informatik.uni-erlangen.de>\n");
-                printf ("        Web page: http://home.pages.de/~jensen/%s/\n", PROJECT);
+                printf ("        (c) Thomas Jensen <boxes@thomasjensen.com>\n");
+                printf ("        Web page: http://boxes.thomasjensen.com/\n");
                 usage (stdout);
                 return 42;
 
@@ -707,6 +710,14 @@ static int process_commandline (int argc, char *argv[])
                  *  List available box styles
                  */
                 opt.l = 1;
+                break;
+
+            case 'm':
+                /*
+                 *  Mend box: remove, then redraw
+                 */
+                opt.mend = 2;
+                opt.r = 1;
                 break;
 
             case 'p':
@@ -905,7 +916,7 @@ static int process_commandline (int argc, char *argv[])
 
     #if defined(DEBUG) || 0
         fprintf (stderr, "Command line option settings (excerpt):\n");
-        fprintf (stderr, "- Padding: l%d o%d r%d u%d\n", opt.padding[BLEF],
+        fprintf (stderr, "- Padding: l:%d t:%d r:%d b:%d\n", opt.padding[BLEF],
                 opt.padding[BTOP], opt.padding[BRIG], opt.padding[BBOT]);
         fprintf (stderr, "- Requested box size: %ldx%ld\n", opt.reqwidth,
                 opt.reqheight);
@@ -917,6 +928,8 @@ static int process_commandline (int argc, char *argv[])
         fprintf (stderr, "- Line justification: \'%c\'\n",
                 opt.justify? opt.justify: '?');
         fprintf (stderr, "- Kill blank lines: %d\n", opt.killblank);
+        fprintf (stderr, "- Remove box: %d\n", opt.r);
+        fprintf (stderr, "- Mend box: %d\n", opt.mend);
         fprintf (stderr, "- Design Definition W shape: %s\n",
                 opt.cld? opt.cld: "n/a");
     #endif
@@ -1389,12 +1402,15 @@ static int apply_substitutions (const int mode)
 
 
 
-static int read_all_input()
+static int read_all_input (const int use_stdin)
 /*
- *  Read entire input from stdin and store it in 'input' array.
+ *  Read entire input (possibly from stdin) and store it in 'input' array.
  *
  *  Tabs are expanded.
  *  Might allocate slightly more memory than it needs. Trade-off for speed.
+ *
+ *  use_stdin: flag indicating whether to read from stdin (use_stdin != 0)
+ *             or use the data currently present in input (use_stdin == 0).
  *
  *  RETURNS:  != 0   on error (out of memory)
  *            == 0   on success
@@ -1410,69 +1426,81 @@ static int read_all_input()
     size_t  i;
     int     rc;
 
-    input.anz_lines = 0;
     input.indent = LINE_MAX;
     input.maxline = 0;
 
-    /*
-     *  Start reading
-     */
-    while (fgets (buf, LINE_MAX+1, opt.infile))
-    {
-        if (input_size % 100 == 0) {
-            input_size += 100;
-            tmp = (line_t *) realloc (input.lines, input_size*sizeof(line_t));
-            if (tmp == NULL) {
-                perror (PROJECT);
-                BFREE (input.lines);
-                return 1;
-            }
-            input.lines = tmp;
-        }
-
-        input.lines[input.anz_lines].len = strlen (buf);
-
-        if (opt.r) {
-            input.lines[input.anz_lines].len -= 1;
-            if (buf[input.lines[input.anz_lines].len] == '\n')
-                buf[input.lines[input.anz_lines].len] = '\0';
-        }
-        else {
-            btrim (buf, &(input.lines[input.anz_lines].len));
-        }
-
-        if (input.lines[input.anz_lines].len > 0) {
-            newlen = expand_tabs_into (buf,
-                    input.lines[input.anz_lines].len, opt.tabstop, &temp);
-            if (newlen == 0) {
-                perror (PROJECT);
-                BFREE (input.lines);
-                return 1;
-            }
-            input.lines[input.anz_lines].text = temp;
-            input.lines[input.anz_lines].len = newlen;
-            temp = NULL;
-        }
-        else {
-            input.lines[input.anz_lines].text = (char *) strdup (buf);
-        }
+    if (use_stdin) {
+        input.anz_lines = 0;
 
         /*
-         *  Update length of longest line
+         *  Start reading
          */
-        if (input.lines[input.anz_lines].len > input.maxline)
-            input.maxline = input.lines[input.anz_lines].len;
+        while (fgets (buf, LINE_MAX+1, opt.infile))
+        {
+            if (input_size % 100 == 0) {
+                input_size += 100;
+                tmp = (line_t *) realloc (input.lines, input_size*sizeof(line_t));
+                if (tmp == NULL) {
+                    perror (PROJECT);
+                    BFREE (input.lines);
+                    return 1;
+                }
+                input.lines = tmp;
+            }
 
-        /*
-         *  next please
-         */
-        ++input.anz_lines;
+            input.lines[input.anz_lines].len = strlen (buf);
+
+            if (opt.r) {
+                input.lines[input.anz_lines].len -= 1;
+                if (buf[input.lines[input.anz_lines].len] == '\n')
+                    buf[input.lines[input.anz_lines].len] = '\0';
+            }
+            else {
+                btrim (buf, &(input.lines[input.anz_lines].len));
+            }
+
+            if (input.lines[input.anz_lines].len > 0) {
+                newlen = expand_tabs_into (buf,
+                        input.lines[input.anz_lines].len, opt.tabstop, &temp);
+                if (newlen == 0) {
+                    perror (PROJECT);
+                    BFREE (input.lines);
+                    return 1;
+                }
+                input.lines[input.anz_lines].text = temp;
+                input.lines[input.anz_lines].len = newlen;
+                temp = NULL;
+            }
+            else {
+                input.lines[input.anz_lines].text = (char *) strdup (buf);
+            }
+
+            /*
+             *  Update length of longest line
+             */
+            if (input.lines[input.anz_lines].len > input.maxline)
+                input.maxline = input.lines[input.anz_lines].len;
+
+            /*
+             *  next please
+             */
+            ++input.anz_lines;
+        }
+
+        if (ferror (stdin)) {
+            perror (PROJECT);
+            BFREE (input.lines);
+            return 1;
+        }
     }
 
-    if (ferror (stdin)) {
-        perror (PROJECT);
-        BFREE (input.lines);
-        return 1;
+    else {
+        /* recalculate input statistics for redrawing the mended box */
+        for (i=0; i<input.anz_lines; ++i) {
+            input.lines[i].len = strlen (input.lines[i].text);
+            if (input.lines[i].len > input.maxline)
+                input.maxline = input.lines[i].len;
+        }
     }
 
     /*
@@ -1540,6 +1568,8 @@ int main (int argc, char *argv[])
     int    rc;                           /* general return code */
     size_t pad;
     int    i;
+    int    saved_designwidth;            /* opt.design->minwith backup, used for mending */
+    int    saved_designheight;           /* opt.design->minheight backup, used for mending */
 
     #ifdef DEBUG
         fprintf (stderr, "BOXES STARTING ...\n");
@@ -1549,7 +1579,7 @@ int main (int argc, char *argv[])
      *  Process command line options
      */
     #ifdef DEBUG
-        fprintf (stderr, "Processing Comand Line ...\n");
+        fprintf (stderr, "Processing Command Line ...\n");
     #endif
     rc = process_commandline (argc, argv);
     if (rc == 42)
@@ -1608,110 +1638,120 @@ int main (int argc, char *argv[])
     }
     if (opt.indentmode)
         opt.design->indentmode = opt.indentmode;
+    saved_designwidth = opt.design->minwidth;
+    saved_designheight = opt.design->minheight;
 
-    /*
-     *  Read input lines
-     */
-    #ifdef DEBUG
-        fprintf (stderr, "Reading all input ...\n");
-    #endif
-    rc = read_all_input();
-    if (rc)
-        exit (EXIT_FAILURE);
-    if (input.anz_lines == 0)
-        exit (EXIT_SUCCESS);
+    do {
+        if (opt.mend == 1)  /* Mending a box works in two phases: */
+            opt.r = 0;      /* opt.mend == 2: remove box          */
+        --opt.mend;         /* opt.mend == 1: add it back         */
+        opt.design->minwidth = saved_designwidth;
+        opt.design->minheight = saved_designheight;
 
-    /*
-     *  Adjust box size to fit requested padding value
-     *  Command line-specified box size takes precedence over padding.
-     */
-    for (i=0; i<ANZ_SIDES; ++i) {
-        if (opt.padding[i] > -1)
-            opt.design->padding[i] = opt.padding[i];
-    }
-    pad  = opt.design->padding[BTOP] + opt.design->padding[BBOT];
-    if (pad > 0) {
-        pad += input.anz_lines;
-        pad += opt.design->shape[NW].height + opt.design->shape[SW].height;
-        if (pad > opt.design->minheight) {
-            if (opt.reqheight) {
-                for (i=0; i<(int)(pad-opt.design->minheight); ++i) {
-                    if (opt.design->padding[i%2?BBOT:BTOP])
-                        opt.design->padding[i%2?BBOT:BTOP] -= 1;
-                    else if (opt.design->padding[i%2?BTOP:BBOT])
-                        opt.design->padding[i%2?BTOP:BBOT] -= 1;
-                    else
-                        break;
-                }
-            }
-            else {
-                opt.design->minheight = pad;
-            }
-        }
-    }
-    pad = opt.design->padding[BLEF] + opt.design->padding[BRIG];
-    if (pad > 0) {
-        pad += input.maxline;
-        pad += opt.design->shape[NW].width + opt.design->shape[NE].width;
-        if (pad > opt.design->minwidth) {
-            if (opt.reqwidth) {
-                for (i=0; i<(int)(pad-opt.design->minwidth); ++i) {
-                    if (opt.design->padding[i%2?BRIG:BLEF])
-                        opt.design->padding[i%2?BRIG:BLEF] -= 1;
-                    else if (opt.design->padding[i%2?BLEF:BRIG])
-                        opt.design->padding[i%2?BLEF:BRIG] -= 1;
-                    else
-                        break;
-                }
-            }
-            else {
-                opt.design->minwidth = pad;
-            }
-        }
-    }
-
-    if (opt.r) {
         /*
-         *  Remove box
+         *  Read input lines
          */
         #ifdef DEBUG
-            fprintf (stderr, "Removing Box ...\n");
+            fprintf (stderr, "Reading all input ...\n");
         #endif
-        if (opt.killblank == -1) {
-            if (empty_side (opt.design->shape, BTOP)
-                    && empty_side (opt.design->shape, BBOT))
-                opt.killblank = 0;
-            else
-                opt.killblank = 1;
-        }
-        rc = remove_box();
+        rc = read_all_input (opt.mend);
         if (rc)
             exit (EXIT_FAILURE);
-        rc = apply_substitutions (1);
-        if (rc)
-            exit (EXIT_FAILURE);
-        output_input();
-    }
+        if (input.anz_lines == 0)
+            exit (EXIT_SUCCESS);
 
-    else {
         /*
-         *  Generate box
+         *  Adjust box size to fit requested padding value
+         *  Command line-specified box size takes precedence over padding.
          */
-        sentry_t *thebox;
-
-        #ifdef DEBUG
-            fprintf (stderr, "Generating Box ...\n");
-        #endif
-        thebox = (sentry_t *) calloc (ANZ_SIDES, sizeof(sentry_t));
-        if (thebox == NULL) {
-            perror (PROJECT);
-            exit (EXIT_FAILURE);
+        for (i=0; i<ANZ_SIDES; ++i) {
+            if (opt.padding[i] > -1)
+                opt.design->padding[i] = opt.padding[i];
         }
-        rc = generate_box (thebox);
-        if (rc)
-            exit (EXIT_FAILURE);
-        output_box (thebox);
-    }
+        pad  = opt.design->padding[BTOP] + opt.design->padding[BBOT];
+        if (pad > 0) {
+            pad += input.anz_lines;
+            pad += opt.design->shape[NW].height + opt.design->shape[SW].height;
+            if (pad > opt.design->minheight) {
+                if (opt.reqheight) {
+                    for (i=0; i<(int)(pad-opt.design->minheight); ++i) {
+                        if (opt.design->padding[i%2?BBOT:BTOP])
+                            opt.design->padding[i%2?BBOT:BTOP] -= 1;
+                        else if (opt.design->padding[i%2?BTOP:BBOT])
+                            opt.design->padding[i%2?BTOP:BBOT] -= 1;
+                        else
+                            break;
+                    }
+                }
+                else {
+                    opt.design->minheight = pad;
+                }
+            }
+        }
+        pad = opt.design->padding[BLEF] + opt.design->padding[BRIG];
+        if (pad > 0) {
+            pad += input.maxline;
+            pad += opt.design->shape[NW].width + opt.design->shape[NE].width;
+            if (pad > opt.design->minwidth) {
+                if (opt.reqwidth) {
+                    for (i=0; i<(int)(pad-opt.design->minwidth); ++i) {
+                        if (opt.design->padding[i%2?BRIG:BLEF])
+                            opt.design->padding[i%2?BRIG:BLEF] -= 1;
+                        else if (opt.design->padding[i%2?BLEF:BRIG])
+                            opt.design->padding[i%2?BLEF:BRIG] -= 1;
+                        else
+                            break;
+                    }
+                }
+                else {
+                    opt.design->minwidth = pad;
+                }
+            }
+        }
+
+        if (opt.r) {
+            /*
+             *  Remove box
+             */
+            #ifdef DEBUG
+                fprintf (stderr, "Removing Box ...\n");
+            #endif
+            if (opt.killblank == -1) {
+                if (empty_side (opt.design->shape, BTOP)
+                        && empty_side (opt.design->shape, BBOT))
+                    opt.killblank = 0;
+                else
+                    opt.killblank = 1;
+            }
+            rc = remove_box();
+            if (rc)
+                exit (EXIT_FAILURE);
+            rc = apply_substitutions (1);
+            if (rc)
+                exit (EXIT_FAILURE);
+            output_input (opt.mend > 0);
+        }
+
+        else {
+            /*
+             *  Generate box
+             */
+            sentry_t *thebox;
+
+            #ifdef DEBUG
+                fprintf (stderr, "Generating Box ...\n");
+            #endif
+            thebox = (sentry_t *) calloc (ANZ_SIDES, sizeof(sentry_t));
+            if (thebox == NULL) {
+                perror (PROJECT);
+                exit (EXIT_FAILURE);
+            }
+            rc = generate_box (thebox);
+            if (rc)
+                exit (EXIT_FAILURE);
+            output_box (thebox);
+        }
+    } while (opt.mend > 0);
 
     return EXIT_SUCCESS;
 }
