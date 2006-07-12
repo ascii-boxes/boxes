@@ -2,7 +2,7 @@
 #   File:       Makefile
 #   Creation:   August 13, 1999 (Friday, 22:13h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.1 1999/08/13 20:56:09 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.2 2006/07/08 08:47:58 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,10 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.2  2006/07/08 08:47:58  tsjensen
+#     Removed -traditional flag from CFLAGS definition
+#     Updated email and web addresses
+#
 #     Revision 1.1  1999/08/13 20:56:09  tsjensen
 #     Initial revision
 #
@@ -59,6 +63,9 @@ snap: $(ALLFILES)
 
 rcstest:
 	-for i in $(ALLFILES) ; do rcsdiff $$i ; done
+
+rcslocks:
+	rlog -L -R $(ALLFILES)
 
 logpage: $(C_SRC)
 	@echo $(ALL_CL)
