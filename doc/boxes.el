@@ -1,13 +1,13 @@
-;;; boxes.el --- use the boxes to comment regions
+;;; boxes.el --- use boxes to comment regions
 
-;; Copyright (C) 1999 Jason L. Shiffer
+;; Copyright (C) 1999, 2001, 2006 Jason L. Shiffer
 
 ;; Author: Jason L. Shiffer <jshiffer@zerotao.com>
 ;; Maintainer: jshiffer@zerotao.com
 ;; Keywords: extensions
 ;; Created: 1999-10-30
-
-;; $Id: boxes.el,v 1.0 1999/10/30 02:45:06 jshiffer Exp $
+;; Others: 
+;;   Vijay Lakshminarayanan: support for choosing boxes comment by current buffer mode. 
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 ;;; Commentary:
 
 ;; This program provides an interface to the boxes application which can be found at
-;; http://home.pages.de/~jensen/boxes/
+;; http://boxes.thomasjensen.com/
 
 ;; To use this, put it somewhere in your load path and add the following
 ;; lines to your .emacs:
@@ -39,74 +39,68 @@
 ;;          (global-set-key "\C-cr" 'boxes-remove)
 
 ;;; Code:
+(eval-when-compile (require 'cl))
 
 ;;;###autoload
 (defvar boxes-command "boxes"
   "The boxes command.")
 
-;;;###autoload
-(defvar boxes-types-alist '(("c" . "c")
-			  ("parchment" . "parchment")
-			  ("columns" . "columns")
-			  ("whirly" . "whirly")
-			  ("scroll" . "scroll")
-			  ("simple" . "simple")
-			  ("c-cmt" . "c-cmt")
-			  ("c-cmt2" . "c-cmt2")
-			  ("html" . "html")
-			  ("shell" . "shell")
-			  ("nuke" . "nuke")
-			  ("diamonds" . "diamonds")
-			  ("mouse" . "mouse")
-			  ("sunset" . "sunset")
-			  ("boy" . "boy")
-			  ("girl" . "girl")
-			  ("tjc" . "tjc")
-			  ("netdata" . "netdata")
-			  ("xes" . "xes")
-			  ("dog" . "dog")
-			  ("cat" . "cat")
-			  ("capgirl" . "capgirl")
-			  ("santa" . "santa")
-			  ("spring" . "spring")
-			  ("stark2" . "stark2")
-			  ("stark1" . "stark1")
-			  ("peek" . "peek")
-			  ("java-cmt" . "java-cmt")
-			  ("pound-cmt" . "pound-cmt")
-			  ("html-cmt" . "html-cmt")
-			  ("vim-cmt" . "vim-cmt")
-			  ("right" . "right")
-			  ("headline" . "headline"))
-  "Association of types available to the current boxes implementation.")
+(defvar boxes-types-alist
+  (ignore-errors
+   (with-temp-buffer
+     (call-process "boxes" nil t nil "-l")
+     (goto-char (point-min))
+     (let ((retval nil))
+       (while (re-search-forward "^\\([a-zA-Z][a-zA-Z0-9-]+\\) (.*):" nil t)
+	 (add-to-list 'retval (cons (match-string 1)
+				    (match-string 1))))
+       retval)))
+  "Association of types available to the current boxes implementation." )
 (make-variable-buffer-local 'boxes-types-alist)
 
 (defvar boxes-history (list nil))
 
 ;;;###autoload
-(defvar boxes-default-type "c-cmt2"
-  "The default type of comment.")
+(defvar boxes-known-modes
+  '((c-mode . "c-cmt2") (c++-mode . "c-cmt2") (java-mode . "java-cmt")
+    (html-mode . "html-cmt") (sh-mode . "pound-cmt") (perl-mode . "pound-cmt")
+    (python-mode . "pound-cmt") (ruby-mode . "pound-cmt")
+    (emacs-lisp-mode . "lisp-cmt") (lisp-mode . "lisp-cmt"))
+  "The default comment type based on file names.")
+(make-variable-buffer-local 'boxes-known-modes)
+
+;;;###autoload
+(defun boxes-set-default-type (mode)
+  "Set the default box mode according to the buffer's major mode."
+  (setq boxes-default-type (or (cdr (assoc mode boxes-known-modes)) "c-cmt2")))
+
+;;;###autoload
+(defvar boxes-default-type nil  "The default type of comment.")
 (make-variable-buffer-local 'boxes-default-type)
 
 ;;;###autoload
 (defvar boxes-args ""
   "Arguments to the boxes command.")
 (make-variable-buffer-local 'boxes-args)
-
 ;;;###autoload
 (defun boxes-create ()
-  (interactive)
-  (boxes-command-on-region (region-beginning) (region-end) boxes-default-type)
-  "Automagicly create a new box around the region based on the default type.")
+  "Automagicly create a new box around the region based on the default type."
+  (interactive "*")
+  (boxes-command-on-region (region-beginning) (region-end) boxes-default-type))
+
 
 ;;;###autoload
 (defun boxes-remove ()
-  (interactive)
-  (boxes-command-on-region (region-beginning) (region-end) boxes-default-type 1)
-  "Automagicly remove a new box around the region based on the default type.")
+  "Automagicly remove a new box around the region based on the default type."
+  (interactive "*")
+  (boxes-command-on-region (region-beginning) (region-end) boxes-default-type 1))
+
 
 ;;;###autoload
 (defun boxes-command-on-region (start end type &optional remove)
+  "Create/Remove boxes from a region.  To create just select a region and M-x boxes-command-on-region
+then you will be prompted to enter a box type.  The type selection can use tab completion on the types available.
+To remove a box simply prefix a 1 to the callL M-1 M-x boxes-command-on-region will remove a box from a region."
   (interactive (let ((string
 		      (completing-read (format "Box type (%s): " boxes-default-type)
 				       boxes-types-alist nil t nil 'boxes-history boxes-default-type)))
@@ -114,7 +108,9 @@
 		      string
 		      current-prefix-arg)))
   (if type
-      (setq boxes-default-type type))
+      (setq boxes-default-type type)
+    (setq boxes-default-type (boxes-set-default-type major-mode)
+          type boxes-default-type))
   (let ((command-string
 	 (concat boxes-command  
 		 (if remove
