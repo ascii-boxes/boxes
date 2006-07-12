@@ -1,11 +1,10 @@
 #
 #   File:       Makefile
 #   Creation:   March 18, 1999 (Thursday, 15:10h)
-#   Author:     Copyright (C) 1999 Thomas Jensen
-#               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.16 1999/11/08 10:55:13 tsjensen Exp tsjensen $
+#   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
+#   Version:    $Id: Makefile,v 1.17 2000-03-17 15:51:43-08 tsjensen Exp tsjensen $
 #   Format:     GNU make
-#   Web Site:   http://home.pages.de/~jensen/boxes/
+#   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6 and others
 #   Purpose:    Makefile for boxes, the box drawing program
 # 
@@ -25,6 +24,9 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.17  2000-03-17 15:51:43-08  tsjensen
+#     Added Makefile.Win32 and misc/* to snap generation commands
+#
 #     Revision 1.16  1999/11/08 10:55:13  tsjensen
 #     Moved config.h into ORIG_HDRCL group, so it appears in the change log Web
 #     page
