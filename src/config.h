@@ -2,10 +2,10 @@
  *  File:             config.h
  *  Project Main:     boxes.c
  *  Date created:     July 4, 1999 (Sunday, 21:04h)
- *  Author:           Copyright (C) 1999 Thomas Jensen
- *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: config.h,v 1.2 1999/08/18 18:23:06 tsjensen Exp tsjensen $
+ *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
+ *  Version:          $Id: config.h,v 1.3 1999-08-25 06:38:37-07 tsjensen Exp tsjensen $
  *  Language:         ANSI C
+ *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Please compiler and ease porting
  *
  *  Remarks: o This program is free software; you can redistribute it and/or
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: config.h,v $
+ *    Revision 1.3  1999-08-25 06:38:37-07  tsjensen
+ *    Bugfix: Changed empty #elif to #else (thanks Tommy Williams)
+ *    Port to i386/FreeBSD by Tommy Williams
+ *
  *    Revision 1.2  1999/08/18 18:23:06  tsjensen
  *    Added Linux defines. Now compiles nicely on (my) Linux.
  *
