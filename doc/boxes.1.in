@@ -1,15 +1,15 @@
 .\" @(#)boxes.1 1.0 04/01/00
 .\"
-.\" $Id: boxes.1.in,v 1.4 2000-04-01 10:26:57-08 tsjensen Exp tsjensen $
+.\" $Id: boxes.1.in,v 1.5 2006/07/12 06:18:05 tsjensen Exp tsjensen $
 .\"
-.TH boxes 1 "July 11 2006"
+.TH boxes 1 "July 18 2006"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter
 .SH SYNOPSIS
 .B boxes
 [-hlmrv] [\-a\ format] [\-d\ design] [\-f\ file] [\-i\ indent] [\-k\ bool]
-[\-p\ pad] [\-s\ size] [\-t\ tabs] [infile [outfile]]
+[\-p\ pad] [\-s\ size] [\-t\ tabopts] [infile [outfile]]
 .SH DESCRIPTION
 .I boxes
 is a text filter which can draw any kind of ASCII art box around its input
@@ -86,7 +86,7 @@ arguments for input text block positioning.
 Short hand notations (can be combined with the above arguments):
 .br
 .B l
-- (ell) short for
+(ell) - short for
 .B h\fPl\fBv\fPc\fBj\fPl
 .br
 .B c
@@ -176,7 +176,9 @@ Mend box. This removes a (possibly broken) box as with
 .B -r\fP,
 and redraws it afterwards. The mended box is drawn according to the
 options given. This may be important to know when it comes to restoring
-padding, identation, etc. for the mended box.
+padding, identation, etc. for the mended box. Implies
+.B -k
+false.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B -p \fIstring\fP
@@ -237,14 +239,62 @@ influence the box size (such as
 By default, the smallest possible box is created around the text.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -t \fIuint\fP
-Distance between tab stops. It is important that this value is set correctly,
-or tabulator characters will upset your input text. The correct value for
+.B -t \fIstring\fP
+Tab handling. This option controls how tab characters in the input text are
+handled. The option string must always begin with a
+.I uint
+number indicating the distance between tab stops. It is important that this
+value be set correctly, or tabulator characters will upset your input text.
+The correct tab distance value depends on the settings used for the text
+you are processing. A common value is 8.
+.br
+Immediately following the tab distance, optional characters can be appended,
+telling
+.I boxes
+how to treat the tabs.
+.br
+
+You can specify tab handling for two areas:
+.br
+.B l
+(ell) - leading tabs, i.e. tabs to the left of the box
+.br
+.B b
+- boxed tabs, i.e. tabs inside the box
+.br
+For each area, the following options are available:
+.br
+.B e
+- expand tabs into spaces
+.br
+.B k
+- keep tabs as close to what they were as possible
+.br
+.B u
+- unexpand tabs. This makes
+.I boxes
+turn as many spaces as possible into tabs.
+.br
+
+In order to maintain backwards compatibility, the
 .B -t
-depends on the settings used for the text you are processing. Usually, a
-value of 8 should be okay. The factory default for
+.I string
+can be just a number. In that case,
+.B l\fPe\fBb\fPe
+is assumed for tab handling, which removes all tabs and replaces them with
+spaces. The factory default for the
 .B -t
-is 8.
+option is simply 8, which is just such a case.
+.br
+For example, you could specify
+.B -t \fP4\fBl\fPu
+in order to have your leading tab (box indent) unexpanded, but the box content
+consist only of spaces. Another example would be
+.B -t \fP4\fBl\fPk\fBb\fPk,
+which would make
+.I boxes
+try to retain all your tabs in their original places. Both examples specify a
+tab distance of 4.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B -v
@@ -265,27 +315,27 @@ will try to read the system-wide config file (see FILES).
 .PP
 The syntax of
 .I boxes
-config files is described on the Web page (see below). They are quite
+config files is described on the website (see below). They are quite
 self-explanatory, though.
 .\" =======================================================================
 .SH AVAILABILITY
-.I boxes
-is available from its World Wide Web home page at
-<URL:http://boxes.thomasjensen.com/>. The Web page also features a number
+.I Boxes
+is available from its website at
+<URL:http://boxes.thomasjensen.com/>. The website also features a number
 of examples illustrating this manual page as well as more in-depth
 documentation.
 .PP
-Check out the
+Check out
 .I vim(1)
-home page at <URL:http://www.vim.org/>!
+at <URL:http://www.vim.org/>!
 .\" =======================================================================
 .SH AUTHOR
-.I boxes
+.I Boxes
 was made by Thomas Jensen <boxes@thomasjensen.com>.
 .br
 Please see the
 .I boxes
-Web page for a current email address.
+website for a current email address.
 .\" =======================================================================
 .SH VERSION
 This is
@@ -299,10 +349,12 @@ needs some more work.
 Should you notice any other unspecified behavior, please tell the author!
 .\" =======================================================================
 .SH ENVIRONMENT
-.TP 15
+.I Boxes
+recognizes the following environment variables:
+.TP 1.0i
 HOME
 The user's home directory.
-.TP 15
+.TP 1.0i
 BOXES
 Name of
 .I boxes
