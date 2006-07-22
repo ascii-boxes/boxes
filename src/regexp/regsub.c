@@ -3,7 +3,7 @@
  *  Date created:     Copyright (c) 1986 by University of Toronto.
  *  Author:           Henry Spencer.
  *                    Extensions and modifications by Thomas Jensen
- *  Version:          $Id: regsub.c,v 1.4 1999-07-20 11:51:41-07 tsjensen Exp $
+ *  Version:          $Id: regsub.c,v 1.5 2006/07/12 05:20:26 tsjensen Exp tsjensen $
  *  Language:         K&R C (traditional)
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Perform substitutions after a regexp match
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: regsub.c,v $
+ *    Revision 1.5  2006/07/12 05:20:26  tsjensen
+ *    Updated world wide web link in comment header
+ *
  *    Revision 1.4  1999-07-20 11:51:41-07  tsjensen
  *    Bugfix: REPLACE "^" with "a" caused a hangup. Now automatically declaring
  *    matches which have a length of zero to be of scope "once".
@@ -46,7 +49,7 @@
 #include "regmagic.h"
 
 char rcsid_regsub_c[] =
-    "$Id: regsub.c,v 1.4 1999-07-20 11:51:41-07 tsjensen Exp $";
+    "$Id: regsub.c,v 1.5 2006/07/12 05:20:26 tsjensen Exp tsjensen $";
 
 
 
@@ -146,6 +149,7 @@ myregsub (prog, orig, orig_len, repstr, dest, dest_size, mode)
     int rc;                              /* received return codes */
     size_t rest_size;                    /* remaining space in dest */
     size_t partlen;                      /* temp length of a piece handled */
+    extern char *strncpy();
 
     fill = 0;
     sp = orig;
