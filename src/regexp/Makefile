@@ -2,7 +2,7 @@
 #   File:       Makefile
 #   Creation:   August 13, 1999 (Friday, 22:13h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.2 2006/07/08 08:47:58 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.3 2006/07/12 21:28:38 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,9 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.3  2006/07/12 21:28:38  tsjensen
+#     Added target rcslocks
+#
 #     Revision 1.2  2006/07/08 08:47:58  tsjensen
 #     Removed -traditional flag from CFLAGS definition
 #     Updated email and web addresses
@@ -57,7 +60,7 @@ regsub.o: regsub.c regmagic.h regexp.h ../config.h
 	$(CC) $(CFLAGS) -c $<
 
 snap: $(ALLFILES)
-	if [ -z "$(SNAPFILE)" ] ; then exit 1 ; fi
+	@if [ -z "$(SNAPFILE)" ] ; then echo "make snap must be run from the main directory" ; exit 1 ; fi
 	mkdir $(SNAPFILE)/src/regexp
 	cp $(ALLFILES) $(SNAPFILE)/src/regexp
 
@@ -65,7 +68,7 @@ rcstest:
 	-for i in $(ALLFILES) ; do rcsdiff $$i ; done
 
 rcslocks:
-	rlog -L -R $(ALLFILES)
+	@rlog -L -R $(ALLFILES) | sed -e 's/^/    - src\/regexp\//'
 
 logpage: $(C_SRC)
 	@echo $(ALL_CL)
