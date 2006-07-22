@@ -27,7 +27,7 @@
 #include "regmagic.h"
 
 char rcsid_regexp_c[] =
-    "$Id$";
+    "$Id: regexp.c,v 1.3 1999/04/12 18:13:20 tsjensen Exp tsjensen $";
 
 /*
  * The "internal use only" fields in regexp.h are present to pass info from
@@ -197,7 +197,8 @@ char *exp;
 	register char *longest;
 	register int len;
 	int flags;
-	extern char *malloc();
+	extern void *malloc();
+    extern size_t strlen();
 
 	if (exp == NULL)
 		FAIL("NULL argument");
@@ -457,6 +458,7 @@ int *flagp;
 {
 	register char *ret;
 	int flags;
+    extern size_t strcspn();
 
 	*flagp = WORST;		/* Tentatively. */
 
@@ -806,6 +808,7 @@ char *prog;
 	register char *scan;	/* Current node. */
 	char *next;		/* Next node. */
 	extern char *strchr();
+    extern size_t strlen();
 
 	scan = prog;
 #ifdef DEBUG
@@ -994,6 +997,8 @@ char *p;
 	register int count = 0;
 	register char *scan;
 	register char *opnd;
+    extern size_t strlen();
+    extern char *strchr();
 
 	scan = reginput;
 	opnd = OPERAND(p);
@@ -1009,13 +1014,13 @@ char *p;
 		}
 		break;
 	case ANYOF:
-		while (*scan != '\0' && strchr(opnd, *scan) != NULL) {
+		while (*scan != '\0' && strchr(opnd, (int)(*scan)) != NULL) {
 			count++;
 			scan++;
 		}
 		break;
 	case ANYBUT:
-		while (*scan != '\0' && strchr(opnd, *scan) == NULL) {
+		while (*scan != '\0' && strchr(opnd, (int)(*scan)) == NULL) {
 			count++;
 			scan++;
 		}
