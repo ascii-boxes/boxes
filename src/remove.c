@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 20:59h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: remove.c,v 1.6 1999-11-08 02:51:41-08 tsjensen Exp tsjensen $
+ *  Version:          $Id: remove.c,v 1.7 2006/07/12 05:28:58 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Box removal, i.e. the deletion of boxes
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: remove.c,v $
+ *    Revision 1.7  2006/07/12 05:28:58  tsjensen
+ *    Updated email and web addresses in comment header
+ *    Added trim_only flag to output_input() function, used for box mending
+ *
  *    Revision 1.6  1999-11-08 02:51:41-08  tsjensen
  *    Bugfix: For non-empty left box sides, spaces belonging to "empty" shape
  *    lines were not properly removed in some cases
@@ -61,7 +65,7 @@
 #include "remove.h"
 
 static const char rcsid_remove_c[] =
-    "$Id: remove.c,v 1.6 1999-11-08 02:51:41-08 tsjensen Exp tsjensen $";
+    "$Id: remove.c,v 1.7 2006/07/12 05:28:58 tsjensen Exp tsjensen $";
 
 
 
@@ -1048,17 +1052,46 @@ void output_input (const int trim_only)
  */
 {
     size_t j;
+    size_t indent;
+    char  *indentspc;
+    int    ntabs, nspcs;
 
     #ifdef DEBUG
         fprintf (stderr, "output_input() - enter (trim_only=%d)\n", trim_only);
     #endif
-    for (j=0; j<input.anz_lines; ++j) {
-        if (input.lines[j].text) {
-            btrim (input.lines[j].text, &(input.lines[j].len));
-            if (!trim_only) {
-                printf ("%s\n", input.lines[j].text);
+    for (j=0; j<input.anz_lines; ++j)
+    {
+        if (input.lines[j].text == NULL)
+            continue;
+        btrim (input.lines[j].text, &(input.lines[j].len));
+        if (trim_only)
+            continue;
+        
+        indentspc = NULL;
+        if (opt.tabexp == 'u') {
+            indent = strspn (input.lines[j].text, " ");
+            ntabs = indent / opt.tabstop;
+            nspcs = indent % opt.tabstop;
+            indentspc = (char *) malloc (ntabs + nspcs + 1);
+            if (indentspc == NULL) {
+                perror (PROJECT);
+                return;
             }
+            memset (indentspc, (int)'\t', ntabs);
+            memset (indentspc+ntabs, (int)' ', nspcs);
+            indentspc[ntabs+nspcs] = '\0';
         }
+        else if (opt.tabexp == 'k') {
+            indentspc = tabbify_indent (j, NULL, input.indent);
+            indent = input.indent;
+        }
+        else {
+            indentspc = (char *) strdup ("");
+            indent = 0;
+        }
+        
+        printf ("%s%s\n", indentspc, input.lines[j].text + indent);
+        BFREE (indentspc);
     }
 }
 

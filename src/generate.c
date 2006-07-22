@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: generate.c,v 1.9 1999-08-31 08:37:01-07 tsjensen Exp tsjensen $
+ *  Version:          $Id: generate.c,v 1.10 2006/07/12 05:42:28 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Box generation, i.e. the drawing of boxes
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: generate.c,v $
+ *    Revision 1.10  2006/07/12 05:42:28  tsjensen
+ *    Updated email and web addresses in comment header
+ *
  *    Revision 1.9  1999-08-31 08:37:01-07  tsjensen
  *    Applied Joe Zbiciak's patches to remove all snprintf()s and variants
  *    Replaced snprintf() calls with calls to concat_strings() in the process
@@ -73,7 +76,7 @@
 
 
 static const char rcsid_generate_c[] =
-    "$Id: generate.c,v 1.9 1999-08-31 08:37:01-07 tsjensen Exp tsjensen $";
+    "$Id: generate.c,v 1.10 2006/07/12 05:42:28 tsjensen Exp tsjensen $";
 
 
 
@@ -861,6 +864,7 @@ int output_box (const sentry_t *thebox)
     size_t nol = thebox[BRIG].height;    /* number of output lines */
     char   trailspc[LINE_MAX+1];
     char  *indentspc;
+    int    indentspclen;
     size_t vfill, vfill1, vfill2;        /* empty lines/columns in box */
     size_t hfill;
     char  *hfill1, *hfill2;              /* space before/after text */
@@ -872,6 +876,8 @@ int output_box (const sentry_t *thebox)
     size_t skip_start;                   /* lines to skip for box top */
     size_t skip_end;                     /* lines to skip for box bottom */
     size_t skip_left;                    /* true if left box part is to be skipped */
+    int    ntabs, nspcs;                 /* needed for unexpand of tabs */
+    char  *restored_indent;
 
     #ifdef DEBUG
         fprintf (stderr, "Padding used: left %d, top %d, right %d, bottom %d\n",
@@ -882,14 +888,31 @@ int output_box (const sentry_t *thebox)
     /*
      *  Create string of spaces for indentation
      */
+    indentspc = NULL;
+    ntabs = nspcs = indentspclen = 0;
     if (opt.design->indentmode == 'b') {
-        indentspc = (char *) malloc (input.indent+1);
+        if (opt.tabexp == 'u') {
+            ntabs = input.indent / opt.tabstop;
+            nspcs = input.indent % opt.tabstop;
+            indentspclen = ntabs + nspcs;
+        }
+        else {
+            indentspclen = input.indent;
+        }
+        indentspc = (char *) malloc (indentspclen + 1);
         if (indentspc == NULL) {
             perror (PROJECT);
             return 1;
         }
-        memset (indentspc, (int)' ', input.indent);
-        indentspc[input.indent] = '\0';
+
+        if (opt.tabexp == 'u') {
+            memset (indentspc, (int)'\t', ntabs);
+            memset (indentspc + ntabs, (int)' ', nspcs);
+        }
+        else {
+            memset (indentspc, (int)' ', indentspclen);
+        }
+        indentspc[indentspclen] = '\0';
     }
     else {
         indentspc = (char *) strdup ("");
@@ -1004,7 +1027,8 @@ int output_box (const sentry_t *thebox)
     for (j=skip_start; j<nol-skip_end; ++j) {
 
         if (j < thebox[BTOP].height) {   /* box top */
-            concat_strings (obuf, LINE_MAX+1, 4, indentspc,
+            restored_indent = tabbify_indent (0, indentspc, indentspclen);
+            concat_strings (obuf, LINE_MAX+1, 4, restored_indent,
                     skip_left?"":thebox[BLEF].chars[j], thebox[BTOP].chars[j],
                     thebox[BRIG].chars[j]);
         }
@@ -1012,7 +1036,8 @@ int output_box (const sentry_t *thebox)
         else if (vfill1) {               /* top vfill */
             r = thebox[BTOP].width;
             trailspc[r] = '\0';
-            concat_strings (obuf, LINE_MAX+1, 4, indentspc,
+            restored_indent = tabbify_indent (0, indentspc, indentspclen);
+            concat_strings (obuf, LINE_MAX+1, 4, restored_indent,
                     skip_left?"":thebox[BLEF].chars[j], trailspc,
                     thebox[BRIG].chars[j]);
             trailspc[r] = ' ';
@@ -1031,7 +1056,8 @@ int output_box (const sentry_t *thebox)
                     return rc;
                 r = input.maxline - input.lines[ti].len;
                 trailspc[r] = '\0';
-                concat_strings (obuf, LINE_MAX+1, 7, indentspc,
+                restored_indent = tabbify_indent (ti, indentspc, indentspclen);
+                concat_strings (obuf, LINE_MAX+1, 7, restored_indent,
                         skip_left?"":thebox[BLEF].chars[j], hfill1,
                         ti >= 0? input.lines[ti].text : "", hfill2,
                         trailspc, thebox[BRIG].chars[j]);
@@ -1039,7 +1065,8 @@ int output_box (const sentry_t *thebox)
             else {                       /* bottom vfill */
                 r = thebox[BTOP].width;
                 trailspc[r] = '\0';
-                concat_strings (obuf, LINE_MAX+1, 4, indentspc,
+                restored_indent = tabbify_indent (input.anz_lines - 1, indentspc, indentspclen);
+                concat_strings (obuf, LINE_MAX+1, 4, restored_indent,
                         skip_left?"":thebox[BLEF].chars[j], trailspc,
                         thebox[BRIG].chars[j]);
             }
@@ -1047,7 +1074,8 @@ int output_box (const sentry_t *thebox)
         }
 
         else {                           /* box bottom */
-            concat_strings (obuf, LINE_MAX+1, 4, indentspc,
+            restored_indent = tabbify_indent (input.anz_lines - 1, indentspc, indentspclen);
+            concat_strings (obuf, LINE_MAX+1, 4, restored_indent,
                     skip_left?"":thebox[BLEF].chars[j],
                     thebox[BBOT].chars[j-(nol-thebox[BBOT].height)],
                     thebox[BRIG].chars[j]);
@@ -1061,6 +1089,9 @@ int output_box (const sentry_t *thebox)
         }
         else {
             btrim (obuf, &obuf_len);
+        }
+        if (opt.tabexp == 'k') {
+            BFREE (restored_indent);
         }
 
         fprintf (opt.outfile, "%s\n", obuf);
