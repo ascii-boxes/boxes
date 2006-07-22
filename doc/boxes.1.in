@@ -1,8 +1,8 @@
 .\" @(#)boxes.1 1.0 04/01/00
 .\"
-.\" $Id: boxes.1.in,v 1.5 2006/07/12 06:18:05 tsjensen Exp tsjensen $
+.\" $Id: boxes.1.in,v 1.6 2006/07/20 21:39:57 tsjensen Exp tsjensen $
 .\"
-.TH boxes 1 "July 18 2006"
+.TH boxes 1 "July 22 2006"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter
@@ -11,21 +11,21 @@ boxes \- text mode box and comment drawing filter
 [-hlmrv] [\-a\ format] [\-d\ design] [\-f\ file] [\-i\ indent] [\-k\ bool]
 [\-p\ pad] [\-s\ size] [\-t\ tabopts] [infile [outfile]]
 .SH DESCRIPTION
-.I boxes
-is a text filter which can draw any kind of ASCII art box around its input
-text. A box can also be removed, even if it has been badly damaged by
-editing of the text inside. Since boxes may be open on any side,
+.I Boxes
+is a text filter which can draw any kind of box around its input text. Box
+design choices range from simple boxes to complex ASCII art. A box can also
+be removed and repaired, even if it has been badly damaged by editing of the
+text inside. Since boxes may be open on any side,
 .I boxes
 can also be used to create regional comments in any programming language.
-With the help of an editor macro/mapping, damaged boxes can easily be
-repaired. New box designs of all sorts can easily be added and shared by
-appending to a free format configuration file.
+New box designs of all sorts can easily be added and shared by appending to
+a free format configuration file.
 .br
 .I boxes
-was intended to be used with the
+was originally intended to be used with the
 .I vim(1)
-text editor, but can be tied to any text editor which supports filters, as
-well as from the command line as a standalone tool.
+text editor, but it can be tied to any text editor which supports filters,
+as well as called from the command line as a standalone tool.
 .\" =======================================================================
 .SH OPTIONS
 Options offered by
@@ -172,7 +172,7 @@ displays detailed information about the specified design.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B -m
-Mend box. This removes a (possibly broken) box as with
+Mend box. This removes a (potentially broken) box as with
 .B -r\fP,
 and redraws it afterwards. The mended box is drawn according to the
 options given. This may be important to know when it comes to restoring
@@ -248,21 +248,10 @@ value be set correctly, or tabulator characters will upset your input text.
 The correct tab distance value depends on the settings used for the text
 you are processing. A common value is 8.
 .br
-Immediately following the tab distance, optional characters can be appended,
+Immediately following the tab distance, an optional character can be appended,
 telling
 .I boxes
-how to treat the tabs.
-.br
-
-You can specify tab handling for two areas:
-.br
-.B l
-(ell) - leading tabs, i.e. tabs to the left of the box
-.br
-.B b
-- boxed tabs, i.e. tabs inside the box
-.br
-For each area, the following options are available:
+how to treat the leading tabs. The following options are available:
 .br
 .B e
 - expand tabs into spaces
@@ -280,21 +269,16 @@ In order to maintain backwards compatibility, the
 .B -t
 .I string
 can be just a number. In that case,
-.B l\fPe\fBb\fPe
+.B e
 is assumed for tab handling, which removes all tabs and replaces them with
 spaces. The factory default for the
 .B -t
 option is simply 8, which is just such a case.
 .br
 For example, you could specify
-.B -t \fP4\fBl\fPu
-in order to have your leading tab (box indent) unexpanded, but the box content
-consist only of spaces. Another example would be
-.B -t \fP4\fBl\fPk\fBb\fPk,
-which would make
-.I boxes
-try to retain all your tabs in their original places. Both examples specify a
-tab distance of 4.
+.B -t \fP4u
+in order to have your leading tabs unexpanded. In the box content, tabs are
+always converted into spaces. The tab distance in this example is 4.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B -v
@@ -361,17 +345,15 @@ Name of
 configuration file, if different from ~/.boxes.
 .\" =======================================================================
 .SH FILES
-.TP 15
+.TP 1.0i
 $HOME/.boxes
 .I boxes
 configuration file
-.TP 15
+.TP 1.0i
 --GLOBALCONF--
 system-wide configuration file
 .\" =======================================================================
 .SH "SEE ALSO"
-.I indent(1)
-,
 .I tal(1)
 ,
 .I vim(1)
