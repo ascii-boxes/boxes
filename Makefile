@@ -2,7 +2,7 @@
 #   File:       Makefile
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.8 2006-07-08 01:58:08-07 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.9 2006-07-11 23:43:00-07 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -24,6 +24,9 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.9  2006-07-11 23:43:00-07  tsjensen
+#     Added a missing tab character
+#
 #     Revision 1.8  2006-07-08 01:58:08-07  tsjensen
 #     Updated email and web addresses
 #
@@ -65,13 +68,13 @@ GLOBALCONF = /usr/local/share/boxes
 BVERSION   = 1.0.2
 
 SNAPFILE   = boxes-SNAP-$(shell date +%Y%m%d)
-WEBHOME    = $(HOME)/d/public_html/software/boxes
-CLOGFILE   = $(WEBHOME)/changelogs.html
+WEBHOME    = $(HOME)/boxes/website
+CLOGFILE   = $(WEBHOME)/changelogs.shtml
 
 CL_FILES   = boxes-config
-RCS_FILES  = $(CL_FILES) Makefile doc/boxes.1.in
+RCS_FILES  = $(CL_FILES) Makefile doc/boxes.1.in doc/boxes.el doc/create_changelog.pl
 ALL_FILES  = COPYING README README.Win32.txt boxes-config Makefile
-DOC_FILES  = doc/boxes.1 doc/boxes.1.in
+DOC_FILES  = doc/boxes.1 doc/boxes.1.in doc/boxes.el
 
 
 build debug boxes: src/boxes.h doc/boxes.1
@@ -87,7 +90,7 @@ doc/boxes.1: doc/boxes.1.in Makefile
 
 
 clean:
-	rm -f doc/boxes.1
+	rm -f doc/boxes.1 src/boxes.h
 	$(MAKE) -C src clean
 
 locsnap: $(ALL_FILES) $(DOC_FILES)
@@ -98,6 +101,7 @@ locsnap: $(ALL_FILES) $(DOC_FILES)
 	mv $(SNAPFILE)/Makefile $(SNAPFILE)/Makefile.vin
 	cat $(SNAPFILE)/Makefile.vin | perl -ne 'if (/^(BVERSION\s*=\s*)(.*)$$/) { print "BVERSION   = above $$2 (SNAP of '`date +%d-%b-%Y`')\n"; } else { print $$_; }' > $(SNAPFILE)/Makefile
 	rm $(SNAPFILE)/Makefile.vin
+	find $(SNAPFILE) -type f -print | xargs chmod 644
 	gtar cfvz $(SNAPFILE).tar.gz $(SNAPFILE)/*
 	rm -rf $(SNAPFILE)/
 
@@ -111,6 +115,11 @@ snap: locsnap
 rcstest:
 	-for i in $(RCS_FILES) ; do rcsdiff $$i ; done
 	$(MAKE) -C src rcstest
+
+rcslocks:
+	@echo Locked files:
+	@rlog -L -R $(RCS_FILES) | sed -e 's/^/    - /'
+	@$(MAKE) -C src rcslocks
 
 logpage: $(CL_FILES)
 	cd src; ../doc/create_changelog.pl $(patsubst %,../%,$(CL_FILES)) $(shell $(MAKE) -C src -s logpage) > $(CLOGFILE)
