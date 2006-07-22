@@ -3,7 +3,7 @@
  *  File:             lexer.l
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: lexer.l,v 1.17 1999/08/20 19:51:12 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.18 2006/07/07 07:24:17 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *
@@ -25,6 +25,10 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.18  2006/07/07 07:24:17  tsjensen
+ *    Applied patch by Andreas Heiduk to facilitate compilation with
+ *    present-day flexes
+ *
  *    Revision 1.17  1999/08/20 19:51:12  tsjensen
  *    Moved contents of YY_USER_INIT definition into a separate function which
  *    is now called by YY_USER_INIT (better readability)
@@ -112,8 +116,8 @@
 
 
 static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.17 1999/08/20 19:51:12 tsjensen Exp tsjensen $";
-int yylineno = 1;
+    "$Id: lexer.l,v 1.18 2006/07/07 07:24:17 tsjensen Exp tsjensen $";
+int tjlineno = 1;
 
 static int yyerrcnt = 0;
 
@@ -156,7 +160,7 @@ SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
 
 <DELWORD,SHAPES,ELASTIC,INITIAL>[ \r\t] /* ignore whitespace */
 
-<DELWORD,SHAPES,ELASTIC,INITIAL>\n ++yylineno;
+<DELWORD,SHAPES,ELASTIC,INITIAL>\n ++tjlineno;
 
 
 <DELWORD>[^ \t\r\n]+ {
@@ -233,7 +237,7 @@ Sample {
 
 
 <SAMPLE>\n {
-    ++yylineno;
+    ++tjlineno;
     if (yyleng > 1)
         yymore();
 }
@@ -438,7 +442,7 @@ Delimiter|Delim {
     BEGIN INITIAL;
 }
 
-<SPEEDMODE>\n ++yylineno;
+<SPEEDMODE>\n ++tjlineno;
 
 <SPEEDMODE>. /* ignore anything else */
 
