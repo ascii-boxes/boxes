@@ -2,7 +2,7 @@
 #   File:       Makefile
 #   Creation:   March 18, 1999 (Thursday, 15:10h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.17 2000-03-17 15:51:43-08 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.18 2006/07/12 05:32:10 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -24,6 +24,9 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.18  2006/07/12 05:32:10  tsjensen
+#     Updated email and web addresses in comment header
+#
 #     Revision 1.17  2000-03-17 15:51:43-08  tsjensen
 #     Added Makefile.Win32 and misc/* to snap generation commands
 #
@@ -81,7 +84,7 @@ CC         = gcc
 CFLAGS     = -ansi -I. -Iregexp -Wall -W $(CFLAGS_ADDTL)
 LDFLAGS    = -Lregexp
 
-GEN_HDR    = parser.h boxes.h
+GEN_HDR    = parser.h
 GEN_SRC    = parser.c lex.yy.c
 GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
 ORIG_HDRCL = boxes.h.in config.h
@@ -93,7 +96,7 @@ ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 OTH_FILES  = Makefile
 
 ALL_CL     = $(ORIG_SRC) $(ORIG_HDRCL) $(OTH_FILES)
-ALL_FILES  = $(ORIG_FILES) $(GEN_FILES) $(OTH_FILES)
+ALL_FILES  = $(ORIG_FILES) $(GEN_FILES) $(OTH_FILES) boxes.h
 ALL_OBJ    = $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o)
 
 
@@ -106,6 +109,10 @@ debug:
 boxes: $(ALL_OBJ)
 	$(MAKE) -C regexp CC=$(CC) libregexp.a
 	$(CC) $(LDFLAGS) $(ALL_OBJ) -o boxes -lregexp
+
+boxes.h:
+	@echo File boxes.h not found or not current. Please run make in the parent directory.
+	@exit 1
 
 parser.c parser.h: parser.y boxes.h regexp/regexp.h
 	$(YACC) -o parser.c -d parser.y
@@ -127,7 +134,7 @@ parser.o: parser.c parser.h tools.h shape.h lexer.h config.h
 
 
 snap: $(ALL_FILES)
-	if [ -z "$(SNAPFILE)" ] ; then exit 1 ; fi
+	@if [ -z "$(SNAPFILE)" ] ; then echo "make snap must be run from the parent directory" ; exit 1 ; fi
 	mkdir $(SNAPFILE)/src
 	cp $(ALL_FILES) $(SNAPFILE)/src
 	cp Makefile.Win32 $(SNAPFILE)/src
@@ -139,6 +146,10 @@ snap: $(ALL_FILES)
 rcstest:
 	-for i in $(ORIG_FILES) $(OTH_FILES) ; do rcsdiff $$i ; done
 	$(MAKE) -C regexp rcstest
+
+rcslocks:
+	@rlog -L -R $(ORIG_FILES) $(OTH_FILES) | sed -e 's/^/    - src\//'
+	@$(MAKE) -C regexp rcslocks
 
 logpage: $(ALL_CL)
 	@echo $(ALL_CL) $(shell $(MAKE) -C regexp -s logpage)
