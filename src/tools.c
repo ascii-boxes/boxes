@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     June 20, 1999 (Sunday, 16:51h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: tools.c,v 1.5 1999-08-31 08:35:13-07 tsjensen Exp tsjensen $
+ *  Version:          $Id: tools.c,v 1.6 2006/07/12 05:25:47 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Provide tool functions for error reporting and some
@@ -25,6 +25,9 @@
  *  Revision History:
  *
  *    $Log: tools.c,v $
+ *    Revision 1.6  2006/07/12 05:25:47  tsjensen
+ *    Updated email and web addresses in comment header
+ *
  *    Revision 1.5  1999-08-31 08:35:13-07  tsjensen
  *    Applied Joe Zbiciak's patches to remove all snprintf()s and variants
  *    Added concat_strings() function and changed yyerror() in the process
@@ -58,7 +61,7 @@
 
 
 static const char rcsid_tools_c[] =
-    "$Id: tools.c,v 1.5 1999-08-31 08:35:13-07 tsjensen Exp tsjensen $";
+    "$Id: tools.c,v 1.6 2006/07/12 05:25:47 tsjensen Exp tsjensen $";
 
 
 
@@ -74,7 +77,7 @@ int yyerror (const char *fmt, ...)
     va_start (ap, fmt);
 
     fprintf  (stderr, "%s: %s: line %d: ", PROJECT,
-              yyfilename? yyfilename: "(null)", yylineno);
+              yyfilename? yyfilename: "(null)", tjlineno);
     vfprintf (stderr, fmt, ap);
     fputc    ('\n', stderr);
 
@@ -253,8 +256,8 @@ int empty_line (const line_t *line)
 
 
 
-size_t expand_tabs_into (const char *input_buffer, const int in_len,
-      const int tabstop, char **text)
+size_t expand_tabs_into (const char *input_buffer, const size_t in_len,
+      const int tabstop, char **text, size_t **tabpos, size_t *tabpos_len)
 /*
  *  Expand tab chars in input_buffer and store result in text.
  *
@@ -262,8 +265,11 @@ size_t expand_tabs_into (const char *input_buffer, const int in_len,
  *  in_len         length of the string in input_buffer
  *  tabstop        tab stop distance
  *  text           address of the pointer that will take the result
+ *  tabpos         array of ints giving the positions of the first
+ *                 space of an expanded tab in the text result buffer
+ *  tabpos_len     number of tabs recorded in tabpos
  *
- *  Memory will be allocated for the result.
+ *  Memory will be allocated for text and tabpos.
  *  Should only be called for lines of length > 0;
  *
  *  RETURNS:  Success: Length of the result line in characters (> 0)
@@ -273,14 +279,31 @@ size_t expand_tabs_into (const char *input_buffer, const int in_len,
  */
 {
    static char temp [LINE_MAX*MAX_TABSTOP+1];  /* work string */
-   int ii;                               /* position in input string */
-   int io;                               /* position in work string */
-   int jp;                               /* tab expansion jump point */
+   size_t ii;                            /* position in input string */
+   size_t io;                            /* position in work string */
+   size_t jp;                            /* tab expansion jump point */
+   size_t tabnum;                        /* number of tabs in input */
 
    *text = NULL;
 
-   for (ii=0, io=0; ii<in_len && io<(LINE_MAX*tabstop-1); ++ii) {
+   for (ii=0, *tabpos_len=0; ii<in_len; ++ii) {
+      if (input_buffer[ii] == '\t')
+         (*tabpos_len)++;
+   }
+   if (opt.tabexp != 'k')
+      *tabpos_len = 0;
+   if (*tabpos_len > 0) {
+      *tabpos = (size_t *) calloc ((*tabpos_len) + 1, sizeof(size_t));
+      if (*tabpos == NULL) {
+          return 0;       /* out of memory */
+      }
+   }
+
+   for (ii=0, io=0, tabnum=0; ii < in_len && ((int) io) < (LINE_MAX*tabstop-1); ++ii) {
       if (input_buffer[ii] == '\t') {
+         if (*tabpos_len > 0) {
+            (*tabpos)[tabnum++] = io;
+         }
          for (jp=io+tabstop-(io%tabstop); io<jp; ++io)
             temp[io] = ' ';
       }
@@ -362,6 +385,65 @@ char *my_strnrstr (const char *s1, const char *s2, const size_t s2_len, int skip
     }
 
     return NULL;
+}
+
+
+
+char *tabbify_indent (const size_t lineno, char *indentspc, const size_t indentspc_len)
+/*
+ *  Checks if tab expansion mode is "keep", and if so, calculates a new
+ *  indentation string based on the one given. The new string contains
+ *  tabs in their original positions.
+ *
+ *    lineno         index of the input line we are referring to
+ *    indentspc      previously calculated "space-only" indentation string
+ *                   (may be NULL). This is only used when opt.tabexp != 'k',
+ *                   in which case it will be used as the function result.
+ *    indentspc_len  desired result length, measured in spaces only
+ *
+ *  RETURNS:  if successful and opt.tabexp == 'k': new string
+ *            on error (invalid input or out of memory): NULL
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    size_t i;
+    char  *result;
+    size_t result_len;
+
+    if (opt.tabexp != 'k') {
+        return indentspc;
+    }
+    if (lineno >= input.anz_lines) {
+        return NULL;
+    }
+    if (indentspc_len == 0) {
+        return (char *) strdup ("");
+    }
+
+    result = (char *) malloc (indentspc_len + 1);
+    if (result == NULL) {
+        perror (PROJECT);
+        return NULL;
+    }
+    memset (result, (int)' ', indentspc_len);
+    result[indentspc_len] = '\0';
+    result_len = indentspc_len;
+    
+    for (i=0; i < input.lines[lineno].tabpos_len
+            && input.lines[lineno].tabpos[i] < indentspc_len; ++i)
+    {
+        size_t tpos = input.lines[lineno].tabpos[i];
+        size_t nspc = opt.tabstop - (tpos % opt.tabstop);   /* no of spcs covered by tab */
+        if (tpos + nspc > input.indent) {
+            break;
+        }
+        result[tpos] = '\t';
+        result_len -= nspc - 1;
+        result[result_len] = '\0';
+    }
+
+    return result;
 }
 
 
