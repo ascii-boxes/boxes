@@ -2,7 +2,7 @@
  *  File:             boxes.h
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: boxes.h.in,v 1.20 2000-04-01 10:28:18-08 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h.in,v 1.21 2006/07/12 05:44:12 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Project-wide globals and data structures
@@ -23,6 +23,10 @@
  *  Revision History:
  *
  *    $Log: boxes.h.in,v $
+ *    Revision 1.21  2006/07/12 05:44:12  tsjensen
+ *    Updated email and web addresses in comment header
+ *    Added new member 'mend' to opt_t (for option -m, mend box)
+ *
  *    Revision 1.20  2000-04-01 10:28:18-08  tsjensen
  *    Added cld member to command line option struct (-c option)
  *
@@ -120,7 +124,7 @@
 /*
  *  default settings of all kinds (THIS PARAGRAPH MAY BE EDITED)
  */
-#define DEF_TABSTOP     8                /* default tab stop distance (-t) */
+#define DEF_TABSTOP     8                /* default tab stop distance (part of -t) */
 #define DEF_INDENTMODE  'b'              /* indent box, not text by default */
 
 /*
@@ -191,7 +195,7 @@ extern int anz_designs;
 extern int design_idx;
 
 
-extern int yylineno;                     /* config file line counter */
+extern int tjlineno;                     /* config file line counter */
 extern char *yyfilename;                 /* name of config file */
 
 
@@ -200,6 +204,7 @@ typedef struct {                         /* Command line options: */
     int       mend;                      /* 1 if -m is given, 2 in 2nd loop */
     int       r;                         /* remove box from input */
     int       tabstop;                   /* tab stop distance */
+    char      tabexp;                    /* tab expansion mode (for leading tabs) */
     int       padding[ANZ_SIDES];        /* in spaces or lines resp. */
     design_t *design;                    /* currently used box design */
     int       design_choice_by_user;     /* true if design was chosen by user */
@@ -219,8 +224,10 @@ extern opt_t opt;
 
 
 typedef struct {
-    size_t len;
-    char  *text;
+    size_t  len;                         /* length of text in characters */
+    char   *text;                        /* line content, tabs expanded */
+    size_t *tabpos;                      /* tab positions in expanded work strings */
+    size_t  tabpos_len;                  /* number of tabs in a line */
 } line_t;
 
 #ifndef FILE_LEXER_L
