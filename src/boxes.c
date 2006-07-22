@@ -2,12 +2,11 @@
  *  File:             boxes.c
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: boxes.c,v 1.36 2000-04-01 10:27:17-08 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.37 2006/07/12 05:49:50 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Filter to draw boxes around input text (and remove it).
- *                    Intended for use with vim(1).
  *
  *  Remarks: o This program is free software; you can redistribute it
  *             and/or modify it under the terms of the GNU General Public
@@ -23,17 +22,15 @@
  *             Software Foundation, Inc., 59 Temple Place, Suite 330,
  *             Boston, MA  02111-1307  USA
  *
- *           - This version is leaking a small bit of memory. The sizes of
- *             the leaks do not depend on the number of lines processed, so
- *             the leaks don't matter as long as this program is executed as
- *             a single process.
+ *           - This version is leaking small bits of memory. Since boxes
+ *             runs as a filter in its own process, the leaks are irrelevant.
  *           - The decision to number box shapes in clockwise order was a
  *             major design mistake. Treatment of box parts of the same
  *             alignment (N-S and E-W) is usually combined in one function,
  *             which must now deal with the numbering being reversed all the
  *             time. This is nasty, but changing the shape order would
  *             pretty much mean a total rewrite of the code, so we'll have
- *             to live with it. :-(
+ *             to live with it.
  *           - All shapes defined in a box design must be used in any box of
  *             that design at least once. In other words, there must not be
  *             a shape which is defined in the config file but cannot be
@@ -47,6 +44,12 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.37  2006/07/12 05:49:50  tsjensen
+ *    Updated email and web addresses in comment header etc.
+ *    Applied patch by Elmar Loos that adds -m option for mending a box
+ *    Changed a few more things to make the box mending patch work in
+ *    connection with all the other boxes options
+ *
  *    Revision 1.36  2000-04-01 10:27:17-08  tsjensen
  *    Added -c option (simple comment definition)
  *
@@ -248,7 +251,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.36 2000-04-01 10:27:17-08 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.37 2006/07/12 05:49:50 tsjensen Exp tsjensen $";
 
 
 
@@ -291,17 +294,17 @@ static void usage (FILE *st)
     fprintf (st, "Usage:  %s [options] [infile [outfile]]\n", PROJECT);
     fprintf (st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
     fprintf (st, "        -c str   use single shape box design where str is the W shape\n");
-    fprintf (st, "        -d name  select box design [default: first one in file]\n");
-    fprintf (st, "        -f file  use only file as configuration file\n");
+    fprintf (st, "        -d name  box design [default: first one in file]\n");
+    fprintf (st, "        -f file  configuration file\n");
     fprintf (st, "        -h       print usage information\n");
     fprintf (st, "        -i mode  indentation mode [default: box]\n");
-    fprintf (st, "        -k bool  kill leading/trailing blank lines on removal or not\n");
+    fprintf (st, "        -k bool  leading/trailing blank line retention on removal\n");
     fprintf (st, "        -l       list available box designs w/ samples\n");
     fprintf (st, "        -m       mend box, i.e. remove it and redraw it afterwards\n");
     fprintf (st, "        -p fmt   padding [default: none]\n");
-    fprintf (st, "        -r       remove box from input\n");
-    fprintf (st, "        -s wxh   specify box size (width w and/or height h)\n");
-    fprintf (st, "        -t uint  set tab stop distance [default: %d]\n", DEF_TABSTOP);
+    fprintf (st, "        -r       remove box\n");
+    fprintf (st, "        -s wxh   box size (width w and/or height h)\n");
+    fprintf (st, "        -t str   tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
     fprintf (st, "        -v       print version information\n");
 }
 
@@ -520,6 +523,7 @@ static int process_commandline (int argc, char *argv[])
      */
     memset (&opt, 0, sizeof(opt_t));
     opt.tabstop = DEF_TABSTOP;
+    opt.tabexp = 'e';
     opt.killblank = -1;
     for (idummy=0; idummy<ANZ_SIDES; ++idummy)
         opt.padding[idummy] = -1;
@@ -695,13 +699,15 @@ static int process_commandline (int argc, char *argv[])
              *  Kill blank lines or not [default: design-dependent]
              */
             case 'k':
-                if (strisyes (optarg))
-                    opt.killblank = 1;
-                else if (strisno (optarg))
-                    opt.killblank = 0;
-                else {
-                    fprintf (stderr, "%s: -k: invalid parameter\n", PROJECT);
-                    return 1;
+                if (opt.killblank == -1) {
+                    if (strisyes (optarg))
+                        opt.killblank = 1;
+                    else if (strisno (optarg))
+                        opt.killblank = 0;
+                    else {
+                        fprintf (stderr, "%s: -k: invalid parameter\n", PROJECT);
+                        return 1;
+                    }
                 }
                 break;
 
@@ -718,6 +724,7 @@ static int process_commandline (int argc, char *argv[])
                  */
                 opt.mend = 2;
                 opt.r = 1;
+                opt.killblank = 0;
                 break;
 
             case 'p':
@@ -820,15 +827,43 @@ static int process_commandline (int argc, char *argv[])
 
             case 't':
                 /*
-                 *  Tab stop distance
+                 *  Tab handling. Format is n[eku]
                  */
-                idummy = (int) strtol (optarg, NULL, 10);
+                idummy = (int) strtol (optarg, &pdummy, 10);
                 if (idummy < 1 || idummy > MAX_TABSTOP) {
                     fprintf (stderr, "%s: invalid tab stop distance -- %d\n",
                             PROJECT, idummy);
                     return 1;
                 }
                 opt.tabstop = idummy;
+
+                errfl = 0;
+                if (*pdummy != '\0') {
+                    if (pdummy[1] != '\0') {
+                        errfl = 1;
+                    }
+                    else {
+                        switch (*pdummy) {
+                            case 'e': case 'E':
+                                opt.tabexp = 'e';
+                                break;
+                            case 'k': case 'K':
+                                opt.tabexp = 'k';
+                                break;
+                            case 'u': case 'U':
+                                opt.tabexp = 'u';
+                                break;
+                            default:
+                                errfl = 1;
+                                break;
+                        }
+                    }
+                }
+                if (errfl) {
+                    fprintf (stderr, "%s: invalid tab handling specification - "
+                            "%s\n", PROJECT, optarg);
+                    return 1;
+                }
                 break;
 
             case 'v':
@@ -906,7 +941,7 @@ static int process_commandline (int argc, char *argv[])
     }
 
     /*
-     *  If no config file has as yet been specified, try getting it elsewhere.
+     *  If no config file has been specified yet, try getting it elsewhere.
      */
     if (opt.cld == NULL) {
         rc = get_config_file();          /* sets yyin and yyfilename     */
@@ -921,6 +956,7 @@ static int process_commandline (int argc, char *argv[])
         fprintf (stderr, "- Requested box size: %ldx%ld\n", opt.reqwidth,
                 opt.reqheight);
         fprintf (stderr, "- Tabstop distance: %d\n", opt.tabstop);
+        fprintf (stderr, "- Tab handling: \'%c\'\n", opt.tabexp);
         fprintf (stderr, "- Alignment: horiz %c, vert %c\n",
                 opt.halign?opt.halign:'?', opt.valign?opt.valign:'?');
         fprintf (stderr, "- Indentmode: \'%c\'\n",
@@ -1461,7 +1497,9 @@ static int read_all_input (const int use_stdin)
 
             if (input.lines[input.anz_lines].len > 0) {
                 newlen = expand_tabs_into (buf,
-                        input.lines[input.anz_lines].len, opt.tabstop, &temp);
+                        input.lines[input.anz_lines].len, opt.tabstop, &temp,
+                        &(input.lines[input.anz_lines].tabpos),
+                        &(input.lines[input.anz_lines].tabpos_len));
                 if (newlen == 0) {
                     perror (PROJECT);
                     BFREE (input.lines);
@@ -1546,8 +1584,19 @@ static int read_all_input (const int use_stdin)
      *  Debugging Code: Display contents of input structure
      */
     for (i=0; i<input.anz_lines; ++i) {
-        fprintf (stderr, "%3d [%02d] \"%s\"\n", i, input.lines[i].len,
+        fprintf (stderr, "%3d [%02d] \"%s\"", i, input.lines[i].len,
                 input.lines[i].text);
+        fprintf (stderr, "\tTabs: [");
+        if (input.lines[i].tabpos != NULL) {
+            size_t j;
+            for (j=0; j<input.lines[i].tabpos_len; ++j) {
+                fprintf (stderr, "%d", input.lines[i].tabpos[j]);
+                if (j < input.lines[i].tabpos_len - 1) {
+                    fprintf (stderr, ", ");
+                }
+            }
+        }
+        fprintf (stderr, "] (%d)\n", input.lines[i].tabpos_len);
     }
     fprintf (stderr, "\nLongest line: %d characters.\n", input.maxline);
     fprintf (stderr, " Indentation: %2d spaces.\n", input.indent);
