@@ -3,7 +3,7 @@
  *  File:             parser.y
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: parser.y,v 1.22 1999-08-21 08:53:58-07 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.23 2006/07/12 05:31:25 tsjensen Exp tsjensen $
  *  Language:         GNU bison (ANSI C)
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Yacc parser for boxes configuration files
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.23  2006/07/12 05:31:25  tsjensen
+ *    Updated email and web addresses in comment header
+ *
  *    Revision 1.22  1999-08-21 08:53:58-07  tsjensen
  *    Removed check for empty sample block, which is also done in lexer.l
  *
@@ -133,7 +136,7 @@
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.22 1999-08-21 08:53:58-07 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.23 2006/07/12 05:31:25 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -852,7 +855,7 @@ block: YSAMPLE STRING YENDSAMPLE
             perror (PROJECT);
             YYABORT;
         }
-        designs[design_idx].reprules[a].line = yylineno;
+        designs[design_idx].reprules[a].line = tjlineno;
         designs[design_idx].reprules[a].mode = $2;
         designs[design_idx].anz_reprules = a + 1;
     }
@@ -883,7 +886,7 @@ block: YSAMPLE STRING YENDSAMPLE
             perror (PROJECT);
             YYABORT;
         }
-        designs[design_idx].revrules[a].line = yylineno;
+        designs[design_idx].revrules[a].line = tjlineno;
         designs[design_idx].revrules[a].mode = $2;
         designs[design_idx].anz_revrules = a + 1;
     }
