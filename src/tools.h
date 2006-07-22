@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     June 20, 1999 (Sunday, 16:57h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: tools.h,v 1.3 1999-08-31 08:38:42-07 tsjensen Exp tsjensen $
+ *  Version:          $Id: tools.h,v 1.4 2006/07/12 05:25:27 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Tool functions for error reporting and some string
@@ -25,6 +25,9 @@
  *  Revision History:
  *
  *    $Log: tools.h,v $
+ *    Revision 1.4  2006/07/12 05:25:27  tsjensen
+ *    Updated email and web addresses in comment header
+ *
  *    Revision 1.3  1999-08-31 08:38:42-07  tsjensen
  *    Added concat_strings() function prototype from Joe Zbiciak's patches
  *
@@ -57,8 +60,8 @@
 int    yyerror     (const char *fmt, ...);
 void   regerror    (char *msg);
 int    empty_line  (const line_t *line);
-size_t expand_tabs_into (const char *input_buffer, const int in_len,
-                    const int tabstop, char **text);
+size_t expand_tabs_into (const char *input_buffer, const size_t in_len,
+           const int tabstop, char **text, size_t **tabpos, size_t *tabpos_len);
 void   btrim       (char *text, size_t *len);
 char*  my_strnrstr (const char *s1, const char *s2, const size_t s2_len,
                     int skip);
@@ -66,6 +69,8 @@ int strisyes (const char *s);
 int strisno (const char *s);
 
 void concat_strings (char *dst, int max_len, int count, ...);
+
+char *tabbify_indent (const size_t lineno, char *indentspc, const size_t indentspc_len);
 
 #endif
 
