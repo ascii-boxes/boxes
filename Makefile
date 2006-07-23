@@ -2,7 +2,7 @@
 #   File:       Makefile
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.9 2006-07-11 23:43:00-07 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.10 2006/07/22 19:51:08 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -24,6 +24,11 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.10  2006/07/22 19:51:08  tsjensen
+#     Added boxes.h management
+#     Added rcslocks target
+#     Updated some of the administrative paths (not relevant for builders)
+#
 #     Revision 1.9  2006-07-11 23:43:00-07  tsjensen
 #     Added a missing tab character
 #
@@ -64,8 +69,8 @@
 
 
 # The following line (GLOBALCONF) is the only line you should need to edit!
-GLOBALCONF = /usr/local/share/boxes
-BVERSION   = 1.0.2
+GLOBALCONF = /usr/share/boxes
+BVERSION   = 1.1
 
 SNAPFILE   = boxes-SNAP-$(shell date +%Y%m%d)
 WEBHOME    = $(HOME)/boxes/website
@@ -100,7 +105,7 @@ locsnap: $(ALL_FILES) $(DOC_FILES)
 	$(MAKE) -C src SNAPFILE=../$(SNAPFILE) snap
 	mv $(SNAPFILE)/Makefile $(SNAPFILE)/Makefile.vin
 	cat $(SNAPFILE)/Makefile.vin | perl -ne 'if (/^(BVERSION\s*=\s*)(.*)$$/) { print "BVERSION   = above $$2 (SNAP of '`date +%d-%b-%Y`')\n"; } else { print $$_; }' > $(SNAPFILE)/Makefile
-	rm $(SNAPFILE)/Makefile.vin
+	rm -f $(SNAPFILE)/Makefile.vin
 	find $(SNAPFILE) -type f -print | xargs chmod 644
 	gtar cfvz $(SNAPFILE).tar.gz $(SNAPFILE)/*
 	rm -rf $(SNAPFILE)/
