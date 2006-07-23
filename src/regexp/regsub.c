@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: regsub.c,v $
+ *    Revision 1.6  2006/07/22 19:01:10  tsjensen
+ *    Added extern declaration of strncpy() to myregsub(), hoping this will clear some warnings on Debian
+ *
  *    Revision 1.5  2006/07/12 05:20:26  tsjensen
  *    Updated world wide web link in comment header
  *
@@ -45,6 +48,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <regexp.h>
 #include "regmagic.h"
 
@@ -77,7 +81,6 @@ regsub (prog, source, dest, dest_size)
     register int no;
     register int len;
     size_t fill;                         /* current number of chars in dest */
-    extern char *strncpy();
 
     if (prog == NULL || source == NULL || dest == NULL) {
         regerror("NULL parm to regsub");
@@ -149,7 +152,6 @@ myregsub (prog, orig, orig_len, repstr, dest, dest_size, mode)
     int rc;                              /* received return codes */
     size_t rest_size;                    /* remaining space in dest */
     size_t partlen;                      /* temp length of a piece handled */
-    extern char *strncpy();
 
     fill = 0;
     sp = orig;
