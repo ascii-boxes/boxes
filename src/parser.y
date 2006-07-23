@@ -3,7 +3,7 @@
  *  File:             parser.y
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: parser.y,v 1.23 2006/07/12 05:31:25 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.24 2006/07/22 19:30:55 tsjensen Exp tsjensen $
  *  Language:         GNU bison (ANSI C)
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Yacc parser for boxes configuration files
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.24  2006/07/22 19:30:55  tsjensen
+ *    Fix: Renamed yylineno to tjlineno to enable compilation on certain
+ *    flexes (reported by Andreas Heiduk)
+ *
  *    Revision 1.23  2006/07/12 05:31:25  tsjensen
  *    Updated email and web addresses in comment header
  *
@@ -136,7 +140,7 @@
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.23 2006/07/12 05:31:25 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.24 2006/07/22 19:30:55 tsjensen Exp tsjensen $";
 
 
 static int pflicht = 0;
@@ -505,7 +509,7 @@ layout YEND WORD
     {
         design_t *tmp;
         int i;
-        unsigned char *p;
+        char *p;
 
         #ifdef PARSER_DEBUG
             fprintf (stderr, "--------- ADDING DESIGN \"%s\".\n", $2);
