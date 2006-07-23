@@ -22,7 +22,9 @@
  * precedence is structured in regular expressions.  Serious changes in
  * regular-expression syntax might require a total rethink.
  */
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <regexp.h>
 #include "regmagic.h"
 
@@ -197,8 +199,6 @@ char *exp;
 	register char *longest;
 	register int len;
 	int flags;
-	extern void *malloc();
-    extern size_t strlen();
 
 	if (exp == NULL)
 		FAIL("NULL argument");
@@ -458,7 +458,6 @@ int *flagp;
 {
 	register char *ret;
 	int flags;
-    extern size_t strcspn();
 
 	*flagp = WORST;		/* Tentatively. */
 
@@ -708,7 +707,6 @@ register regexp *prog;
 register char *string;
 {
 	register char *s;
-	extern char *strchr();
 
 	/* Be paranoid... */
 	if (prog == NULL || string == NULL) {
@@ -807,8 +805,6 @@ char *prog;
 {
 	register char *scan;	/* Current node. */
 	char *next;		/* Next node. */
-	extern char *strchr();
-    extern size_t strlen();
 
 	scan = prog;
 #ifdef DEBUG
@@ -997,8 +993,6 @@ char *p;
 	register int count = 0;
 	register char *scan;
 	register char *opnd;
-    extern size_t strlen();
-    extern char *strchr();
 
 	scan = reginput;
 	opnd = OPERAND(p);
@@ -1014,13 +1008,13 @@ char *p;
 		}
 		break;
 	case ANYOF:
-		while (*scan != '\0' && strchr(opnd, (int)(*scan)) != NULL) {
+		while (*scan != '\0' && strchr(opnd, *scan) != NULL) {
 			count++;
 			scan++;
 		}
 		break;
 	case ANYBUT:
-		while (*scan != '\0' && strchr(opnd, (int)(*scan)) == NULL) {
+		while (*scan != '\0' && strchr(opnd, *scan) == NULL) {
 			count++;
 			scan++;
 		}
@@ -1071,7 +1065,6 @@ regexp *r;
 	register char *s;
 	register char op = EXACTLY;	/* Arbitrary non-END op. */
 	register char *next;
-	extern char *strchr();
 
 
 	s = r->program + 1;
