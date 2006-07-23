@@ -3,11 +3,14 @@
 #  Author:       Thomas Jensen <boxes@thomasjensen.com>
 #  Date created: July 12, 1999 (Monday, 13:14h)
 #  Language:     Perl 5
-#  Version:      $Id: create_changelog.pl,v 1.4 1999/09/10 17:33:32 tsjensen Exp tsjensen $
+#  Version:      $Id: create_changelog.pl,v 1.6 2006-07-12 19:30:40+02 tsjensen Exp tsjensen $
 #
 #  History:
 #
 #    $Log: create_changelog.pl,v $
+#    Revision 1.6  2006-07-12 19:30:40+02  tsjensen
+#    Merged with newly discovered newest version
+#
 #    Revision 1.4  1999/09/10 17:33:32  tsjensen
 #    Renamed current snapshot archive file to boxes-SNAP-latest.tar.gz
 #    Added "milestones": Draw horizontal ruler at particular times (v1 out etc.)
@@ -33,10 +36,14 @@
 $#files >= 0 or die "no input files";
 
 %milestones = (
-    "2000-03-17 23:51:43" => "VERSION 1.0.1 RELEASED",
-    "1999-08-22 11:37:27" => "VERSION 1.0 RELEASED",
-    "1999-06-25 18:52:28" => "FIRST BETA RELEASED"
+    "2006/07/23 18:28:13" => "VERSION 1.1 RELEASED",
+    "2000/03/18 01:51:43" => "VERSION 1.0.1 RELEASED",
+    "1999/08/22 13:37:27" => "VERSION 1.0 RELEASED",
+    "1999/06/25 20:52:28" => "FIRST BETA RELEASED"
 );
+
+my $tz = `date +'%z' | cut -c -3`;
+chomp($tz);
 
 print '<HTML>
 
@@ -63,7 +70,7 @@ HREF="download/boxes-SNAP-latest.tar.gz">current snapshot</A> yet.
 %cl = ();
 
 foreach $dat (sort @files) {
-    @tmp = `rlog $dat`;
+    @tmp = `rlog -z$tz $dat`;
     $start = 0;
 
     $rev = "";
@@ -79,8 +86,9 @@ foreach $dat (sort @files) {
             next;
         }
 
-        if ($tmp[$i] =~ /^date: ([^;]*);/) {
+        if ($tmp[$i] =~ /^date: ([^\+]*)\+/) {
             $datum = $1;
+            $datum =~ tr/-/\//;
         }
         if ($tmp[$i] =~ /^revision ([0-9]\.[0-9]+)/) {
             $rev = $1;
@@ -187,7 +195,7 @@ foreach $dat (sort @files) {
 print '</DL>
 
 
-<!--#include file="footer.inc.html" -->
+<!--#include file="footer.inc.shtml" -->
 
 </BODY>
 </HTML>
