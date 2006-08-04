@@ -2,7 +2,7 @@
 #   File:       Makefile
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.10 2006/07/22 19:51:08 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.11 2006/07/23 16:50:09 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -24,6 +24,10 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.11  2006/07/23 16:50:09  tsjensen
+#     Updated version number to 1.1
+#     Changed default value of GLOBALCONF to comply with current Linux standards
+#
 #     Revision 1.10  2006/07/22 19:51:08  tsjensen
 #     Added boxes.h management
 #     Added rcslocks target
@@ -111,11 +115,10 @@ locsnap: $(ALL_FILES) $(DOC_FILES)
 	rm -rf $(SNAPFILE)/
 
 snap: locsnap
-	cp $(SNAPFILE).tar.gz $(WEBHOME)/download/
-	rm -f $(WEBHOME)/download/boxes-SNAP-latest.tar.gz
-	(cd $(WEBHOME)/download; ln -s $(SNAPFILE).tar.gz boxes-SNAP-latest.tar.gz)
 	mv -i $(SNAPFILE).tar.gz archive/
 	chmod 444 archive/$(SNAPFILE).tar.gz
+	rm -f archive/boxes-SNAP-latest.tar.gz
+	(cd archive; ln -s $(SNAPFILE).tar.gz boxes-SNAP-latest.tar.gz)
 
 rcstest:
 	-for i in $(RCS_FILES) ; do rcsdiff $$i ; done
