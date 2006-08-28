@@ -2,7 +2,7 @@
  *  File:             boxes.c
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: boxes.c,v 1.37 2006/07/12 05:49:50 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.38 2006/07/22 19:40:40 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://boxes.thomasjensen.com/
@@ -44,6 +44,11 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.38  2006/07/22 19:40:40  tsjensen
+ *    Applied patch by Christoph Dreyer to support unexpansion of leading tabs
+ *    Added ability to retain leading tabs in their original positions
+ *    Mending a box with -m now implies -k false
+ *
  *    Revision 1.37  2006/07/12 05:49:50  tsjensen
  *    Updated email and web addresses in comment header etc.
  *    Applied patch by Elmar Loos that adds -m option for mending a box
@@ -251,7 +256,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.37 2006/07/12 05:49:50 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.38 2006/07/22 19:40:40 tsjensen Exp tsjensen $";
 
 
 
@@ -306,6 +311,34 @@ static void usage (FILE *st)
     fprintf (st, "        -s wxh   box size (width w and/or height h)\n");
     fprintf (st, "        -t str   tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
     fprintf (st, "        -v       print version information\n");
+}
+
+
+
+static void usage_short (FILE *st)
+/*
+ *  Print abbreviated usage information on stream st.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    fprintf (st, "Usage: %s [options] [infile [outfile]]\n", PROJECT);
+    fprintf (st, "Try `%s -h' for more information.\n", PROJECT);
+}
+
+
+
+static void usage_long (FILE *st)
+/*
+ *  Print usage information on stream st, including a header text.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    fprintf (st, "%s - draws any kind of box around your text (and removes it)\n", PROJECT);
+    fprintf (st, "        (c) Thomas Jensen <boxes@thomasjensen.com>\n");
+    fprintf (st, "        Web page: http://boxes.thomasjensen.com/\n");
+    usage (st);
 }
 
 
@@ -530,6 +563,16 @@ static int process_commandline (int argc, char *argv[])
     yyin = stdin;
 
     /*
+     *  Intercept '--help' and '-?' cases first, as they are not supported by getopt()
+     */
+    if (argc >= 2 && argv[1] != NULL
+        && (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-?") == 0))
+    {
+        usage_long (stdout);
+        return 42;
+    }
+
+    /*
      *  Parse Command Line
      */
     do {
@@ -672,10 +715,7 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Display usage information and terminate
                  */
-                printf ("%s - draws any kind of box around your text (and removes it)\n", PROJECT);
-                printf ("        (c) Thomas Jensen <boxes@thomasjensen.com>\n");
-                printf ("        Web page: http://boxes.thomasjensen.com/\n");
-                usage (stdout);
+                usage_long (stdout);
                 return 42;
 
             case 'i':
@@ -877,6 +917,7 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Missing argument or illegal option - do nothing else
                  */
+                usage_short (stderr);
                 return 1;
 
             case EOF:
@@ -906,7 +947,7 @@ static int process_commandline (int argc, char *argv[])
     else if (argv[optind+1] && argv[optind+2]) {       /* illegal third file */
         fprintf (stderr, "%s: illegal parameter -- %s\n",
                 PROJECT, argv[optind+2]);
-        usage (stderr);
+        usage_short (stderr);
         return 1;
     }
 
