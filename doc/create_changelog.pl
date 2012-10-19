@@ -3,11 +3,16 @@
 #  Author:       Thomas Jensen <boxes@thomasjensen.com>
 #  Date created: July 12, 1999 (Monday, 13:14h)
 #  Language:     Perl 5
-#  Version:      $Id: create_changelog.pl,v 1.6 2006-07-12 19:30:40+02 tsjensen Exp tsjensen $
+#  Version:      $Id: create_changelog.pl,v 1.7 2006/07/23 18:01:01 tsjensen Exp tsjensen $
 #
 #  History:
 #
 #    $Log: create_changelog.pl,v $
+#    Revision 1.7  2006/07/23 18:01:01  tsjensen
+#    Added milestone for version 1.1
+#    Changed footer include to reflect new filename
+#    Added time zone handling to rlog calls, which gives us local checkin times
+#
 #    Revision 1.6  2006-07-12 19:30:40+02  tsjensen
 #    Merged with newly discovered newest version
 #
@@ -124,8 +129,9 @@ foreach $dat (sort @files) {
             || $tmp[$i] =~ /^===============================================/)
         {
             $desc[$#desc] = "";
-            $dat =~ s/^.*\///;
-            $cl{$datum."; <STRONG>".$dat." ".$rev."</STRONG> (".$auth.")"} = [ @desc ];
+            $simpleName = $dat;
+            $simpleName =~ s/^.*\///;
+            $cl{$datum."; <STRONG>".$simpleName." ".$rev."</STRONG> (".$auth.")"} = [ @desc ];
             @desc = ();
         }
     }
@@ -159,6 +165,8 @@ foreach $dat (sort @files) {
     next unless -r $dat;
     @tmp = `rlog $dat`;
 
+    $dat =~ s/^.*\///;
+    
     @foo = ();
     $start = 0;
     @desc = ();
