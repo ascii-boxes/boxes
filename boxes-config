@@ -2,7 +2,7 @@
 #   File:           boxes-config
 #   Date created:   March 17, 1999 (Wednesday, 17:02h)
 #   Author:         Thomas Jensen <boxes(at)thomasjensen(dot)com>
-#   Version:        $Id: boxes-config,v 1.17 2006/07/12 21:05:59 tsjensen Exp tsjensen $
+#   Version:        $Id: boxes-config,v 1.18 2012/10/19 14:10:36 tsjensen Exp tsjensen $
 #   Format:         ASCII Text
 #   World Wide Web: http://boxes.thomasjensen.com/
 #   Purpose:        Example configuration file for the boxes program
@@ -401,22 +401,22 @@ END javadoc
 BOX html
 
 author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
-revision "1.1"
-revdate "August 22, 1999 (Sunday, 12:48h)"
+revision "1.2"
+revdate "October 19, 2012 (Friday, 17:32h)"
 created "March 18, 1999 (Thursday, 15:26h)"
 
 sample
-    <!-- ------------------- -->
+    <!-- - - - - - - - - - - -->
     <!--                     -->
     <!--                     -->
     <!--                     -->
-    <!-- ------------------- -->
+    <!-- - - - - - - - - - - -->
 ends
 
 shapes {
-    nw ("<!--") nnw (" ") n ("-") nne (" ") ne ("-->")
-     w ("<!--")                              e ("-->")
-    sw ("<!--") ssw (" ") s ("-") sse (" ") se ("-->")
+    nw ("<!--") nnw (" ") n ("- ") ne ("-->")
+     w ("<!--")                     e ("-->")
+    sw ("<!--") ssw (" ") s ("- ") se ("-->")
 }
 
 padding { h 1 }
