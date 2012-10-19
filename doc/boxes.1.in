@@ -1,6 +1,6 @@
 .\" @(#)boxes.1 1.1 07/23/06
 .\"
-.\" $Id: boxes.1.in,v 1.7 2006/07/22 19:49:13 tsjensen Exp tsjensen $
+.\" $Id: boxes.1.in,v 1.8 2006/07/23 13:52:01 tsjensen Exp tsjensen $
 .\"
 .TH boxes 1 "July 22 2006"
 .UC 4
@@ -8,7 +8,7 @@
 boxes \- text mode box and comment drawing filter
 .SH SYNOPSIS
 .B boxes
-[-hlmrv] [\-a\ format] [\-d\ design] [\-f\ file] [\-i\ indent] [\-k\ bool]
+[\-hlmrv] [\-a\ format] [\-d\ design] [\-f\ file] [\-i\ indent] [\-k\ bool]
 [\-p\ pad] [\-s\ size] [\-t\ tabopts] [infile [outfile]]
 .SH DESCRIPTION
 .I Boxes
@@ -32,7 +32,7 @@ Options offered by
 .I boxes
 are the following:
 .TP 0.6i
-.B -a \fIstring\fP
+.B \-a \fIstring\fP
 Alignment/positioning of text inside box. This option takes a format string
 argument which is read from left to right. The format string may not
 contain whitespace and must consist of one or more of the following
@@ -40,7 +40,7 @@ components:
 .br
 
 .B h\fPx
-- horizontal alignment of the input text block inside a potentially larger
+\- horizontal alignment of the input text block inside a potentially larger
 box. Possible values for
 .I x
 are
@@ -55,7 +55,7 @@ input text block (use the
 argument instead).
 .br
 .B v\fPx
-- vertical alignment of the input text block inside a potentially larger
+\- vertical alignment of the input text block inside a potentially larger
 box. Possible values for
 .I x
 are
@@ -67,7 +67,7 @@ are
 (bottom).
 .br
 .B j\fPx
-- justification of lines within the input text block. Possible values for
+\- justification of lines within the input text block. Possible values for
 .I x
 are
 .B l
@@ -86,76 +86,76 @@ arguments for input text block positioning.
 Short hand notations (can be combined with the above arguments):
 .br
 .B l
-(ell) - short for
+(ell) \- short for
 .B h\fPl\fBv\fPc\fBj\fPl
 .br
 .B c
-- short for
+\- short for
 .B h\fPc\fBv\fPc\fBj\fPc
 .br
 .B r
-- short for
+\- short for
 .B h\fPr\fBv\fPc\fBj\fPr
 .br
 
 The factory default setting for
-.B -a
+.B \-a
 is
 .B h\fPl\fBv\fPt.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -c \fIstring\fP
+.B \-c \fIstring\fP
 Command line design definition for simple cases. The argument of this
 option is the definition for the "west" (W) shape. The defined shape must
-consist of exactly one line, i.e. no multi-line shapes are allowed. The
-.B -c
+consist of exactly one line, i.e. no multi\-line shapes are allowed. The
+.B \-c
 option is intended as a shortcut for those cases where simple regional
 comments are to be created, which only need a certain character or sequence
 of characters to be placed in front of every line. In such cases, it is
 much more convenient to simply specify
-.B -c
+.B \-c
 than to do a complete design definition in one's config file, where the
 only shape defined is the west shape.
 .br
 This option implies a
-.B -d
+.B \-d
 and does not access the config file.
-.B -c
+.B \-c
 may of course be used in conjuction with any of the other options. By default,
-.B -c
+.B \-c
 is not specified.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -d \fIstring\fP
+.B \-d \fIstring\fP
 Design selection. The one argument of this option is the name of the design to
 use.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -f \fIstring\fP
+.B \-f \fIstring\fP
 Use alternate config file. The one argument of this option is the name of a
 valid
 .I boxes
 config file, containing new and exciting designs!
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -h
+.B \-h
 Print usage information.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -i \fIstring\fP
+.B \-i \fIstring\fP
 Indentation mode. Possible arguments are "text" (indent text inside of
 box), "box" (indent box, not text inside of box), or "none" (throw away
 indentation). Arguments may be abbreviated. The default is to indent the
 box, but not the text.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -k \fIbool\fP
+.B \-k \fIbool\fP
 Kill leading/trailing blank lines on removal. The value of
 .I bool
 can be specified as on, yes, true, 1, or t, all meaning yes, or off, no,
-false, 0, or f, which mean no. This is case-insensitive. This option only
+false, 0, or f, which mean no. This is case\-insensitive. This option only
 takes effect in connection with
-.B -r\fP.
+.B \-r\fP.
 If set to yes, leading and trailing blank lines will be removed from the
 output. If set to no, the entire content of the former box is returned.
 The default is no, if both the top and the bottom part of the box are open,
@@ -163,53 +163,53 @@ as is the case with most regional comments. If the box's design defines a
 top part or a bottom part, the default is yes.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -l
+.B \-l
 (ell) List designs. Produces a listing of all available box designs in the
 config file, along with a sample box and information about it's creator.
 Also checks syntax of the entire config file. If used in connection with
-.B -d\fP,
+.B \-d\fP,
 displays detailed information about the specified design.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -m
+.B \-m
 Mend box. This removes a (potentially broken) box as with
-.B -r\fP,
+.B \-r\fP,
 and redraws it afterwards. The mended box is drawn according to the
 options given. This may be important to know when it comes to restoring
 padding, identation, etc. for the mended box. Implies
-.B -k
+.B \-k
 false.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -p \fIstring\fP
+.B \-p \fIstring\fP
 Padding. Specify padding in spaces around the input text block for all
 sides of the box. The argument string may not contain whitespace and must
 consist of a combination of the following characters, each followed by a
 number indicating the padding in spaces:
 .br
 .B a
-- (all) give padding for all sides at once
+\- (all) give padding for all sides at once
 .br
 .B h
-- (horiz) give padding for both horizontal sides
+\- (horiz) give padding for both horizontal sides
 .br
 .B v
-- (vertical) give padding for both vertical sides
+\- (vertical) give padding for both vertical sides
 .br
 .B b
-- (bottom) give padding for bottom (south) side
+\- (bottom) give padding for bottom (south) side
 .br
 .B l
-- (left) give padding for left (west) side
+\- (left) give padding for left (west) side
 .br
 .B t
-- (top) give padding for top (north) side
+\- (top) give padding for top (north) side
 .br
 .B r
-- (right) give padding for right (east) side
+\- (right) give padding for right (east) side
 .br
 Example:
-.B -p a\fP4\fBt\fP2
+.B \-p a\fP4\fBt\fP2
 would define the padding to be 4 characters on all sides, except for the
 top of the box, where the input text block will be only 2 lines away from
 the box.
@@ -218,15 +218,15 @@ By default, unless specified otherwise in the config file, no padding is
 used.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -r
+.B \-r
 Remove box. Removes an existing box instead of drawing it. Which design to
 use is detected automatically. In order to save time or in case the
 detection does not decide correctly, combine with
-.B -d
+.B \-d
 to specify the design. The default is to draw a new box.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -s \fIwidth\fBx\fPheight\fP
+.B \-s \fIwidth\fBx\fPheight\fP
 Box size. This option specifies the desired box size in units of columns
 (for width) and lines (for height).
 If only a single number is given as argument, this number specifies the
@@ -234,12 +234,12 @@ desired box width. A single number prefixed by 'x' specifies only the box
 height.  The actual resulting box size may vary depending on the individual
 shape sizes of the chosen design. Also, other command line options may
 influence the box size (such as
-.B -p\fP).
+.B \-p\fP).
 .br
 By default, the smallest possible box is created around the text.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -t \fIstring\fP
+.B \-t \fIstring\fP
 Tab handling. This option controls how tab characters in the input text are
 handled. The option string must always begin with a
 .I uint
@@ -254,40 +254,40 @@ telling
 how to treat the leading tabs. The following options are available:
 .br
 .B e
-- expand tabs into spaces
+\- expand tabs into spaces
 .br
 .B k
-- keep tabs as close to what they were as possible
+\- keep tabs as close to what they were as possible
 .br
 .B u
-- unexpand tabs. This makes
+\- unexpand tabs. This makes
 .I boxes
 turn as many spaces as possible into tabs.
 .br
 
 In order to maintain backwards compatibility, the
-.B -t
+.B \-t
 .I string
 can be just a number. In that case,
 .B e
 is assumed for tab handling, which removes all tabs and replaces them with
 spaces. The factory default for the
-.B -t
+.B \-t
 option is simply 8, which is just such a case.
 .br
 For example, you could specify
-.B -t \fP4u
+.B \-t \fP4u
 in order to have your leading tabs unexpanded. In the box content, tabs are
 always converted into spaces. The tab distance in this example is 4.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B -v
+.B \-v
 Print out current version number.
 .\" =======================================================================
 .SH CONFIGURATION FILES
 .I Boxes
 will use the configuration file specified on the command line (using
-.B -f\fP).
+.B \-f\fP).
 If no config file is specified on the command line,
 .I boxes
 will check for the BOXES environment variable, which may contain a filename
@@ -295,18 +295,18 @@ to use. If BOXES is not set,
 .I boxes
 will try to read $HOME/.boxes and use it as a config file. Failing that,
 .I boxes
-will try to read the system-wide config file (see FILES).
+will try to read the system\-wide config file (see FILES).
 .PP
 The syntax of
 .I boxes
 config files is described on the website (see below). They are quite
-self-explanatory, though.
+self\-explanatory, though.
 .\" =======================================================================
 .SH AVAILABILITY
 .I Boxes
 is available from its website at
 <URL:http://boxes.thomasjensen.com/>. The website also features a number
-of examples illustrating this manual page as well as more in-depth
+of examples illustrating this manual page as well as more in\-depth
 documentation.
 .PP
 Check out
@@ -351,7 +351,7 @@ $HOME/.boxes
 configuration file
 .TP 1.0i
 --GLOBALCONF--
-system-wide configuration file
+system\-wide configuration file
 .\" =======================================================================
 .SH "SEE ALSO"
 .I tal(1)
