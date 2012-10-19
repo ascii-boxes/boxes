@@ -1,8 +1,8 @@
-.\" @(#)boxes.1 1.1 07/23/06
+.\" @(#)boxes.1 1.1.1 10/19/12
 .\"
-.\" $Id: boxes.1.in,v 1.8 2006/07/23 13:52:01 tsjensen Exp tsjensen $
+.\" $Id: boxes.1.in,v 1.9 2012/10/19 14:56:00 tsjensen Exp tsjensen $
 .\"
-.TH boxes 1 "July 22 2006"
+.TH boxes 1 "October 19 2012"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter
@@ -121,7 +121,7 @@ This option implies a
 .B \-d
 and does not access the config file.
 .B \-c
-may of course be used in conjuction with any of the other options. By default,
+may of course be used in conjunction with any of the other options. By default,
 .B \-c
 is not specified.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
