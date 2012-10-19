@@ -2,10 +2,10 @@
 #   File:       Makefile
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.11 2006/07/23 16:50:09 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.12 2006/08/04 20:44:00 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
-#   Platforms:  sparc/Solaris 2.6 and others
+#   Platforms:  sparc/Solaris 2.6, Linux, and others
 #   Purpose:    Makefile for boxes, the box drawing program
 # 
 #   Remarks:  o This program is free software; you can redistribute it and/or
@@ -24,6 +24,9 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.12  2006/08/04 20:44:00  tsjensen
+#     Changed the latest snap creation target to adjust to VM build environment
+#
 #     Revision 1.11  2006/07/23 16:50:09  tsjensen
 #     Updated version number to 1.1
 #     Changed default value of GLOBALCONF to comply with current Linux standards
@@ -74,14 +77,14 @@
 
 # The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/share/boxes
-BVERSION   = 1.1
+BVERSION   = 1.1.1
 
 SNAPFILE   = boxes-SNAP-$(shell date +%Y%m%d)
 WEBHOME    = $(HOME)/boxes/website
 CLOGFILE   = $(WEBHOME)/changelogs.shtml
 
-CL_FILES   = boxes-config
-RCS_FILES  = $(CL_FILES) Makefile doc/boxes.1.in doc/boxes.el doc/create_changelog.pl
+CL_FILES   = boxes-config doc/boxes.1.in
+RCS_FILES  = $(CL_FILES) Makefile doc/boxes.el doc/create_changelog.pl
 ALL_FILES  = COPYING README README.Win32.txt boxes-config Makefile
 DOC_FILES  = doc/boxes.1 doc/boxes.1.in doc/boxes.el
 
