@@ -3,11 +3,14 @@
 #  Author:       Thomas Jensen <boxes@thomasjensen.com>
 #  Date created: July 12, 1999 (Monday, 13:14h)
 #  Language:     Perl 5
-#  Version:      $Id: create_changelog.pl,v 1.7 2006/07/23 18:01:01 tsjensen Exp tsjensen $
+#  Version:      $Id: create_changelog.pl,v 1.8 2012/10/19 16:42:10 tsjensen Exp tsjensen $
 #
 #  History:
 #
 #    $Log: create_changelog.pl,v $
+#    Revision 1.8  2012/10/19 16:42:10  tsjensen
+#    Include files in non-src subfolders in the list of files at the end of the created document
+#
 #    Revision 1.7  2006/07/23 18:01:01  tsjensen
 #    Added milestone for version 1.1
 #    Changed footer include to reflect new filename
@@ -41,6 +44,7 @@
 $#files >= 0 or die "no input files";
 
 %milestones = (
+    "2012/10/19 17:33:21" => "VERSION 1.1.1 RELEASED",
     "2006/07/23 18:28:13" => "VERSION 1.1 RELEASED",
     "2000/03/18 01:51:43" => "VERSION 1.0.1 RELEASED",
     "1999/08/22 13:37:27" => "VERSION 1.0 RELEASED",
