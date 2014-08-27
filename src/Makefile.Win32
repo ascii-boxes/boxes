@@ -1,11 +1,12 @@
 #
-#   File:       Makefile
+#   File:       Makefile.Win32
 #   Creation:   March 18, 1999 (Thursday, 15:10h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.19 2006/07/22 19:07:21 tsjensen Exp $
+#               Win32 Modifications by Ron Aaron <ron@mossbayeng.com>
+#   Version:    $Id: Makefile,v 1.16 1999/11/08 10:55:13 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
-#   Platforms:  sparc/Solaris 2.6 and others
+#   Platforms:  win32
 #   Purpose:    Makefile for boxes, the box drawing program
 # 
 #   Remarks:  o This program is free software; you can redistribute it and/or
@@ -24,16 +25,8 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
-#     Revision 1.19  2006/07/22 19:07:21  tsjensen
-#     The file boxes.h is now managed by the top level Makefile only
-#     Added rcslocks target to check lock status
-#     Small usability enhancements
-#
-#     Revision 1.18  2006/07/12 05:32:10  tsjensen
-#     Updated email and web addresses in comment header
-#
-#     Revision 1.17  2000-03-17 15:51:43-08  tsjensen
-#     Added Makefile.Win32 and misc/* to snap generation commands
+#     Revision 1.17  2000/03/16 10:55:13  ronaaron
+#     Win32 port
 #
 #     Revision 1.16  1999/11/08 10:55:13  tsjensen
 #     Moved config.h into ORIG_HDRCL group, so it appears in the change log Web
@@ -86,10 +79,10 @@
 LEX        = flex
 YACC       = bison
 CC         = gcc
-CFLAGS     = -ansi -I. -Iregexp -Wall -W $(CFLAGS_ADDTL)
-LDFLAGS    = -Lregexp
+CFLAGS     = -Os -s -I. -Iregexp -Wall -W $(CFLAGS_ADDTL)
+LDFLAGS    = -s
 
-GEN_HDR    = parser.h
+GEN_HDR    = parser.h boxes.h
 GEN_SRC    = parser.c lex.yy.c
 GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
 ORIG_HDRCL = boxes.h.in config.h
@@ -101,30 +94,20 @@ ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 OTH_FILES  = Makefile
 
 ALL_CL     = $(ORIG_SRC) $(ORIG_HDRCL) $(OTH_FILES)
-ALL_FILES  = $(ORIG_FILES) $(GEN_FILES) $(OTH_FILES) boxes.h
-ALL_OBJ    = $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o)
+ALL_FILES  = $(ORIG_FILES) $(GEN_FILES) $(OTH_FILES)
+ALL_OBJ    = $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o) regexp/regexp.o \
+	regexp/regsub.o misc/getopt.o
 
-
-build:
-	$(MAKE) CFLAGS_ADDTL=-O boxes
-	strip boxes
-debug:
-	$(MAKE) CFLAGS_ADDTL=-g boxes
 
 boxes: $(ALL_OBJ)
-	$(MAKE) -C regexp CC=$(CC) libregexp.a
-	$(CC) $(LDFLAGS) $(ALL_OBJ) -o boxes -lregexp
-
-boxes.h:
-	@echo File boxes.h not found or not current. Please run make in the parent directory.
-	@exit 1
+	$(CC) $(LDFLAGS) $(ALL_OBJ) -o boxes -lkernel32
 
 parser.c parser.h: parser.y boxes.h regexp/regexp.h
 	$(YACC) -o parser.c -d parser.y
 
 lex.yy.c: lexer.l boxes.h
 	$(LEX) -t lexer.l > lexer.tmp.c
-	echo '#include "config.h"' > lex.yy.c
+	echo #include "config.h" > lex.yy.c
 	cat lexer.tmp.c >> lex.yy.c
 	rm lexer.tmp.c
 
@@ -136,25 +119,21 @@ generate.o: generate.c generate.h boxes.h shape.h tools.h config.h
 remove.o: remove.c remove.h boxes.h shape.h tools.h config.h
 lex.yy.o: lex.yy.c parser.h tools.h shape.h lexer.h config.h
 parser.o: parser.c parser.h tools.h shape.h lexer.h config.h
+regexp/regexp.o: regexp/regexp.c
+regexp/regsub.o: regexp/regsub.c
+misc/getopt.o: misc/getopt.c
 
 
 snap: $(ALL_FILES)
-	@if [ -z "$(SNAPFILE)" ] ; then echo "make snap must be run from the parent directory" ; exit 1 ; fi
+	if [ -z "$(SNAPFILE)" ] ; then exit 1 ; fi
 	mkdir $(SNAPFILE)/src
 	cp $(ALL_FILES) $(SNAPFILE)/src
-	cp Makefile.Win32 $(SNAPFILE)/src
-	mkdir $(SNAPFILE)/src/misc
-	cp misc/getopt.c misc/getopt.h $(SNAPFILE)/src/misc
 	touch $(patsubst %,$(SNAPFILE)/src/%,$(GEN_FILES))
 	$(MAKE) -C regexp SNAPFILE=../$(SNAPFILE) snap
 
 rcstest:
 	-for i in $(ORIG_FILES) $(OTH_FILES) ; do rcsdiff $$i ; done
 	$(MAKE) -C regexp rcstest
-
-rcslocks:
-	@rlog -L -R $(ORIG_FILES) $(OTH_FILES) | sed -e 's/^/    - src\//'
-	@$(MAKE) -C regexp rcslocks
 
 logpage: $(ALL_CL)
 	@echo $(ALL_CL) $(shell $(MAKE) -C regexp -s logpage)
@@ -168,6 +147,14 @@ clean:
 love:
 	@echo "Not in front of the kids, honey!"
 
+boxes.h: boxes.h.in
+	cp boxes.h.in boxes.h
 
+build:
+	$(MAKE) CFLAGS_ADDTL=-O boxes
+	strip boxes
+	
+debug:
+	$(MAKE) CFLAGS_ADDTL=-g boxes
 
 #EOF

@@ -2,7 +2,7 @@
  *  File:             boxes.h
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: boxes.h.in,v 1.21 2006/07/12 05:44:12 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.h.in,v 1.22 2006/07/22 19:15:52 tsjensen Exp $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Project-wide globals and data structures
@@ -23,6 +23,12 @@
  *  Revision History:
  *
  *    $Log: boxes.h.in,v $
+ *    Revision 1.22  2006/07/22 19:15:52  tsjensen
+ *    Fix: Renamed yylineno to tjlineno to enable compilation on certain
+ *    flexes (reported by Andreas Heiduk)
+ *    Added tabexp to opt_t
+ *    Added tabpos and tabpos_len to line_t for advanced tab handling
+ *
  *    Revision 1.21  2006/07/12 05:44:12  tsjensen
  *    Updated email and web addresses in comment header
  *    Added new member 'mend' to opt_t (for option -m, mend box)

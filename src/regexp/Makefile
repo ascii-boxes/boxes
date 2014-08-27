@@ -2,7 +2,7 @@
 #   File:       Makefile
 #   Creation:   August 13, 1999 (Friday, 22:13h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.3 2006/07/12 21:28:38 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.4 2006/07/22 19:04:30 tsjensen Exp $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,9 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.4  2006/07/22 19:04:30  tsjensen
+#     Small usability enhancements
+#
 #     Revision 1.3  2006/07/12 21:28:38  tsjensen
 #     Added target rcslocks
 #

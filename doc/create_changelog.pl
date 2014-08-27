@@ -3,11 +3,14 @@
 #  Author:       Thomas Jensen <boxes@thomasjensen.com>
 #  Date created: July 12, 1999 (Monday, 13:14h)
 #  Language:     Perl 5
-#  Version:      $Id: create_changelog.pl,v 1.8 2012/10/19 16:42:10 tsjensen Exp tsjensen $
+#  Version:      $Id: create_changelog.pl,v 1.9 2012/10/19 18:44:25 tsjensen Exp $
 #
 #  History:
 #
 #    $Log: create_changelog.pl,v $
+#    Revision 1.9  2012/10/19 18:44:25  tsjensen
+#    Added milestone for version 1.1.1
+#
 #    Revision 1.8  2012/10/19 16:42:10  tsjensen
 #    Include files in non-src subfolders in the list of files at the end of the created document
 #

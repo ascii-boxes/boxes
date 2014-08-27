@@ -1,0 +1,11 @@
+# Note: Better user vh-man2html !!
+
+outfile=boxes.1.shtml
+if [ -e $outfile ]; then
+    cp -a $outfile $outfile"."$$".bak"
+fi
+cat ./boxes.1 | sed -e 's/^\.br/--LINEBREAK--/' | man -l - | man2html -title 'boxes(1)' | sed -e 's/boxes@thomasjensen.com/boxes(at)thomasjensen(dot)com/g' -e 's/&lt;URL:\([^&]\+\)&gt;/<a target="_blank" href="\1">\1<\/a>/g' -e 's/<\/BODY>/\n<!--#include file="footer.inc.shtml" -->\n\n<\/BODY>/' > $outfile
+echo "Conversion complete. Excessive manual work remains."
+
+
+# vim: set wrap :
