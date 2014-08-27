@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     June 20, 1999 (Sunday, 16:51h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: tools.c,v 1.6 2006/07/12 05:25:47 tsjensen Exp tsjensen $
+ *  Version:          $Id: tools.c,v 1.7 2006/07/22 19:27:15 tsjensen Exp $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Provide tool functions for error reporting and some
@@ -25,6 +25,10 @@
  *  Revision History:
  *
  *    $Log: tools.c,v $
+ *    Revision 1.7  2006/07/22 19:27:15  tsjensen
+ *    Changed expand_tabs_into() so that it records the original tab positions in a line
+ *    Added tabbify_indent() to restore original leading tabs after box processing
+ *
  *    Revision 1.6  2006/07/12 05:25:47  tsjensen
  *    Updated email and web addresses in comment header
  *
@@ -61,7 +65,7 @@
 
 
 static const char rcsid_tools_c[] =
-    "$Id: tools.c,v 1.6 2006/07/12 05:25:47 tsjensen Exp tsjensen $";
+    "$Id: tools.c,v 1.7 2006/07/22 19:27:15 tsjensen Exp $";
 
 
 

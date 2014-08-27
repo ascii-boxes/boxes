@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: generate.c,v 1.10 2006/07/12 05:42:28 tsjensen Exp tsjensen $
+ *  Version:          $Id: generate.c,v 1.11 2006/07/22 19:21:13 tsjensen Exp $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Box generation, i.e. the drawing of boxes
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: generate.c,v $
+ *    Revision 1.11  2006/07/22 19:21:13  tsjensen
+ *    Applied patch by Christoph Dreyer to support unexpansion of leading tabs
+ *    Added ability to retain existing tabs
+ *
  *    Revision 1.10  2006/07/12 05:42:28  tsjensen
  *    Updated email and web addresses in comment header
  *
@@ -76,7 +80,7 @@
 
 
 static const char rcsid_generate_c[] =
-    "$Id: generate.c,v 1.10 2006/07/12 05:42:28 tsjensen Exp tsjensen $";
+    "$Id: generate.c,v 1.11 2006/07/22 19:21:13 tsjensen Exp $";
 
 
 

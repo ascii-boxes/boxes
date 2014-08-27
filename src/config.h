@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     July 4, 1999 (Sunday, 21:04h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: config.h,v 1.3 1999-08-25 06:38:37-07 tsjensen Exp tsjensen $
+ *  Version:          $Id: config.h,v 1.4 2006/07/12 05:42:48 tsjensen Exp $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Please compiler and ease porting
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: config.h,v $
+ *    Revision 1.4  2006/07/12 05:42:48  tsjensen
+ *    Updated email and web addresses in comment header
+ *
  *    Revision 1.3  1999-08-25 06:38:37-07  tsjensen
  *    Bugfix: Changed empty #elif to #else (thanks Tommy Williams)
  *    Port to i386/FreeBSD by Tommy Williams

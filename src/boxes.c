@@ -2,7 +2,7 @@
  *  File:             boxes.c
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: boxes.c,v 1.38 2006/07/22 19:40:40 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.39 2006/08/28 15:53:46 tsjensen Exp $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://boxes.thomasjensen.com/
@@ -44,6 +44,10 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.39  2006/08/28 15:53:46  tsjensen
+ *    Added support for --help and -? options, which do the same as -h
+ *    (This feature was requested by Raphael Wimmer).
+ *
  *    Revision 1.38  2006/07/22 19:40:40  tsjensen
  *    Applied patch by Christoph Dreyer to support unexpansion of leading tabs
  *    Added ability to retain leading tabs in their original positions
@@ -256,7 +260,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.38 2006/07/22 19:40:40 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.39 2006/08/28 15:53:46 tsjensen Exp $";
 
 
 
