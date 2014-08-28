@@ -3,7 +3,7 @@
  *  Date created:     Copyright (c) 1986 by University of Toronto.
  *  Author:           Henry Spencer.
  *                    Extensions and modifications by Thomas Jensen
- *  Version:          $Id: regsub.c,v 1.3 1999/04/12 18:13:57 tsjensen Exp tsjensen $
+ *  Version:          $Id: regsub.c,v 1.4 1999/07/20 18:51:41 tsjensen Exp tsjensen $
  *  Language:         K&R C (traditional)
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Perform substitutions after a regexp match
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: regsub.c,v $
+ *    Revision 1.4  1999/07/20 18:51:41  tsjensen
+ *    Bugfix: REPLACE "^" with "a" caused a hangup. Now automatically declaring
+ *    matches which have a length of zero to be of scope "once".
+ *
  *    Revision 1.3  1999/04/12 18:13:57  tsjensen
  *    Added missing '$' to rcs id string, changed from #ident to char
  *
@@ -42,7 +46,7 @@
 #include "regmagic.h"
 
 char rcsid_regsub_c[] =
-    "$Id: regsub.c,v 1.3 1999/04/12 18:13:57 tsjensen Exp tsjensen $";
+    "$Id: regsub.c,v 1.4 1999/07/20 18:51:41 tsjensen Exp tsjensen $";
 
 
 

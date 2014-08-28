@@ -27,7 +27,7 @@
 #include "regmagic.h"
 
 char rcsid_regexp_c[] =
-    "$Id$";
+    "$Id: regexp.c,v 1.3 1999/04/12 18:13:20 tsjensen Exp tsjensen $";
 
 /*
  * The "internal use only" fields in regexp.h are present to pass info from

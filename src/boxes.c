@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: boxes.c,v 1.31 1999/08/21 23:33:03 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.32 1999/08/22 11:34:46 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
@@ -48,6 +48,9 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.32  1999/08/22 11:34:46  tsjensen
+ *    Bugfix: no-input-check must take place before indentation computation
+ *
  *    Revision 1.31  1999/08/21 23:33:03  tsjensen
  *    Added usage of system-wide config file (GLOBALCONF from boxes.h)
  *    Moved config file selection code into it own function (get_config_file())
@@ -215,7 +218,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.31 1999/08/21 23:33:03 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.32 1999/08/22 11:34:46 tsjensen Exp tsjensen $";
 
 
 /*       _\|/_

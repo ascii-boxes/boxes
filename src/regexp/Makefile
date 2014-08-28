@@ -3,7 +3,7 @@
 #   Creation:   August 13, 1999 (Friday, 22:13h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id$
+#   Version:    $Id: Makefile,v 1.1 1999/08/13 20:56:09 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,7 +25,9 @@
 #
 #   Revision History:
 #
-#     $Log$
+#     $Log: Makefile,v $
+#     Revision 1.1  1999/08/13 20:56:09  tsjensen
+#     Initial revision
 #____________________________________________________________________________
 #============================================================================
 

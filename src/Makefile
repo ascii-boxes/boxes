@@ -3,7 +3,7 @@
 #   Creation:   March 18, 1999 (Thursday, 15:10h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.14 1999/08/21 16:10:41 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.15 1999/08/21 23:35:44 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,10 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.15  1999/08/21 23:35:44  tsjensen
+#     boxes.h is now generated from boxes.h.in by top level Makefile
+#     Added -Wall -W to CFLAGS and removed .c.o rule
+#
 #     Revision 1.14  1999/08/21 16:10:41  tsjensen
 #     Removed case insensitivity option (-i) from flex call (-> lexer.l)
 #

@@ -4,7 +4,7 @@
  *  Date created:     June 20, 1999 (Sunday, 16:57h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: tools.h,v 1.1 1999/06/23 11:19:59 tsjensen Exp tsjensen $
+ *  Version:          $Id: tools.h,v 1.2 1999/07/20 18:56:15 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Tool functions for error reporting and some string
  *                    handling and other needful things
@@ -25,6 +25,11 @@
  *  Revision History:
  *
  *    $Log: tools.h,v $
+ *    Revision 1.2  1999/07/20 18:56:15  tsjensen
+ *    Added GNU GPL disclaimer
+ *    Removed include boxes.h
+ *    Added prototypes for strisyes() and strisno()
+ *
  *    Revision 1.1  1999/06/23 11:19:59  tsjensen
  *    Initial revision
  *

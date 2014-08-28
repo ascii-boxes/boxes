@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 13:45h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: shape.h,v 1.3 1999/07/23 16:36:33 tsjensen Exp tsjensen $
+ *  Version:          $Id: shape.h,v 1.4 1999/08/14 19:08:34 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Shape handling and information functions
  *
@@ -24,6 +24,12 @@
  *  Revision History:
  *
  *    $Log: shape.h,v $
+ *    Revision 1.4  1999/08/14 19:08:34  tsjensen
+ *    Added genshape(), freeshape(), and findshape() prototypes
+ *    Added on_side() prototype back again
+ *    Added isdeepempty() prototype
+ *    Changed first parameter of empty_side() prototype
+ *
  *    Revision 1.3  1999/07/23 16:36:33  tsjensen
  *    Added GNU GPL disclaimer
  *    Removed prototypes of iscorner(), on_side(), shapecmp(), both_on_side(),

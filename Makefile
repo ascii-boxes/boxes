@@ -3,7 +3,7 @@
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.3 1999/08/21 23:39:01 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.4 1999/08/22 11:43:55 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,9 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.4  1999/08/22 11:43:55  tsjensen
+#     Added comment to guide user to GLOBALCONF definition line
+#
 #     Revision 1.3  1999/08/21 23:39:01  tsjensen
 #     Added GLOBALCONF and BVERSION macros whose values are put into boxes.h and
 #     boxes.1

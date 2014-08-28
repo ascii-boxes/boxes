@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:59h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: remove.c,v 1.3 1999/07/20 18:57:16 tsjensen Exp tsjensen $
+ *  Version:          $Id: remove.c,v 1.4 1999/08/21 16:03:31 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box removal, i.e. the deletion of boxes
@@ -25,6 +25,9 @@
  *  Revision History:
  *
  *    $Log: remove.c,v $
+ *    Revision 1.4  1999/08/21 16:03:31  tsjensen
+ *    Bugfix: When matching vertical side shape lines, ignore empty shape lines
+ *
  *    Revision 1.3  1999/07/20 18:57:16  tsjensen
  *    Added GNU GPL disclaimer
  *    Does not kill leading/trailing blank lines anymore when !opt.killblank
@@ -50,7 +53,7 @@
 #include "remove.h"
 
 static const char rcsid_remove_c[] =
-    "$Id: remove.c,v 1.3 1999/07/20 18:57:16 tsjensen Exp tsjensen $";
+    "$Id: remove.c,v 1.4 1999/08/21 16:03:31 tsjensen Exp tsjensen $";
 
 
 
