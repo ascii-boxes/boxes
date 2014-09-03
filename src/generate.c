@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: generate.c,v 1.8 1999/08/22 11:36:45 tsjensen Exp tsjensen $
+ *  Version:          $Id: generate.c,v 1.9 1999/08/31 15:37:01 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Box generation, i.e. the drawing of boxes
@@ -25,6 +25,10 @@
  *  Revision History:
  *
  *    $Log: generate.c,v $
+ *    Revision 1.9  1999/08/31 15:37:01  tsjensen
+ *    Applied Joe Zbiciak's patches to remove all snprintf()s and variants
+ *    Replaced snprintf() calls with calls to concat_strings() in the process
+ *
  *    Revision 1.8  1999/08/22 11:36:45  tsjensen
  *    Removed const from 2nd parameter of justify_line() function
  *
@@ -70,7 +74,7 @@
 
 
 static const char rcsid_generate_c[] =
-    "$Id: generate.c,v 1.8 1999/08/22 11:36:45 tsjensen Exp tsjensen $";
+    "$Id: generate.c,v 1.9 1999/08/31 15:37:01 tsjensen Exp tsjensen $";
 
 
 

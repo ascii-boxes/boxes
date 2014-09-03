@@ -1,0 +1,98 @@
+   _.
+  | |                                                      ____          
+  | |__     ____   ___  ___   ____     ______     ___  __ /_   |   ____  
+  | __ \   /  _ \  \  \/  / _/ __ \   /  ___/     \  \/ /  |   |  /  _ \ 
+  | \_\ \ (  <_> )  >    <  \  ___/   \___ \       \   /   |   | (  <_> )
+  |___  /  \____/  /__/\_ \  \___  > /____  >       \_/    |___| /\____/ 
+      \/                 \/      \/       \/                     \/  
+
+         draws all kinds of boxes around your text (in ASCII art)
+
+                 [stability & portability release 1.0.1]
+
+
+
+GETTING IT
+
+    http://home.pages.de/~jensen/boxes/
+
+    Boxes is free software under the GNU General Public License (GNU GPL).
+    See COPYING file or http://www.gnu.org/copyleft/gpl.html.
+
+
+COMPILING IT
+
+    Skip this section if you got yourself a binary distribution. NOTE,
+    however, that the location of the system-wide config file can only be
+    changed using the source distribution, because its path is compiled in.
+
+    1. Unpack the archive
+
+    2. Edit the top level Makefile and change the value of GLOBALCONF to
+       whereever you want the system-wide config file to reside. Note that
+       each user may have his/her own config file in $HOME/.boxes.
+
+    3. Type 'make' in the top level directory.
+       This should leave you with a binary in the src directory.
+
+       The author takes care that this always works under intel/Linux and
+       sparc/Solaris, the latter of which is the boxes development
+       platform.
+       If you are on a different platform and somehow manage to materialize
+       a binary, please send it to the author (boxes@home-of.tj), so it
+       can be posted on the boxes home page. Boxes is generally very easy
+       to port, because it uses only a small set of instructions and is
+       based on ANSI C.
+
+
+INSTALLING IT
+
+    1. Copy doc/boxes.1 to an appropriate manual page directory (such as
+       /usr/local/man/man1).
+       Copy boxes-config to the location specified in the Makefile as being
+       the name of the system-wide boxes config file.
+       Copy src/boxes (the binary) to a location which is in your path
+       (such as /usr/local/bin).
+
+       Example:
+            cp doc/boxes.1 /usr/local/man/man1
+            cp boxes-config /usr/local/share/boxes
+            cp src/boxes /usr/local/bin
+
+    2. If you want to make your own changes to the config file, copy the
+       system-wide config file into your home as $HOME/.boxes, then modify
+       it. Boxes will use $HOME/.boxes if it exists.
+
+
+RUNNING IT
+
+    Try if boxes works by typing "boxes" on the command line, then enter
+    "foo", press return and hit Ctrl-D. It should give you something
+    like that:  /*******/
+                /* foo */
+                /*******/
+
+    Detailed usage information is in the manual page and a lot more can be
+    found on the Web page (see above). It is especially interesting to tie
+    boxes to your editor, so that it can be invoked by a simple keypress.
+
+
+CONTACT
+
+    * For questions which the online documentation could not answer, requests
+      for more features, praise and bug reports please feel free to email
+      the author at boxes@home-of.tj. Bug reports are especially appreciated.
+
+    * For questions particular to the binary you downloaded contact the
+      supplier of the binary listed on the download page.
+
+    * Send your cool new box designs to boxdesigns@home-of.tj! If they are
+      good or useful, they may be added to the official config file.
+
+
+                                                _________________________
+                                               /\                        \
+                                               \_|  Enjoy!               |
+03/18/2000                                       |     -- Thomas Jensen  |
+                                                 |   ____________________|_
+EOF                                               \_/______________________/

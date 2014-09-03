@@ -4,7 +4,7 @@
  *  Date created:     June 20, 1999 (Sunday, 16:51h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: tools.c,v 1.4 1999/08/21 16:09:33 tsjensen Exp tsjensen $
+ *  Version:          $Id: tools.c,v 1.5 1999/08/31 15:35:13 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  World Wide Web:   http://home.pages.de/~jensen/boxes/
  *  Purpose:          Provide tool functions for error reporting and some
@@ -26,6 +26,10 @@
  *  Revision History:
  *
  *    $Log: tools.c,v $
+ *    Revision 1.5  1999/08/31 15:35:13  tsjensen
+ *    Applied Joe Zbiciak's patches to remove all snprintf()s and variants
+ *    Added concat_strings() function and changed yyerror() in the process
+ *
  *    Revision 1.4  1999/08/21 16:09:33  tsjensen
  *    Removed newline check from empty_line() function
  *
@@ -55,7 +59,7 @@
 
 
 static const char rcsid_tools_c[] =
-    "$Id: tools.c,v 1.4 1999/08/21 16:09:33 tsjensen Exp tsjensen $";
+    "$Id: tools.c,v 1.5 1999/08/31 15:35:13 tsjensen Exp tsjensen $";
 
 
 

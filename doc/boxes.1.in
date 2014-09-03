@@ -1,6 +1,6 @@
 .\" @(#)boxes.1 1.0 08/22/99
 .\"
-.\" $Id: boxes.1,v 1.2 1999/08/18 19:14:08 tsjensen Exp tsjensen $
+.\" $Id: boxes.1.in,v 1.3 1999/08/21 23:41:25 tsjensen Exp tsjensen $
 .\"
 .TH boxes 1 "August 22 1999"
 .UC 4

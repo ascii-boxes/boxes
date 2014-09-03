@@ -3,7 +3,7 @@
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen
 #               tsjensen@stud.informatik.uni-erlangen.de
-#   Version:    $Id: Makefile,v 1.4 1999/08/22 11:43:55 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.5 2000/03/17 23:52:29 tsjensen Exp tsjensen $
 #   Format:     GNU make
 #   Web Site:   http://home.pages.de/~jensen/boxes/
 #   Platforms:  sparc/Solaris 2.6 and others
@@ -25,6 +25,11 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.5  2000/03/17 23:52:29  tsjensen
+#     Incremented version number to 1.0.1
+#     Renamed snapshot file name to boxes-SNAP-latest
+#     Added README.Win32.txt to snapshot generation commands
+#
 #     Revision 1.4  1999/08/22 11:43:55  tsjensen
 #     Added comment to guide user to GLOBALCONF definition line
 #

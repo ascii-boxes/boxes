@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.l,v 1.16 1999/08/18 18:23:41 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.17 1999/08/20 19:51:12 tsjensen Exp tsjensen $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *
@@ -26,6 +26,10 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.17  1999/08/20 19:51:12  tsjensen
+ *    Moved contents of YY_USER_INIT definition into a separate function which
+ *    is now called by YY_USER_INIT (better readability)
+ *
  *    Revision 1.16  1999/08/18 18:23:41  tsjensen
  *    Declared yyerrcnt to be static
  *    Added YY_USER_INIT macro to set the input buffer size to the config file
@@ -109,7 +113,7 @@
 
 
 static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.16 1999/08/18 18:23:41 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.17 1999/08/20 19:51:12 tsjensen Exp tsjensen $";
 
 
 int yylineno = 1;

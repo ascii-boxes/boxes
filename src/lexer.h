@@ -4,7 +4,7 @@
  *  Date created:     July 01, 1999 (Thursday, 13:43h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: lexer.h,v 1.3 1999/08/14 19:06:26 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.h,v 1.4 1999/08/18 15:42:46 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Export symbols used by the parser files only
  *
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: lexer.h,v $
+ *    Revision 1.4  1999/08/18 15:42:46  tsjensen
+ *    Added LEX_SDELIM macro (valid string delimiter characters)
+ *    Added prototype for chg_strdelims()
+ *
  *    Revision 1.3  1999/08/14 19:06:26  tsjensen
  *    Added GNU GPL disclaimer
  *    Added yylex() declaration to please compiler

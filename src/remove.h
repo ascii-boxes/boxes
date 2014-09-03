@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 21:00h)
  *  Author:           Copyright (C) 1999 Thomas Jensen
  *                    tsjensen@stud.informatik.uni-erlangen.de
- *  Version:          $Id: remove.h,v 1.1 1999/06/23 19:15:00 tsjensen Exp $
+ *  Version:          $Id: remove.h,v 1.2 1999/07/23 16:16:40 tsjensen Exp tsjensen $
  *  Language:         ANSI C
  *  Purpose:          Box removal, i.e. the deletion of boxes
  *
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: remove.h,v $
+ *    Revision 1.2  1999/07/23 16:16:40  tsjensen
+ *    Added GNU GPL disclaimer
+ *
  *    Revision 1.1  1999/06/23 19:15:00  tsjensen
  *    Initial revision
  *
