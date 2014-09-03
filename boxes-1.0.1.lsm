@@ -1,0 +1,21 @@
+Begin4
+Title:          boxes
+Version:        1.0.1
+Entered-date:   2000-03-18
+Description:    Draws all kinds of boxes around its input text, ranging from
+                C comment boxes to complex ASCII art. Removes/repairs boxes,
+                even if they have been badly damaged by editing of the text
+                inside. Creates regional comments in any programming language.
+                Add and share new box designs by appending to a flexible
+                config file.
+Keywords:       text utility, boxes, ASCII art, filter program, text editing
+Author:         boxes@home-of.tj (Thomas Jensen)
+Maintained-by:  boxes@home-of.tj (Thomas Jensen)
+Primary-site:   sunsite.unc.edu /pub/Linux/utils/text
+                122k boxes-1.0.1.src.tar.gz
+                46k boxes-1.0.1.bin.ELF.tar.gz
+Alternate-site: http://www6.informatik.uni-erlangen.de/~tsjensen/software/boxes/
+Original-site:  http://home.pages.de/~jensen/boxes/
+Platforms:      
+Copying-policy: GPL 2.0
+End
