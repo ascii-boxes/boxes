@@ -3,7 +3,7 @@
  *  Date created:     Copyright (c) 1986 by University of Toronto.
  *  Author:           Henry Spencer.
  *                    Extensions and modifications by Thomas Jensen
- *  Version:          $Id: regsub.c,v 1.5 2006/07/12 05:20:26 tsjensen Exp tsjensen $
+ *  Version:          $Id: regsub.c,v 1.7 2006/07/23 16:15:55 tsjensen Exp $
  *  Language:         K&R C (traditional)
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Perform substitutions after a regexp match
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: regsub.c,v $
+ *    Revision 1.7  2006/07/23 16:15:55  tsjensen
+ *    Undo of previous version
+ *    Added include string.h and removed manual extern declarations for strncpy()
+ *
  *    Revision 1.6  2006/07/22 19:01:10  tsjensen
  *    Added extern declaration of strncpy() to myregsub(), hoping this will clear some warnings on Debian
  *
@@ -53,7 +57,7 @@
 #include "regmagic.h"
 
 char rcsid_regsub_c[] =
-    "$Id: regsub.c,v 1.5 2006/07/12 05:20:26 tsjensen Exp tsjensen $";
+    "$Id: regsub.c,v 1.7 2006/07/23 16:15:55 tsjensen Exp $";
 
 
 

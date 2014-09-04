@@ -3,7 +3,7 @@
  *  File:             lexer.l
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: lexer.l,v 1.18 2006/07/07 07:24:17 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.l,v 1.19 2006/07/22 19:31:25 tsjensen Exp $
  *  Language:         lex (ANSI C)
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *
@@ -25,6 +25,10 @@
  *  Revision History:
  *
  *    $Log: lexer.l,v $
+ *    Revision 1.19  2006/07/22 19:31:25  tsjensen
+ *    Fix: Renamed yylineno to tjlineno to enable compilation on certain
+ *    flexes (reported by Andreas Heiduk)
+ *
  *    Revision 1.18  2006/07/07 07:24:17  tsjensen
  *    Applied patch by Andreas Heiduk to facilitate compilation with
  *    present-day flexes
@@ -116,7 +120,7 @@
 
 
 static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.18 2006/07/07 07:24:17 tsjensen Exp tsjensen $";
+    "$Id: lexer.l,v 1.19 2006/07/22 19:31:25 tsjensen Exp $";
 int tjlineno = 1;
 
 static int yyerrcnt = 0;

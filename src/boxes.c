@@ -2,7 +2,7 @@
  *  File:             boxes.c
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: boxes.c,v 1.37 2006/07/12 05:49:50 tsjensen Exp tsjensen $
+ *  Version:          $Id: boxes.c,v 1.38 2006/07/22 19:40:40 tsjensen Exp $
  *  Language:         ANSI C
  *  Platforms:        sunos5/sparc, for now
  *  World Wide Web:   http://boxes.thomasjensen.com/
@@ -44,6 +44,11 @@
  *  Revision History:
  *
  *    $Log: boxes.c,v $
+ *    Revision 1.38  2006/07/22 19:40:40  tsjensen
+ *    Applied patch by Christoph Dreyer to support unexpansion of leading tabs
+ *    Added ability to retain leading tabs in their original positions
+ *    Mending a box with -m now implies -k false
+ *
  *    Revision 1.37  2006/07/12 05:49:50  tsjensen
  *    Updated email and web addresses in comment header etc.
  *    Applied patch by Elmar Loos that adds -m option for mending a box
@@ -251,7 +256,7 @@ extern int optind, opterr, optopt;       /* for getopt() */
 
 
 static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.37 2006/07/12 05:49:50 tsjensen Exp tsjensen $";
+    "$Id: boxes.c,v 1.38 2006/07/22 19:40:40 tsjensen Exp $";
 
 
 

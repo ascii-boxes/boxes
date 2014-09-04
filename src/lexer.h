@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     July 01, 1999 (Thursday, 13:43h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: lexer.h,v 1.4 1999-08-18 08:42:46-07 tsjensen Exp tsjensen $
+ *  Version:          $Id: lexer.h,v 1.5 2006/07/12 05:33:12 tsjensen Exp $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Export symbols used by the parser files only
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: lexer.h,v $
+ *    Revision 1.5  2006/07/12 05:33:12  tsjensen
+ *    Updated email and web addresses in comment header
+ *
  *    Revision 1.4  1999-08-18 08:42:46-07  tsjensen
  *    Added LEX_SDELIM macro (valid string delimiter characters)
  *    Added prototype for chg_strdelims()

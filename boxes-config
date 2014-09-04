@@ -2,7 +2,7 @@
 #   File:           boxes-config
 #   Date created:   March 17, 1999 (Wednesday, 17:02h)
 #   Author:         Thomas Jensen <boxes(at)thomasjensen(dot)com>
-#   Version:        $Id: boxes-config,v 1.16 2000/03/17 23:39:34 tsjensen Exp tsjensen $
+#   Version:        $Id: boxes-config,v 1.17 2006/07/12 21:05:59 tsjensen Exp $
 #   Format:         ASCII Text
 #   World Wide Web: http://boxes.thomasjensen.com/
 #   Purpose:        Example configuration file for the boxes program
