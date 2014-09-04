@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 20:12h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: generate.h,v 1.3 1999-08-14 12:30:01-07 tsjensen Exp tsjensen $
+ *  Version:          $Id: generate.h,v 1.4 2006/07/12 05:41:52 tsjensen Exp $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Box generation, i.e. the drawing of boxes
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: generate.h,v $
+ *    Revision 1.4  2006/07/12 05:41:52  tsjensen
+ *    Updated email and web addresses in comment header
+ *
  *    Revision 1.3  1999-08-14 12:30:01-07  tsjensen
  *    Added GNU GPL disclaimer
  *

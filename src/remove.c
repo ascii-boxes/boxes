@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 20:59h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: remove.c,v 1.7 2006/07/12 05:28:58 tsjensen Exp tsjensen $
+ *  Version:          $Id: remove.c,v 1.8 2006/07/22 19:19:26 tsjensen Exp $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Box removal, i.e. the deletion of boxes
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: remove.c,v $
+ *    Revision 1.8  2006/07/22 19:19:26  tsjensen
+ *    Applied patch by Christoph Dreyer to support unexpansion of leading tabs
+ *    Added ability to retain existing tabs
+ *
  *    Revision 1.7  2006/07/12 05:28:58  tsjensen
  *    Updated email and web addresses in comment header
  *    Added trim_only flag to output_input() function, used for box mending
@@ -65,7 +69,7 @@
 #include "remove.h"
 
 static const char rcsid_remove_c[] =
-    "$Id: remove.c,v 1.7 2006/07/12 05:28:58 tsjensen Exp tsjensen $";
+    "$Id: remove.c,v 1.8 2006/07/22 19:19:26 tsjensen Exp $";
 
 
 

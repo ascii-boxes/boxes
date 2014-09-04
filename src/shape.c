@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 13:39h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: shape.c,v 1.5 1999-08-14 12:11:53-07 tsjensen Exp tsjensen $
+ *  Version:          $Id: shape.c,v 1.6 2006/07/12 05:27:29 tsjensen Exp $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Shape handling and information functions
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: shape.c,v $
+ *    Revision 1.6  2006/07/12 05:27:29  tsjensen
+ *    Updated email and web addresses in comment header
+ *
  *    Revision 1.5  1999-08-14 12:11:53-07  tsjensen
  *    Added findshape(), genshape(), freeshape(), and isdeepempty() functions
  *    Added on_side() back in with a few changes
@@ -57,7 +60,7 @@
 #include "tools.h"
 
 static const char rcsid_shape_c[] =
-    "$Id: shape.c,v 1.5 1999-08-14 12:11:53-07 tsjensen Exp tsjensen $";
+    "$Id: shape.c,v 1.6 2006/07/12 05:27:29 tsjensen Exp $";
 
 
 

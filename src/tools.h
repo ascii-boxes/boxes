@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     June 20, 1999 (Sunday, 16:57h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: tools.h,v 1.4 2006/07/12 05:25:27 tsjensen Exp tsjensen $
+ *  Version:          $Id: tools.h,v 1.5 2006/07/22 19:11:07 tsjensen Exp $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Tool functions for error reporting and some string
@@ -25,6 +25,10 @@
  *  Revision History:
  *
  *    $Log: tools.h,v $
+ *    Revision 1.5  2006/07/22 19:11:07  tsjensen
+ *    Changed expand_tabs_into() signature in order to support advanced tab handling
+ *    Added tabbify_indent()
+ *
  *    Revision 1.4  2006/07/12 05:25:27  tsjensen
  *    Updated email and web addresses in comment header
  *

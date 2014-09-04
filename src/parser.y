@@ -3,7 +3,7 @@
  *  File:             parser.y
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: parser.y,v 1.24 2006/07/22 19:30:55 tsjensen Exp tsjensen $
+ *  Version:          $Id: parser.y,v 1.25 2006/07/23 16:11:39 tsjensen Exp $
  *  Language:         GNU bison (ANSI C)
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Yacc parser for boxes configuration files
@@ -24,6 +24,10 @@
  *  Revision History:
  *
  *    $Log: parser.y,v $
+ *    Revision 1.25  2006/07/23 16:11:39  tsjensen
+ *    Removed unsigned modifier from a pointer declaration in order to clear a warning
+ *    which appeared on some Linuxes (reported by Andreas Heiduk)
+ *
  *    Revision 1.24  2006/07/22 19:30:55  tsjensen
  *    Fix: Renamed yylineno to tjlineno to enable compilation on certain
  *    flexes (reported by Andreas Heiduk)
@@ -140,7 +144,7 @@
 
 
 const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.24 2006/07/22 19:30:55 tsjensen Exp tsjensen $";
+    "$Id: parser.y,v 1.25 2006/07/23 16:11:39 tsjensen Exp $";
 
 
 static int pflicht = 0;

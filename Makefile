@@ -2,7 +2,7 @@
 #   File:       Makefile
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.12 2006/08/04 20:44:00 tsjensen Exp tsjensen $
+#   Version:    $Id: Makefile,v 1.13 2012/10/19 16:46:32 tsjensen Exp $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  sparc/Solaris 2.6, Linux, and others
@@ -24,6 +24,10 @@
 #   Revision History:
 #
 #     $Log: Makefile,v $
+#     Revision 1.13  2012/10/19 16:46:32  tsjensen
+#     Incremented version number to 1.1.1
+#     Include boxes.1.in in the changelog
+#
 #     Revision 1.12  2006/08/04 20:44:00  tsjensen
 #     Changed the latest snap creation target to adjust to VM build environment
 #

@@ -3,7 +3,7 @@
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 21:00h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: remove.h,v 1.2 1999-07-23 09:16:40-07 tsjensen Exp tsjensen $
+ *  Version:          $Id: remove.h,v 1.3 2006/07/12 05:28:31 tsjensen Exp $
  *  Language:         ANSI C
  *  World Wide Web:   http://boxes.thomasjensen.com/
  *  Purpose:          Box removal, i.e. the deletion of boxes
@@ -24,6 +24,9 @@
  *  Revision History:
  *
  *    $Log: remove.h,v $
+ *    Revision 1.3  2006/07/12 05:28:31  tsjensen
+ *    Updated email and web addresses in comment header
+ *
  *    Revision 1.2  1999-07-23 09:16:40-07  tsjensen
  *    Added GNU GPL disclaimer
  *
