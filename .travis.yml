@@ -1,0 +1,10 @@
+# Travis CI Build Configuration file for boxes
+
+language: c
+
+compiler: gcc
+
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq flex bison
+ 
