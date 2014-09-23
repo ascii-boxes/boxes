@@ -1,0 +1,11 @@
+:ARGS
+-s 10x5
+:INPUT
+foo
+:EXPECTED
+/********/
+/* foo  */
+/*      */
+/*      */
+/********/
+:EOF

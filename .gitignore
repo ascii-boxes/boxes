@@ -1,7 +1,7 @@
 *.o
 *.a
 archive/
-test/
+test.orig/
 website/
 zs-*
 idee
@@ -12,6 +12,7 @@ doc/*.tar.gz
 press/
 *.tar.gz
 src/boxes
+src/boxes.exe
 src/boxes.h
 src/lex.yy.c
 src/parser.h
