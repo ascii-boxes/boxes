@@ -2,9 +2,7 @@
 
 language: c
 
-compiler: gcc
-
-script: make
+script: make && make test
 
 before_install:
  - sudo apt-get update -qq

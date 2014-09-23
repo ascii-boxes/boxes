@@ -92,6 +92,7 @@ RCS_FILES  = $(CL_FILES) Makefile doc/boxes.el doc/create_changelog.pl
 ALL_FILES  = COPYING README README.Win32.txt boxes-config Makefile
 DOC_FILES  = doc/boxes.1 doc/boxes.1.in doc/boxes.el
 
+.PHONY: clean build debug locsnap rcstest rcslocks love test
 
 build debug boxes: src/boxes.h doc/boxes.1
 	@echo For compilation info see the boxes website at http://boxes.thomasjensen.com/
@@ -139,6 +140,9 @@ rcslocks:
 logpage: $(CL_FILES)
 	cd src; ../doc/create_changelog.pl $(patsubst %,../%,$(CL_FILES)) $(shell $(MAKE) -C src -s logpage) > $(CLOGFILE)
 
+
+test:
+	cd test; ./testrunner.sh -suite
 
 love:
 	@echo "Not in front of the kids, honey!"

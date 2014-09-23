@@ -1,0 +1,6 @@
+:ARGS
+-f nonexistent
+:INPUT
+:EXPECTED-ERROR 1
+boxes: Couldn't open config file 'nonexistent' for input.
+:EOF

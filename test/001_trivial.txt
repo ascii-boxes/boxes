@@ -1,0 +1,8 @@
+:ARGS
+:INPUT
+foo
+:EXPECTED
+/*******/
+/* foo */
+/*******/
+:EOF
