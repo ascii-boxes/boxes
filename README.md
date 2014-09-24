@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tsjensen/boxes.svg?branch=master)](https://travis-ci.org/tsjensen/boxes)
+[![Build Status](https://travis-ci.org/ascii-boxes/boxes.svg?branch=master)](https://travis-ci.org/ascii-boxes/boxes)
 
 
 ```
