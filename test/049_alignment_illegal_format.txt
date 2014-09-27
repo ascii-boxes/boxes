@@ -3,5 +3,5 @@
 :INPUT
 foo
 :EXPECTED-ERROR 1
-../src/boxes: Illegal text format -- mistake
+boxes: Illegal text format -- mistake
 :EOF
