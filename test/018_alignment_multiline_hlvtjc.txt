@@ -1,0 +1,16 @@
+The row of 'b's shows how position is rounded down if necessary.
+:ARGS
+-s 15x7 -a hlvtjc
+:INPUT
+aaa
+bbbb
+ccccc
+:EXPECTED
+/*************/
+/*  aaa      */
+/* bbbb      */
+/* ccccc     */
+/*           */
+/*           */
+/*************/
+:EOF

@@ -1,0 +1,15 @@
+:ARGS
+-s 15x7 -a hcvbjc
+:INPUT
+aaa
+bbbb
+ccccc
+:EXPECTED
+/*************/
+/*           */
+/*           */
+/*    aaa    */
+/*   bbbb    */
+/*   ccccc   */
+/*************/
+:EOF

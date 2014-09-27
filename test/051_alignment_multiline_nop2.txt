@@ -1,0 +1,13 @@
+:ARGS
+-s 11x7 -a hrvbjr
+:INPUT
+XXXXX
+XXXXX
+XXXXX
+:EXPECTED
+/*********/
+/* XXXXX */
+/* XXXXX */
+/* XXXXX */
+/*********/
+:EOF

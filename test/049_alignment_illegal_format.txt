@@ -1,0 +1,7 @@
+:ARGS
+-a mistake
+:INPUT
+foo
+:EXPECTED-ERROR 1
+../src/boxes: Illegal text format -- mistake
+:EOF

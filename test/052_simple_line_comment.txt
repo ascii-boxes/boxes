@@ -1,0 +1,15 @@
+:ARGS
+-c #
+:INPUT
+a
+
+bbb
+
+
+:EXPECTED
+# a
+#
+# bbb
+#
+#
+:EOF
