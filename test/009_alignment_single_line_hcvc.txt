@@ -1,0 +1,11 @@
+:ARGS
+-s 15x5 -a hcvc
+:INPUT
+foo
+:EXPECTED
+/*************/
+/*           */
+/*    foo    */
+/*           */
+/*************/
+:EOF
