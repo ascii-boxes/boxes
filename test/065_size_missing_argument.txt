@@ -1,0 +1,9 @@
+:ARGS
+-s
+:INPUT
+foo
+:EXPECTED-ERROR 1
+..\src\boxes: option requires an argument -- 's'
+Usage: boxes [options] [infile [outfile]]
+Try `boxes -h' for more information.
+:EOF

@@ -1,0 +1,15 @@
+:ARGS
+-s 15x7 -p l2
+:INPUT
+    aaa
+    bbbb
+    ccccc
+:EXPECTED
+    /*************/
+    /*  aaa      */
+    /*  bbbb     */
+    /*  ccccc    */
+    /*           */
+    /*           */
+    /*************/
+:EOF

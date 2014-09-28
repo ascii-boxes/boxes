@@ -1,0 +1,14 @@
+Size takes precedence over padding, left padding is killed first
+:ARGS
+-s 10x5
+:INPUT
+aaa
+bbbb
+ccccc
+:EXPECTED
+/********/
+/*aaa   */
+/*bbbb  */
+/*ccccc */
+/********/
+:EOF
