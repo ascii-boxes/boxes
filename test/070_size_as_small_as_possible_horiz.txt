@@ -1,0 +1,13 @@
+:ARGS
+-s 1x0
+:INPUT
+aaa
+bbbb
+ccccc
+:EXPECTED
+/*******/
+/*aaa  */
+/*bbbb */
+/*ccccc*/
+/*******/
+:EOF

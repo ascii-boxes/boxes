@@ -1,0 +1,7 @@
+:ARGS
+-s 0x0
+:INPUT
+foo
+:EXPECTED-ERROR 1
+boxes: invalid box size specification -- 0x0
+:EOF

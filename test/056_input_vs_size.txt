@@ -1,0 +1,14 @@
+Input length takes precedence over size option
+:ARGS
+-s 2x2 -p a2
+:INPUT
+aaa
+bbbb
+ccccc
+:EXPECTED
+/*******/
+/*aaa  */
+/*bbbb */
+/*ccccc*/
+/*******/
+:EOF

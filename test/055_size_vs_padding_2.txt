@@ -1,0 +1,14 @@
+Size takes precedence over padding
+:ARGS
+-s 9x5
+:INPUT
+aaa
+bbbb
+ccccc
+:EXPECTED
+/*******/
+/*aaa  */
+/*bbbb */
+/*ccccc*/
+/*******/
+:EOF
