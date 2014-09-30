@@ -1,0 +1,13 @@
+:ARGS
+-t 8u
+:INPUT
+        XXXXXX
+	XXX	XXX
+        XXXXXX
+:EXPECTED
+	/***************/
+	/* XXXXXX      */
+	/* XXX     XXX */
+	/* XXXXXX      */
+	/***************/
+:EOF
