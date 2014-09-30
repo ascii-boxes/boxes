@@ -1,0 +1,12 @@
+:ARGS
+:INPUT
+    XXXXXX
+	XXXXXX
+    XXXXXX
+:EXPECTED
+    /**************/
+    /* XXXXXX     */
+    /*     XXXXXX */
+    /* XXXXXX     */
+    /**************/
+:EOF
