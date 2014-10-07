@@ -2,13 +2,11 @@
 #   File:       Makefile
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
-#   Version:    $Id: Makefile,v 1.13 2012/10/19 16:46:32 tsjensen Exp $
 #   Format:     GNU make
 #   Web Site:   http://boxes.thomasjensen.com/
-#   Platforms:  sparc/Solaris 2.6, Linux, and others
 #   Purpose:    Makefile for boxes, the box drawing program
 # 
-#   Remarks:  o This program is free software; you can redistribute it and/or
+#   License:  o This program is free software; you can redistribute it and/or
 #               modify it under the terms of the GNU General Public License as
 #               published by the Free Software Foundation; either version 2 of
 #               the License, or (at your option) any later version.
@@ -20,61 +18,6 @@
 #               License along with this program; if not, write to the Free
 #               Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 #               MA 02111-1307  USA
-#
-#   Revision History:
-#
-#     $Log: Makefile,v $
-#     Revision 1.13  2012/10/19 16:46:32  tsjensen
-#     Incremented version number to 1.1.1
-#     Include boxes.1.in in the changelog
-#
-#     Revision 1.12  2006/08/04 20:44:00  tsjensen
-#     Changed the latest snap creation target to adjust to VM build environment
-#
-#     Revision 1.11  2006/07/23 16:50:09  tsjensen
-#     Updated version number to 1.1
-#     Changed default value of GLOBALCONF to comply with current Linux standards
-#
-#     Revision 1.10  2006/07/22 19:51:08  tsjensen
-#     Added boxes.h management
-#     Added rcslocks target
-#     Updated some of the administrative paths (not relevant for builders)
-#
-#     Revision 1.9  2006-07-11 23:43:00-07  tsjensen
-#     Added a missing tab character
-#
-#     Revision 1.8  2006-07-08 01:58:08-07  tsjensen
-#     Updated email and web addresses
-#
-#     Revision 1.7  2006/07/08 08:56:38  tsjensen
-#     Added reminder of compilation faq
-#     Changed BVERSION to 1.0.2
-#
-#     Revision 1.6  2000/04/01 18:29:17  tsjensen
-#     Added code to add snapshot info to version number for snapshots. This
-#     affects the author only.
-#
-#     Revision 1.5  2000/03/17 23:52:29  tsjensen
-#     Incremented version number to 1.0.1
-#     Renamed snapshot file name to boxes-SNAP-latest
-#     Added README.Win32.txt to snapshot generation commands
-#
-#     Revision 1.4  1999/08/22 11:43:55  tsjensen
-#     Added comment to guide user to GLOBALCONF definition line
-#
-#     Revision 1.3  1999/08/21 23:39:01  tsjensen
-#     Added GLOBALCONF and BVERSION macros whose values are put into boxes.h and
-#     boxes.1
-#     Added locsnap target for generation of archives without posting to the Web
-#     page
-#     Added README file
-#     Added rules to generate boxes.h and boxes.1 from boxes.1.in and boxes.h.in
-#
-#     Revision 1.2  1999/08/14 19:01:31  tsjensen
-#     After taking a snapshot, put it in the author's archives, too.
-#
-#     Revision 1.1  1999/08/13 23:45:34  tsjensen
-#     Initial revision
 #____________________________________________________________________________
 #============================================================================
 
@@ -83,21 +26,28 @@
 GLOBALCONF = /usr/share/boxes
 BVERSION   = 1.1.1
 
-SNAPFILE   = boxes-SNAP-$(shell date +%Y%m%d)
-WEBHOME    = $(HOME)/boxes/website
-CLOGFILE   = $(WEBHOME)/changelogs.shtml
+ALL_FILES  = LICENSE README.md README.Win32.txt boxes-config
+DOC_FILES  = doc/boxes.1 doc/boxes.el
+PKG_NAME   = boxes-$(BVERSION)
 
-CL_FILES   = boxes-config doc/boxes.1.in
-RCS_FILES  = $(CL_FILES) Makefile doc/boxes.el doc/create_changelog.pl
-ALL_FILES  = COPYING README README.Win32.txt boxes-config Makefile
-DOC_FILES  = doc/boxes.1 doc/boxes.1.in doc/boxes.el
+.PHONY: clean build win32 debug win32.debug infomsg replaceinfos test package win32.package package_common
 
-.PHONY: clean build debug locsnap rcstest rcslocks love test
 
-build debug boxes: src/boxes.h doc/boxes.1
-	@echo For compilation info see the boxes website at http://boxes.thomasjensen.com/
-	$(MAKE) -C src $@
+build debug: infomsg replaceinfos
+	$(MAKE) -C src BOXES_PLATFORM=unix $@
 
+win32: infomsg replaceinfos
+	$(MAKE) -C src BOXES_PLATFORM=win32 build
+
+win32.debug: infomsg replaceinfos
+	$(MAKE) -C src BOXES_PLATFORM=win32 debug
+
+
+infomsg:
+	@echo "| For compilation info please refer to the boxes compilation FAQ"
+	@echo "| at https://github.com/ascii-boxes/boxes/wiki/FAQ#q-5-compilation"
+
+replaceinfos: src/boxes.h doc/boxes.1
 
 src/boxes.h: src/boxes.h.in src/regexp/regexp.h Makefile
 	sed -e 's/--BVERSION--/$(BVERSION)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' src/boxes.h.in > src/boxes.h
@@ -106,47 +56,29 @@ doc/boxes.1: doc/boxes.1.in Makefile
 	sed -e 's/--BVERSION--/$(BVERSION)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' doc/boxes.1.in > doc/boxes.1
 
 
+$(PKG_NAME).tar.gz:
+	mkdir -p $(PKG_NAME)/doc
+	cp $(ALL_FILES) $(PKG_NAME)
+	cp $(DOC_FILES) $(PKG_NAME)/doc
+	$(MAKE) -C src PKG_NAME=$(PKG_NAME) BOXES_PLATFORM=$(BOXES_PLATFORM) flags_$(BOXES_PLATFORM) package
+	if which gtar >/dev/null 2>&1 ; then gtar cfvz $(PKG_NAME).tar.gz $(PKG_NAME)/* ; \
+	    else tar cfvz $(PKG_NAME).tar.gz $(PKG_NAME)/* ; fi
+	rm -rf $(PKG_NAME)/
+
+package: build
+	$(MAKE) BOXES_PLATFORM=unix $(PKG_NAME).tar.gz
+
+win32.package: win32
+	$(MAKE) BOXES_PLATFORM=win32 $(PKG_NAME).tar.gz
+
+
 clean:
 	rm -f doc/boxes.1 src/boxes.h
 	$(MAKE) -C src clean
 
-locsnap: $(ALL_FILES) $(DOC_FILES)
-	mkdir -p $(SNAPFILE)/doc
-	cp $(ALL_FILES) $(SNAPFILE)
-	cp $(DOC_FILES) $(SNAPFILE)/doc
-	$(MAKE) -C src SNAPFILE=../$(SNAPFILE) snap
-	mv $(SNAPFILE)/Makefile $(SNAPFILE)/Makefile.vin
-	cat $(SNAPFILE)/Makefile.vin | perl -ne 'if (/^(BVERSION\s*=\s*)(.*)$$/) { print "BVERSION   = above $$2 (SNAP of '`date +%d-%b-%Y`')\n"; } else { print $$_; }' > $(SNAPFILE)/Makefile
-	rm -f $(SNAPFILE)/Makefile.vin
-	find $(SNAPFILE) -type f -print | xargs chmod 644
-	gtar cfvz $(SNAPFILE).tar.gz $(SNAPFILE)/*
-	rm -rf $(SNAPFILE)/
-
-snap: locsnap
-	mv -i $(SNAPFILE).tar.gz archive/
-	chmod 444 archive/$(SNAPFILE).tar.gz
-	rm -f archive/boxes-SNAP-latest.tar.gz
-	(cd archive; ln -s $(SNAPFILE).tar.gz boxes-SNAP-latest.tar.gz)
-
-rcstest:
-	-for i in $(RCS_FILES) ; do rcsdiff $$i ; done
-	$(MAKE) -C src rcstest
-
-rcslocks:
-	@echo Locked files:
-	@rlog -L -R $(RCS_FILES) | sed -e 's/^/    - /'
-	@$(MAKE) -C src rcslocks
-
-logpage: $(CL_FILES)
-	cd src; ../doc/create_changelog.pl $(patsubst %,../%,$(CL_FILES)) $(shell $(MAKE) -C src -s logpage) > $(CLOGFILE)
-
 
 test:
 	cd test; ./testrunner.sh -suite
-
-love:
-	@echo "Not in front of the kids, honey!"
-
 
 
 #EOF
