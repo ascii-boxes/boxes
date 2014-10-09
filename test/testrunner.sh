@@ -65,10 +65,15 @@ declare -r boxesArgs=$(cat $testCaseFile | sed -n '/^:ARGS/,+1p' | grep -v ^:INP
 cat $testCaseFile | sed -n '/^:INPUT/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > $testInputFile
 cat $testCaseFile | sed -n '/^:EXPECTED/,/^:EOF\b.*$/p;' | sed '1d;$d' | tr -d '\r' > $testExpectationFile
 
-echo "    Invoking: boxes $boxesArgs"
+declare boxesBinary=../src/boxes.exe
+if [ ! -x $boxesBinary ]; then
+    boxesBinary=../src/boxes
+fi
+
+echo "    Invoking: $(basename $boxesBinary) $boxesArgs"
 export BOXES=../boxes-config
 
-cat $testInputFile | ../src/boxes $boxesArgs >$testOutputFile 2>&1
+cat $testInputFile | $boxesBinary $boxesArgs >$testOutputFile 2>&1
 declare -ir actualReturnCode=$?
 cat $testOutputFile | tr -d '\r' | diff - $testExpectationFile
 if [ $? -ne 0 ]; then
