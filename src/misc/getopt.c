@@ -814,7 +814,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	    if (opterr)
 	      {
 		/* 1003.2 specifies the format of this message.  */
-		fprintf (stderr, _("%s: option requires an argument -- %c\n"),
+		fprintf (stderr, _("%s: option requires an argument -- '%c'\n"),
 			 argv[0], c);
 	      }
 	    optopt = c;
@@ -944,7 +944,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 		  {
 		    /* 1003.2 specifies the format of this message.  */
 		    fprintf (stderr,
-			   _("%s: option requires an argument -- %c\n"),
+			   _("%s: option requires an argument -- '%c'\n"),
 			   argv[0], c);
 		  }
 		optopt = c;
