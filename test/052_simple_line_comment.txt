@@ -6,6 +6,7 @@ a
 bbb
 
 
+:OUTPUT-FILTER
 :EXPECTED
 # a
 #

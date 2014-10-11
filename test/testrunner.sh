@@ -45,7 +45,7 @@ fi
 echo "Running test case: $testCaseFile"
 
 declare sectionName
-for sectionName in :ARGS :INPUT :EXPECTED :EOF; do
+for sectionName in :ARGS :INPUT :OUTPUT-FILTER :EXPECTED :EOF; do
     if [ $(grep -c ^$sectionName $testCaseFile) -ne 1 ]; then
         >&2 echo "Missing section $sectionName in test case '$testCaseFile'."
         exit 4
@@ -59,11 +59,13 @@ fi
 
 declare -r testInputFile=${testCaseFile/%.txt/.input.tmp}
 declare -r testExpectationFile=${testCaseFile/%.txt/.expected.tmp}
+declare -r testFilterFile=${testCaseFile/%.txt/.sed.tmp}
 declare -r testOutputFile=${testCaseFile/%.txt/.out.tmp}
 declare -r boxesArgs=$(cat $testCaseFile | sed -n '/^:ARGS/,+1p' | grep -v ^:INPUT | sed '1d')
 
-cat $testCaseFile | sed -n '/^:INPUT/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > $testInputFile
-cat $testCaseFile | sed -n '/^:EXPECTED/,/^:EOF\b.*$/p;' | sed '1d;$d' | tr -d '\r' > $testExpectationFile
+cat $testCaseFile | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d '\r' > $testInputFile
+cat $testCaseFile | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > $testFilterFile
+cat $testCaseFile | sed -n '/^:EXPECTED/,/^:EOF/p;' | sed '1d;$d' | tr -d '\r' > $testExpectationFile
 
 declare boxesBinary=../src/boxes.exe
 if [ ! -x $boxesBinary ]; then
@@ -75,7 +77,7 @@ export BOXES=../boxes-config
 
 cat $testInputFile | $boxesBinary $boxesArgs >$testOutputFile 2>&1
 declare -ir actualReturnCode=$?
-cat $testOutputFile | tr -d '\r' | diff - $testExpectationFile
+cat $testOutputFile | tr -d '\r' | sed -f $testFilterFile | diff - $testExpectationFile
 if [ $? -ne 0 ]; then
     >&2 echo "Error in test case: $testCaseFile (top: actual; bottom: expected)"
     exit 5
@@ -86,6 +88,7 @@ if [ $actualReturnCode -ne $expectedReturnCode ]; then
 fi
 
 rm $testInputFile
+rm $testFilterFile
 rm $testExpectationFile
 rm $testOutputFile
 

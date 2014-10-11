@@ -2,6 +2,7 @@
 -s 15x5 -a hcvt
 :INPUT
 foo
+:OUTPUT-FILTER
 :EXPECTED
 /*************/
 /*    foo    */

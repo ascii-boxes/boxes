@@ -5,6 +5,7 @@ Because input lines 1 and 3 are only 4 spaces, no tabs can be unexpanded!
     XXXXXX
 	XXX	XXX
     XXXXXX
+:OUTPUT-FILTER
 :EXPECTED
     /*******************/
     /* XXXXXX          */

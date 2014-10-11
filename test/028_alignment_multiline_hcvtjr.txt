@@ -4,6 +4,7 @@
 aaa
 bbbb
 ccccc
+:OUTPUT-FILTER
 :EXPECTED
 /*************/
 /*     aaa   */

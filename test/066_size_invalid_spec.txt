@@ -2,6 +2,7 @@
 -s -2x3
 :INPUT
 foo
+:OUTPUT-FILTER
 :EXPECTED-ERROR 1
 boxes: invalid box size specification -- -2x3
 :EOF

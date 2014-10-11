@@ -1,6 +1,7 @@
 :ARGS
 :INPUT
 foo
+:OUTPUT-FILTER
 :EXPECTED
 /*******/
 /* foo */
