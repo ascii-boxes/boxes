@@ -5,6 +5,7 @@ The row of 'b's shows how position is rounded down if necessary.
 aaa
 bbbb
 ccccc
+:OUTPUT-FILTER
 :EXPECTED
 /*************/
 /*  aaa      */

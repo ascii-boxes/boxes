@@ -2,6 +2,7 @@
 -s 10x5
 :INPUT
 foo
+:OUTPUT-FILTER
 :EXPECTED
 /********/
 /* foo  */

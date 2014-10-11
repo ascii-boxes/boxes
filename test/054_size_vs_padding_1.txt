@@ -5,6 +5,7 @@ Size takes precedence over padding, left padding is killed first
 aaa
 bbbb
 ccccc
+:OUTPUT-FILTER
 :EXPECTED
 /********/
 /*aaa   */

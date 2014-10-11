@@ -3,6 +3,7 @@
 :INPUT
 aaa
 bbbb
+:OUTPUT-FILTER
 :EXPECTED
 /*************/
 /*           */

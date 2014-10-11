@@ -5,6 +5,7 @@ Input length takes precedence over size option
 aaa
 bbbb
 ccccc
+:OUTPUT-FILTER
 :EXPECTED
 /*******/
 /*aaa  */

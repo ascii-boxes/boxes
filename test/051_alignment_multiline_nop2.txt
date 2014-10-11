@@ -4,6 +4,7 @@
 XXXXX
 XXXXX
 XXXXX
+:OUTPUT-FILTER
 :EXPECTED
 /*********/
 /* XXXXX */

@@ -5,6 +5,7 @@ If no alignment option is given, text is aligned left and put in the top left co
 aaa
 bbbb
 ccccc
+:OUTPUT-FILTER
 :EXPECTED
 /*************/
 /* aaa       */
