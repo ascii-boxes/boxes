@@ -1,0 +1,20 @@
+:ARGS
+-l -d c
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+Complete Design Information for "c":
+------------------------------------
+Author:                 Thomas Jensen <boxes(at)thomasjensen(dot)com>
+Creation Date:          March 18, 1999 (Thursday, 15:25h)
+Current Revision:       1.0 as of March 18, 1999 (Thursday, 15:25h)
+Indentation Mode:       box (indent box)
+Replacement Rules:      1. (glob) "\*/" WITH "*\/"
+Reversion Rules:        1. (glob) "\*\\/" TO "*/"
+Minimum Box Dimensions: 5 x 3  (width x height)
+Default Padding:        left 1, right 1
+Default Killblank:      yes
+Elastic Shapes:         N, E, S, W
+Defined Shapes:         NW: "/*"  N: "*"  NE: "*/"  E: "*/"  SE: "*/"  S: "*"
+                        SW: "/*"  W: "/*"
+:EOF
