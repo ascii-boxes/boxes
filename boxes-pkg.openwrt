@@ -1,0 +1,51 @@
+#   Copyright (C)  boxes (c)1999 by Thomas Jensen
+#      <boxes(at)thomasjensen.com>  All rights reserved.
+#
+# This is free software, licensed under the GNU General Public License 
+# See /LICENSE for more information.
+#
+#   File:           $(TOPDIR)/feeds/packages/utils/boxes/Makefile
+#   Date created:   2014-09-12 23:28
+#   Author:         Lu Weifeng <lyredsoft@gmail.com>
+#   usage:                 
+# +-------------------------------------------------------------------------+
+# |$cd $(TOPDIR)                                                            |
+# |$./scripts/feeds update -i                                               |
+# |$./scripts/feeds install boxes                                           |
+# |$apt-get install binutils-multiarch                                      |
+# |$make package/boxes/compile package/index                                |
+# |$scp  $(TOPDIR)/bin/ar71xx/packages/boxes_1.1-1_ar71xx.ipk  openwrt:/tmp/|
+# |$opkg install --force-depends /tmp/boxes_1.1-1_ar71xx.ipk                |
+# +-------------------------------------------------------------------------+
+#____________________________________________________________________________
+#============================================================================
+
+
+include $(TOPDIR)/rules.mk
+PKG_NAME:=boxes
+PKG_VERSION:=1.1
+PKG_RELEASE:=1
+PKG_BUILD_DIR:=$(PKG_NAME)-$(PKG_VERSION).$(PKG_RELEASE)
+
+
+PKG_SOURCE:=boxes-1.1.1.src.tar.gz
+PKG_SOURCE_URL:=http://boxes.thomasjensen.com/download/
+
+include $(INCLUDE_DIR)/package.mk
+define Package/boxes
+	SECTION:=utils
+	CATEGORY:=Utilities
+	TITLE:=HW
+endef
+define Package/boxes/description
+boxes 
+endef
+define Package/boxes/Build/Compile
+	$(MAKE) -C $(PKG_BUILD_DIR) boxes
+endef
+define Package/boxes/install
+	$(INSTALL_DIR) $(1)/bin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/boxes $(1)/bin/
+
+endef
+$(eval $(call BuildPackage,boxes))
