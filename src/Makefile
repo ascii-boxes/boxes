@@ -7,7 +7,7 @@
 #   Web Site:   http://boxes.thomasjensen.com/
 #   Platforms:  win32
 #   Purpose:    Makefile for boxes, the box drawing program
-# 
+#
 #   License:  o This program is free software; you can redistribute it and/or
 #               modify it under the terms of the GNU General Public License as
 #               published by the Free Software Foundation; either version 2 of
@@ -46,10 +46,10 @@ ALL_FILES  = $(ORIG_FILES) $(GEN_FILES) $(OTH_FILES)
 
 
 build: flags_$(BOXES_PLATFORM)
-	$(MAKE) BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" CFLAGS_ADDTL=-O STRIP=true flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
+	$(MAKE) BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" CFLAGS_ADDTL="-O $(CFLAGS_ADDTL)" STRIP=true flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
 
 debug: flags_$(BOXES_PLATFORM)
-	$(MAKE) BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" CFLAGS_ADDTL=-g STRIP=false flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
+	$(MAKE) BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" CFLAGS_ADDTL="-g $(CFLAGS_ADDTL)" STRIP=false flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
 
 boxes: $(ALL_OBJ)
 	$(MAKE) -C regexp CC=$(CC) libregexp.a
@@ -63,7 +63,7 @@ boxes.exe: $(ALL_OBJ)
 
 flags_unix:
 	$(eval CFLAGS := -ansi -I. -Iregexp -Wall -W $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := -Lregexp)
+	$(eval LDFLAGS := -Lregexp $(LDFLAGS_ADDTL))
 	$(eval BOXES_EXECUTABLE_NAME := boxes)
 	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
 
