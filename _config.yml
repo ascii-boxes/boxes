@@ -4,7 +4,8 @@ name: boxes
 description: Command line ASCII boxes unlimited!
 
 # enable emoticons
-gems: ["emoji_for_jekyll"]
+gems:
+  - jemoji
 
 # url is currently only used only for the RSS feed in feed.xml
 url: http://ascii-boxes.github.io
