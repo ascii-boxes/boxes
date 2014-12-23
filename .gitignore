@@ -3,13 +3,9 @@
 *.o
 *.a
 _support/
-archive/
-test.orig/
 idee
-delme/
 doc/boxes.1
 doc/*.tar.gz
-press/
 *.tar.gz
 src/boxes
 src/boxes.exe
@@ -17,3 +13,5 @@ src/boxes.h
 src/lex.yy.c
 src/parser.h
 src/parser.c
+_site/
+_cache/
