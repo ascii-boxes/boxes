@@ -1,0 +1,18 @@
+<div class="sidebar well">
+<img src="{{ site.baseurl}}/images/boxes.png" vspace="12" class="hidden-md" style="margin-left:-9px;" />
+<img src="{{ site.baseurl}}/images/boxes-md.png" vspace="12" class="visible-md" style="margin-left:3px;" />
+<div style="clear:both;">{{ site.description }}</div>
+</div>
+
+<div class="sidebar well">
+    <h1>Recent Posts</h1>
+    <ul>
+        {% for post in site.posts limit:6 %}
+          <li><a href="{{ site.baseurl}}{{ post.url }}">{{ post.title }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="sidebar well">
+{% include links-list.html %}
+</div>

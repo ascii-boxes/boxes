@@ -1,0 +1,9 @@
+---
+layout: default
+title: Legal Stuff
+---
+
+{% capture includedMarkdown %}{% include docs/legal.md %}{% endcapture %}
+<div class="bxpage well">
+{{ includedMarkdown | markdownify }}
+</div>

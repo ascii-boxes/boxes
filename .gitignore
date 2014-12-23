@@ -1,0 +1,17 @@
+_cache
+_site
+.cproject
+.project
+*.o
+*.a
+_support/
+idee
+doc/boxes.1
+doc/*.tar.gz
+*.tar.gz
+src/boxes
+src/boxes.exe
+src/boxes.h
+src/lex.yy.c
+src/parser.h
+src/parser.c

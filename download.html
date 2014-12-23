@@ -1,0 +1,8 @@
+---
+layout: default
+---
+
+{% capture includedMarkdown %}{% include download.md %}{% endcapture %}
+<div class="bxpage well">
+{{ includedMarkdown | markdownify }}
+</div>

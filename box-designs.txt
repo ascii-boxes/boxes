@@ -1,0 +1,544 @@
+44 Available Styles in ".boxes":
+--------------------------------
+
+ada-box (Neil Bird <neil.bird@rdel.co.uk>):
+
+    ---------------
+    --           --
+    --           --
+    ---------------
+
+
+ada-cmt (Neil Bird <neil.bird@rdel.co.uk>):
+
+    --
+    -- regular Ada
+    -- comments
+    --
+
+
+boxquote (Christian Molls <CMolls@gmx.net>):
+
+    ,----[ mp3-wav ]
+    | #!/bin/sh
+    | # konvertiert im aktuellen Verzeichnis .mp3 in .wav
+    | for i in *.mp3; do
+    |   mpg123 -v  --stereo --rate 44100 -w "`basename "$i" .mp3`".wav "$i"
+    | done
+    `----
+
+
+boy (Joan G. Stark <spunk1111@juno.com>):
+
+                    .-"""-.
+                   / .===. \
+                   \/ 6 6 \/
+                   ( \___/ )
+      _________ooo__\_____/______________
+     /                                   \
+    |   joan stark   spunk1111@juno.com   |
+    |     VISIT MY ASCII ART GALLERY:     |
+    | http://www.geocities.com/SoHo/7373/ |
+     \_______________________ooo_________/  jgs
+                    |  |  |
+                    |_ | _|
+                    |  |  |
+                    |__|__|
+                    /-'Y'-\
+                   (__/ \__)
+
+
+c (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    /*************/
+    /*           */
+    /*           */
+    /*************/
+
+
+c-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    /*                               */
+    /*     regular C language        */
+    /*     comments                  */
+    /*                               */
+
+
+c-cmt2 (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    /*
+     *  regular C language
+     *  comments
+     */
+
+
+c-cmt3 (AlpT (@freaknet.org)):
+
+    /**
+     *
+     */
+    code(here); a++;
+    /**/
+
+
+capgirl (Joan G. Stark <spunk1111@juno.com>):
+
+                    .-"```"-.
+                   /_______; \
+                  (_________)\|
+                  / / a a \ \(_)
+                 / ( \___/ ) \
+      ________ooo\__\_____/__/___________
+     /                                   \
+    |   joan stark   spunk1111@juno.com   |
+    |     VISIT MY ASCII ART GALLERY:     |
+    |      http://www.ascii-art.com       |
+     \________________________ooo________/
+                 /           \   jgs
+                /:.:.:.:.:.:.:\
+                    |  |  |
+                    \==|==/
+                    /-'Y'-\
+                   (__/ \__)
+
+
+cat (Joan G. Stark <spunk1111@juno.com>):
+
+                  /\             /\
+                 |`\\_,--="=--,_//`|
+                 \ ."  :'. .':  ". /
+                ==)  _ :  '  : _  (==
+                  |>/O\   _   /O\<|
+                  | \-"~` _ `~"-/ |
+                 >|`===. \_/ .===`|<
+       jgs .-"-.   \==='  |  '===/   .-"-.
+    .-----{'. '`}---\,  .-'-.  ,/---{.'. '}-----.
+     )    `"---"`     `~-===-~`     `"---"`    (
+    (                 joan  stark               )
+     )           < spunk1111@juno.com >        (
+    (              ASCII ART GALLERY:           )
+     ) < http://www.geocities.com/SoHo/7373/ > (
+    '-------------------------------------------'
+
+
+cc (Bas van Gils <bvg@linuxfan.com>):
+
+    /****************
+     *              *
+     *              *
+     ****************/
+
+
+ccel (Elmar Loos <elInfo@gmx.net>):
+
+    ///////////////
+    text         //
+    here         //
+    ///////////////
+
+
+columns (unknown artist):
+
+     __^__                 __^__
+    ( ___ )---------------( ___ )
+     | / |                 | \ |
+     | / |                 | \ |
+     | / |                 | \ |
+     |___|                 |___|
+    (_____)---------------(_____)
+
+
+diamonds (Joan G. Stark <spunk1111@juno.com>):
+
+           /\          /\          /\          /\  
+        /\//\\/\    /\//\\/\    /\//\\/\    /\//\\/\  
+     /\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\
+    //\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\
+    \\//\/                                        \/\\//
+     \/                                              \/
+     /\                                              /\
+    //\\      joan stark   spunk1111@juno.com       //\\
+    \\//    http://www.geocities.com/SoHo/7373/     \\//
+     \/                                              \/
+     /\                                              /\
+    //\\/\                                        /\//\\
+    \\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\//
+     \/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/
+        \/\\//\/    \/\\//\/    \/\\//\/    \/\\//\/
+           \/          \/          \/          \/
+
+
+dog (Joan G. Stark <spunk1111@juno.com>):
+
+                __   _,--="=--,_   __
+               /  \."    .-.    "./  \
+              /  ,/  _   : :   _  \/` \
+              \  `| /o\  :_:  /o\ |\__/
+               `-'| :="~` _ `~"=: |
+                  \`     (_)     `/
+       jgs .-"-.   \      |      /   .-"-.
+    .-----{     }--|  /,.-'-.,\  |--{     }-----.
+     )    (_)_)_)  \_/`~-===-~`\_/  (_(_(_)    (
+    (                joan  stark                )
+     )          < spunk1111@juno.com >         (
+    (             ASCII ART GALLERY:            )
+     ) < http://www.geocities.com/SoHo/7373/ > (
+    '-------------------------------------------'
+
+
+girl (Joan G. Stark <spunk1111@juno.com>):
+
+                    .-"""-.
+                   / .===. \
+                  / / a a \ \
+                 / ( \___/ ) \
+      ________ooo\__\_____/__/___________
+     /                                   \
+    |   joan stark   spunk1111@juno.com   |
+    |     VISIT MY ASCII ART GALLERY:     |
+    | http://www.geocities.com/SoHo/7373/ |
+     \________________________ooo________/  jgs
+                 /           \
+                /:.:.:.:.:.:.:\
+                    |  |  |
+                    \==|==/
+                    /-'Y'-\
+                   (__/ \__)
+
+
+headline (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    /*************/
+    /*           */
+    /*           */
+    /*************/
+
+
+html (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    <!-- - - - - - - - - - - -->
+    <!--                     -->
+    <!--                     -->
+    <!--                     -->
+    <!-- - - - - - - - - - - -->
+
+
+html-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    <!--                                     -->
+    <!-- regular comments used in HTML files -->
+    <!--                                     -->
+
+
+ian_jones (Karl E. Jorgensen <karl@jorgensen.com>):
+
+                            \\\///
+                           / _  _ \
+                         (| (.)(.) |)
+.----------------------.OOOo--()--oOOO.-----------------.
+|                                                       |
+| Your Text Here Your Text Here Your Text Here Your Tex |
+| Your Text Here Your Text Here Your Text Here Your Tex |
+| Your Text Here Your Text Here Your Text Here Your Tex |
+| Your Text Here Your Text Here Your Text Here Your Tex |
+|                                                       |
+'--------------------.oooO------------------------------'
+                      (   )   Oooo.
+                       \ (    (   )
+                        \_)    ) /
+                              (_/
+
+
+java-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    //
+    // regular Java
+    // comments
+    //
+
+
+javadoc (Ted Berg <tedberg@spiritone.com>):
+
+    /**
+     *  Javadoc Comments
+     *
+     */
+
+
+lisp-cmt (Vijay Lakshminarayanan <liyer.vijay@gmail.com>):
+
+    ;;
+    ;;  regular comments used in Lisp
+    ;;
+
+
+mouse (Joan G. Stark <spunk1111@juno.com>):
+
+                .--,       .--,
+               ( (  \.---./  ) )
+                '.__/o   o\__.'
+                   {=  ^  =}
+                    >  -  <
+     ___________.""`-------`"".____________
+    /                                      \ 
+    \ o          joan stark        O       / 
+    /          spunk1111@juno.com          \
+    \          ascii art gallery           /
+    / http://www.geocities.com/SoHo/7373/  \
+    \______________________________________/
+                  ___)( )(___
+                 (((__) (__)))
+
+
+netdata (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    %{-----------------------------------------------------------------+
+     | IBM Net.Data Macro Sample - Perl and SQL Backends               |
+     | Thomas Jensen, February 17, 1998 (Tuesday, 16:40h)              |
+     +-----------------------------------------------------------------%}
+
+
+nuke (Joan G. Stark <spunk1111@juno.com>):
+
+                            _ ._  _ , _ ._
+                          (_ ' ( `  )_  .__)
+                        ( (  (    )   `)  ) _)
+                       (__ (_   (_ . _) _) ,__)
+                           `~~`\ ' . /`~~`
+                           ,::: ;   ; :::,
+                          ':::::::::::::::'
+     _________________jgs______/_ __ \________________________
+    |                                                         |
+    |                 BAD, BAD, BUG HERE :-)                  |
+    |_________________________________________________________|
+
+
+parchment (unknown artist):
+
+     ________________________
+    /\                       \
+    \_|                       |
+      |                       |
+      |                       |
+      |   ____________________|_
+       \_/_____________________/
+
+
+peek (unknown artist):
+
+   /*       _\|/_
+            (o o)
+    +----oOO-{_}-OOo---------------------+
+    |                                    |
+    | C function headers?                |
+    |                                    |
+    |                                    |
+    +-----------------------------------*/
+
+
+pound-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    #
+    #  regular comments used in Perl, Shell scripts, etc.
+    #
+
+
+right (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    This can be used for marking code changes with your initials
+    (I don't like it, but some people work this way):
+
+    for (j=0; j<blank_count; ++j)        /*@TJ@*/
+        fprintf (opt.outfile, "\n");     /*@TJ@*/
+    blank_count = 0;                     /*@TJ@*/
+
+
+santa (Joan G. Stark <spunk1111@juno.com>):
+
+                     .-"``"-.
+                    /______; \
+                   {_______}\|
+                   (/ a a \)(_)
+                   (.-.).-.)
+      _______ooo__(    ^    )____________
+     /             '-.___.-'             \
+    |             joan stark              |
+    |         spunk1111@juno.com          |
+    |         ASCII ART GALLERY:          |
+    |      http://www.ascii-art.com       |
+     \________________________ooo________/
+                   |_  |  _|  jgs
+                   \___|___/
+                   {___|___}
+                    |_ | _|
+                    /-'Y'-\
+                   (__/ \__)
+
+
+scroll (unknown artist):
+
+     / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \  
+    |  /~~\                                           /~~\  |
+    |\ \   |                                         |   / /|
+    | \   /|                                         |\   / |
+    |  ~~  |                                         |  ~~  |
+    |      |                                         |      |
+    |      |                                         |      |
+    |      |                                         |      |
+    |      |                                         |      |
+    |      |                                         |      |
+     \     |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|     /
+      \   /                                           \   /
+       ~~~                                             ~~~
+
+
+shell (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    #############
+    #           #
+    #           #
+    #############
+
+
+simple (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    *************
+    *           *
+    *           *
+    *************
+
+
+spring (Joan G. Stark <spunk1111@juno.com>):
+
+          ,
+      /\^/`\             
+     | \/   |            
+     | |    |               SPRING IS IN THE AIR!              jgs
+     \ \    /                                                _ _
+      '\\//'                                               _{ ' }_
+        ||                      joan stark                { `.!.` }
+        ||                  <spunk1111@juno.com>          ',_/Y\_,'
+        ||  ,                                               {_,_}
+    |\  ||  |\                                                |
+    | | ||  | |              ASCII ART GALLERY:             (\|  /)
+    | | || / /      <http://www.geocities.com/SoHo/7373/>    \| //
+     \ \||/ /                                                 |//
+      `\\//`   \\   \./    \\ /     //    \\./   \\   //   \\ |/ /
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+stark1 (Joan G. Stark <spunk1111@juno.com>):
+
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    ^   -,                ,-. .          .    ^
+    ^    | ,-. ,-. ;-.    `-, |- ,-. ;-. | '  ^
+    ^  , | | | ,-| | |    , ; |  ,-| |   |`.  ^
+    ^  `-' `-' `-^ ' ^    `-' `- `-^ '   ` `  ^
+    ^          Spunk1111@juno.com             ^
+    ^      ,-.             .   . . . .        ^
+    ^      `-, ;-. . . ;-. | ' | | | |        ^
+    ^      , ; | | | | | | |`. | | | |        ^
+    ^      `-' |-' `-^ ' ^ ` ` ` ` ` `        ^
+    ^          `                              ^
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+stark2 (Joan G. Stark <spunk1111@juno.com>):
+
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+    .:-@    ____        (_,      _,  _,  _,  _,                        @-:.
+    .:-@   (-(__`,_    ,_ |_,     |   |   |   |    Spunk1111@juno.com  @-:.
+    .:-@    ____)|_)|_|| || \__, _|_ _|_ _|_ _|_                       @-:.
+    .:-@   (    _|       |_,                                           @-:.
+    .:-@       (            ____,         ____        (_,              @-:.
+    .:-@                   (-| _  _ ,_   (-(__`_|_ _ ,_ |_,            @-:.
+    .:-@                  _  |(_)(_|| |   ____) | (_||  | \_,          @-:.
+    .:-@                 (__/            (      |_,                    @-:.
+    .:-@                                                               @-:.
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+
+
+stone (Fredrik Steen <fsteen@stone.nu>):
+
+    +-------------+
+    |    stone    |
+    +-------------+
+
+
+sunset (Joan G. Stark <spunk1111@juno.com>):
+
+                               .
+                          .    |    .
+                           \   |   /
+                       '.   \  '  /   .'
+                         '. .'```'. .'
+     <>.............:::::::`.......`:::::::................<>
+     <>:   ., .., . . .  . .  .  .  .  .  . joan stark    :<>
+     <>:  :,  :.' : : :`.: :.'  `: `: `: `:  spunk1111    :<>
+     <>:  ,.; :   `.' : `: : `.  :  :  :  :   @juno.com   :<>
+     <>:..................................................:<>
+     <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+   ~you can't hurt your eyesight by looking on the bright side~
+       ~but you can hurt them by looking at bad ascii art!~
+
+
+tjc (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    static char *foo (const int a, const int b)
+    /*
+     *  Do the foo on the bar and around again.
+     *
+     *      a     number of doodlefrobs
+     *      b     barfoo mode (0 == off)
+     *
+     *  Memory will be allocated for the result.
+     *
+     *  RETURNS:  Success: Pointer to result line
+     *            Error:   0       (e.g. out of memory)
+     *
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     */
+    {
+        static char temp ....
+        int ii;          ....
+
+
+underline (Elmar Loos <elInfo@gmx.net>):
+
+    // Bla, foo bar!
+    // ~~~~~~~~~~~~~
+
+
+vim-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+
+    "
+    " comments used in the vim editor's config file (.vimrc)
+    "
+
+
+whirly (unknown artist):
+
+     .+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.
+    (                                                             )
+     )                                                           (
+    (                                                             )
+     "+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"
+
+
+xes (Joan G. Stark <spunk1111@juno.com>):
+
+            <\/><\/><\/>
+        <\/></\></\></\><\/>
+        </\>            </\>
+     <\/>                  <\/>
+     </\>                  </\>
+    <\/>                    <\/>
+    </\>                    </\>
+     <\/>                  <\/>
+     </\>                  </\>
+        <\/>            <\/>
+        </\><\/><\/><\/></\>
+    jgs     </\></\></\>
+

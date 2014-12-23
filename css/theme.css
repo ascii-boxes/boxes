@@ -1,0 +1,122 @@
+body {
+    padding-top: 60px;
+    padding-bottom: 60px;
+	font-size: 1.6em;
+}
+
+.copyright {
+    color: #ffffff;
+}
+
+.footer {
+    text-align: center;
+}
+div.footer {
+    max-height: 33px;
+    padding-top: 2px;
+    font-size: 12px;
+    line-height: 1.1em;
+}
+
+.footer a {
+    color: #ee4444;
+}
+
+.sidebar h1 {
+    color: #ee4444;
+    font-size: 1.3em;
+}
+
+.sidebar a {
+    color: #428bca;
+}
+
+.sidebar li {
+    margin-top: .7em;
+    line-height: 1em;
+}
+
+.sidebar a:hover {
+    color: #3071a9;
+}
+
+.container-left {
+    margin: 0;
+}
+
+.well {
+    padding-top: 0;
+}
+
+.well h1 {
+    color: #ee4444;
+    font-size: 1.3em;
+}
+
+.author {
+    color: #ee4444;
+}
+
+.author a {
+    color: #ee4444;
+}
+
+.bxsample div {
+    margin: 0;
+    padding: 0;
+}
+.bxsample pre {
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+}
+
+.bxpage h1 {
+    color: black;
+    font-size: 28px;
+    font-weight: bold;
+}
+.bxpage h2 {
+    color: black;
+    font-size: 22px;
+    font-weight: bold;
+    padding-top: 0.5em;
+    border-top: 1px solid darkgray;
+}
+.bxpage h3{
+    color: black;
+    font-size: 18px;
+    font-weight: bold;
+}
+.bxpage dd {
+    margin-left: 2em;
+}
+.bxpage pre {
+    border: 0;
+    background-color: white;
+}
+p code, li code {  /* also outside of bxpages */
+    color: black;
+    background-color: #ffffdc;
+}
+blockquote {
+    font-size: 1em;
+    font-weight: normal;
+    font-style: italic;
+}
+
+pre {
+    line-height: 100%;
+    word-wrap: normal; /* prevent contents of pre areas from line wrapping */
+}
+pre code {
+    white-space: pre; /* prevent contents of pre areas from line wrapping */
+}
+
+a.bxOffsetAnchor { /* used to prevent anchors from being obscured by the fixed header */
+    display: block;
+    position: relative;
+    top: -60px;
+    visibility: hidden;
+}
