@@ -14,7 +14,8 @@ url: http://ascii-boxes.github.io
 # be the project name.
 # *** IMPORTANT: If your local "jekyll serve" throws errors change this to '' or
 #     run it like so: jekyll serve --baseurl=''
-baseurl: /boxes
+#baseurl: /boxes
+baseurl: ''
 
 # This can be '' to hide the Github nav button
 github: 'ascii-boxes/boxes'
