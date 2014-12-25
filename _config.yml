@@ -49,3 +49,4 @@ defaults:
       path: ""   # everywhere
     values:
       bxemail: '&lt;boxes(at)thomasjensen.com&gt;'
+      sitehost: 'boxes.thomasjensen.com'

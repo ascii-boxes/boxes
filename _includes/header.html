@@ -12,8 +12,12 @@
     <meta name="author" content="Thomas Jensen" />
     <meta name="robots" content="index,follow" />
 	{% if page.sedesc %}
+	<!-- start page -->
 	<meta name="description" content="{{ page.sedesc }}" />
     <meta name="keywords" content="software, ascii, ascii art, filter, command line, box, boxes, box drawing" />
+	<link rel="canonical" href="http://{{ page.sitehost }}/" />
+	{% else %}
+	<link rel="canonical" href="http://{{ page.sitehost }}{{ page.url }}" />
 	{% endif %}
     <script type="text/javascript">
         if (window.location.hostname == "ascii-boxes.github.io") {
@@ -25,7 +29,7 @@
 			else if (targetPath.indexOf(prjNamePrefix + "/") == 0) {
 			    targetPath = targetPath.substring(prjNamePrefix.length);
             }
-            window.location = window.location.protocol + "//boxes.thomasjensen.com"
+            window.location = window.location.protocol + "//{{ page.sitehost }}"
                     + targetPath + window.location.hash;
         }
     </script>
