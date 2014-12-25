@@ -15,6 +15,12 @@
 	<meta name="description" content="{{ page.sedesc }}" />
     <meta name="keywords" content="ascii, ascii art, filter, command line, box, boxes, box drawing" />
 	{% endif %}
+    <script type="text/javascript">
+        if (window.location.hostname == "ascii-boxes.github.io") {
+            window.location = window.location.protocol + "//boxes.thomasjensen.com"
+                    + window.location.pathname + window.location.hash;
+        }
+    </script>
     <script src="{{ site.baseurl }}/js/jquery.min.js"></script>
     <script src="{{ site.baseurl }}/js/bootstrap.min.js"></script>
     <link href="{{ site.baseurl }}/css/bootstrap.min.css" rel="stylesheet">
