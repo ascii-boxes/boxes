@@ -13,12 +13,20 @@
     <meta name="robots" content="index,follow" />
 	{% if page.sedesc %}
 	<meta name="description" content="{{ page.sedesc }}" />
-    <meta name="keywords" content="ascii, ascii art, filter, command line, box, boxes, box drawing" />
+    <meta name="keywords" content="software, ascii, ascii art, filter, command line, box, boxes, box drawing" />
 	{% endif %}
     <script type="text/javascript">
         if (window.location.hostname == "ascii-boxes.github.io") {
+		    var prjNamePrefix = "/{{ site.name }}";
+		    var targetPath = window.location.pathname;
+			if (targetPath == prjNamePrefix) {
+			    targetPath = "/";
+			}
+			else if (targetPath.indexOf(prjNamePrefix + "/") == 0) {
+			    targetPath = targetPath.substring(prjNamePrefix.length);
+            }
             window.location = window.location.protocol + "//boxes.thomasjensen.com"
-                    + window.location.pathname + window.location.hash;
+                    + targetPath + window.location.hash;
         }
     </script>
     <script src="{{ site.baseurl }}/js/jquery.min.js"></script>
