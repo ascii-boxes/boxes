@@ -62,6 +62,7 @@ div.footer {
 }
 
 .bxsample div {
+	display: table;
     margin: 0;
     padding: 0;
 }
