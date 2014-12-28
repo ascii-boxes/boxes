@@ -1,5 +1,3 @@
-_cache
-_site
 .cproject
 .project
 *.o
@@ -15,3 +13,5 @@ src/boxes.h
 src/lex.yy.c
 src/parser.h
 src/parser.c
+_site/
+_cache/
