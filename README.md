@@ -52,7 +52,7 @@ uses only a small set of instructions and is comformant to the ANSI C
 standard.
 
 For a small collection of frequently asked questions, visit the
-[compilation FAQ](http://boxes.thomasjensen.com/docs/faq.shtml#q5)
+[compilation FAQ](https://github.com/ascii-boxes/boxes/wiki/FAQ#q-5-compilation)
 on the boxes website.
 
 
@@ -87,10 +87,10 @@ on the boxes website.
    it. Boxes will use *$HOME/.boxes* if it exists.
 
 3. Integration into your text editor: Please see the
-   [editor installation page](http://boxes.thomasjensen.com/docs/install.shtml)
+   [editor integration page](http://boxes.thomasjensen.com/docs/install.html)
    on the website.
-   It currently describes installation with vim, emacs, and jed, but
-   this list may grow as time goes by and people send me how-tos.
+   It currently describes integration with vim, emacs, and jed, but
+   this list may grow as time goes by and people send how-tos.
 
 
 ###RUNNING IT
