@@ -1279,7 +1279,7 @@ static int list_styles()
                         fprintf (opt.outfile, "%s: ", shape_name[i]);
                     else {
                         space[strlen(shape_name[i])+2] = '\0';
-                        fprintf (opt.outfile, space);
+                        fprintf (opt.outfile, "%s", space);
                         space[strlen(shape_name[i])+2] = ' ';
                     }
                     if (j < d->shape[i].height) {
@@ -1287,7 +1287,7 @@ static int list_styles()
                     }
                     else {
                         space[d->shape[i].width+2] = '\0';
-                        fprintf (opt.outfile, space);
+                        fprintf (opt.outfile, "%s", space);
                         space[d->shape[i].width+2] = ' ';
                     }
                 }
