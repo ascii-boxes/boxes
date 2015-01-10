@@ -1,4 +1,4 @@
-44 Available Styles in ".boxes":
+46 Available Styles in ".boxes":
 --------------------------------
 
 ada-box (Neil Bird <neil.bird@rdel.co.uk>):
@@ -509,6 +509,38 @@ underline (Elmar Loos <elInfo@gmx.net>):
 
     // Bla, foo bar!
     // ~~~~~~~~~~~~~
+
+
+unicornsay (Mike Meyer <boxes@meyer.fm>):
+
+   _________________________________
+  /                                 \
+  |     E L E C T R O L Y T E S     |
+  \___________________________  __'\
+                              |/   \\
+                               \    \\  .
+                                    |\\/|
+                                    / " '\
+                                    . .   .
+                                   /    ) |
+                                  '  _.'  |
+                                  '-'/    \
+
+
+unicornthink (Mike Meyer <boxes@meyer.fm>):
+
+   _________________________________
+  /                                 \
+  |     E L E C T R O L Y T E S     |
+  \______________________________ '\
+                             ()    \\
+                               O    \\  .
+                                 o  |\\/|
+                                    / " '\
+                                    . .   .
+                                   /    ) |
+                                  '  _.'  |
+                                  '-'/    \
 
 
 vim-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
