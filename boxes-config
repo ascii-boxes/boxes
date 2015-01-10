@@ -2280,4 +2280,42 @@ elastic (n, s, e, w)
 END unicornsay
 
 
+# ============================================================================
+
+
+BOX caml
+
+author   "Michael Tiernan <Michael.Tiernan@gMail.com>"
+revision "1.5"
+revdate  "Wed May 14 11:41:27 EDT 2014"
+created  "Wed May 14 11:41:27 EDT 2014"
+
+sample
+    (*************)
+    (*           *)
+    (*           *)
+    (*************)
+ends
+
+shapes {
+    nw ("(*") n ("*") ne ("*)")
+     w ("(*")          e ("*)")
+    sw ("(*") s ("*") se ("*)")
+}
+
+elastic (n,e,s,w)
+
+padding {
+    horiz 1
+}
+
+replace "\\(\\*" with "(+*"
+replace "\\*\\)" with "*+)"
+
+reverse "\\(\\+\\*" to "(*"
+reverse "\\*\\+\\)" to "*)"
+
+END caml
+
+
 #EOF                                                  vim: set ai sw=4:
