@@ -1,4 +1,4 @@
-46 Available Styles in ".boxes":
+47 Available Styles in ".boxes":
 --------------------------------
 
 ada-box (Neil Bird <neil.bird@rdel.co.uk>):
@@ -79,6 +79,14 @@ c-cmt3 (AlpT (@freaknet.org)):
      */
     code(here); a++;
     /**/
+
+
+caml (Michael Tiernan <Michael.Tiernan@gMail.com>):
+
+    (*************)
+    (*           *)
+    (*           *)
+    (*************)
 
 
 capgirl (Joan G. Stark <spunk1111@juno.com>):

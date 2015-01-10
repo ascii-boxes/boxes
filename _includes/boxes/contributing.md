@@ -65,5 +65,6 @@ Now that *boxes* is on GitHub, all contributors are automatically [listed on Git
   - Elmar Loos - the *ccel* and *underline* designs
   - Christian Molls - the *boxquote* design
   - Fredrik Steen - the *stone* design
+  - Michael Tiernan - the *caml* design
 
 Many thanks to these awesome folks!
