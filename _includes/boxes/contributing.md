@@ -44,7 +44,7 @@ Now that *boxes* is on GitHub, all contributors are automatically [listed on Git
 
   - Ron Aaron - win32 port
   - Peter van den Berkmortel - HPUX 10 binaries of v1.0.1
-  - Salvatore Bonaccorso - fixes to the man page
+  - Salvatore Bonaccorso - enable compilation on GNU/kFreeBSD and GNU/Hurd; fixes to the man page
   - Christoph Dreyer - tab unexpansion
   - Andreas Heiduk - bug fixes and compatibility improvements; Jed integration
   - Jakub Hrozek - patch to eliminate a compilation warning on Fedora
