@@ -4,7 +4,7 @@
 " Latest Change: September 12, 1999 (Sunday, 01:14h)
 " Vim Version:   5.4
 " Filenames:     .boxes boxes-config boxes
-" URL:           http://boxes.thomasjensen.com/vim/syntax/boxes.vim
+" URL:           https://github.com/ascii-boxes/boxes/blob/master/boxes.vim
 "
 " Problems:    - Strings must start and end with double quotes (") and the
 "                escape character is always backslash (\), which does not
