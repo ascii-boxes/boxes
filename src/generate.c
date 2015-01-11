@@ -3,12 +3,11 @@
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 20:10h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: generate.c,v 1.11 2006/07/22 19:21:13 tsjensen Exp $
  *  Language:         ANSI C
- *  World Wide Web:   http://boxes.thomasjensen.com/
+ *  Web Site:         http://boxes.thomasjensen.com/
  *  Purpose:          Box generation, i.e. the drawing of boxes
  *
- *  Remarks: o This program is free software; you can redistribute it and/or
+ *  License: o This program is free software; you can redistribute it and/or
  *             modify it under the terms of the GNU General Public License as
  *             published by the Free Software Foundation; either version 2 of
  *             the License, or (at your option) any later version.
@@ -20,51 +19,6 @@
  *             License along with this program; if not, write to the Free
  *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *             MA 02111-1307  USA
- *
- *  Revision History:
- *
- *    $Log: generate.c,v $
- *    Revision 1.11  2006/07/22 19:21:13  tsjensen
- *    Applied patch by Christoph Dreyer to support unexpansion of leading tabs
- *    Added ability to retain existing tabs
- *
- *    Revision 1.10  2006/07/12 05:42:28  tsjensen
- *    Updated email and web addresses in comment header
- *
- *    Revision 1.9  1999-08-31 08:37:01-07  tsjensen
- *    Applied Joe Zbiciak's patches to remove all snprintf()s and variants
- *    Replaced snprintf() calls with calls to concat_strings() in the process
- *
- *    Revision 1.8  1999/08/22 11:36:45  tsjensen
- *    Removed const from 2nd parameter of justify_line() function
- *
- *    Revision 1.7  1999/08/21 16:04:24  tsjensen
- *    Bugfix: justify_line() still didn't work right. It should now. (This time I
- *    discovered that indentmode=="text" was confusing it. Arghh!)
- *
- *    Revision 1.6  1999/08/18 15:37:09  tsjensen
- *    Bugfix: justify_line() still didn't work right. It should now. (Man, I got
- *    a strong sense of déja vu! Weird ...)
- *
- *    Revision 1.5  1999/08/16 18:30:32  tsjensen
- *    Bugfix: justify_line() still didn't work right. It should now.
- *
- *    Revision 1.4  1999/07/21 16:50:48  tsjensen
- *    Added GNU GPL disclaimer
- *    Bugfix: When doing the line justification in output_box(), the padding
- *    was counted as part of the modifyable inner part of the box instead of
- *    the fixed box itself, which resulted in strange bugs (tricky one).
- *
- *    Revision 1.3  1999/06/25 18:42:50  tsjensen
- *    Added justify_line() function for alignment of lines inside the text block
- *    Cleaned up hfill calculation in output_box()
- *    Changed parameters of empty_side() calls to comply with new signature
- *
- *    Revision 1.2  1999/06/23 19:23:55  tsjensen
- *    Added output_box() from boxes.c
- *
- *    Revision 1.1  1999/06/23 18:52:54  tsjensen
- *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */

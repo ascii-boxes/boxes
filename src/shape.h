@@ -3,12 +3,11 @@
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 13:45h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: shape.h,v 1.5 2006/07/12 05:27:59 tsjensen Exp $
  *  Language:         ANSI C
- *  World Wide Web:   http://boxes.thomasjensen.com/
+ *  Web Site:         http://boxes.thomasjensen.com/
  *  Purpose:          Shape handling and information functions
  *
- *  Remarks: o This program is free software; you can redistribute it and/or
+ *  License: o This program is free software; you can redistribute it and/or
  *             modify it under the terms of the GNU General Public License as
  *             published by the Free Software Foundation; either version 2 of
  *             the License, or (at your option) any later version.
@@ -20,29 +19,6 @@
  *             License along with this program; if not, write to the Free
  *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *             MA 02111-1307  USA
- *
- *  Revision History:
- *
- *    $Log: shape.h,v $
- *    Revision 1.5  2006/07/12 05:27:59  tsjensen
- *    Updated email and web addresses in comment header
- *
- *    Revision 1.4  1999-08-14 12:08:34-07  tsjensen
- *    Added genshape(), freeshape(), and findshape() prototypes
- *    Added on_side() prototype back again
- *    Added isdeepempty() prototype
- *    Changed first parameter of empty_side() prototype
- *
- *    Revision 1.3  1999/07/23 16:36:33  tsjensen
- *    Added GNU GPL disclaimer
- *    Removed prototypes of iscorner(), on_side(), shapecmp(), both_on_side(),
- *    and shape_distance() - nobody was using those anyway.
- *
- *    Revision 1.2  1999/06/25 18:52:59  tsjensen
- *    Added empty_side() prototype
- *
- *    Revision 1.1  1999/06/23 12:27:06  tsjensen
- *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */

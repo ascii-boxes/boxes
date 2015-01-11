@@ -3,13 +3,12 @@
  *  Project Main:     boxes.c
  *  Date created:     June 20, 1999 (Sunday, 16:57h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: tools.h,v 1.5 2006/07/22 19:11:07 tsjensen Exp $
  *  Language:         ANSI C
- *  World Wide Web:   http://boxes.thomasjensen.com/
+ *  Web Site:         http://boxes.thomasjensen.com/
  *  Purpose:          Tool functions for error reporting and some string
  *                    handling and other needful things
  *
- *  Remarks: o This program is free software; you can redistribute it and/or
+ *  License: o This program is free software; you can redistribute it and/or
  *             modify it under the terms of the GNU General Public License as
  *             published by the Free Software Foundation; either version 2 of
  *             the License, or (at your option) any later version.
@@ -21,28 +20,6 @@
  *             License along with this program; if not, write to the Free
  *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *             MA 02111-1307  USA
- *
- *  Revision History:
- *
- *    $Log: tools.h,v $
- *    Revision 1.5  2006/07/22 19:11:07  tsjensen
- *    Changed expand_tabs_into() signature in order to support advanced tab handling
- *    Added tabbify_indent()
- *
- *    Revision 1.4  2006/07/12 05:25:27  tsjensen
- *    Updated email and web addresses in comment header
- *
- *    Revision 1.3  1999-08-31 08:38:42-07  tsjensen
- *    Added concat_strings() function prototype from Joe Zbiciak's patches
- *
- *    Revision 1.2  1999/07/20 18:56:15  tsjensen
- *    Added GNU GPL disclaimer
- *    Removed include boxes.h
- *    Added prototypes for strisyes() and strisno()
- *
- *    Revision 1.1  1999/06/23 11:19:59  tsjensen
- *    Initial revision
- *
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */

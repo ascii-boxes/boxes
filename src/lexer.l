@@ -3,11 +3,11 @@
  *  File:             lexer.l
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: lexer.l,v 1.19 2006/07/22 19:31:25 tsjensen Exp $
  *  Language:         lex (ANSI C)
+ *  Web Site:         http://boxes.thomasjensen.com/
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *
- *  Remarks: o This program is free software; you can redistribute it and/or
+ *  License: o This program is free software; you can redistribute it and/or
  *             modify it under the terms of the GNU General Public License as
  *             published by the Free Software Foundation; either version 2 of
  *             the License, or (at your option) any later version.
@@ -19,85 +19,9 @@
  *             License along with this program; if not, write to the Free
  *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *             MA 02111-1307  USA
- *           - We don't use the yylineno %option. It is not only inefficient,
+ *
+ * Remarks:  - We don't use the yylineno %option. It is not only inefficient,
  *             but also doesn't work. :-| *doh*
- *
- *  Revision History:
- *
- *    $Log: lexer.l,v $
- *    Revision 1.19  2006/07/22 19:31:25  tsjensen
- *    Fix: Renamed yylineno to tjlineno to enable compilation on certain
- *    flexes (reported by Andreas Heiduk)
- *
- *    Revision 1.18  2006/07/07 07:24:17  tsjensen
- *    Applied patch by Andreas Heiduk to facilitate compilation with
- *    present-day flexes
- *
- *    Revision 1.17  1999/08/20 19:51:12  tsjensen
- *    Moved contents of YY_USER_INIT definition into a separate function which
- *    is now called by YY_USER_INIT (better readability)
- *
- *    Revision 1.16  1999/08/18 18:23:41  tsjensen
- *    Declared yyerrcnt to be static
- *    Added YY_USER_INIT macro to set the input buffer size to the config file
- *    size (plus a bit). This is supposed to be a workaround for the REJECT
- *    problem.
- *
- *    Revision 1.15  1999/08/18 15:40:10  tsjensen
- *    Added %options never-interactive and caseless
- *    Added code for DELIMITER statements
- *    Rewrote string rules to deal with delimiter statements
- *
- *    Revision 1.14  1999/08/16 16:28:03  tsjensen
- *    Implemented new SAMPLE block syntax
- *    Replaced states SAMPLE1 and SAMPLE2 with new state SAMPLE - this is now
- *    much simpler code
- *
- *    Revision 1.13  1999/07/22 12:21:14  tsjensen
- *    Added GNU GPL disclaimer
- *    Renamed y.tab.h include to parser.h (same file)
- *    Renamed parser.h include to lexer.h (same file)
- *    Added config.h include
- *
- *    Revision 1.12  1999/07/02 11:58:15  tsjensen
- *    Added begin_speedmode() which is called by parser.y
- *    Added state SPEEDMODE for fast skipping of designs
- *    Introduced definitions for PWORD, PBOX, and PWHITE (whitespace)
- *    Added %options nounput and noyywrap for easier compilation/linking
- *
- *    Revision 1.11  1999/06/28 18:37:38  tsjensen
- *    Replaced DEBUG macro with LEXER_DEBUG, which is now activated in boxes.h
- *    New tokens to, with, global, once
- *    Added LEX_MAX_WARN macro to limit number of lex errors printed per design
- *    Replaced exit()s with return YUNREC where errors are not fatal
- *
- *    Revision 1.10  1999/06/28 12:17:46  tsjensen
- *    Added tokens YBOX and YEND (thus, BOX and END are no longer YKEYWORDs)
- *    Added #define FILE_LEXER_L around #include boxes.h to please compiler
- *
- *    Revision 1.9  1999/06/22 12:00:05  tsjensen
- *    Added #undef DEBUG, because DEBUGging is now activated in boxes.h
- *    Added #include tools.h
- *
- *    Revision 1.8  1999/06/20 14:17:58  tsjensen
- *    Added "padding" keyword and recognition of numbers (YNUMBER)
- *
- *    Revision 1.7  1999/06/17 19:05:46  tsjensen
- *    Bugfix: Sample block analysis didn't handle empty blocks
- *
- *    Revision 1.6  1999/06/14 12:13:41  tsjensen
- *    Added Reverse pattern
- *
- *    Revision 1.4  1999/04/09 13:31:13  tsjensen
- *    Removed all code related to OFFSET blocks (obsolete)
- *
- *    Revision 1.3  1999/04/04 16:11:39  tsjensen
- *    Added indent keyword
- *    Added Replace token
- *    Some fiddling which will hopefully fix a line counting bug
- *
- *    Revision 1.1  1999/03/18 15:09:48  tsjensen
- *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */

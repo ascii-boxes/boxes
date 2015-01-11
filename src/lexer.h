@@ -3,12 +3,11 @@
  *  Project Main:     boxes.c
  *  Date created:     July 01, 1999 (Thursday, 13:43h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: lexer.h,v 1.5 2006/07/12 05:33:12 tsjensen Exp $
  *  Language:         ANSI C
- *  World Wide Web:   http://boxes.thomasjensen.com/
+ *  Web Site:         http://boxes.thomasjensen.com/
  *  Purpose:          Export symbols used by the parser files only
  *
- *  Remarks: o This program is free software; you can redistribute it and/or
+ *  License: o This program is free software; you can redistribute it and/or
  *             modify it under the terms of the GNU General Public License as
  *             published by the Free Software Foundation; either version 2 of
  *             the License, or (at your option) any later version.
@@ -20,26 +19,6 @@
  *             License along with this program; if not, write to the Free
  *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *             MA 02111-1307  USA
- *
- *  Revision History:
- *
- *    $Log: lexer.h,v $
- *    Revision 1.5  2006/07/12 05:33:12  tsjensen
- *    Updated email and web addresses in comment header
- *
- *    Revision 1.4  1999-08-18 08:42:46-07  tsjensen
- *    Added LEX_SDELIM macro (valid string delimiter characters)
- *    Added prototype for chg_strdelims()
- *
- *    Revision 1.3  1999/08/14 19:06:26  tsjensen
- *    Added GNU GPL disclaimer
- *    Added yylex() declaration to please compiler
- *
- *    Revision 1.2  1999/07/03 16:12:19  tsjensen
- *    Renamed file from parser.h to lexer.h
- *
- *    Revision 1.1  1999/07/02 11:47:11  tsjensen
- *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */

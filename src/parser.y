@@ -3,12 +3,11 @@
  *  File:             parser.y
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: parser.y,v 1.25 2006/07/23 16:11:39 tsjensen Exp $
  *  Language:         GNU bison (ANSI C)
- *  World Wide Web:   http://boxes.thomasjensen.com/
+ *  Web Site:         http://boxes.thomasjensen.com/
  *  Purpose:          Yacc parser for boxes configuration files
  *
- *  Remarks: o This program is free software; you can redistribute it and/or
+ *  License: o This program is free software; you can redistribute it and/or
  *             modify it under the terms of the GNU General Public License as
  *             published by the Free Software Foundation; either version 2 of
  *             the License, or (at your option) any later version.
@@ -20,115 +19,6 @@
  *             License along with this program; if not, write to the Free
  *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *             MA 02111-1307  USA
- *
- *  Revision History:
- *
- *    $Log: parser.y,v $
- *    Revision 1.25  2006/07/23 16:11:39  tsjensen
- *    Removed unsigned modifier from a pointer declaration in order to clear a warning
- *    which appeared on some Linuxes (reported by Andreas Heiduk)
- *
- *    Revision 1.24  2006/07/22 19:30:55  tsjensen
- *    Fix: Renamed yylineno to tjlineno to enable compilation on certain
- *    flexes (reported by Andreas Heiduk)
- *
- *    Revision 1.23  2006/07/12 05:31:25  tsjensen
- *    Updated email and web addresses in comment header
- *
- *    Revision 1.22  1999-08-21 08:53:58-07  tsjensen
- *    Removed check for empty sample block, which is also done in lexer.l
- *
- *    Revision 1.21  1999/08/18 15:38:44  tsjensen
- *    Added new tokens YCHGDEL and YDELWORD
- *    Added code for DELIMITER statements
- *
- *    Revision 1.20  1999/08/16 16:29:25  tsjensen
- *    Changed SAMPLE block syntax to get rid of all the quoting sh*t in SAMPLE
- *    blocks. Samples now look authentic even in the config file. Very simple now.
- *    Added new token YENDSAMPLE in the process.
- *
- *    Revision 1.19  1999/08/14 19:19:25  tsjensen
- *    Added anz_shapespec variable to count non-deepempty user-specified shapes
- *    (must at least be 1)
- *    Moved yylex declaration to lexer.h, where it belongs
- *    Bugfix: bison and yacc seem to differ in the way action code is treated
- *    which is associated with an error token. Since bison calls the action
- *    routine whenever a token is skipped while recovering, added skipping
- *    variable to ensure that only one "skipping to next design" message is
- *    printed. That was not necessary before. %-/
- *    Removed existence check from corner_check() routine (obsolete).
- *    Added code to generate required shapes which were not specified by the user
- *    Clean-up in shape_def rule (use freeshape() and some more)
- *
- *    Revision 1.18  1999/07/23 16:14:17  tsjensen
- *    Added computation of height of highest shape in design (maxshapeheight)
- *    Options -l and -d together now call quickinfo mode -> parse only 1 design
- *
- *    Revision 1.17  1999/07/22 12:27:16  tsjensen
- *    Added GNU GPL disclaimer
- *    Renamed parser.h include to lexer.h (same file)
- *    Added include config.h
- *
- *    Revision 1.16  1999/07/02 11:54:52  tsjensen
- *    Some minor changes to please compiler
- *    Communication of speed mode to lexer
- *    Bugfix: Forgot to check for opt.l before calling YYACCEPT
- *
- *    Revision 1.15  1999/06/30 12:13:47  tsjensen
- *    Now parsing only those designs which will be needed later on
- *    Checks formerly done in boxes.c now done here (no valid designs etc.)
- *
- *    Revision 1.14  1999/06/28 18:32:51  tsjensen
- *    Unified appearance of error messages, which are now all based on yyerror()
- *    Eliminated duplicate code by introducing intermediate rules
- *    New tokens YTO, YWITH, and YRXPFLAG to reduce strcasecmp() usage
- *    New token YUNREC for integration of lexer into error handling
- *    Some code restructuring and rule renaming for better consistency
- *    Added out-of-memory-checks to many strdup()s and such
- *
- *    Revision 1.13  1999/06/28 12:15:47  tsjensen
- *    Added error handling. Now skips to next design on error.
- *    Replaced DEBUG macro with PARSER_DEBUG, which is now activated in boxes.h
- *    Added rule first_rule, which performs init and cleanup formerly done in main()
- *    Introduced symbols YBOX and YEND
- *
- *    Revision 1.12  1999/06/22 12:01:01  tsjensen
- *    Added #undef DEBUG, because DEBUGging is now activated in boxes.h
- *    Added #include tools.h
- *
- *    Revision 1.11  1999/06/20 14:18:51  tsjensen
- *    Adden YPADDING and YNUMBER tokens plus code for padding blocks
- *
- *    Revision 1.10  1999/06/17 19:04:45  tsjensen
- *    Added detection of empty sample blocks (we don't want that)
- *    Added detection of duplicate sample blocks
- *
- *    Revision 1.9  1999/06/14 12:13:01  tsjensen
- *    Added YREVERSE token
- *    Added code for regexp reversion
- *
- *    Revision 1.7  1999/04/09 13:31:54  tsjensen
- *    Added checks for duplicate design names
- *    Added checks for valid design names (no extended ASCII or ctrl chars)
- *    Removed all code related to OFFSET blocks (obsolete)
- *
- *    Revision 1.6  1999/04/04 16:07:53  tsjensen
- *    Enforced use of PROJECT macro
- *    Added "indent" directive to grammar
- *    Added "replace" directive to grammar
- *
- *    Revision 1.5  1999/03/30 13:29:50  tsjensen
- *    Added computation of minimum width/height of each design.
- *
- *    Revision 1.4  1999/03/30 09:37:51  tsjensen
- *    It drew a correct box for the first time!
- *
- *    Revision 1.3  1999/03/24 17:29:12  tsjensen
- *    Added detection of empty shapes ("") which are now cleared (+warning)
- *    Changed rcs string to #ident directive
- *
- *    Revision 1.1  1999/03/18 15:10:06  tsjensen
- *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */

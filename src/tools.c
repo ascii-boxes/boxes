@@ -3,13 +3,12 @@
  *  Project Main:     boxes.c
  *  Date created:     June 20, 1999 (Sunday, 16:51h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: tools.c,v 1.7 2006/07/22 19:27:15 tsjensen Exp $
  *  Language:         ANSI C
- *  World Wide Web:   http://boxes.thomasjensen.com/
+ *  Web Site:         http://boxes.thomasjensen.com/
  *  Purpose:          Provide tool functions for error reporting and some
  *                    string handling
  *
- *  Remarks: o This program is free software; you can redistribute it and/or
+ *  License: o This program is free software; you can redistribute it and/or
  *             modify it under the terms of the GNU General Public License as
  *             published by the Free Software Foundation; either version 2 of
  *             the License, or (at your option) any later version.
@@ -21,34 +20,6 @@
  *             License along with this program; if not, write to the Free
  *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *             MA 02111-1307  USA
- *
- *  Revision History:
- *
- *    $Log: tools.c,v $
- *    Revision 1.7  2006/07/22 19:27:15  tsjensen
- *    Changed expand_tabs_into() so that it records the original tab positions in a line
- *    Added tabbify_indent() to restore original leading tabs after box processing
- *
- *    Revision 1.6  2006/07/12 05:25:47  tsjensen
- *    Updated email and web addresses in comment header
- *
- *    Revision 1.5  1999-08-31 08:35:13-07  tsjensen
- *    Applied Joe Zbiciak's patches to remove all snprintf()s and variants
- *    Added concat_strings() function and changed yyerror() in the process
- *
- *    Revision 1.4  1999/08/21 16:09:33  tsjensen
- *    Removed newline check from empty_line() function
- *
- *    Revision 1.3  1999/08/13 23:54:24  tsjensen
- *    Bugfix: cut&paste error in in strisyes() and strisno(). Thanks Warren Seltzer
- *
- *    Revision 1.2  1999/07/20 18:55:20  tsjensen
- *    Added GNU GPL disclaimer
- *    Added functions strisyes() and strisno()
- *    Added config.h and shape.h include statements
- *
- *    Revision 1.1  1999/06/23 11:19:30  tsjensen
- *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */

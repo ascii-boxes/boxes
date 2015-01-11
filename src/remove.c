@@ -3,12 +3,11 @@
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 20:59h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: remove.c,v 1.8 2006/07/22 19:19:26 tsjensen Exp $
  *  Language:         ANSI C
- *  World Wide Web:   http://boxes.thomasjensen.com/
+ *  Web Site:         http://boxes.thomasjensen.com/
  *  Purpose:          Box removal, i.e. the deletion of boxes
  *
- *  Remarks: o This program is free software; you can redistribute it and/or
+ *  License: o This program is free software; you can redistribute it and/or
  *             modify it under the terms of the GNU General Public License as
  *             published by the Free Software Foundation; either version 2 of
  *             the License, or (at your option) any later version.
@@ -20,41 +19,6 @@
  *             License along with this program; if not, write to the Free
  *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *             MA 02111-1307  USA
- *
- *  Revision History:
- *
- *    $Log: remove.c,v $
- *    Revision 1.8  2006/07/22 19:19:26  tsjensen
- *    Applied patch by Christoph Dreyer to support unexpansion of leading tabs
- *    Added ability to retain existing tabs
- *
- *    Revision 1.7  2006/07/12 05:28:58  tsjensen
- *    Updated email and web addresses in comment header
- *    Added trim_only flag to output_input() function, used for box mending
- *
- *    Revision 1.6  1999-11-08 02:51:41-08  tsjensen
- *    Bugfix: For non-empty left box sides, spaces belonging to "empty" shape
- *    lines were not properly removed in some cases
- *
- *    Revision 1.5  1999/11/07 17:46:26  tsjensen
- *    Bugfix: Horizontal box parts were not correctly detected if the west box
- *    side was empty (reported: Tobias Buchal)
- *    Bugfix: boxes could hang in detect_horiz() due to goeast/west confusion
- *
- *    Revision 1.4  1999/08/21 16:03:31  tsjensen
- *    Bugfix: When matching vertical side shape lines, ignore empty shape lines
- *
- *    Revision 1.3  1999/07/20 18:57:16  tsjensen
- *    Added GNU GPL disclaimer
- *    Does not kill leading/trailing blank lines anymore when !opt.killblank
- *    Added include config.h
- *
- *    Revision 1.2  1999/06/25 18:45:33  tsjensen
- *    Added initialization of mmok to please compiler
- *    Changed parameters of empty_side() calls to comply with new signature
- *
- *    Revision 1.1  1999/06/23 19:14:53  tsjensen
- *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */

@@ -2,12 +2,11 @@
  *  File:             boxes.h
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: boxes.h.in,v 1.22 2006/07/22 19:15:52 tsjensen Exp $
  *  Language:         ANSI C
- *  World Wide Web:   http://boxes.thomasjensen.com/
+ *  Web Site:         http://boxes.thomasjensen.com/
  *  Purpose:          Project-wide globals and data structures
  *
- *  Remarks: o This program is free software; you can redistribute it and/or
+ *  License: o This program is free software; you can redistribute it and/or
  *             modify it under the terms of the GNU General Public License as
  *             published by the Free Software Foundation; either version 2 of
  *             the License, or (at your option) any later version.
@@ -19,93 +18,6 @@
  *             License along with this program; if not, write to the Free
  *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *             MA 02111-1307  USA
- *
- *  Revision History:
- *
- *    $Log: boxes.h.in,v $
- *    Revision 1.22  2006/07/22 19:15:52  tsjensen
- *    Fix: Renamed yylineno to tjlineno to enable compilation on certain
- *    flexes (reported by Andreas Heiduk)
- *    Added tabexp to opt_t
- *    Added tabpos and tabpos_len to line_t for advanced tab handling
- *
- *    Revision 1.21  2006/07/12 05:44:12  tsjensen
- *    Updated email and web addresses in comment header
- *    Added new member 'mend' to opt_t (for option -m, mend box)
- *
- *    Revision 1.20  2000-04-01 10:28:18-08  tsjensen
- *    Added cld member to command line option struct (-c option)
- *
- *    Revision 1.19  2000/03/17 23:43:13  tsjensen
- *    Added vim autocommand to set syntax highlighting to C
- *
- *    Revision 1.18  1999/08/21 23:37:23  tsjensen
- *    Renamed file from boxes.h to boxes.h.in
- *    VERSION and GLOBALCONF values are now put in by top level Makefile
- *
- *    Revision 1.17  1999/08/14 19:31:23  tsjensen
- *    Incremented beta version number to 5
- *    Added maxshapeheight member to design_t struct
- *
- *    Revision 1.16  1999/07/20 18:48:46  tsjensen
- *    Added GNU GPL disclaimer
- *    Updated beta version number :-)
- *    Added killblank member to global options
- *
- *    Revision 1.15  1999/06/30 12:19:12  tsjensen
- *    Removed DEF_DESIGN macro, because it now defaults to first design
- *    Removed some porting code, hoping for autoconf future
- *    Added PARSER_DEBUG and LEXER_DEBUG macros
- *
- *    Revision 1.14  1999/06/25 18:51:04  tsjensen
- *    Removed empty_side() prototype (now in shape.h)
- *    Added indentmode and justify members to command line options struct
- *
- *    Revision 1.13  1999/06/23 19:21:15  tsjensen
- *    Now exporting anz_designs, input, and empty_side()
- *    Added #include regexp.h back
- *
- *    Revision 1.12  1999/06/23 12:33:49  tsjensen
- *    Moved some data structures and macros related to shapes to shape.h
- *    Added #ifdef DEBUG around __TJ() macro for convenience
- *
- *    Revision 1.11  1999/06/22 12:01:24  tsjensen
- *    Added DEF_DESIGN (default design name)
- *    Added opt_t and opt global variable from boxes.c
- *    Moved BFREE macro and yyerror() and empty_line() prototypes to tools.h
- *    Added LINE_MAX and MAX_TABSTOP macros from boxes.c
- *    Added #define DEBUG and REGEXP_DEBUG. This will centrally activate
- *    debugging.
- *
- *    Revision 1.10  1999/06/20 14:19:31  tsjensen
- *    Added padding member to design struct
- *
- *    Revision 1.9  1999/06/17 19:08:50  tsjensen
- *    Removed #pragma ident "string"
- *    Changed VERSION to 1.0 beta
- *    Added line_t and empty_line() prototype
- *
- *    Revision 1.8  1999/06/14 12:11:54  tsjensen
- *    Added struct members for regexp reversion code
- *    Renamed current_reprule to current_rule, now used for both directions
- *
- *    Revision 1.6  1999/04/09 13:32:55  tsjensen
- *    Removed code related to OFFSET blocks (obsolete)
- *
- *    Revision 1.5  1999/04/04 16:10:51  tsjensen
- *    Added some flags to design structure
- *    Move default settings here from boxes.c
- *
- *    Revision 1.4  1999/03/31 17:34:43  tsjensen
- *    ... still programming ...
- *    Added minwidth and minheight to design structure
- *
- *    Revision 1.3  1999/03/30 09:36:58  tsjensen
- *    ... still programming ...
- *    It drew a correct box for the first time!
- *
- *    Revision 1.1  1999/03/18 15:09:34  tsjensen
- *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */

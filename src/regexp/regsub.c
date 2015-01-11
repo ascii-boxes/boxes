@@ -3,11 +3,10 @@
  *  Date created:     Copyright (c) 1986 by University of Toronto.
  *  Author:           Henry Spencer.
  *                    Extensions and modifications by Thomas Jensen
- *  Version:          $Id: regsub.c,v 1.7 2006/07/23 16:15:55 tsjensen Exp $
  *  Language:         K&R C (traditional)
- *  World Wide Web:   http://boxes.thomasjensen.com/
+ *  Web Site:         http://boxes.thomasjensen.com/
  *  Purpose:          Perform substitutions after a regexp match
- *  Remarks:          - Not derived from licensed software.
+ *  License:          - Not derived from licensed software.
  *                    - Permission is granted to anyone to use this
  *                      software for any purpose on any computer system,
  *                      and to redistribute it freely, subject to the
@@ -21,32 +20,6 @@
  *                      3. Altered versions must be plainly marked as such,
  *                         and must not be misrepresented as being the
  *                         original software.
- *  Revision History:
- *
- *    $Log: regsub.c,v $
- *    Revision 1.7  2006/07/23 16:15:55  tsjensen
- *    Undo of previous version
- *    Added include string.h and removed manual extern declarations for strncpy()
- *
- *    Revision 1.6  2006/07/22 19:01:10  tsjensen
- *    Added extern declaration of strncpy() to myregsub(), hoping this will clear some warnings on Debian
- *
- *    Revision 1.5  2006/07/12 05:20:26  tsjensen
- *    Updated world wide web link in comment header
- *
- *    Revision 1.4  1999-07-20 11:51:41-07  tsjensen
- *    Bugfix: REPLACE "^" with "a" caused a hangup. Now automatically declaring
- *    matches which have a length of zero to be of scope "once".
- *
- *    Revision 1.3  1999/04/12 18:13:57  tsjensen
- *    Added missing '$' to rcs id string, changed from #ident to char
- *
- *    Revision 1.2  1999/04/05 19:39:27  tsjensen
- *    Hopefully fixed a potential buffer overrun problem in regsub()
- *
- *    Revision 1.1  1999/04/04 16:14:46  tsjensen
- *    Initial revision
- *
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */

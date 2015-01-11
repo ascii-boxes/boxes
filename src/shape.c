@@ -3,12 +3,11 @@
  *  Project Main:     boxes.c
  *  Date created:     June 23, 1999 (Wednesday, 13:39h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Version:          $Id: shape.c,v 1.6 2006/07/12 05:27:29 tsjensen Exp $
  *  Language:         ANSI C
- *  World Wide Web:   http://boxes.thomasjensen.com/
+ *  Web Site:         http://boxes.thomasjensen.com/
  *  Purpose:          Shape handling and information functions
  *
- *  Remarks: o This program is free software; you can redistribute it and/or
+ *  License: o This program is free software; you can redistribute it and/or
  *             modify it under the terms of the GNU General Public License as
  *             published by the Free Software Foundation; either version 2 of
  *             the License, or (at your option) any later version.
@@ -20,32 +19,6 @@
  *             License along with this program; if not, write to the Free
  *             Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *             MA 02111-1307  USA
- *
- *  Revision History:
- *
- *    $Log: shape.c,v $
- *    Revision 1.6  2006/07/12 05:27:29  tsjensen
- *    Updated email and web addresses in comment header
- *
- *    Revision 1.5  1999-08-14 12:11:53-07  tsjensen
- *    Added findshape(), genshape(), freeshape(), and isdeepempty() functions
- *    Added on_side() back in with a few changes
- *    Changed empty_side() to use isdeepempty() -> much simpler code
- *
- *    Revision 1.4  1999/07/23 16:38:02  tsjensen
- *    Removed functions iscorner(), on_side(), shapecmp(), both_on_side(), and
- *    shape_distance() - nobody was using them anyway.
- *
- *    Revision 1.3  1999/07/22 12:28:25  tsjensen
- *    Added GNU GPL disclaimer
- *    Added include config.h
- *
- *    Revision 1.2  1999/06/25 18:52:28  tsjensen
- *    Added empty_side() function from boxes.c
- *    Removed #include regexp.h
- *
- *    Revision 1.1  1999/06/23 12:26:59  tsjensen
- *    Initial revision
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
