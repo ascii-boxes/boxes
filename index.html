@@ -13,7 +13,7 @@ sedesc: Command line ASCII boxes unlimited!
           <p class="author"><a href="{{ site.baseurl }}{{ post.url }}/#disqus_thread">Comments</a></p>
         {% endif %}
         <div class="content">
-            {{ post.content }}
+            {{ post.content | split:'<!--break-->' | first }}{% if post.content contains '<!--break-->' %} <a href="{{ post.url }}"> ... read more</a> {% endif %}
         </div>
     </div>
 </div>

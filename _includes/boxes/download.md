@@ -2,7 +2,7 @@
 
 *Boxes* is free software under the <A TARGET="_blank" HREF="http://www.gnu.org/licenses/gpl-2.0.html#TOC1">GNU General Public License</A> (GNU GPL), version 2.
 
-The current release is **version 1.1.1**. For older revisions, feel free to browse the [release history](https://github.com/{{ site.github }}/wiki/Release-History).
+The current release is **version 1.1.2**. For older revisions, feel free to browse the [release history](https://github.com/{{ site.github }}/wiki/Release-History).
 
 
 ## Sources
