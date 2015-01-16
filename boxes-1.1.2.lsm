@@ -1,7 +1,7 @@
 Begin4
 Title:          boxes
-Version:        1.1.1
-Entered-date:   2012-10-19
+Version:        1.1.2
+Entered-date:   2015-01-16
 Description:    Boxes is a text filter which can draw any kind of box around
                 its input text. Box design choices range from simple boxes to
                 complex ASCII art. Removes and repairs boxes, even even if
@@ -14,8 +14,8 @@ Keywords:       text utility, boxes, ASCII art, filter program, text editing
 Author:         boxes@thomasjensen.com (Thomas Jensen)
 Maintained-by:  boxes@thomasjensen.com (Thomas Jensen)
 Primary-site:   metalab.unc.edu /pub/Linux/utils/text
-                135k boxes-1.1.src.tar.gz
-                51k boxes-1.1.bin.ELF.tar.gz
+                135k boxes-1.1.2.src.tar.gz
+                51k boxes-1.1.2.bin.ELF.tar.gz
 Original-site:  http://boxes.thomasjensen.com/
 Copying-policy: GPL 2.0
 End

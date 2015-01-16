@@ -1,11 +1,9 @@
-boxes 1.1 Win32 port Information                     Date: 03-Aug-2006
+boxes 1.1.2 Win32 port Information                     Date: 16-Jan-2015
 
 
-This is the Win32 Version of boxes 1.1, built from the official source
-tarball. It was built using gcc 3.4.2 (mingw-special) with MinGW 3.9.
-Many thanks to Ron Aaron <ron@mossbayeng.com> for originally helping me
-with the Win32 port of boxes! I could use his information for the
-version 1.0.1 port to build this one, too.
+This is the Win32 Version of boxes 1.1.2, built from the official source
+tarball. Many thanks to Ron Aaron <ron@aaron-tech.com> for making this
+Windows build possible!
 
 General information may be found in the generic README file provided with
 this archive and at http://boxes.thomasjensen.com/, the boxes home page.
@@ -29,7 +27,7 @@ provided.
 
 Enjoy!
 
-Thomas Jensen <boxes@thomasjensen.com>
+Thomas Jensen <boxes(at)thomasjensen(dot)com>
 
 
 EOT

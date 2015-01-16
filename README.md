@@ -12,7 +12,7 @@
 
            draws all kinds of boxes around your text (in ASCII art)
 
-                            [stable release 1.1.1]
+                            [stable release 1.1.2]
 ```
 
 
@@ -131,12 +131,12 @@ http://boxes.thomasjensen.com/docs/
   *boxes-config*, and they may make it into the next release!
 
 ```
-                                          _________________________
-                                         /\                        \
-                                         \_|  Thank you for        |
-                                           |  using Boxes. Enjoy!  |
-                                           |   ____________________|_
-                                           \_/______________________/
+     _________________________
+    /\                        \
+    \_|  Thank you for        |
+      |  using Boxes. Enjoy!  |
+      |  _____________________|_
+      \_/______________________/
 ```
 10/19/2012
 

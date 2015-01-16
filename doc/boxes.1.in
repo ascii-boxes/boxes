@@ -1,8 +1,9 @@
-.\" @(#)boxes.1 1.1.1 10/19/12
+.\" @(#)boxes.1 1.1.2 10/19/12
 .\"
-.\" $Id: boxes.1.in,v 1.10 2012/10/19 15:05:17 tsjensen Exp $
+.\" boxes.1.in
+.\" Thomas Jensen
 .\"
-.TH boxes 1 "October 19 2012"
+.TH boxes 1 "January 16 2015"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter

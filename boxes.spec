@@ -1,5 +1,5 @@
 %define name	boxes
-%define version	1.1
+%define version	1.1.2
 %define release	0
 %define prefix	/usr
 %define cfgfile	%prefix/share/boxes
@@ -14,13 +14,13 @@ release:	%release
 vendor:		Thomas Jensen <boxes@thomasjensen.com>
 packager:	Thomas Jensen <boxes@thomasjensen.com>
 
-summary:	Draw any kind of box around some given text
+summary:	Command line ASCII boxes unlimited
 group:		Applications/Text
 
 copyright:	GPL Version 2
 URL:		http://boxes.thomasjensen.com/
 
-source:		http://boxes.thomasjensen.com/download/%{name}-%{version}-src.tar.gz
+source:		http://github.com/ascii-boxes/%{name}/archive/v%{version}.tar.gz
 buildroot:	%defbr
 
 %description
