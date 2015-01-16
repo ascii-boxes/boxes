@@ -24,7 +24,7 @@
 
 # The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/share/boxes
-BVERSION   = 1.1.2
+BVERSION   = 1.1.3-SNAPSHOT
 
 ALL_FILES  = LICENSE README.md README.Win32.txt boxes-config
 DOC_FILES  = doc/boxes.1 doc/boxes.el
