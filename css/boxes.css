@@ -62,6 +62,10 @@ blockquote {
     font-style: italic;
 }
 
+.atmention a {  /* at-mentions of github users, e.g. @tsjensen */
+    color: inherit;
+}
+
 pre {
     line-height: 100%;
     word-wrap: normal; /* prevent contents of pre areas from line wrapping */
