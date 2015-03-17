@@ -45,7 +45,7 @@ win32.debug: infomsg replaceinfos
 
 infomsg:
 	@echo "| For compilation info please refer to the boxes compilation FAQ"
-	@echo "| at https://github.com/ascii-boxes/boxes/wiki/FAQ#q-5-compilation"
+	@echo "| at http://boxes.thomasjensen.com/docs/faq.html#q5"
 
 replaceinfos: src/boxes.h doc/boxes.1
 

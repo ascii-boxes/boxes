@@ -52,7 +52,7 @@ uses only a small set of instructions and is comformant to the ANSI C
 standard.
 
 For a small collection of frequently asked questions, visit the
-[compilation FAQ](https://github.com/ascii-boxes/boxes/wiki/FAQ#q-5-compilation)
+[compilation FAQ](http://boxes.thomasjensen.com/docs/faq.html#q5)
 on the boxes website.
 
 
