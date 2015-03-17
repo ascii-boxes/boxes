@@ -49,6 +49,7 @@ Now that *boxes* is on GitHub, all contributors are automatically [listed on Git
   - Andreas Heiduk - bug fixes and compatibility improvements; Jed integration
   - Jakub Hrozek - patch to eliminate a compilation warning on Fedora
   - Yosuke Kimura - DEC alpha/OSF binaries of v1.0.1
+  - Jeff Lanzarotta - contribution to FAQ
   - Elmar Loos - 'mend' option
   - Zdenek Sekera - SGI/Irix6 binaries of v1.0.1
   - Jason L. Shiffer - Emacs integration
