@@ -5,10 +5,11 @@ You are considering a contribution to *boxes*? That's fantastic!
 All *boxes* development has moved to the GitHub social coding platform:
 
   - [Sources](https://github.com/{{ site.github }})
+  - [Building from Source]({{ site.baseurl }}/build.html)
+  - [Writing Test Cases]({{ site.baseurl }}/testing.html)
   - [Bug Reports and Feature Requests](https://github.com/{{ site.github }}/issues)
-  - [Development Wiki](https://github.com/{{ site.github }}/wiki)
   - [Change Log](https://github.com/{{ site.github }}/commits/master)
-  - [History of Releases](https://github.com/{{ site.github }}/wiki/Release-History)
+  - [History of Releases]({{ site.baseurl }}/docs/releases.html)
 
 Boxes has been around a long time. It is available for many platforms (in reality for many more than those featured on the [download page]({{ site.baseurl }}/download.html)). Great care has been taken to make the *boxes* source as compatible as possible with all kinds of different platforms.
 

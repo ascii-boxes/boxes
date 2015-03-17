@@ -1,0 +1,9 @@
+---
+layout: default
+title: Release History
+---
+
+{% capture includedMarkdown %}{% include boxes/docs/releases.md %}{% endcapture %}
+<div class="bxpage well">
+{{ includedMarkdown | markdownify }}
+</div>

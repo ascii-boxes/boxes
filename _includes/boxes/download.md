@@ -2,7 +2,7 @@
 
 *Boxes* is free software under the <A TARGET="_blank" HREF="http://www.gnu.org/licenses/gpl-2.0.html#TOC1">GNU General Public License</A> (GNU GPL), version 2.
 
-The current release is **version 1.1.2**. For older revisions, feel free to browse the [release history](https://github.com/{{ site.github }}/wiki/Release-History).
+The current release is **version 1.1.2**. For older revisions, feel free to browse the [release history]({{ site.baseurl }}/docs/releases.html).
 
 
 ## Sources
@@ -16,7 +16,7 @@ For the (historical) record, the source of the outdated version 1.1 is also on [
 
 ## Binaries
 
-The author supports binaries for intel/linux and intel/win32. *Boxes* has been compiled on a very wide variety of platforms, and for older releases, some of these binaries are available via the [release history](https://github.com/{{ site.github }}/wiki/Release-History). If you have binaries for different and/or new platforms, please send them in!
+The author supports binaries for intel/linux and intel/win32. *Boxes* has been compiled on a very wide variety of platforms, and for older releases, some of these binaries are available via the [release history]({{ site.baseurl }}/docs/releases.html). If you have binaries for different and/or new platforms, please send them in!
 
 **Windows** and **Linux** binary download:
 [https://github.com/{{ site.github }}/releases/latest](https://github.com/{{ site.github }}/releases/latest)
