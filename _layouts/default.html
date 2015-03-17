@@ -1,15 +1,4 @@
 {% include header.html %}
-{% if page.redirect %}
-<div>
-This page has moved to <A HREF="{{ page.redirect }}">{{ page.redirect }}</A>.
-
-<P>Please update your bookmarks.
-</div>
-
-</body>
-</html>
-{% else %}
-
 <div class="container container-left">
     <div class="row">
         <div class="col-md-3 hidden-xs">
@@ -22,4 +11,3 @@ This page has moved to <A HREF="{{ page.redirect }}">{{ page.redirect }}</A>.
 </div>
 
 {% include footer.html %}
-{% endif %}
