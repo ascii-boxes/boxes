@@ -4,7 +4,7 @@ Here's how to build your own version of *boxes* using the [boxes sources](https:
 
 ## Building on Linux / UNIX
 
-Just unzip the [source archive](https://github.com/{{ site.github }}/releases/latest) or [clone the GitHub repo](https://help.github.com/articles/cloning-a-repository/). Make sure you have your C&nbsp;compiler installed, including [Flex](http://flex.sourceforge.net/) and [Bison](http://www.gnu.org/software/bison/). In the top level directory, type `make && make test`. Find the resulting binary in the *src* folder.
+Just unzip the [source archive](https://github.com/{{ site.github }}/releases/latest) or [clone the GitHub repo](https://help.github.com/articles/cloning-a-repository/). Make sure you have your C&nbsp;compiler installed, including [Flex](http://flex.sourceforge.net/) and [Bison](http://www.gnu.org/software/bison/). In the top level directory, type `make && make test`. Find the resulting binary in the *src* folder. In case of problems, check the [compilation faq]({{ site.baseurl }}/docs/faq.html#q5).
 
 That should be all. *Boxes* is built so that this works almost everywhere.
 
