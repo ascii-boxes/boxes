@@ -1,0 +1,9 @@
+---
+layout: default
+title: FAQ
+---
+
+{% capture includedMarkdown %}{% include boxes/docs/faq.md %}{% endcapture %}
+<div class="bxpage well">
+{{ includedMarkdown | markdownify }}
+</div>

@@ -3,7 +3,7 @@
   1. General
     a. [Overview]({{ site.baseurl}}/about.html) &amp; [Features]({{ site.baseurl}}/about.html#some-of-the-features)
     b. [News]({{ site.baseurl}}/)
-    c. [FAQ](https://github.com/{{ site.github }}/wiki/FAQ) (Frequently Asked Questions)
+    c. [FAQ]({{ site.baseurl}}/docs/faq.html) (Frequently Asked Questions)
 
   1. [Legal Stuff](legal.html)
 
