@@ -32,7 +32,7 @@ The pull request must meet the criteria mentioned below. If additional changes a
 Since *boxes* is not actively being developed anymore, changes to the code base must be "production ready" from the start. The following check list may help:
 
   - The [Travis CI build](https://travis-ci.org/{{ site.github }}) must pass for the pull request. This is indicated by a small green check mark next to your pull request.
-  - Provide [test cases](https://github.com/{{ site.github }}/wiki/Test-Cases) for any code that you add. This helps make sure that nobody else breaks it later.
+  - Provide [test cases]({{ site.baseurl}}/testing.html) for any code that you add. This helps make sure that nobody else breaks it later.
   - Cross-platform compatibility is very important for *boxes*. Since *boxes* does not (and cannot really) make use of *autoconf*, the C code itself must work on every platform. In other words, you can use only such C commands that are known on every platform. When in doubt, restrict yourself to commands that you already find in the current sources.
 
 These criteria apply only to code changes. (Although other changes should not break the build, either.)

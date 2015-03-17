@@ -1,0 +1,9 @@
+---
+layout: default
+title: Test Cases
+---
+
+{% capture includedMarkdown %}{% include boxes/testing.md %}{% endcapture %}
+<div class="bxpage well">
+{{ includedMarkdown | markdownify }}
+</div>

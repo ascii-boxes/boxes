@@ -33,7 +33,8 @@
   1. Development
     a. [Contributing]({{ site.baseurl}}/contributing.html)
 	b. [List of Contributors]({{ site.baseurl}}/contributing.html#contributors)
-	c. [Chronological Change Log](https://github.com/{{ site.github }}/commits/master)
+	c. [Testing]({{ site.baseurl}}/testing.html)
+	d. [Chronological Change Log](https://github.com/{{ site.github }}/commits/master)
 
   1. [Download]({{ site.baseurl}}/download.html)
 
