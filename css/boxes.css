@@ -53,6 +53,9 @@ p code, li code {  /* also outside of bxpages */
     color: black;
     background-color: #ffffdc;
 }
+p pre code, li pre code {
+    background-color: transparent;
+}
 blockquote {
     font-size: 1em;
     font-weight: normal;
