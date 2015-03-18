@@ -8,7 +8,7 @@ gems:
   - jemoji
 
 # url is currently only used only for the RSS feed in feed.xml
-url: http://ascii-boxes.github.io
+url: http://boxes.thomasjensen.com/
 
 # baseurl will often be '', but for a project page on gh-pages, it needs to
 # be the project name.
@@ -32,7 +32,8 @@ comments: false
 permalink: /:year/:month/:title
 paginate: 10
 
-highlighter: rouge
+#highlighter: rouge
+highlighter: pygments
 #markdown: redcarpet
 #redcarpet:
 #  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data"]
