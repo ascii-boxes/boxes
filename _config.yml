@@ -41,7 +41,7 @@ markdown: kramdown
 kramdown:
   input: GFM
 
-exclude: ['README.md', 'LICENSE']
+exclude: ['README.md', 'LICENSE', 'src/', 'doc/']
 
 # boxes custom variables
 defaults:
