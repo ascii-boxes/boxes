@@ -21,7 +21,7 @@ Every box design definition must have at least a `SHAPE` block, an `ELASTIC` lis
 <PRE><b>SAMPLE</b>
     sample_image_of_box
 <b>ENDS</b></PRE>
-This is the box image used for the list of available designs. The reason why an image is not simply generated is that this way, the box can be shown in an environment in which it might actually be used, e.g. with some C code around (see the [boxes config file](https://github.com/{{ site.github }}/blob/master/boxes-config) for many examples).
+This is the box image used for the list of available designs. The reason why an image is not simply generated is that this way, the box can be shown in an environment in which it might actually be used, e.g. with some C code around (see the [boxes config file](https://github.com/{{ site.github }}/blob/master/boxes-config){:target="_blank"} for many examples).
 The `ENDS` statement must stand on a line of its own, although it may be indented. Such a line cannot occur as part of the sample itself.
 The `SAMPLE` block is a required entry in every box design definition.
 
@@ -152,7 +152,8 @@ Simply states who the ingenious guy/girl was who created the design. This entry 
 ### General Entries
 
 <PRE><b>keyword</b> &quot;<i>string_value</i>&quot;</PRE>
-In addition to the author entry, there may be any number of other entries of the above form, giving any kind of information. The [boxes config file](https://github.com/{{ site.github }}/blob/master/boxes-config) includes the entries `CREATED`, `REVISION`, and `REVDATE`, to indicate the creation timestamp, revision number, and timestamp of the latest revision, respectively. These other entries are not yet used by *boxes*, though, and will simply be ignored.
+
+In addition to the author entry, there may be any number of other entries of the above form, giving any kind of information. The [boxes config file](https://github.com/{{ site.github }}/blob/master/boxes-config){:target="_blank"} includes the entries `CREATED`, `REVISION`, and `REVDATE`, to indicate the creation timestamp, revision number, and timestamp of the latest revision, respectively. These other entries are not yet used by *boxes*, though, and will simply be ignored.
 
 
 [ [up](index.html) \| [next](config-step.html) ]

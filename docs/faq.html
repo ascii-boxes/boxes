@@ -56,7 +56,7 @@ The current version includes changes to solve all compilation issues reported to
   It's a known bug in flex, and has no impact on boxes. You can safely ignore this warning.
 
 - `Bad address` on *boxes* execution after compiling on a 64bit system:
-  This may happen when the system you are compiling on is 64bit. Boxes is only a 32bit program, so the compiler may have to be forced to 32bit by adding the `-m32` option. (Thanks to <span class="atmention">[@stefanow](https://github.com/stefanow)</span> for [supplying](https://github.com/{{ site.github }}/issues/7) this information!)
+  This may happen when the system you are compiling on is 64bit. Boxes is only a 32bit program, so the compiler may have to be forced to 32bit by adding the `-m32` option. (Thanks to <span class="atmention">[@stefanow](https://github.com/stefanow)</span> for [supplying](https://github.com/{{ site.github }}/issues/7){:target="_blank"} this information!)
   In order to do this, use the following command line (works with current sources):
 
       make CFLAGS_ADDTL=-m32 LDFLAGS_ADDTL=-m32
