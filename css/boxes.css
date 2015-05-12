@@ -49,6 +49,9 @@ div.footer {
     border: 0;
     background-color: white;
 }
+.row .col-md-9 .bxpage {
+    margin-bottom: 0;
+}
 
 .bxpage table {
     border: 0;
