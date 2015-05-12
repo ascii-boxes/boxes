@@ -5,11 +5,11 @@ title: Building from Source
 
 # Building from Source
 
-Here's how to build your own version of *boxes* using the [boxes sources](https://github.com/{{ site.github }}).
+Here's how to build your own version of *boxes* using the [boxes sources](https://github.com/{{ site.github }}){:target="_blank"}.
 
 ## Building on Linux / UNIX
 
-Just unzip the [source archive](https://github.com/{{ site.github }}/releases/latest) or [clone the GitHub repo](https://help.github.com/articles/cloning-a-repository/). Make sure you have your C&nbsp;compiler installed, including [Flex](http://flex.sourceforge.net/) and [Bison](http://www.gnu.org/software/bison/). In the top level directory, type `make && make test`. Find the resulting binary in the *src* folder. In case of problems, check the [compilation faq]({{ site.baseurl }}/docs/faq.html#q5).
+Just unzip the [source archive](https://github.com/{{ site.github }}/releases/latest){:target="_blank"} or [clone the GitHub repo](https://help.github.com/articles/cloning-a-repository/){:target="_blank"}. Make sure you have your C&nbsp;compiler installed, including [Flex](http://flex.sourceforge.net/){:target="_blank"} and [Bison](http://www.gnu.org/software/bison/){:target="_blank"}. In the top level directory, type `make && make test`. Find the resulting binary in the *src* folder. In case of problems, check the [compilation faq]({{ site.baseurl }}/docs/faq.html#q5).
 
 That should be all. *Boxes* is built so that this works almost everywhere.
 
@@ -21,7 +21,7 @@ Boxes was written for UNIX, but it can also run on Windows! Boxes is a 32bit app
 
 In order to build *boxes* on Windows, the required win32 executable can be created like this:
 
-1. Install [MinGW32](http://www.mingw.org/)
+1. Install [MinGW32](http://www.mingw.org/){:target="_blank"}
 2. Configure MinGW32
 3. Open a MinGW shell and run `make win32`
 
@@ -29,7 +29,7 @@ Basically very simple, but there may be a few pitfalls, so we'll go through each
 
 ### 1. Install MinGW32
 
-1. Download MinGW from [mingw.org](http://www.mingw.org/) by pressing the **Download Installer** button in the top right corner of the page. You'll receive a mingw-get-setup.exe.
+1. Download MinGW from [mingw.org](http://www.mingw.org/){:target="_blank"} by pressing the **Download Installer** button in the top right corner of the page. You'll receive a mingw-get-setup.exe.
 2. Right-click mingw-get-setup.exe and choose **Run as Administrator** from the pop-up menu.
    This brings up the Installation Preferences.
 3. Choose `C:\MinGW` as installation directory. This is really important. If for some reason you cannot use this highly recommended directory, choose another one that has a short path, does not contain spaces (!), and does not include a Windows "special path". For example, `C:\MinGW_2`.

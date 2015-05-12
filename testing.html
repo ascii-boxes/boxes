@@ -5,7 +5,7 @@ title: Test Cases
 
 # Test Cases
 
-The boxes sources have a low-tech test suite in the [test](https://github.com/{{ site.github }}/tree/master/test) subdirectory.
+The boxes sources have a low-tech test suite in the [test](https://github.com/{{ site.github }}/tree/master/test){:target="_blank"} subdirectory.
 Travis CI will execute it in order to make sure that a change did not break the program.
 
 Currently, the test suite could use more test cases, so any help with growing the number of tests is highly appreciated.
@@ -58,4 +58,4 @@ A test case that makes sure boxes **fails** under certain conditions looks like 
 
 Note that you write `:EXPECTED-ERROR` instead of just `:EXPECTED`, and the expected return code is given after a space (in this example, it is `1`).
 
-The `:OUTPUT-FILTER` section can be used to give a *sed* script which is run on the actual output before comparing it to the expected output ([example](https://github.com/{{ site.github }}/blob/master/test/065_size_missing_argument.txt)). This way, differences in output that occur because of platform differences can be filtered out. The general advice is to leave this section empty unless you are facing a situation where there is no other solution.
+The `:OUTPUT-FILTER` section can be used to give a *sed* script which is run on the actual output before comparing it to the expected output ([example](https://github.com/{{ site.github }}/blob/master/test/065_size_missing_argument.txt){:target="_blank"}). This way, differences in output that occur because of platform differences can be filtered out. The general advice is to leave this section empty unless you are facing a situation where there is no other solution.
