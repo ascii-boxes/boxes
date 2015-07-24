@@ -4,6 +4,10 @@ language: c
 
 script: make && make test
 
-before_install:
- - sudo apt-get update -qq
- - sudo apt-get install -qq flex bison
+sudo: false
+
+addons:
+  apt:
+    packages:
+    - flex
+    - bison
