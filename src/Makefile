@@ -82,7 +82,7 @@ parser.c parser.h: parser.y boxes.h regexp/regexp.h
 
 lex.yy.c: lexer.l boxes.h
 	$(LEX) -t lexer.l > lexer.tmp.c
-	echo #include "config.h" > lex.yy.c
+	echo '#include "config.h"' > lex.yy.c
 	cat lexer.tmp.c >> lex.yy.c
 	rm lexer.tmp.c
 
