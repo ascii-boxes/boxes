@@ -58,7 +58,7 @@
   "Association of types available to the current boxes implementation." )
 (make-variable-buffer-local 'boxes-types-alist)
 
-(defvar boxes-history (list nil))
+(defvar boxes-history nil)
 
 ;;;###autoload
 (defvar boxes-known-modes
