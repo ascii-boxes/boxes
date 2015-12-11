@@ -6,8 +6,8 @@
 ;; Maintainer: jshiffer@zerotao.com
 ;; Keywords: extensions
 ;; Created: 1999-10-30
-;; Others: 
-;;   Vijay Lakshminarayanan: support for choosing boxes comment by current buffer mode. 
+;; Others:
+;;   Vijay Lakshminarayanan: support for choosing boxes comment by current buffer mode.
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ To remove a box simply prefix a 1 to the callL M-1 M-x boxes-command-on-region w
   (interactive (let ((string
 		      (completing-read (format "Box type (%s): " boxes-default-type)
 				       boxes-types-alist nil t nil 'boxes-history boxes-default-type)))
-		(list (region-beginning) (region-end) 
+		(list (region-beginning) (region-end)
 		      string
 		      current-prefix-arg)))
   (if type
@@ -112,12 +112,12 @@ To remove a box simply prefix a 1 to the callL M-1 M-x boxes-command-on-region w
     (setq boxes-default-type (boxes-set-default-type major-mode)
           type boxes-default-type))
   (let ((command-string
-	 (concat boxes-command  
+	 (concat boxes-command
 		 (if remove
 		     (concat boxes-args " -r "))
 		 (if type
 		     (concat boxes-args " -d " type)))))
-    (shell-command-on-region start end command-string nil 1 nil)))
+    (shell-command-on-region start end command-string nil 1)))
 
 (provide 'boxes)
 ;;; boxes.el ends here
