@@ -117,7 +117,7 @@ To remove a box simply prefix a 1 to the callL M-1 M-x boxes-command-on-region w
 		     (concat boxes-args " -r "))
 		 (if type
 		     (concat boxes-args " -d " type)))))
-    (shell-command-on-region start end command-string nil 1 nil)))
+    (shell-command-on-region start end command-string nil 1)))
 
 (provide 'boxes)
 ;;; boxes.el ends here
