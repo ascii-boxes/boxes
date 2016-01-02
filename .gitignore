@@ -1,5 +1,7 @@
 .cproject
 .project
+.idea/
+.jekyll-metadata
 *.o
 *.a
 _support/
