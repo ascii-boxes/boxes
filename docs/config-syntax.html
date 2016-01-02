@@ -144,9 +144,12 @@ This set may change, but *boxes* will tell you your choices if you make a mistak
 ### Name of Author
 
 <PRE><b>AUTHOR</b> &quot;<i>name_of_author</i>&quot;</PRE>
-Simply states who the ingenious guy/girl was who created the design. This entry is used when displaying the list of designs (`boxes -l`). The name should include the email address. Ideally, the entry should be usable "as is" in a `TO:` mail header, like this:
+Simply states who the person was who coded the box design definition. This entry is used when displaying the list of designs (`boxes -l`). The value is free text, but it is good if some contact information is included, for example `John Doe <john@acme.com>`. These days, such openness with one's email address may not suit everyone, so feel free to give less or differently formatted author information.
 
-    author "Thomas Jensen <tj@foobar.com>"
+<PRE><b>DESIGNER</b> &quot;<i>name_of_designer</i>&quot;</PRE>
+In contrast to `author`, which tells us who created the config file entry, the `designer` keyword tells us who created the box design itself. In other words, this is the artist who originally created the ASCII artwork.
+
+Please try to give both fields always. Especially in those cases where existing ASCII art from the internet is adapted for use with boxes, it is important (and good manners) to give credit to the original artist.
 
 
 ### General Entries
