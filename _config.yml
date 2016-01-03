@@ -6,6 +6,7 @@ description: Command line ASCII boxes unlimited!
 # enable emoticons
 gems:
   - jemoji
+  - jekyll-paginate
 
 # url is currently only used only for the RSS feed in feed.xml
 url: http://boxes.thomasjensen.com/
