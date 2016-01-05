@@ -269,6 +269,7 @@ static void recover()
       */
      BFREE (designs[design_idx].name);
      BFREE (designs[design_idx].author);
+     BFREE (designs[design_idx].designer);
      BFREE (designs[design_idx].created);
      BFREE (designs[design_idx].revision);
      BFREE (designs[design_idx].revdate);
@@ -387,7 +388,7 @@ design_or_error: design | error
         }
     }
 ;
-    
+
 
 design: YBOX WORD
     {
@@ -417,7 +418,7 @@ layout YEND WORD
             yyerror ("entries SAMPLE, SHAPES, and ELASTIC are mandatory");
             YYERROR;
         }
-        
+
         for (i=0; i<design_idx; ++i) {
             if (strcasecmp ($2, designs[i].name) == 0) {
                 yyerror ("duplicate box design name -- %s", $2);
@@ -480,6 +481,13 @@ entry: KEYWORD STRING
         if (strcasecmp ($1, "author") == 0) {
             designs[design_idx].author = (char *) strdup ($2);
             if (designs[design_idx].author == NULL) {
+                perror (PROJECT);
+                YYABORT;
+            }
+        }
+        else if (strcasecmp ($1, "designer") == 0) {
+            designs[design_idx].designer = (char *) strdup ($2);
+            if (designs[design_idx].designer == NULL) {
                 perror (PROJECT);
                 YYABORT;
             }

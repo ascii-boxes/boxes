@@ -167,7 +167,7 @@ static int is_dir (const char *path)
  *      path    file name to check
  *
  *  On Windows, this check seems unnecessary, because fopen() seems to fail
- *  when applied to a directory. 
+ *  when applied to a directory.
  *
  *  RETURNS:    ==  0   path is not a directory
  *               >  0   path is a directory
@@ -960,7 +960,9 @@ static int list_styles()
         fprintf (opt.outfile, "\n");
 
         fprintf (opt.outfile, "Author:                 %s\n",
-                d->author? d->author: "(unknown artist)");
+                d->author? d->author: "(unknown author)");
+        fprintf (opt.outfile, "Original Designer:      %s\n",
+                 d->designer? d->designer: "(unknown artist)");
         fprintf (opt.outfile, "Creation Date:          %s\n",
                 d->created? d->created: "(unknown)");
 
@@ -1135,11 +1137,23 @@ static int list_styles()
         for (i=strlen(yyfilename)+strlen(buf); i>0; --i)
             fprintf (opt.outfile, "-");
         fprintf (opt.outfile, "\n\n");
-        for (i=0; i<anz_designs; ++i)
-            fprintf (opt.outfile, "%s (%s):\n\n%s\n\n", list[i]->name,
-                    list[i]->author? list[i]->author: "unknown artist",
-                    list[i]->sample);
-
+        for (i=0; i<anz_designs; ++i) {
+            if (list[i]->author && list[i]->designer && strcmp(list[i]->author, list[i]->designer) != 0) {
+                fprintf(opt.outfile, "%s\n%s, coded by %s:\n\n%s\n\n", list[i]->name,
+                        list[i]->designer, list[i]->author, list[i]->sample);
+            }
+            else if (list[i]->designer) {
+                fprintf(opt.outfile, "%s\n%s:\n\n%s\n\n", list[i]->name,
+                        list[i]->designer, list[i]->sample);
+            }
+            else if (list[i]->author) {
+                fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n\n%s\n\n", list[i]->name,
+                        list[i]->author, list[i]->sample);
+            }
+            else {
+                fprintf(opt.outfile, "%s:\n\n%s\n\n", list[i]->name, list[i]->sample);
+            }
+        }
         BFREE (list);
     }
 

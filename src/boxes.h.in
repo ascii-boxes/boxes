@@ -89,7 +89,8 @@ typedef struct {
 
 typedef struct {
     char      *name;
-    char      *author;
+    char      *author;                   /* creator of the configuration file entry */
+    char      *designer;                 /* creator of the original ASCII artwork */
     char      *created;                  /* date created, free format */
     char      *revision;                 /* revision number of design */
     char      *revdate;                  /* date of current revision */

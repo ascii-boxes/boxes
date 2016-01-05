@@ -6,6 +6,7 @@
 Complete Design Information for "c":
 ------------------------------------
 Author:                 Thomas Jensen <boxes(at)thomasjensen(dot)com>
+Original Designer:      (public domain)
 Creation Date:          March 18, 1999 (Thursday, 15:25h)
 Current Revision:       1.0 as of March 18, 1999 (Thursday, 15:25h)
 Indentation Mode:       box (indent box)

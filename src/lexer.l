@@ -76,7 +76,7 @@ static void inflate_inbuf();
 %s ELASTIC
 
 
-PWORD  [a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*
+PWORD  [a-zA-Zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½][a-zA-Z0-9\-_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]*
 PWHITE [\n \r\t]
 PBOX   Box
 SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
@@ -288,7 +288,7 @@ Once    { yylval.c = 'o'; return YRXPFLAG; }
 }
 
 
-author|created|revision|revdate|indent {
+author|designer|created|revision|revdate|indent {
     /*
      *  general key words
      */

@@ -5,7 +5,8 @@
 :EXPECTED
 Complete Design Information for "<Command Line Definition>":
 ------------------------------------------------------------
-Author:                 (unknown artist)
+Author:                 (unknown author)
+Original Designer:      (unknown artist)
 Creation Date:          now
 Current Revision:       1.0
 Indentation Mode:       box (indent box)
