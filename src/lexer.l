@@ -76,7 +76,7 @@ static void inflate_inbuf();
 %s ELASTIC
 
 
-PWORD  [a-zA-Zпњљпњљпњљпњљпњљпњљ][a-zA-Z0-9\-_пњљпњљпњљпњљпњљпњљпњљ]*
+PWORD  [a-zA-Zдцьƒ÷№][a-zA-Z0-9\-_ьдц№ƒ÷я]*
 PWHITE [\n \r\t]
 PBOX   Box
 SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
