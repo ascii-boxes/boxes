@@ -18,6 +18,7 @@
 BOX c
 
 author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "(public domain)"
 revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:25h)"
 created "March 18, 1999 (Thursday, 15:25h)"
@@ -51,8 +52,9 @@ END c
 # ============================================================================
 
 
-BOX parchment 
+BOX parchment
 
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 created  "March 12, 1999 (Friday, 17:05h)"
 revision "1.0"
 revdate  "March 12, 1999 (Friday, 17:05h)"
@@ -97,6 +99,7 @@ END parchment
 
 BOX columns
 
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.1"
 revdate  "July 20, 1999 (Tuesday, 21:06h)"
 created  "March 17, 1999 (Wednesday, 15:27h)"
@@ -139,6 +142,7 @@ END columns
 
 BOX whirly
 
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 created "March 17, 1999 (Wednesday, 15:40h)"
 revdate "March 17, 1999 (Wednesday, 15:40h)"
 revision "1.0"
@@ -176,12 +180,13 @@ END whirly
 
 BOX scroll
 
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.2"
 revdate  "August 18, 1999 (Wednesday, 17:00h)"
 created  "March 17, 1999 (Wednesday, 17:04h)"
 
 SAMPLE
-     / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \  
+     / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \
     |  /~~\                                           /~~\  |
     |\ \   |                                         |   / /|
     | \   /|                                         |\   / |
@@ -234,10 +239,11 @@ END scroll
 
 BOX simple
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "(public domain)"
 revision "1.1"
-revdate "August 22, 1999 (Sunday, 12:44h)"
-created "March 18, 1999 (Thursday, 15:24h)"
+revdate  "August 22, 1999 (Sunday, 12:44h)"
+created  "March 18, 1999 (Thursday, 15:24h)"
 
 sample
     *************
@@ -262,10 +268,11 @@ END simple
 
 BOX c-cmt
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "(public domain)"
 revision "1.0"
-revdate "June 17, 1999 (Thursday, 19:59h)"
-created "June 17, 1999 (Thursday, 19:59h)"
+revdate  "June 17, 1999 (Thursday, 19:59h)"
+created  "June 17, 1999 (Thursday, 19:59h)"
 
 sample
     /*                               */
@@ -294,10 +301,11 @@ END c-cmt
 
 BOX c-cmt2
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "(public domain)"
 revision "1.1"
-revdate "August 18, 1999 (Wednesday, 17:01h)"
-created "June 17, 1999 (Thursday, 19:59h)"
+revdate  "August 18, 1999 (Wednesday, 17:01h)"
+created  "June 17, 1999 (Thursday, 19:59h)"
 
 sample
     /*
@@ -328,10 +336,11 @@ END c-cmt2
 
 BOX c-cmt3
 
-author "AlpT (@freaknet.org)"
+author   "AlpT (@freaknet.org)"
+designer "AlpT (@freaknet.org)"
 revision "1.0"
-revdate "Fri Jun  9 11:04:42 CEST 2006"
-created "Fri Jun  9 11:04:42 CEST 2006"
+revdate  "Fri Jun  9 11:04:42 CEST 2006"
+created  "Fri Jun  9 11:04:42 CEST 2006"
 
 sample
     /**
@@ -367,6 +376,7 @@ END c-cmt3
 BOX javadoc
 
 author   "Ted Berg <tedberg@spiritone.com>"
+designer "(public domain)"
 revision "1.0"
 revdate  "October 25, 1999 (Monday 10:16h)"
 created  "October 25, 1999 (Monday 10:16h)"
@@ -400,10 +410,11 @@ END javadoc
 
 BOX html
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "(public domain)"
 revision "1.2"
-revdate "October 19, 2012 (Friday, 17:32h)"
-created "March 18, 1999 (Thursday, 15:26h)"
+revdate  "October 19, 2012 (Friday, 17:32h)"
+created  "March 18, 1999 (Thursday, 15:26h)"
 
 sample
     <!-- - - - - - - - - - - -->
@@ -435,10 +446,11 @@ END html
 
 BOX shell
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "(public domain)"
 revision "1.0"
-revdate "March 18, 1999 (Thursday, 15:27h)"
-created "March 18, 1999 (Thursday, 15:27h)"
+revdate  "March 18, 1999 (Thursday, 15:27h)"
+created  "March 18, 1999 (Thursday, 15:27h)"
 
 sample
     #############
@@ -466,10 +478,11 @@ END shell
 
 BOX nuke
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
-revdate "August 22, 1999 (Sunday, 12:51h)"
-created "March 30, 1999 (Tuesday, 15:55h)"
+revdate  "August 22, 1999 (Sunday, 12:51h)"
+created  "March 30, 1999 (Tuesday, 15:55h)"
 
 sample
                             _ ._  _ , _ ._
@@ -517,14 +530,15 @@ END nuke
 
 BOX diamonds
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
-revdate "August 18, 1999 (Wednesday, 17:02h)"
-created "March 30, 1999 (Tuesday, 15:59h)"
+revdate  "August 18, 1999 (Wednesday, 17:02h)"
+created  "March 30, 1999 (Tuesday, 15:59h)"
 
 Sample
-           /\          /\          /\          /\  
-        /\//\\/\    /\//\\/\    /\//\\/\    /\//\\/\  
+           /\          /\          /\          /\
+        /\//\\/\    /\//\\/\    /\//\\/\    /\//\\/\
      /\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\
     //\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\
     \\//\/                                        \/\\//
@@ -595,10 +609,11 @@ END diamonds
 
 BOX mouse
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
-revdate "August 22, 1999 (Sunday, 12:57h)"
-created "March 18, 1999 (Thursday, 15:27h)"
+revdate  "August 22, 1999 (Sunday, 12:57h)"
+created  "March 18, 1999 (Thursday, 15:27h)"
 
 sample
                 .--,       .--,
@@ -607,14 +622,14 @@ sample
                    {=  ^  =}
                     >  -  <
      ___________.""`-------`"".____________
-    /                                      \ 
-    \ o          joan stark        O       / 
+    /                                      \
+    \ o          joan stark        O       /
     /          spunk1111@juno.com          \
     \          ascii art gallery           /
     / http://www.geocities.com/SoHo/7373/  \
     \______________________________________/
                   ___)( )(___
-                 (((__) (__)))     
+                 (((__) (__)))
 ends
 
 shapes {
@@ -659,10 +674,11 @@ END mouse
 
 BOX sunset
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
-revdate "March 30, 1999 (Tuesday, 17:10h)"
-created "March 30, 1999 (Tuesday, 17:10h)"
+revdate  "March 30, 1999 (Tuesday, 17:10h)"
+created  "March 30, 1999 (Tuesday, 17:10h)"
 
 sample
                                .
@@ -708,10 +724,11 @@ END sunset
 
 BOX boy
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
-revdate "August 22, 1999 (Sunday, 13:02h)"
-created "April 02, 1999 (Friday, 15:02h)"
+revdate  "August 22, 1999 (Sunday, 13:02h)"
+created  "April 02, 1999 (Friday, 15:02h)"
 
 sample
                     .-"""-.
@@ -740,8 +757,8 @@ shapes {
     ssw ("_", " ", " ", " ", " ", " ", " ")
     sse ("_", " ", " ", " ", " ", " ", " ")
     nw  ("  ", "  ", "  ", "  ", "  ")
-    nnw (" ", " ", " ", " ", "_") 
-    nne (" ", " ", " ", " ", "_") 
+    nnw (" ", " ", " ", " ", "_")
+    nne (" ", " ", " ", " ", "_")
     ne ("  ", "  ", "  ", "  ", "  ")
     ene ("\\ ")
     wnw (" /")
@@ -772,10 +789,11 @@ END boy
 
 BOX girl
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
-revdate "April 02, 1999 (Friday, 19:13h)"
-created "April 02, 1999 (Friday, 19:13h)"
+revdate  "April 02, 1999 (Friday, 19:13h)"
+created  "April 02, 1999 (Friday, 19:13h)"
 
 sample
                     .-"""-.
@@ -817,8 +835,8 @@ shapes {
     ssw ("_", " ", " ", " ", " ", " ", " ")
     sse ("_", " ", " ", " ", " ", " ", " ")
     nw  ("  ", "  ", "  ", "  ", "  ", " /")
-    nnw (" ", " ", " ", " ", "_", " ") 
-    nne (" ", " ", " ", " ", "_", " ") 
+    nnw (" ", " ", " ", " ", "_", " ")
+    nne (" ", " ", " ", " ", "_", " ")
     ne ("  ", "  ", "  ", "  ", "  ", "\\ ")
 }
 
@@ -833,6 +851,7 @@ END girl
 BOX tjc
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.1"
 revdate  "July 16, 1999 (Friday, 18:55h)"
 created  "April 02, 1999 (Friday, 19:26h)"
@@ -885,10 +904,11 @@ END tjc
 
 BOX netdata
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
-revdate "April 09, 1999 (Friday, 19:06h)"
-created "April 09, 1999 (Friday, 19:06h)"
+revdate  "April 09, 1999 (Friday, 19:06h)"
+created  "April 09, 1999 (Friday, 19:06h)"
 
 sample
     %{-----------------------------------------------------------------+
@@ -921,10 +941,11 @@ END netdata
 
 BOX xes
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
-revdate "August 18, 1999 (Wednesday, 17:04h)"
-created "April 09, 1999 (Friday, 20:05h)"
+revdate  "August 18, 1999 (Wednesday, 17:04h)"
+created  "April 09, 1999 (Friday, 20:05h)"
 
 sample
             <\/><\/><\/>
@@ -972,10 +993,11 @@ END xes
 
 BOX dog
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
-revdate "April 09, 1999 (Friday, 19:45h)"
-created "April 09, 1999 (Friday, 19:45h)"
+revdate  "April 09, 1999 (Friday, 19:45h)"
+created  "April 09, 1999 (Friday, 19:45h)"
 
 sample
                 __   _,--="=--,_   __
@@ -1025,10 +1047,11 @@ END dog
 
 BOX cat
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
-revdate "April 09, 1999 (Friday, 19:45h)"
-created "April 09, 1999 (Friday, 19:45h)"
+revdate  "April 09, 1999 (Friday, 19:45h)"
+created  "April 09, 1999 (Friday, 19:45h)"
 
 sample
                   /\             /\
@@ -1080,10 +1103,11 @@ END cat
 
 BOX capgirl
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
-revdate "April 09, 1999 (Friday, 19:24h)"
-created "April 09, 1999 (Friday, 19:24h)"
+revdate  "April 09, 1999 (Friday, 19:24h)"
+created  "April 09, 1999 (Friday, 19:24h)"
 
 sample
                     .-"```"-.
@@ -1127,8 +1151,8 @@ shapes {
     ssw ("_", " ", " ", " ", " ", " ", " ")
     sse ("_", " ", " ", " ", " ", " ", " ")
     nw  ("  ", "  ", "  ", "  ", "  ", "  ", " /")
-    nnw (" ", " ", " ", " ", " ", "_", " ") 
-    nne (" ", " ", " ", " ", " ", "_", " ") 
+    nnw (" ", " ", " ", " ", " ", "_", " ")
+    nne (" ", " ", " ", " ", " ", "_", " ")
     ne  ("  ", "  ", "  ", "  ", "  ", "  ", "\\ ")
 }
 
@@ -1142,10 +1166,11 @@ END capgirl
 
 BOX santa
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
-revdate "April 09, 1999 (Friday, 19:24h)"
-created "April 09, 1999 (Friday, 19:24h)"
+revdate  "April 09, 1999 (Friday, 19:24h)"
+created  "April 09, 1999 (Friday, 19:24h)"
 
 sample
                      .-"``"-.
@@ -1190,8 +1215,8 @@ shapes {
     ssw ("_", " ", " ", " ", " ", " ", " ")
     sse ("_", " ", " ", " ", " ", " ", " ")
     nw  ("  ", "  ", "  ", "  ", "  ", "  ", " /")
-    nnw (" ", " ", " ", " ", " ", "_", " ") 
-    nne (" ", " ", " ", " ", " ", "_", " ") 
+    nnw (" ", " ", " ", " ", " ", "_", " ")
+    nne (" ", " ", " ", " ", " ", "_", " ")
     ne  ("  ", "  ", "  ", "  ", "  ", "  ", "\\ ")
 }
 
@@ -1205,15 +1230,16 @@ END santa
 
 BOX spring
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
-revdate "August 18, 1999 (Wednesday, 17:05h)"
-created "April 09, 1999 (Friday, 15:53h)"
+revdate  "August 18, 1999 (Wednesday, 17:05h)"
+created  "April 09, 1999 (Friday, 15:53h)"
 
 sample
           ,
-      /\^/`\             
-     | \/   |            
+      /\^/`\
+     | \/   |
      | |    |               SPRING IS IN THE AIR!              jgs
      \ \    /                                                _ _
       '\\//'                                               _{ ' }_
@@ -1274,10 +1300,11 @@ END spring
 
 BOX stark2
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
-revdate "April 05, 1999 (Monday, 21:55h)"
-created "April 05, 1999 (Monday, 21:55h)"
+revdate  "April 05, 1999 (Monday, 21:55h)"
+created  "April 05, 1999 (Monday, 21:55h)"
 
 sample
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
@@ -1318,10 +1345,11 @@ END stark2
 
 BOX stark1
 
-author "Joan G. Stark <spunk1111@juno.com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
-revdate "April 05, 1999 (Monday, 21:55h)"
-created "April 05, 1999 (Monday, 21:55h)"
+revdate  "April 05, 1999 (Monday, 21:55h)"
+created  "April 05, 1999 (Monday, 21:55h)"
 
 sample
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -1355,6 +1383,7 @@ END stark1
 
 BOX peek
 
+author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate "April 12, 1999 (Monday, 12:52h)"
 created "April 12, 1999 (Monday, 12:52h)"
@@ -1398,10 +1427,11 @@ END peek
 
 BOX java-cmt
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "(public domain)"
 revision "1.0"
-revdate "June 17, 1999 (Thursday, 19:59h)"
-created "June 17, 1999 (Thursday, 19:59h)"
+revdate  "June 17, 1999 (Thursday, 19:59h)"
+created  "June 17, 1999 (Thursday, 19:59h)"
 
 sample
     //
@@ -1426,10 +1456,11 @@ END java-cmt
 
 BOX pound-cmt
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "(public domain)"
 revision "1.0"
-revdate "June 17, 1999 (Thursday, 19:59h)"
-created "June 17, 1999 (Thursday, 19:59h)"
+revdate  "June 17, 1999 (Thursday, 19:59h)"
+created  "June 17, 1999 (Thursday, 19:59h)"
 
 sample
     #
@@ -1453,10 +1484,11 @@ END pound-cmt
 
 BOX html-cmt
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "(public domain)"
 revision "1.0"
-revdate "June 17, 1999 (Thursday, 19:59h)"
-created "June 17, 1999 (Thursday, 19:59h)"
+revdate  "June 17, 1999 (Thursday, 19:59h)"
+created  "June 17, 1999 (Thursday, 19:59h)"
 
 sample
     <!--                                     -->
@@ -1479,10 +1511,11 @@ END html-cmt
 
 BOX vim-cmt
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Bram Moolenaar"
 revision "1.0"
-revdate "June 17, 1999 (Thursday, 19:59h)"
-created "June 17, 1999 (Thursday, 19:59h)"
+revdate  "June 17, 1999 (Thursday, 19:59h)"
+created  "June 17, 1999 (Thursday, 19:59h)"
 
 sample
     "
@@ -1508,10 +1541,11 @@ END vim-cmt
 
 BOX right
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
-revdate "June 17, 1999 (Thursday, 19:59h)"
-created "June 17, 1999 (Thursday, 19:59h)"
+revdate  "June 17, 1999 (Thursday, 19:59h)"
+created  "June 17, 1999 (Thursday, 19:59h)"
 
 sample
     This can be used for marking code changes with your initials
@@ -1539,6 +1573,7 @@ END right
 BOX ada-cmt
 
 author   "Neil Bird <neil.bird@rdel.co.uk>"
+designer "(public domain)"
 revision "1.0"
 revdate  "March 15, 2000 (Wednesday 12:17h)"
 created  "March 15, 2000 (Wednesday 12:17h)"
@@ -1567,6 +1602,7 @@ END ada-cmt
 BOX ada-box
 
 author   "Neil Bird <neil.bird@rdel.co.uk>"
+designer "(public domain)"
 revision "1.0"
 revdate  "March 15, 2000 (Wednesday 12:24h)"
 created  "March 15, 2000 (Wednesday 12:24h)"
@@ -1598,9 +1634,10 @@ END ada-box
 
 BOX boxquote
 
-author "Christian Molls <CMolls@gmx.net>"
-revdate "Die Aug 15 23:02:02 CEST 2000"
-created "Die Aug 15 23:01:50 CEST 2000"
+author   "Christian Molls <CMolls@gmx.net>"
+designer "Christian Molls <CMolls@gmx.net>"
+revdate  "Tue Aug 15 23:02:02 CEST 2000"
+created  "Tue Aug 15 23:01:50 CEST 2000"
 revision "1.0"
 
 sample
@@ -1634,6 +1671,7 @@ END boxquote
 BOX cc
 
 author "Bas van Gils <bvg@linuxfan.com>"
+designer "(public domain)"
 revision "1.0"
 revdate "Tue Sep 19 12:06:51 CEST 2000"
 created "Tue Sep 19 12:06:51 CEST 2000"
@@ -1669,9 +1707,10 @@ END cc
 
 BOX stone
 
-author "Fredrik Steen <fsteen@stone.nu>"
+author   "Fredrik Steen <fsteen@stone.nu>"
+designer "Fredrik Steen <fsteen@stone.nu>"
 revision "1.0"
-created "April 25, 2001 (Wed 11:00)"
+created  "April 25, 2001 (Wed 11:00)"
 
 sample
     +-------------+
@@ -1700,6 +1739,7 @@ END stone
 BOX test1
 
 author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample test1
 ends
@@ -1723,6 +1763,7 @@ END test1
 BOX test2
 
 author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample test2
 ends
@@ -1747,6 +1788,7 @@ END test2
 BOX test3
 
 author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample test3
 ends
@@ -1773,6 +1815,7 @@ END test3
 BOX test4
 
 author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample test4
 ends
@@ -1795,6 +1838,7 @@ END test4
 BOX test5
 
 author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample   test5
                ends
@@ -1819,9 +1863,10 @@ END test5
 BOX test6
 
 author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 
 sample test6
-ends   
+ends
 
 shapes {
     ene ("1","2","3")
@@ -1844,10 +1889,11 @@ END test6
 
 BOX retest
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.1"
-revdate "August 18, 1999 (Wednesday, 17:07h)"
-created "April 04, 1999 (Sunday, 18:00h)"
+revdate  "August 18, 1999 (Wednesday, 17:07h)"
+created  "April 04, 1999 (Sunday, 18:00h)"
 
 sample
     regular expression test
@@ -1874,10 +1920,11 @@ END retest
 
 BOX headline
 
-author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.2"
-revdate "August 22, 1999 (Sunday, 13:22h)"
-created "March 18, 1999 (Thursday, 15:25h)"
+revdate  "August 22, 1999 (Sunday, 13:22h)"
+created  "March 18, 1999 (Thursday, 15:25h)"
 
 sample
     /*************/
@@ -1913,6 +1960,7 @@ END headline
 BOX lisp-cmt
 
 author "Vijay Lakshminarayanan <liyer.vijay@gmail.com>"
+designer "(public domain)"
 revision "1.0"
 revdate "February 20, 2006 (Monday, 20:36h)"
 created "February 20, 2006 (Monday, 20:36h)"
@@ -1939,7 +1987,8 @@ END lisp-cmt
 
 BOX ccel
 
-author "Elmar Loos <elInfo@gmx.net>"
+author   "Elmar Loos <elInfo@gmx.net>"
+designer "Elmar Loos <elInfo@gmx.net>"
 revision "1.0"
 
 sample
@@ -1969,7 +2018,8 @@ END ccel
 
 BOX underline
 
-author "Elmar Loos <elInfo@gmx.net>"
+author   "Elmar Loos <elInfo@gmx.net>"
+designer "Elmar Loos <elInfo@gmx.net>"
 revision "1.0"
 
 sample
@@ -2011,7 +2061,7 @@ sample
                       (   )   Oooo.
                        \ (    (   )
                         \_)    ) /
-                              (_/ 
+                              (_/
 ends
 
 shapes {
@@ -2286,6 +2336,7 @@ END unicornsay
 BOX caml
 
 author   "Michael Tiernan <Michael.Tiernan@gMail.com>"
+designer "Michael Tiernan <Michael.Tiernan@gMail.com>"
 revision "1.5"
 revdate  "Wed May 14 11:41:27 EDT 2014"
 created  "Wed May 14 11:41:27 EDT 2014"
@@ -2402,7 +2453,7 @@ NNW ("___. .___",
      "_",
      "_",
      "_",
-     "_",	 
+     "_",
      "_")
 
 NNE ("___. .___",
@@ -2425,7 +2476,7 @@ ENE ("| | ! !_! |",
      "| | | ._. |")
 
   E ("| | | | | |")
-	 
+
 ESE ("| | ! !_! |",
      "| | !_____!",
      "| | ._____.",
@@ -2437,12 +2488,12 @@ ESE ("| | ! !_! |",
      "____| |_. |",
      "! | | !_! |",
      "__! !_____!")
-	 
+
   S ("_",
      "_",
      "_",
      "_",
-     "_",	 
+     "_",
      "_")
 
 SSE ("________",
@@ -2477,6 +2528,7 @@ END twisted
 BOX scroll-akn
 
 author   "Tristano Ajmone <tajmone@gmail.com>"
+designer "akn"
 created  "Saturday, 02-Jan-16 03:34:03 UTC+1"
 revision "1.0"
 tags     "scroll"
@@ -2491,17 +2543,17 @@ sample
  /"\/\_|----------------------------------|_/\/"\
 (     _|                                  |_     )
  \_/\/ `----------------------------------' \/\_/
-ends   
+ends
 
 shapes {
     NW (" /\"\\/\\_..")
    WNW ("(     _||", " \\_/\\/ ||")
      W ("       ||")
     SW (" /\"\\/\\_|-", "(     _| ", " \\_/\\/ `-")
-     
+
      N ("-")
      S ("-", " ", "-")
-   
+
     NE ("-._/\\/\"\\ ")
    ENE ("||_     )", "|| \\/\\_/ ")
      E ("||       ")
@@ -2516,9 +2568,6 @@ padding {
 }
 
 END scroll-akn
-
-
-# ============================================================================
 
 
 #EOF                                                  vim: set ai sw=4:
