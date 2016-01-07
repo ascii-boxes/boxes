@@ -11,3 +11,7 @@ addons:
     packages:
     - flex
     - bison
+
+branches:
+  only:
+  - master
