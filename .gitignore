@@ -1,5 +1,6 @@
 .cproject
 .project
+.idea/
 *.o
 *.a
 _support/
@@ -15,3 +16,4 @@ src/parser.h
 src/parser.c
 _site/
 _cache/
+bin/
