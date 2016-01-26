@@ -2570,4 +2570,48 @@ padding {
 END scroll-akn
 
 
+# ============================================================================
+
+
+BOX face
+
+author "Dmitry Bolshakov <bdimych@protonmail.com>"
+designer "Dmitry Bolshakov <bdimych@protonmail.com>"
+created "2014-02-13 08:41:11"
+revision "1.0"
+
+sample
+     .--(0)    (0)--.
+    (       \/       )
+    (     \____/     )
+    (                )
+    ( face face face )
+    ( face face face )
+     '--------------'
+ends
+
+shapes {
+    nw (" .", "( ", "( ")
+    nnw ("-", " ", " ")
+    n (
+      "(0)    (0)",
+      "    \\/    ",
+      "  \\____/  "
+    )
+    nne ("-", " ", " ")
+    ne (". ", " )", " )")
+    e (" )")
+    se ("' ")
+    s ("-")
+    sw (" '")
+    w ("( ")
+}
+
+padding { top 1 }
+
+elastic (nnw, nne, e, s, w)
+
+END face
+
+
 #EOF                                                  vim: set ai sw=4:
