@@ -3,7 +3,6 @@
 name: boxes
 description: Command line ASCII boxes unlimited!
 
-# enable emoticons
 gems:
   - jemoji
   - jekyll-paginate
@@ -18,7 +17,6 @@ url: http://boxes.thomasjensen.com/
 #baseurl: /boxes
 baseurl: ''
 
-# This can be '' to hide the Github nav button
 github: 'ascii-boxes/boxes'
 
 # Set this to your UA-# value, or '' to disable the block completely
@@ -33,7 +31,7 @@ comments: false
 permalink: /:year/:month/:title
 paginate: 10
 
-highlighter: pygments
+highlighter: rouge
 markdown: kramdown
 kramdown:
   input: GFM
