@@ -1,7 +1,8 @@
-47 Available Styles in ".boxes":
---------------------------------
+50 Available Styles in "boxes-config":
+--------------------------------------
 
-ada-box (Neil Bird <neil.bird@rdel.co.uk>):
+ada-box
+(public domain), coded by Neil Bird <neil.bird@rdel.co.uk>:
 
     ---------------
     --           --
@@ -9,7 +10,8 @@ ada-box (Neil Bird <neil.bird@rdel.co.uk>):
     ---------------
 
 
-ada-cmt (Neil Bird <neil.bird@rdel.co.uk>):
+ada-cmt
+(public domain), coded by Neil Bird <neil.bird@rdel.co.uk>:
 
     --
     -- regular Ada
@@ -17,7 +19,8 @@ ada-cmt (Neil Bird <neil.bird@rdel.co.uk>):
     --
 
 
-boxquote (Christian Molls <CMolls@gmx.net>):
+boxquote
+Christian Molls <CMolls@gmx.net>:
 
     ,----[ mp3-wav ]
     | #!/bin/sh
@@ -28,7 +31,8 @@ boxquote (Christian Molls <CMolls@gmx.net>):
     `----
 
 
-boy (Joan G. Stark <spunk1111@juno.com>):
+boy
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
                     .-"""-.
                    / .===. \
@@ -48,7 +52,8 @@ boy (Joan G. Stark <spunk1111@juno.com>):
                    (__/ \__)
 
 
-c (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+c
+(public domain), coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     /*************/
     /*           */
@@ -56,7 +61,8 @@ c (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
     /*************/
 
 
-c-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+c-cmt
+(public domain), coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     /*                               */
     /*     regular C language        */
@@ -64,7 +70,8 @@ c-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
     /*                               */
 
 
-c-cmt2 (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+c-cmt2
+(public domain), coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     /*
      *  regular C language
@@ -72,7 +79,8 @@ c-cmt2 (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
      */
 
 
-c-cmt3 (AlpT (@freaknet.org)):
+c-cmt3
+AlpT (@freaknet.org):
 
     /**
      *
@@ -81,7 +89,8 @@ c-cmt3 (AlpT (@freaknet.org)):
     /**/
 
 
-caml (Michael Tiernan <Michael.Tiernan@gMail.com>):
+caml
+Michael Tiernan <Michael.Tiernan@gMail.com>:
 
     (*************)
     (*           *)
@@ -89,7 +98,8 @@ caml (Michael Tiernan <Michael.Tiernan@gMail.com>):
     (*************)
 
 
-capgirl (Joan G. Stark <spunk1111@juno.com>):
+capgirl
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
                     .-"```"-.
                    /_______; \
@@ -110,7 +120,8 @@ capgirl (Joan G. Stark <spunk1111@juno.com>):
                    (__/ \__)
 
 
-cat (Joan G. Stark <spunk1111@juno.com>):
+cat
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
                   /\             /\
                  |`\\_,--="=--,_//`|
@@ -129,7 +140,8 @@ cat (Joan G. Stark <spunk1111@juno.com>):
     '-------------------------------------------'
 
 
-cc (Bas van Gils <bvg@linuxfan.com>):
+cc
+(public domain), coded by Bas van Gils <bvg@linuxfan.com>:
 
     /****************
      *              *
@@ -137,7 +149,8 @@ cc (Bas van Gils <bvg@linuxfan.com>):
      ****************/
 
 
-ccel (Elmar Loos <elInfo@gmx.net>):
+ccel
+Elmar Loos <elInfo@gmx.net>:
 
     ///////////////
     text         //
@@ -145,7 +158,8 @@ ccel (Elmar Loos <elInfo@gmx.net>):
     ///////////////
 
 
-columns (unknown artist):
+columns
+unknown artist, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
      __^__                 __^__
     ( ___ )---------------( ___ )
@@ -156,10 +170,11 @@ columns (unknown artist):
     (_____)---------------(_____)
 
 
-diamonds (Joan G. Stark <spunk1111@juno.com>):
+diamonds
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
-           /\          /\          /\          /\  
-        /\//\\/\    /\//\\/\    /\//\\/\    /\//\\/\  
+           /\          /\          /\          /\
+        /\//\\/\    /\//\\/\    /\//\\/\    /\//\\/\
      /\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\
     //\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\
     \\//\/                                        \/\\//
@@ -176,7 +191,8 @@ diamonds (Joan G. Stark <spunk1111@juno.com>):
            \/          \/          \/          \/
 
 
-dog (Joan G. Stark <spunk1111@juno.com>):
+dog
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
                 __   _,--="=--,_   __
                /  \."    .-.    "./  \
@@ -194,7 +210,20 @@ dog (Joan G. Stark <spunk1111@juno.com>):
     '-------------------------------------------'
 
 
-girl (Joan G. Stark <spunk1111@juno.com>):
+face
+Dmitry Bolshakov <bdimych@protonmail.com>:
+
+     .--(0)    (0)--.
+    (       \/       )
+    (     \____/     )
+    (                )
+    ( face face face )
+    ( face face face )
+     '--------------'
+
+
+girl
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
                     .-"""-.
                    / .===. \
@@ -214,7 +243,8 @@ girl (Joan G. Stark <spunk1111@juno.com>):
                    (__/ \__)
 
 
-headline (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+headline
+Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     /*************/
     /*           */
@@ -222,7 +252,8 @@ headline (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
     /*************/
 
 
-html (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+html
+(public domain), coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     <!-- - - - - - - - - - - -->
     <!--                     -->
@@ -231,14 +262,16 @@ html (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
     <!-- - - - - - - - - - - -->
 
 
-html-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+html-cmt
+(public domain), coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     <!--                                     -->
     <!-- regular comments used in HTML files -->
     <!--                                     -->
 
 
-ian_jones (Karl E. Jorgensen <karl@jorgensen.com>):
+ian_jones
+unknown artist, coded by Karl E. Jorgensen <karl@jorgensen.com>:
 
                             \\\///
                            / _  _ \
@@ -257,7 +290,8 @@ ian_jones (Karl E. Jorgensen <karl@jorgensen.com>):
                               (_/
 
 
-java-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+java-cmt
+(public domain), coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     //
     // regular Java
@@ -265,7 +299,8 @@ java-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
     //
 
 
-javadoc (Ted Berg <tedberg@spiritone.com>):
+javadoc
+(public domain), coded by Ted Berg <tedberg@spiritone.com>:
 
     /**
      *  Javadoc Comments
@@ -273,14 +308,16 @@ javadoc (Ted Berg <tedberg@spiritone.com>):
      */
 
 
-lisp-cmt (Vijay Lakshminarayanan <liyer.vijay@gmail.com>):
+lisp-cmt
+(public domain), coded by Vijay Lakshminarayanan <liyer.vijay@gmail.com>:
 
     ;;
     ;;  regular comments used in Lisp
     ;;
 
 
-mouse (Joan G. Stark <spunk1111@juno.com>):
+mouse
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
                 .--,       .--,
                ( (  \.---./  ) )
@@ -288,8 +325,8 @@ mouse (Joan G. Stark <spunk1111@juno.com>):
                    {=  ^  =}
                     >  -  <
      ___________.""`-------`"".____________
-    /                                      \ 
-    \ o          joan stark        O       / 
+    /                                      \
+    \ o          joan stark        O       /
     /          spunk1111@juno.com          \
     \          ascii art gallery           /
     / http://www.geocities.com/SoHo/7373/  \
@@ -298,7 +335,8 @@ mouse (Joan G. Stark <spunk1111@juno.com>):
                  (((__) (__)))
 
 
-netdata (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+netdata
+Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     %{-----------------------------------------------------------------+
      | IBM Net.Data Macro Sample - Perl and SQL Backends               |
@@ -306,7 +344,8 @@ netdata (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
      +-----------------------------------------------------------------%}
 
 
-nuke (Joan G. Stark <spunk1111@juno.com>):
+nuke
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
                             _ ._  _ , _ ._
                           (_ ' ( `  )_  .__)
@@ -321,7 +360,8 @@ nuke (Joan G. Stark <spunk1111@juno.com>):
     |_________________________________________________________|
 
 
-parchment (unknown artist):
+parchment
+unknown artist, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
      ________________________
     /\                       \
@@ -332,7 +372,8 @@ parchment (unknown artist):
        \_/_____________________/
 
 
-peek (unknown artist):
+peek
+unknown artist, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
    /*       _\|/_
             (o o)
@@ -344,14 +385,16 @@ peek (unknown artist):
     +-----------------------------------*/
 
 
-pound-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+pound-cmt
+(public domain), coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     #
     #  regular comments used in Perl, Shell scripts, etc.
     #
 
 
-right (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+right
+Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     This can be used for marking code changes with your initials
     (I don't like it, but some people work this way):
@@ -361,7 +404,8 @@ right (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
     blank_count = 0;                     /*@TJ@*/
 
 
-santa (Joan G. Stark <spunk1111@juno.com>):
+santa
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
                      .-"``"-.
                     /______; \
@@ -383,9 +427,10 @@ santa (Joan G. Stark <spunk1111@juno.com>):
                    (__/ \__)
 
 
-scroll (unknown artist):
+scroll
+unknown artist, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
-     / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \  
+     / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \
     |  /~~\                                           /~~\  |
     |\ \   |                                         |   / /|
     | \   /|                                         |\   / |
@@ -400,7 +445,22 @@ scroll (unknown artist):
        ~~~                                             ~~~
 
 
-shell (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+scroll-akn
+akn, coded by Tristano Ajmone <tajmone@gmail.com>:
+
+ /"\/\_..---------------------------------._/\/"\
+(     _|| ||| Scroll-AKN...          ||| ||_     )
+ \_/\/ || ------------------------------ || \/\_/
+       || Original Design by "akn" (???) ||
+       || Implemented in boxes by:       ||
+       ||     -~{ Tristano Ajmone }~-    ||
+ /"\/\_|----------------------------------|_/\/"\
+(     _|                                  |_     )
+ \_/\/ `----------------------------------' \/\_/
+
+
+shell
+(public domain), coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     #############
     #           #
@@ -408,7 +468,8 @@ shell (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
     #############
 
 
-simple (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+simple
+(public domain), coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     *************
     *           *
@@ -416,11 +477,12 @@ simple (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
     *************
 
 
-spring (Joan G. Stark <spunk1111@juno.com>):
+spring
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
           ,
-      /\^/`\             
-     | \/   |            
+      /\^/`\
+     | \/   |
      | |    |               SPRING IS IN THE AIR!              jgs
      \ \    /                                                _ _
       '\\//'                                               _{ ' }_
@@ -435,7 +497,8 @@ spring (Joan G. Stark <spunk1111@juno.com>):
      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-stark1 (Joan G. Stark <spunk1111@juno.com>):
+stark1
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     ^   -,                ,-. .          .    ^
@@ -451,7 +514,8 @@ stark1 (Joan G. Stark <spunk1111@juno.com>):
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
-stark2 (Joan G. Stark <spunk1111@juno.com>):
+stark2
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
@@ -468,14 +532,16 @@ stark2 (Joan G. Stark <spunk1111@juno.com>):
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
 
 
-stone (Fredrik Steen <fsteen@stone.nu>):
+stone
+Fredrik Steen <fsteen@stone.nu>:
 
     +-------------+
     |    stone    |
     +-------------+
 
 
-sunset (Joan G. Stark <spunk1111@juno.com>):
+sunset
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
                                .
                           .    |    .
@@ -492,7 +558,8 @@ sunset (Joan G. Stark <spunk1111@juno.com>):
        ~but you can hurt them by looking at bad ascii art!~
 
 
-tjc (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+tjc
+Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     static char *foo (const int a, const int b)
     /*
@@ -513,13 +580,42 @@ tjc (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
         int ii;          ....
 
 
-underline (Elmar Loos <elInfo@gmx.net>):
+twisted
+Michael Naylor, coded by Tristano Ajmone <tajmone@gmail.com>:
+
+._____. ._____. .________________________________________. ._____. ._____.
+| ._. | | ._. | | .____________________________________. | | ._. | | ._. |
+| !_| |_|_|_! | | !____________________________________! | | !_| |_|_|_! |
+!___| |_______! !________________________________________! !___| |_______!
+.___|_|_| |____________________________________________________|_|_| |___.
+| ._____| |________________________________________________________| |_. |
+| !_! | | |                                                    | | ! !_! |
+!_____! | | * * * * * * * * * * * TWISTED * * * * * * * * * *  | | !_____!
+._____. | | -----------------------|-------------------------  | | ._____.
+| ._. | | | Just another cool ascii frame, brought to you by:  | | | ._. |
+| | | | | |                                                    | | | | | |
+| | | | | |              -~{ Tristano Ajmone }~-               | | | | | |
+| !_! | | | -----------------------|-------------------------  | | ! !_! |
+!_____! | | Derived from an ascii frame originally created by: | | !_____!
+._____. | |                                                    | | ._____.
+| ._. | | |               -~{ Michael Naylor }~                | | | ._. |
+| !_| |_|_|____________________________________________________| |_|_|_! |
+!___| |________________________________________________________| |_______!
+.___|_|_| |___. .________________________________________. .___|_|_| |___.
+| ._____| |_. | | .____________________________________. | | ._____| |_. |
+| !_! | | !_! | | !____________________________________! | | !_! | | !_! |
+!_____! !_____! !________________________________________! !_____! !_____!
+
+
+underline
+Elmar Loos <elInfo@gmx.net>:
 
     // Bla, foo bar!
     // ~~~~~~~~~~~~~
 
 
-unicornsay (Mike Meyer <boxes@meyer.fm>):
+unicornsay
+unknown artist, coded by Mike Meyer <boxes@meyer.fm>:
 
    _________________________________
   /                                 \
@@ -535,7 +631,8 @@ unicornsay (Mike Meyer <boxes@meyer.fm>):
                                   '-'/    \
 
 
-unicornthink (Mike Meyer <boxes@meyer.fm>):
+unicornthink
+unknown artist, coded by Mike Meyer <boxes@meyer.fm>:
 
    _________________________________
   /                                 \
@@ -551,14 +648,16 @@ unicornthink (Mike Meyer <boxes@meyer.fm>):
                                   '-'/    \
 
 
-vim-cmt (Thomas Jensen <boxes(at)thomasjensen(dot)com>):
+vim-cmt
+Bram Moolenaar, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
     "
     " comments used in the vim editor's config file (.vimrc)
     "
 
 
-whirly (unknown artist):
+whirly
+unknown artist, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
      .+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.
     (                                                             )
@@ -567,7 +666,8 @@ whirly (unknown artist):
      "+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"
 
 
-xes (Joan G. Stark <spunk1111@juno.com>):
+xes
+Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
             <\/><\/><\/>
         <\/></\></\></\><\/>
@@ -581,4 +681,3 @@ xes (Joan G. Stark <spunk1111@juno.com>):
         <\/>            <\/>
         </\><\/><\/><\/></\>
     jgs     </\></\></\>
-
