@@ -15,5 +15,6 @@ src/boxes.h
 src/lex.yy.c
 src/parser.h
 src/parser.c
+bin/
 _site/
 _cache/
