@@ -5,7 +5,6 @@
 *.o
 *.a
 _support/
-idee
 doc/boxes.1
 doc/*.tar.gz
 *.tar.gz
@@ -18,4 +17,3 @@ src/parser.c
 bin/
 _site/
 _cache/
-bin/
