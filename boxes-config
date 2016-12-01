@@ -1632,6 +1632,68 @@ END ada-box
 # ============================================================================
 
 
+BOX tex-cmt
+
+author   "Nic H <not@applicable.com>"
+designer "(public domain)"
+revision "1.0"
+revdate  "December 01, 2016 (Thursday 15:20h)"
+created  "December 01, 2016 (Thursday 15:20h)"
+
+sample
+    %
+    % regular TeX/LaTeX
+    % comments
+    %
+ends
+
+shapes {
+    w ("%")
+}
+
+padding {lef 1}
+
+elastic (w)
+
+END tex-cmt
+
+
+# ============================================================================
+
+
+BOX tex-box
+
+author   "Nic H <not@applicable.com>"
+designer "(public domain)"
+revision "1.0"
+revdate  "December 01, 2016 (Thursday 15:21h)"
+created  "December 01, 2016 (Thursday 15:21h)"
+
+sample
+    %=============%
+    % TeX is love %
+    % Tex is life %
+    %=============%
+ends
+
+shapes {
+    nw ("%") n ("=") ne ("%")
+     w ("%")          e ("%")
+    sw ("%") s ("=") se ("%")
+}
+
+padding {
+    horiz 1
+}
+
+elastic (n,e,s,w)
+
+END tex-box
+
+
+# ============================================================================
+
+
 BOX boxquote
 
 author   "Christian Molls <CMolls@gmx.net>"
