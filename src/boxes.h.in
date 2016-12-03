@@ -35,8 +35,8 @@
 
 
 #define PROJECT "boxes"                  /* name of program */
-#define VERSION "--BVERSION--"           /* current release of project */
-#define GLOBALCONF "--GLOBALCONF--"      /* name of system-wide config file */
+#define VERSION "@boxes_VERSION@"        /* boxes version number */
+#define GLOBALCONF "@boxes_GLOBALCONF@"  /* name of system-wide config file */
 
 
 /*
