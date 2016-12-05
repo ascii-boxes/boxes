@@ -1,0 +1,27 @@
+
+platform:
+    - Win32
+    - Win64
+
+configuration:
+    - Release
+
+install:
+    - cinst cmake.portable winflexbison mingw
+
+build: false
+
+test_script:
+    - PATH C:\tools\mingw64\bin;%PATH:C:\Program Files\Git\usr\bin;=%
+    - echo %PATH%
+    - win_flex.exe --version
+    - win_bison.exe --version
+    - cmake.exe --version
+    - cmake.exe -G "MinGW Makefiles" .
+    - mingw32-make.exe
+    - echo "Build completed"
+    - echo "draw a box" | .\boxes -f .\boxes-config
+    - mingw32-make.exe check
+
+on_failure:
+    - type test\Testing\Temporary\LastTest.log

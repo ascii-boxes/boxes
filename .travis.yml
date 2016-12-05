@@ -2,7 +2,7 @@
 
 language: c
 
-script: make && make test
+script: cmake . && make && make check
 
 sudo: false
 
@@ -11,6 +11,12 @@ addons:
     packages:
     - flex
     - bison
+    - python
+    sources:
+        - george-edison55-precise-backports # cmake 3.2.3 / doxygen 1.8.3
+    packages:
+        - cmake
+        - cmake-data
 
 branches:
   only:
