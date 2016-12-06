@@ -7,6 +7,7 @@ Author:           Nic H
 _____________________________________________________________________
 """
 
+import errno
 import sys
 import os
 import subprocess
