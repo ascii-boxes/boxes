@@ -7,8 +7,6 @@ Author:           Nic H
 _____________________________________________________________________
 """
 
-__doc__ = __doc__.strip()
-
 import sys
 import os
 import subprocess
@@ -40,9 +38,14 @@ def execute_test(exe, cfg, args, text):
             stderr=subprocess.PIPE,
             env=dict(os.environ, BOXES=cfg)
         )
-    p.stdin.write(text)
-    (out, err) = p.communicate()
-    return (filter(lambda x : x != '\r', out), filter(lambda x : x != '\r', err), p.wait())
+    try:
+        p.stdin.write(text)
+        (out, err) = p.communicate()
+        return (filter(lambda x : x != '\r', out), filter(lambda x : x != '\r', err), p.wait())
+    except IOError as e:
+        if e.errno != errno.EPIPE:
+            raise e
+        return ('', '', p.wait())
 
 def run_test(exe, cfg, testcase):
     """Run 'exe' with configuration 'cfg' on the test case 'testcase'"""
@@ -52,7 +55,10 @@ def run_test(exe, cfg, testcase):
     if code == expected_return and out == test_case_sections[':EXPECTED']:
         print 'Passed:', testcase
     else:
-        print 'Failed: %s\n\nExpected output:\n%s\n\nActual output:\n%s\n\n Error codes (expected actual): %d %d' % (testcase, test_case_sections[':EXPECTED'], out, expected_return, code)
+        print 'Failed: %s' % testcase
+        print '\nExpected output:\n%s\n\nActual output:\n%s\nError:\n%s\n' % (test_case_sections[':EXPECTED'], out, err)
+        print '\n Error codes (expected actual): %d %d' % (expected_return, code)
+        print ''
         sys.exit(1)
 
 if __name__ == "__main__":
