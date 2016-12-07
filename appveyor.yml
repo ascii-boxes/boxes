@@ -12,7 +12,8 @@ install:
 build: false
 
 test_script:
-    - PATH C:\tools\mingw64\bin;%PATH% #:C:\Program Files\Git\usr\bin;=%
+    - PATH C:\tools\mingw64\bin;%PATH%
+    - rename "C:\Program Files\Git\usr\bin\sh.exe" "sh.exe.bak"
     - echo %PATH%
     - win_flex.exe --version
     - win_bison.exe --version
