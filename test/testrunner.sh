@@ -44,7 +44,7 @@ declare -r testInputFile=${testCaseFile/%.txt/.input.tmp}
 declare -r testExpectationFile=${testCaseFile/%.txt/.expected.tmp}
 declare -r testFilterFile=${testCaseFile/%.txt/.sed.tmp}
 declare -r testOutputFile=${testCaseFile/%.txt/.out.tmp}
-declare -r boxesArgs=$(cat $testCaseFile | sed -n '/^:ARGS/,+1p' | grep -v ^:INPUT | sed '1d')
+declare -r boxesArgs=$(cat $testCaseFile | sed -n '/^:ARGS/,/^:INPUT/p;' | sed '1d;$d' | tr -d '\r')
 
 cat $testCaseFile | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d '\r' > $testInputFile
 cat $testCaseFile | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > $testFilterFile
