@@ -12,6 +12,8 @@ install:
 build: false
 
 test_script:
+    - bash bashtest.sh foo bar
+    - bash bashtest.sh -h
     - PATH C:\tools\mingw64\bin;%PATH:C:\Program Files\Git\usr\bin;=%
     - echo %PATH%
     - win_flex.exe --version
@@ -25,3 +27,6 @@ test_script:
 
 on_failure:
     - type test\Testing\Temporary\LastTest.log
+
+cache:
+    - C:\Users\appveyor\AppData\Local\Temp\chocolatey\ -> appveyor.yml
