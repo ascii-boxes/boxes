@@ -12,7 +12,7 @@ install:
 build: false
 
 test_script:
-    - PATH C:\tools\mingw64\bin;%PATH:C:\Program Files\Git\usr\bin;=%
+    - PATH C:\tools\mingw64\bin;%PATH% #:C:\Program Files\Git\usr\bin;=%
     - echo %PATH%
     - win_flex.exe --version
     - win_bison.exe --version
