@@ -7,36 +7,19 @@
 # Author:           Thomas Jensen
 # _____________________________________________________________________
 
-if [ $# -ne 1 ]; then
-    echo 'Usage: testrunner.sh {-suite | <testCaseFile>}'
+if [ $# -ne 3 ]; then
+    echo 'Usage: testrunner.sh <executable> <configFile> <testCaseFile>'
     echo '       Returns 0 for success, else non-zero'
     exit 2
 fi
-if [ ${PWD##*/} != "test" ]; then
-    >&2 echo "Please run this script from the test folder."
-    exit 2
-fi
 
-# Execute the entire test suite
-if [ "$1" == "-suite" ]; then
-    declare -i overallResult=0
-    declare -i countExecuted=0
-    declare -i countFailed=0
-    declare tc
-    for tc in *.txt; do
-        $0 $tc
-        if [ $? -ne 0 ]; then
-            overallResult=1
-            ((countFailed++))
-        fi
-        ((countExecuted++))
-    done
-    echo "$countExecuted tests executed, $(($countExecuted-$countFailed)) successful, $countFailed failed."
-    exit $overallResult
+declare -r boxesBinary="$1"
+if [ ! -x $boxesBinary ]; then
+    >&2 echo "Binary '$boxesBinary' not found or not executable."
+    exit 3
 fi
-
-# Execute only a single test
-declare -r testCaseFile="$1"
+declare -r boxesConfiguration="$2"
+declare -r testCaseFile="$3"
 if [ ! -f $testCaseFile ]; then
     >&2 echo "Test Case '$testCaseFile' not found."
     exit 3
@@ -67,13 +50,8 @@ cat $testCaseFile | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d
 cat $testCaseFile | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > $testFilterFile
 cat $testCaseFile | sed -n '/^:EXPECTED/,/^:EOF/p;' | sed '1d;$d' | tr -d '\r' > $testExpectationFile
 
-declare boxesBinary=../bin/boxes.exe
-if [ ! -x $boxesBinary ]; then
-    boxesBinary=../bin/boxes
-fi
-
 echo "    Invoking: $(basename $boxesBinary) $boxesArgs"
-export BOXES=../boxes-config
+export BOXES="$boxesConfiguration"
 
 cat $testInputFile | $boxesBinary $boxesArgs >$testOutputFile 2>&1
 declare -ir actualReturnCode=$?

@@ -656,25 +656,20 @@ static int process_commandline (int argc, char *argv[])
                  */
                 pdummy = strchr (optarg, 'x');
                 if (!pdummy) pdummy = strchr (optarg, 'X');
+                if(pdummy) {
+                    *pdummy = '\0';
+                }
                 errno = 0;
-                opt.reqwidth = strtol (optarg, NULL, 10);
-                idummy = errno;
-                if (idummy) {
-                    fprintf (stderr, "%s: invalid box size specification: %s\n",
-                            PROJECT, strerror(idummy));
-                    return 1;
-                }
+                if (optarg != pdummy) opt.reqwidth = strtol (optarg, NULL, 10);
                 if (pdummy) {
-                    errno = 0;
                     opt.reqheight = strtol (pdummy+1, NULL, 10);
-                    idummy = errno;
-                    if (idummy) {
-                        fprintf (stderr, "%s: invalid box size specification: %s\n",
-                                PROJECT, strerror(idummy));
-                        return 1;
-                    }
+                    *pdummy = 'x';
                 }
-                if ((opt.reqwidth == 0 && opt.reqheight == 0)
+                if(errno){
+                    fprintf (stderr, "%s: box size: %s, '%s'\n",
+                            PROJECT, strerror(idummy), optarg);
+                    return 1;
+                } else if ((opt.reqwidth == 0 && opt.reqheight == 0)
                   || opt.reqwidth < 0 || opt.reqheight < 0) {
                     fprintf (stderr, "%s: invalid box size specification -- %s\n",
                             PROJECT, optarg);
