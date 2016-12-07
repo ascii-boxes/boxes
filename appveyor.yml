@@ -12,17 +12,13 @@ install:
 build: false
 
 test_script:
-    - bash bashtest.sh -h
     - PATH C:\tools\mingw64\bin;%PATH:C:\Program Files\Git\usr\bin;=%
-    - bash bashtest.sh foo bar
     - echo %PATH%
     - win_flex.exe --version
     - win_bison.exe --version
     - cmake.exe --version
     - cmake.exe -G "MinGW Makefiles" .
     - mingw32-make.exe
-    - echo "Build completed"
-    - echo "draw a box" | .\boxes -f .\boxes-config
     - mingw32-make.exe check
 
 on_failure:
