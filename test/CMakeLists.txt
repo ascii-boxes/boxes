@@ -11,6 +11,8 @@ add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${BOXES_EXE})
 
 # testing framework needs python
 include(FindPythonInterp)
+find_program(BASH_EXE bash)
+message(STATUS " Bash is at ${BASH_EXE}")
 
 # Calls the testrunner script on the given test-case
 macro(BOXES_TEST tpath)

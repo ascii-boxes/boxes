@@ -12,9 +12,9 @@ install:
 build: false
 
 test_script:
-    - bash bashtest.sh foo bar
     - bash bashtest.sh -h
     - PATH C:\tools\mingw64\bin;%PATH:C:\Program Files\Git\usr\bin;=%
+    - bash bashtest.sh foo bar
     - echo %PATH%
     - win_flex.exe --version
     - win_bison.exe --version
