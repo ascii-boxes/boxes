@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/ascii-boxes/boxes.svg?branch=master)](https://travis-ci.org/ascii-boxes/boxes)
-
 
 ```
      _.
@@ -15,6 +13,8 @@
                             [stable release 1.1.2]
 ```
 
+* Linux/Mac OSX: [![Build Status](https://travis-ci.org/ascii-boxes/boxes.svg?branch=master)](https://travis-ci.org/ascii-boxes/boxes)
+* Windows: [![Build status](https://ci.appveyor.com/api/projects/status/yex19lywgdrdbsdp?svg=true)](https://ci.appveyor.com/project/scyptnex/boxes)
 
 ###GETTING IT
 
@@ -31,18 +31,30 @@ Skip this section if you got yourself a binary distribution. Note,
 however, that the location of the system-wide config file can only be
 changed using the source distribution, because its path is compiled in.
 
-1. Unpack the archive.
-2. Edit the top level *Makefile* and change the value of `GLOBALCONF` to
-   whereever you want the system-wide config file to reside. Note that
-   each user may have his/her own config file in *$HOME/.boxes*.
-   Also note that the value of `GLOBALCONF` is a full file name. It does
-   **not** specify a directory into which to copy the config file.
-
-3. If you are on DEC/OSF, edit *src/regexp/Makefile*, and add
-   `-D_ANSI_C_SOURCE` to the `CFLAGS` definition.
-
-4. Type `make` in the top level directory.<br/>
-   This should leave you with the binary in the *src* directory.
+* Using GNU make:
+  1. Unpack the archive.
+  2. Edit the top level *Makefile* and change the value of `GLOBALCONF` to
+  whereever you want the system-wide config file to reside. Note that each user
+  may have his/her own config file in *$HOME/.boxes*.  Also note that the value
+  of `GLOBALCONF` is a full file name. It does **not** specify a directory into
+  which to copy the config file.
+  3. If you are on DEC/OSF, edit *src/regexp/Makefile*, and add
+  `-D_ANSI_C_SOURCE` to the `CFLAGS` definition.
+  4. Type `make` in the top level directory.<br/> This should leave you with
+  the binary in the *src* directory.
+* Using CMake:
+  1. Unpack the archive
+  2. Edit the top level `CMakeLists.txt` and change the value of `GLOBALCONF`
+  to whereever you want the system-wide config file to reside. Note that each
+  user may have his/her own config file in *$HOME/.boxes*.  Also note that the
+  value of `boxes_GLOBALCONF` is a full file name. It does **not** specify a
+  directory into which to copy the config file.
+  3. Create a directory for the build and enter it: `mkdir build && cd build`
+  4. Configure and build with `cmake <path-to-boxes> && make`
+     * If you are having trouble building on Windows, you may need to force use
+       of MinGW with `cmake -G "MinGW Makefiles" <path-to-boxes>`.  Consult the
+       `appveyor.yml` script for an example of a complete windows build.
+  5. (Optional) Test the build with `make check`
 
 The boxes development platform is intel/linux (SLES). If you are on a
 different platform and somehow manage to materialize a binary, please

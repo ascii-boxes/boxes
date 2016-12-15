@@ -8,13 +8,12 @@ _support/
 doc/boxes.1
 doc/*.tar.gz
 *.tar.gz
+build/
 src/boxes
 src/boxes.exe
 src/boxes.h
 src/lex.yy.c
 src/parser.h
 src/parser.c
-bin/
 _site/
 _cache/
-bin/

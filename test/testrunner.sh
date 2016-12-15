@@ -7,24 +7,22 @@
 # Author:           Thomas Jensen
 # _____________________________________________________________________
 
-if [ $# -ne 1 ]; then
-    echo 'Usage: testrunner.sh {-suite | <testCaseFile>}'
-    echo '       Returns 0 for success, else non-zero'
-    exit 2
-fi
-if [ ${PWD##*/} != "test" ]; then
-    >&2 echo "Please run this script from the test folder."
-    exit 2
-fi
-
 # Execute the entire test suite
 if [ "$1" == "-suite" ]; then
     declare -i overallResult=0
     declare -i countExecuted=0
     declare -i countFailed=0
+    declare -r boxesRoot=$(dirname $0)/..
+    echo $boxesRoot
+    declare boxesExe="$boxesRoot/boxes.exe"
+    [ -x "$boxesExe" ] || boxesExe="$boxesRoot/boxes"
+    [ -x "$boxesExe" ] || boxesExe="$boxesRoot/src/boxes.exe"
+    [ -x "$boxesExe" ] || boxesExe="$boxesRoot/src/boxes"
+    [ -x "$boxesExe" ] || boxesExe="$boxesRoot/build/boxes.exe"
+    [ -x "$boxesExe" ] || boxesExe="$boxesRoot/build/boxes"
     declare tc
-    for tc in *.txt; do
-        $0 $tc
+    for tc in $boxesRoot/test/*_*.txt; do
+        ./$0 $boxesExe "$boxesRoot/boxes-config" $tc
         if [ $? -ne 0 ]; then
             overallResult=1
             ((countFailed++))
@@ -35,8 +33,19 @@ if [ "$1" == "-suite" ]; then
     exit $overallResult
 fi
 
-# Execute only a single test
-declare -r testCaseFile="$1"
+if [ $# -ne 3 ]; then
+    echo 'Usage: testrunner.sh {-suite | <executable> <configFile> <testCaseFile>}'
+    echo '       Returns 0 for success, else non-zero'
+    exit 2
+fi
+
+declare -r boxesBinary="$1"
+if [ ! -x $boxesBinary ]; then
+    >&2 echo "Binary '$boxesBinary' not found or not executable."
+    exit 3
+fi
+declare -r boxesConfiguration="$2"
+declare -r testCaseFile="$3"
 if [ ! -f $testCaseFile ]; then
     >&2 echo "Test Case '$testCaseFile' not found."
     exit 3
@@ -61,19 +70,14 @@ declare -r testInputFile=${testCaseFile/%.txt/.input.tmp}
 declare -r testExpectationFile=${testCaseFile/%.txt/.expected.tmp}
 declare -r testFilterFile=${testCaseFile/%.txt/.sed.tmp}
 declare -r testOutputFile=${testCaseFile/%.txt/.out.tmp}
-declare -r boxesArgs=$(cat $testCaseFile | sed -n '/^:ARGS/,+1p' | grep -v ^:INPUT | sed '1d')
+declare -r boxesArgs=$(cat $testCaseFile | sed -n '/^:ARGS/,/^:INPUT/p;' | sed '1d;$d' | tr -d '\r')
 
 cat $testCaseFile | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d '\r' > $testInputFile
-cat $testCaseFile | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > $testFilterFile
+cat $testCaseFile | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED/p;' | sed '1d;$d' | tr -d '\r' > $testFilterFile
 cat $testCaseFile | sed -n '/^:EXPECTED/,/^:EOF/p;' | sed '1d;$d' | tr -d '\r' > $testExpectationFile
 
-declare boxesBinary=../bin/boxes.exe
-if [ ! -x $boxesBinary ]; then
-    boxesBinary=../bin/boxes
-fi
-
 echo "    Invoking: $(basename $boxesBinary) $boxesArgs"
-export BOXES=../boxes-config
+export BOXES="$boxesConfiguration"
 
 cat $testInputFile | $boxesBinary $boxesArgs >$testOutputFile 2>&1
 declare -ir actualReturnCode=$?
