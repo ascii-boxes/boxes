@@ -2,7 +2,7 @@
 -s
 :INPUT
 :OUTPUT-FILTER
-1s/^.\+: /boxes: /
+1s/^.*boxes[^:]*: /boxes: /
 :EXPECTED-ERROR 1
 boxes: option requires an argument -- 's'
 Usage: boxes [options] [infile [outfile]]
