@@ -231,16 +231,20 @@ static int get_config_file()
             return 1;
         }
         rc = is_dir (s);
-        if (rc == -1)
+        if (rc == -1) {
+            fclose (new_yyin);
             return 1;
+        }
         else if (rc) {
             fprintf (stderr, "%s: Alleged config file '%s' is a directory "
                     "(taken from $BOXES)\n", PROJECT, s);
+            fclose (new_yyin);
             return 1;
         }
         yyfilename = (char *) strdup (s);
         if (yyfilename == NULL) {
             perror (PROJECT);
+            fclose (new_yyin);
             return 1;
         }
         yyin = new_yyin;
@@ -260,13 +264,16 @@ static int get_config_file()
         new_yyin = fopen (BOXES_CONFIG, "r");
         if (new_yyin) {
             rc = is_dir (BOXES_CONFIG);
-            if (rc == -1)
+            if (rc == -1) {
+                fclose (new_yyin);
                 return 1;
+            }
             else {
                 if (rc == 0) {
                     yyfilename = (char *) strdup (BOXES_CONFIG);
                     if (yyfilename == NULL) {
                         perror (PROJECT);
+                        fclose (new_yyin);
                         return 1;
                     }
                     yyin = new_yyin;
@@ -320,17 +327,21 @@ static int get_config_file()
             yyfilename = (char *) strdup (exepath);
         #else
             rc = is_dir (GLOBALCONF);
-            if (rc == -1)
+            if (rc == -1) {
+                fclose (new_yyin);
                 return 1;
+            }
             else if (rc) {
                 fprintf (stderr, "%s: Alleged system-wide config file '%s' "
                         "is a directory\n", PROJECT, GLOBALCONF);
+                fclose (new_yyin);
                 return 1;
             }
             yyfilename = (char *) strdup (GLOBALCONF);
         #endif
         if (yyfilename == NULL) {
             perror (PROJECT);
+            fclose (new_yyin);
             return 1;
         }
         yyin = new_yyin;
@@ -477,7 +488,7 @@ static int process_commandline (int argc, char *argv[])
                     return 1;
                 }
                 else {
-                    line_t templine;
+                    line_t templine = {0};
                     templine.len = strlen (opt.cld);
                     templine.text = opt.cld;
                     if (empty_line(&templine)) {
@@ -513,16 +524,20 @@ static int process_commandline (int argc, char *argv[])
                     return 1;
                 }
                 rc = is_dir (optarg);
-                if (rc == -1)
+                if (rc == -1) {
+                    fclose (f);
                     return 1;
+                }
                 else if (rc) {
                     fprintf (stderr, "%s: Alleged config file '%s' is a "
                             "directory\n", PROJECT, optarg);
+                    fclose (f);
                     return 1;
                 }
                 yyfilename = (char *) strdup (optarg);
                 if (yyfilename == NULL) {
                     perror (PROJECT);
+                    fclose (f);
                     return 1;
                 }
                 yyin = f;
