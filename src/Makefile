@@ -62,7 +62,7 @@ boxes.exe: $(ALL_OBJ)
 
 
 flags_unix:
-	$(eval CFLAGS := -ansi -I. -Iregexp -Wall -W $(CFLAGS_ADDTL))
+	$(eval CFLAGS := -I. -Iregexp -Wall -W $(CFLAGS_ADDTL))
 	$(eval LDFLAGS := -Lregexp $(LDFLAGS_ADDTL))
 	$(eval BOXES_EXECUTABLE_NAME := boxes)
 	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
