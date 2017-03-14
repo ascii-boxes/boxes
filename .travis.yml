@@ -2,16 +2,31 @@
 
 language: c
 
-script: make && make test
+script: cmake . && make && make check
 
 sudo: false
 
+matrix:
+    include: 
+        - os: linux 
+          compiler: gcc 
+        - os: osx
+          compiler: clang 
+
 addons:
-  apt:
-    packages:
-    - flex
-    - bison
+    apt:
+        sources:
+            - george-edison55-precise-backports # cmake 3.2.3 / doxygen 1.8.3
+        packages:
+            - flex
+            - bison
+            - python
+            - cmake
+            - cmake-data
 
 branches:
-  only:
-  - master
+    only:
+        - master
+
+after_failure:
+    - cat test/Testing/Temporary/LastTest.log

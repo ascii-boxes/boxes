@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/ascii-boxes/boxes.svg?branch=master)](https://travis-ci.org/ascii-boxes/boxes)
-
 
 ```
      _.
@@ -15,6 +13,8 @@
                             [stable release 1.1.2]
 ```
 
+* Linux/Mac OSX: [![Build Status](https://travis-ci.org/ascii-boxes/boxes.svg?branch=master)](https://travis-ci.org/ascii-boxes/boxes)
+* Windows: [![Build status](https://ci.appveyor.com/api/projects/status/yex19lywgdrdbsdp?svg=true)](https://ci.appveyor.com/project/scyptnex/boxes)
 
 ###GETTING IT
 
