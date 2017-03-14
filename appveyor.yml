@@ -1,0 +1,29 @@
+
+platform:
+    - Win32
+    - Win64
+
+configuration:
+    - Release
+
+install:
+    - cinst cmake.portable winflexbison mingw
+
+build: false
+
+test_script:
+    - PATH C:\tools\mingw64\bin;%PATH%
+    - rename "C:\Program Files\Git\usr\bin\sh.exe" "sh.exe.bak"
+    - echo %PATH%
+    - win_flex.exe --version
+    - win_bison.exe --version
+    - cmake.exe --version
+    - cmake.exe -G "MinGW Makefiles" .
+    - mingw32-make.exe
+    - mingw32-make.exe check
+
+on_failure:
+    - type test\Testing\Temporary\LastTest.log
+
+cache:
+    - C:\Users\appveyor\AppData\Local\Temp\chocolatey\ -> appveyor.yml

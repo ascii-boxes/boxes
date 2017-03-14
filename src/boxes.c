@@ -686,7 +686,7 @@ static int process_commandline (int argc, char *argv[])
                     return 1;
                 } else if ((opt.reqwidth == 0 && opt.reqheight == 0)
                   || opt.reqwidth < 0 || opt.reqheight < 0) {
-                    fprintf (stderr, "%s: invalid box size specification -- %s\n",
+                    fprintf (stderr, "%s: invalid box size -- %s\n",
                             PROJECT, optarg);
                     return 1;
                 }
