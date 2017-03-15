@@ -5,13 +5,67 @@ title: Building from Source
 
 # Building from Source
 
-Here's how to build your own version of *boxes* using the [boxes sources](https://github.com/{{ site.github }}){:target="_blank"}.
+Here's how to build your own version of *boxes* using the
+[boxes sources](https://github.com/{{ site.github }}){:target="_blank"}.
+
+The boxes development platform is currently MinGW on win32. If you are on a
+different platform, please send in your binaries for inclusion among the files to
+[download](https://github.com/ascii-boxes/boxes/releases).
+
+Boxes is generally very easy to port, because it uses only a small set of instructions
+and is comformant to the ANSI C standard.
+
+Once built and deployed, *boxes* can be
+[integrated into your text editor]({{ site.baseurl }}/docs/install.html).
+We currently describe integration with vim, emacs, and jed, but
+this list may grow as time goes by and people send how-tos.
+
 
 ## Building on Linux / UNIX
 
-Just unzip the [source archive](https://github.com/{{ site.github }}/releases/latest){:target="_blank"} or [clone the GitHub repo](https://help.github.com/articles/cloning-a-repository/){:target="_blank"}. Make sure you have your C&nbsp;compiler installed, including [Flex](http://flex.sourceforge.net/){:target="_blank"} and [Bison](http://www.gnu.org/software/bison/){:target="_blank"}. In the top level directory, type `make && make test`. Find the resulting binary in the *src* folder. In case of problems, check the [compilation faq]({{ site.baseurl }}/docs/faq.html#q5).
+Just unzip the [source archive](https://github.com/{{ site.github }}/releases/latest){:target="_blank"}
+or [clone the GitHub repo](https://help.github.com/articles/cloning-a-repository/){:target="_blank"}.
+Make sure you have your C&nbsp;compiler installed, including
+[Flex](https://github.com/westes/flex){:target="_blank"} and
+[Bison](http://www.gnu.org/software/bison/){:target="_blank"}.
+
+The location of the system-wide config file is compiled in, so if you don't like it's default location,
+you can edit the top level *Makefile* and change the value of `GLOBALCONF` to
+whereever you want the system-wide config file to reside. Note that
+each user may have his/her own config file in *$HOME/.boxes*.
+Also note that the value of `GLOBALCONF` is a full file name. It does
+**not** specify a directory into which to copy the config file.
+
+If you are on DEC/OSF, edit *src/regexp/Makefile*, and add `-D_ANSI_C_SOURCE` to the `CFLAGS` definition.
+
+In the top level directory, type `make && make test`. Find the resulting binary in the *src* folder.
+In case of problems, check the [compilation faq]({{ site.baseurl }}/docs/faq.html#q5).
 
 That should be all. *Boxes* is built so that this works almost everywhere.
+
+### Deployment
+
+In order to deploy your newly created binary on Linux/UNIX, these steps are recommended:
+
+- Copy *doc/boxes.1* to an appropriate manual page directory.
+- Copy *boxes-config* to the location specified in the Makefile
+  as being the name of the system-wide boxes config file.
+  Note that the value of `GLOBALCONF` is the name of the file,
+  and **not** the name of a directory into which to copy the file.
+  So, the name of the config file is changed from *boxes-config* to just *boxes*.
+- Copy *src/boxes* (the binary) to a location which is in your path.
+
+Example (as root):
+
+    cp doc/boxes.1 /usr/share/man/man1
+    cp boxes-config /usr/share/boxes
+    cp src/boxes /usr/bin
+
+If you want to make your own changes to the config file, copy the system-wide config file
+into your home as *$HOME/.boxes*, then modify it. Boxes will use *$HOME/.boxes* if it exists.
+
+<p><br/></p>
+
 
 ## Building on Windows
 
