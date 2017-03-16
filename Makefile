@@ -3,7 +3,6 @@
 #   Creation:   August 14, 1999 (Saturday, 01:08h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
 #   Format:     GNU make
-#   Web Site:   http://boxes.thomasjensen.com/
 #   Purpose:    Makefile for boxes, the box drawing program
 # 
 #   License:  o This program is free software; you can redistribute it and/or
@@ -24,7 +23,7 @@
 
 # The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/share/boxes
-BVERSION   = 1.1.3-SNAPSHOT
+BVERSION   = 1.1.3
 
 ALL_FILES  = LICENSE README.md README.Win32.txt boxes-config
 DOC_FILES  = doc/boxes.1 doc/boxes.el
