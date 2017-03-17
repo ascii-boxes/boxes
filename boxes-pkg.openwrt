@@ -23,12 +23,12 @@
 
 include $(TOPDIR)/rules.mk
 PKG_NAME:=boxes
-PKG_VERSION:=1.1.3
+PKG_VERSION:=1.2
 PKG_RELEASE:=1
 PKG_BUILD_DIR:=$(PKG_NAME)-$(PKG_VERSION).$(PKG_RELEASE)
 
 
-PKG_SOURCE:=v1.1.3.tar.gz
+PKG_SOURCE:=v1.2.tar.gz
 PKG_SOURCE_URL:=http://github.com/ascii-boxes/boxes/archive/
 
 include $(INCLUDE_DIR)/package.mk

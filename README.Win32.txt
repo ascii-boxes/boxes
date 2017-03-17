@@ -1,7 +1,7 @@
-boxes 1.1.3 Win32 port Information                     Date: 16-Mar-2017
+boxes 1.2 Win32 port Information                       Date: 16-Mar-2017
 
 
-This is the Win32 Version of boxes 1.1.3, built from the official source
+This is the Win32 Version of boxes 1.2, built from the official source
 tarball. Many thanks to Ron Aaron <ron@aaron-tech.com> for making this
 Windows build possible!
 

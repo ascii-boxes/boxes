@@ -1,5 +1,5 @@
 %define name	boxes
-%define version	1.1.3
+%define version	1.2
 %define release	0
 %define prefix	/usr
 %define cfgfile	%prefix/share/boxes
