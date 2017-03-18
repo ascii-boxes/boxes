@@ -1,4 +1,4 @@
-50 Available Styles in "boxes-config":
+52 Available Styles in "boxes-config":
 --------------------------------------
 
 ada-box
@@ -558,6 +558,24 @@ Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjense
        ~but you can hurt them by looking at bad ascii art!~
 
 
+tex-box
+(public domain), coded by Nic H <not@applicable.com>:
+
+    %=============%
+    % TeX is love %
+    % Tex is life %
+    %=============%
+
+
+tex-cmt
+(public domain), coded by Nic H <not@applicable.com>:
+
+    %
+    % regular TeX/LaTeX
+    % comments
+    %
+
+
 tjc
 Thomas Jensen <boxes(at)thomasjensen(dot)com>:
 
@@ -681,3 +699,4 @@ Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjense
         <\/>            <\/>
         </\><\/><\/><\/></\>
     jgs     </\></\></\>
+
