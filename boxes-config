@@ -2694,6 +2694,7 @@ END face
 
 BOX fence
 
+designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author "Dmitry Bolshakov <bdimych@protonmail.com>"
 created "2017-04-10"
 revision "1.0"
@@ -2742,6 +2743,7 @@ END fence
 
 BOX important
 
+designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author "Dmitry Bolshakov <bdimych@protonmail.com>"
 created "2017-04-10"
 revision "1.0"
@@ -2783,6 +2785,7 @@ END important
 
 BOX important2
 
+designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author "Dmitry Bolshakov <bdimych@protonmail.com>"
 created "2017-04-10"
 revision "1.0"
@@ -2828,6 +2831,7 @@ END important2
 
 BOX important3
 
+designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author "Dmitry Bolshakov <bdimych@protonmail.com>"
 created "2017-04-10"
 revision "1.0"
