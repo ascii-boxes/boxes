@@ -1,4 +1,4 @@
-###getopt Library
+### getopt Library
 
 This is used only for the Win32 build.
 
