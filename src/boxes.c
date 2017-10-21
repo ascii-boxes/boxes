@@ -1022,7 +1022,7 @@ static int list_styles()
         }
 
         fprintf (opt.outfile, "Minimum Box Dimensions: %d x %d  (width x height)\n",
-                d->minwidth, d->minheight);
+                (int) d->minwidth, (int) d->minheight);
 
         fprintf (opt.outfile, "Default Padding:        ");
         if (d->padding[BTOP] || d->padding[BRIG]
