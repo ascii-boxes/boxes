@@ -123,3 +123,10 @@ a.bxOffsetAnchor { /* used to prevent anchors from being obscured by the fixed h
     width: 100%;
     height: 100%;
 }
+
+.img-shad {
+    margin-top: 10px;
+    -moz-box-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
+    -webkit-box-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
+    box-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
+}
