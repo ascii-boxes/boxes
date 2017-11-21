@@ -108,20 +108,8 @@ a.bxOffsetAnchor { /* used to prevent anchors from being obscured by the fixed h
     visibility: hidden;
 }
 
-/* reponsive embedded video for xs layout */
-.bxEmbedContainer {
-    position: relative;
-    padding-bottom: 75%; /* 4/3 ratio */
-    padding-top: 30px; /* IE6 workaround*/
-    height: 0;
-    overflow: hidden;
-}
-.bxEmbedContainer iframe, .bxEmbedContainer object, .bxEmbedContainer embed {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+div.bxEmbedContainer {
+    max-width: 512px;
 }
 
 .img-shad {
