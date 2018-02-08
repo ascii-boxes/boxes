@@ -2878,4 +2878,36 @@ elastic (n, e, s, w)
 END important3
 
 
+# ============================================================================
+
+
+BOX fortran
+
+author   "Matt Thompson <fortran(at)gmail(dot)com>"
+designer "(public domain)"
+revision "1.0"
+created  "2018-02-08"
+
+sample
+    !!!!!!!!!!!!!
+    !           !
+    !           !
+    !!!!!!!!!!!!!
+ends
+
+shapes {
+    nw ("!") n ("!")
+    se ("!") e ("!")
+    sw ("!") s ("!")
+    ne ("!") w ("!")
+}
+
+padding { h 1 }
+
+elastic (n,s,e, w)
+
+END fortran
+
+# ============================================================================
+
 #EOF                                                  vim: set ai sw=4:
