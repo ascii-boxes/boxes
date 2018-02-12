@@ -2881,7 +2881,7 @@ END important3
 # ============================================================================
 
 
-BOX fortran
+BOX f90-box
 
 author   "Matt Thompson <fortran(at)gmail(dot)com>"
 designer "(public domain)"
@@ -2906,7 +2906,35 @@ padding { h 1 }
 
 elastic (n,s,e, w)
 
-END fortran
+END f90-box
+
+
+# ============================================================================
+
+
+BOX f90-cmt
+
+author   "Matt Thompson <fortran(at)gmail(dot)com>"
+designer "(public domain)"
+revision "1.0"
+created  "2018-02-08"
+
+sample
+    !
+    !  regular comments used in Fortran 90+
+    !
+ends
+
+shapes {
+     w ("!")
+}
+
+padding { left 1}
+
+elastic (w)
+
+END f90-cmt
+
 
 # ============================================================================
 
