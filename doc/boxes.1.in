@@ -177,7 +177,7 @@ Mend box. This removes a (potentially broken) box as with
 .B \-r\fP,
 and redraws it afterwards. The mended box is drawn according to the
 options given. This may be important to know when it comes to restoring
-padding, identation, etc. for the mended box. Implies
+padding, indentation, etc. for the mended box. Implies
 .B \-k
 false.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
