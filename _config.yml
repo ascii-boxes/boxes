@@ -3,7 +3,7 @@
 name: boxes
 description: Command line ASCII boxes unlimited!
 
-gems:
+plugins:
   - jemoji
   - jekyll-paginate
 

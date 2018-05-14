@@ -7,23 +7,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Thomas Jensen" />
     <meta name="robots" content="index,follow" />
-	{% if page.sedesc %}
-	<!-- start page -->
-	<meta name="description" content="{{ page.sedesc }}" />
+    {% if page.sedesc %}
+    <!-- start page -->
+    <meta name="description" content="{{ page.sedesc }}" />
     <meta name="keywords" content="software, ascii, ascii art, filter, command line, box, boxes, box drawing" />
-	<link rel="canonical" href="http://{{ page.sitehost }}/" />
-	{% else %}
-	<link rel="canonical" href="http://{{ page.sitehost }}{{ page.url }}" />
-	{% endif %}
+    <link rel="canonical" href="https://{{ page.sitehost }}/" />
+    {% else %}
+    <link rel="canonical" href="https://{{ page.sitehost }}{{ page.url }}" />
+    {% endif %}
+    {% include analytics.html %}
     <script type="text/javascript">
         if (window.location.hostname == "ascii-boxes.github.io") {
-		    var prjNamePrefix = "/{{ site.name }}";
-		    var targetPath = window.location.pathname;
-			if (targetPath == prjNamePrefix) {
-			    targetPath = "/";
-			}
-			else if (targetPath.indexOf(prjNamePrefix + "/") == 0) {
-			    targetPath = targetPath.substring(prjNamePrefix.length);
+            var prjNamePrefix = "/{{ site.name }}";
+            var targetPath = window.location.pathname;
+            if (targetPath == prjNamePrefix) {
+                targetPath = "/";
+            }
+            else if (targetPath.indexOf(prjNamePrefix + "/") == 0) {
+                targetPath = targetPath.substring(prjNamePrefix.length);
             }
             window.location = window.location.protocol + "//{{ page.sitehost }}"
                     + targetPath + window.location.hash;
@@ -56,7 +57,7 @@
                     <li class="active"><a href="{{ site.baseurl }}/examples.html">Examples</a></li>
                     <li class="active"><a href="{{ site.baseurl }}/docs/">Documentation</a></li>
                     <li class="active"><a href="{{ site.baseurl }}/contributing.html">Contributing</a></li>
-					<li class="active"><a href="{{ site.baseurl }}/download.html"><b>Download</b></a></li>
+                    <li class="active"><a href="{{ site.baseurl }}/download.html"><b>Download</b></a></li>
                     <li class="active visible-xs-block"><a href="{{ site.baseurl }}/links.html">Links</a></li>
                     {% if site.github != '' %}
                       <li class="active"><a href="https://github.com/{{ site.github }}">Github</a></li>
