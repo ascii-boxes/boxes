@@ -118,3 +118,8 @@ div.bxEmbedContainer {
     -webkit-box-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
     box-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
 }
+
+.mark-hilite {
+    background-color: #e0ffe0;
+    border-radius: 3px;
+}
