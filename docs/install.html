@@ -154,8 +154,9 @@ your config file.
    choose [FilterPipes](https://packagecontrol.io/packages/FilterPipes).
 1. Choose *Tools &rarr; Command Palette...* from the main menu and select *FilterPipes: My Custom Filters Plugin*
 1. In the following file open dialog, open
-   `%APPDATA%\Sublime Text 3\Packages\MyCustomFilterPipes\Default.sublime-commands`. This is the default on Windows,
-   but if you are on other operating systems, the dialog should already be open in the correct folder.
+   <code class="highlighter-rouge">%APPDATA%\Sublime Text&nbsp;3\&#8203;Packages\&#8203;MyCustomFilterPipes\&#8203;Default.sublime-commands</code>.
+   This is the default on Windows, but if you are on other operating systems, the dialog should already be open
+   in the correct folder.
 1. Before the closing `]`, add the following:
    ```
    {   /* Boxes stone */
@@ -188,7 +189,9 @@ We use the NppExec plugin. Install NppExec via PluginManager:
 1. Press **Install**.
 1. Restart Notepad++
 
-   ![Plugin Manager]({{ site.baseurl }}/images/editor-npp-pluginmanager.png)
+   <div class="bxLargeImageWrapper">
+   <img src="{{ site.baseurl }}/images/editor-npp-pluginmanager.png" alt="Plugin Manager" width="670" height="493" />
+   </div>
 
 Once the NppExec plugin is available, proceed with *boxes* integration:
 
@@ -213,7 +216,9 @@ cmd.exe /c del /f /q "$(tempfile)" "$(ascfile)"</code></pre></div></div>
 1. Press **Save...** and give it a meaningful name, for example `boxes nuke 80`.
 1. Press **Save** on the *Script name* input box.
 
-   ![NppExec Script]({{ site.baseurl }}/images/editor-npp-script.png)
+   <div class="bxLargeImageWrapper">
+   <img src="{{ site.baseurl }}/images/editor-npp-script.png" alt="NppExec Script" width="472" height="277" />
+   </div>
 
 1. Go to *Plugins &rarr; NppExec &rarr; Advanced Options ...*
 1. In the *Associated Script* dropdown, select the `boxes nuke 80` script entry created previously, then press
@@ -221,13 +226,17 @@ cmd.exe /c del /f /q "$(tempfile)" "$(ascfile)"</code></pre></div></div>
 1. Optionally select *Place to the Macros submenu*, if you want an entry for this in the *Macros* menu.
 1. Press **OK**, and if asked, restart Notepad++.
 
-   ![NppExec Advanced Options]({{ site.baseurl }}/images/editor-npp-options.png)
+   <div class="bxLargeImageWrapper">
+   <img src="{{ site.baseurl }}/images/editor-npp-options.png" alt="NppExec Advanced Options" width="530" height="511" />
+   </div>
 
 1. Go to *Macro &rarr; Modify Shortcut/Delete Macro...* to call up the Shortcut mapper.
 1. Select the *Plugin commands* tab, and type `boxes` into the filter line at the bottom of the dialog window.
 1. Choose our `boxes nuke 80` entry and press **Modify**:
 
-   ![Shortcut mapper]({{ site.baseurl }}/images/editor-npp-shortcut.png)
+   <div class="bxLargeImageWrapper">
+   <img src="{{ site.baseurl }}/images/editor-npp-shortcut.png" alt="Shortcut mapper" width="677" height="290" />
+   </div>
 
 1. Assign a shortcut key, for example Ctrl+Shift+B.
 1. Make sure that the Shortcut mapper reports `No shortcut conflicts for this item` in the status area.

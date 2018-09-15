@@ -117,9 +117,29 @@ div.bxEmbedContainer {
     -moz-box-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
     -webkit-box-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
     box-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
+    margin-bottom: 4px;
+    margin-left: 3px;
 }
 
 .mark-hilite {
     background-color: #e0ffe0;
     border-radius: 3px;
+}
+
+div.bxLargeImageWrapper {
+    overflow-x: auto;
+    overflow-y: visible;
+    white-space: nowrap;
+    margin-bottom: 1em;
+}
+div.highlight {
+    white-space: pre;
+    word-wrap: normal;
+    overflow-x: auto;
+    overflow-y: visible;
+}
+div.highlight > pre, div.highlight > pre code {
+    white-space: pre !important;
+    word-break: keep-all;
+    word-wrap: normal;
 }
