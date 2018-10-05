@@ -27,7 +27,7 @@ set iskeyword=a-z,A-Z
 "
 "  Key Words
 "
-syntax keyword boxesClassicKeywords contained author revision created revdate indent skipwhite skipempty nextgroup=boxesString
+syntax keyword boxesClassicKeywords contained author designer revision created revdate indent skipwhite skipempty nextgroup=boxesString
 syntax keyword boxesBlocks   contained elastic replace reverse padding shapes
 syntax keyword boxesRegStuff contained with to once global
 
