@@ -124,6 +124,7 @@ static void usage (FILE *st)
     fprintf (st, "        -l       list available box designs w/ samples\n");
     fprintf (st, "        -m       mend box, i.e. remove it and redraw it afterwards\n");
     fprintf (st, "        -p fmt   padding [default: none]\n");
+    //fprintf (st, "        -q       modify command for needs of the web UI (undocumented)\n");
     fprintf (st, "        -r       remove box\n");
     fprintf (st, "        -s wxh   box size (width w and/or height h)\n");
     fprintf (st, "        -t str   tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
@@ -404,7 +405,7 @@ static int process_commandline (int argc, char *argv[])
      *  Parse Command Line
      */
     do {
-        oc = getopt (argc, argv, "a:c:d:f:hi:k:lmp:rs:t:v");
+        oc = getopt (argc, argv, "a:c:d:f:hi:k:lmp:qrs:t:v");
 
         switch (oc) {
 
@@ -658,6 +659,13 @@ static int process_commandline (int argc, char *argv[])
                 }
                 break;
 
+            case 'q':
+                /*
+                 *  Activate special behavior for web UI (undocumented)
+                 */
+                opt.q = 1;
+                break;
+
             case 'r':
                 /*
                  *  Remove box from input
@@ -833,6 +841,7 @@ static int process_commandline (int argc, char *argv[])
                 opt.justify? opt.justify: '?');
         fprintf (stderr, "- Kill blank lines: %d\n", opt.killblank);
         fprintf (stderr, "- Remove box: %d\n", opt.r);
+        fprintf (stderr, "- Special handling for Web UI: %d\n", opt.q);
         fprintf (stderr, "- Mend box: %d\n", opt.mend);
         fprintf (stderr, "- Design Definition W shape: %s\n",
                 opt.cld? opt.cld: "n/a");
@@ -1069,58 +1078,63 @@ static int list_styles()
         /*
          *  Display all shapes
          */
-        fprintf (opt.outfile, "Defined Shapes:       ");
-        until = -1;
-        sstart = 0;
-        do {
-            sstart = until + 1;
-            for (w=0, i=sstart; i<ANZ_SHAPES; ++i) {
-                if (isempty(d->shape+i))
-                    continue;
-                w += 6;
-                w += d->shape[i].width;
-                w += strlen(shape_name[i]);
-                if (i == 0)
-                    w -= 2;
-                else if (w > 56) {       /* assuming an 80 character screen */
-                    until = i - 1;
-                    break;
-                }
-            }
-            if (i == ANZ_SHAPES)
-                until = ANZ_SHAPES - 1;
-            for (w=0, i=sstart; i<=until; ++i) {
-                if (d->shape[i].height > w)
-                    w = d->shape[i].height;
-            }
-            for (j=0; j<w; ++j) {
-                if (j > 0 || sstart > 0)
-                    fprintf (opt.outfile, "                      ");
-                for (i=sstart; i<=until; ++i) {
+        if (opt.q) {
+            fprintf (opt.outfile, "Sample:\n%s\n", d->sample);
+        }
+        else {
+            fprintf (opt.outfile, "Defined Shapes:       ");
+            until = -1;
+            sstart = 0;
+            do {
+                sstart = until + 1;
+                for (w=0, i=sstart; i<ANZ_SHAPES; ++i) {
                     if (isempty(d->shape+i))
                         continue;
-                    fprintf (opt.outfile, "  ");
-                    if (j == 0)
-                        fprintf (opt.outfile, "%s: ", shape_name[i]);
-                    else {
-                        space[strlen(shape_name[i])+2] = '\0';
-                        fprintf (opt.outfile, "%s", space);
-                        space[strlen(shape_name[i])+2] = ' ';
-                    }
-                    if (j < d->shape[i].height) {
-                        fprintf (opt.outfile, "\"%s\"", d->shape[i].chars[j]);
-                    }
-                    else {
-                        space[d->shape[i].width+2] = '\0';
-                        fprintf (opt.outfile, "%s", space);
-                        space[d->shape[i].width+2] = ' ';
+                    w += 6;
+                    w += d->shape[i].width;
+                    w += strlen(shape_name[i]);
+                    if (i == 0)
+                        w -= 2;
+                    else if (w > 56) {       /* assuming an 80 character screen */
+                        until = i - 1;
+                        break;
                     }
                 }
-                fprintf (opt.outfile, "\n");
-            }
-            if (until < ANZ_SHAPES-1 && d->maxshapeheight > 2)
-                fprintf (opt.outfile, "\n");
-        } while (until < ANZ_SHAPES-1);
+                if (i == ANZ_SHAPES)
+                    until = ANZ_SHAPES - 1;
+                for (w=0, i=sstart; i<=until; ++i) {
+                    if (d->shape[i].height > w)
+                        w = d->shape[i].height;
+                }
+                for (j=0; j<w; ++j) {
+                    if (j > 0 || sstart > 0)
+                        fprintf (opt.outfile, "                      ");
+                    for (i=sstart; i<=until; ++i) {
+                        if (isempty(d->shape+i))
+                            continue;
+                        fprintf (opt.outfile, "  ");
+                        if (j == 0)
+                            fprintf (opt.outfile, "%s: ", shape_name[i]);
+                        else {
+                            space[strlen(shape_name[i])+2] = '\0';
+                            fprintf (opt.outfile, "%s", space);
+                            space[strlen(shape_name[i])+2] = ' ';
+                        }
+                        if (j < d->shape[i].height) {
+                            fprintf (opt.outfile, "\"%s\"", d->shape[i].chars[j]);
+                        }
+                        else {
+                            space[d->shape[i].width+2] = '\0';
+                            fprintf (opt.outfile, "%s", space);
+                            space[d->shape[i].width+2] = ' ';
+                        }
+                    }
+                    fprintf (opt.outfile, "\n");
+                }
+                if (until < ANZ_SHAPES-1 && d->maxshapeheight > 2)
+                    fprintf (opt.outfile, "\n");
+            } while (until < ANZ_SHAPES-1);
+        }
     }
 
 
@@ -1140,28 +1154,35 @@ static int list_styles()
 
         sprintf (buf, "%d", anz_designs);
 
-        fprintf (opt.outfile, "%d Available Style%s in \"%s\":\n",
-                anz_designs, anz_designs==1?"":"s", yyfilename);
-        fprintf (opt.outfile, "-----------------------%s",
-                anz_designs==1? "": "-");
-        for (i=strlen(yyfilename)+strlen(buf); i>0; --i)
-            fprintf (opt.outfile, "-");
-        fprintf (opt.outfile, "\n\n");
+        if (!opt.q) {
+            fprintf (opt.outfile, "%d Available Style%s in \"%s\":\n",
+                    anz_designs, anz_designs==1?"":"s", yyfilename);
+            fprintf (opt.outfile, "-----------------------%s",
+                    anz_designs==1? "": "-");
+            for (i=strlen(yyfilename)+strlen(buf); i>0; --i)
+                fprintf (opt.outfile, "-");
+            fprintf (opt.outfile, "\n\n");
+        }
         for (i=0; i<anz_designs; ++i) {
-            if (list[i]->author && list[i]->designer && strcmp(list[i]->author, list[i]->designer) != 0) {
-                fprintf(opt.outfile, "%s\n%s, coded by %s:\n\n%s\n\n", list[i]->name,
-                        list[i]->designer, list[i]->author, list[i]->sample);
-            }
-            else if (list[i]->designer) {
-                fprintf(opt.outfile, "%s\n%s:\n\n%s\n\n", list[i]->name,
-                        list[i]->designer, list[i]->sample);
-            }
-            else if (list[i]->author) {
-                fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n\n%s\n\n", list[i]->name,
-                        list[i]->author, list[i]->sample);
+            if (opt.q) {
+                fprintf(opt.outfile, "%s\n", list[i]->name);
             }
             else {
-                fprintf(opt.outfile, "%s:\n\n%s\n\n", list[i]->name, list[i]->sample);
+                if (list[i]->author && list[i]->designer && strcmp(list[i]->author, list[i]->designer) != 0) {
+                    fprintf(opt.outfile, "%s\n%s, coded by %s:\n\n%s\n\n", list[i]->name,
+                            list[i]->designer, list[i]->author, list[i]->sample);
+                }
+                else if (list[i]->designer) {
+                    fprintf(opt.outfile, "%s\n%s:\n\n%s\n\n", list[i]->name,
+                            list[i]->designer, list[i]->sample);
+                }
+                else if (list[i]->author) {
+                    fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n\n%s\n\n", list[i]->name,
+                            list[i]->author, list[i]->sample);
+                }
+                else {
+                    fprintf(opt.outfile, "%s:\n\n%s\n\n", list[i]->name, list[i]->sample);
+                }
             }
         }
         BFREE (list);

@@ -121,6 +121,7 @@ extern char *yyfilename;                 /* name of config file */
 typedef struct {                         /* Command line options: */
     int       l;                         /* list available designs */
     int       mend;                      /* 1 if -m is given, 2 in 2nd loop */
+    int       q;                         /* special handling of web UI needs */
     int       r;                         /* remove box from input */
     int       tabstop;                   /* tab stop distance */
     char      tabexp;                    /* tab expansion mode (for leading tabs) */
