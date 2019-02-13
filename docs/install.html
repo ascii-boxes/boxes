@@ -204,7 +204,7 @@ cmd.exe /c exit %RANDOM%
 set tempfile = $(SYS.TEMP)\NppBoxes_$(EXITCODE).out.txt
 set ascfile = $(SYS.TEMP)\NppBoxes_$(EXITCODE).in.txt
 sel_saveto $(ascfile) :a
-<span class="mark-hilite">boxes -d nuke -s 80 -pt1 -ac</span> "$(ascfile)" "$(tempfile)"
+cmd.exe /c <span class="mark-hilite">boxes -d nuke -s 80 -pt1 -ac</span> "$(ascfile)" > "$(tempfile)"
 sel_loadfrom $(tempfile)
 cmd.exe /c del /f /q "$(tempfile)" "$(ascfile)"</code></pre></div></div>
 
