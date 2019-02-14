@@ -1058,7 +1058,7 @@ void output_input (const int trim_only)
             indent = 0;
         }
         
-        printf ("%s%s\n", indentspc, input.lines[j].text + indent);
+        fprintf (opt.outfile, "%s%s\n", indentspc, input.lines[j].text + indent);
         BFREE (indentspc);
     }
 }
