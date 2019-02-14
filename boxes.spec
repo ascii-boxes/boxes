@@ -18,7 +18,7 @@ summary:	Command line ASCII boxes unlimited
 group:		Applications/Text
 
 copyright:	GPL Version 2
-URL:		http://boxes.thomasjensen.com/
+URL:		https://boxes.thomasjensen.com/
 
 source:		http://github.com/ascii-boxes/%{name}/archive/v%{version}.tar.gz
 buildroot:	%defbr

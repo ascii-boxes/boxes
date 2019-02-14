@@ -6,7 +6,7 @@ tarball. Many thanks to Ron Aaron <ron@aaron-tech.com> for making this
 Windows build possible!
 
 General information may be found in the generic README file provided with
-this archive and at http://boxes.thomasjensen.com/, the boxes home page.
+this archive and at https://boxes.thomasjensen.com/, the boxes home page.
 Note that the generic README file is intended for UNIX users, so some
 things don't translate literally (e.g., you would have to type Ctrl-Z
 instead of Ctrl-D to signal end of file, etc.).

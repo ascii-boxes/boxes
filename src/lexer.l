@@ -4,7 +4,7 @@
  *  Date created:     March 15, 1999 (Monday, 17:16h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
  *  Language:         lex (ANSI C)
- *  Web Site:         http://boxes.thomasjensen.com/
+ *  Web Site:         https://boxes.thomasjensen.com/
  *  Purpose:          flex lexical analyzer for boxes configuration files
  *
  *  License: o This program is free software; you can redistribute it and/or

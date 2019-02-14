@@ -4,7 +4,7 @@
  *  Date created:     March 16, 1999 (Tuesday, 17:17h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
  *  Language:         GNU bison (ANSI C)
- *  Web Site:         http://boxes.thomasjensen.com/
+ *  Web Site:         https://boxes.thomasjensen.com/
  *  Purpose:          Yacc parser for boxes configuration files
  *
  *  License: o This program is free software; you can redistribute it and/or

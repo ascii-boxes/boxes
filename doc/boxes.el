@@ -27,7 +27,7 @@
 ;;; Commentary:
 
 ;; This program provides an interface to the boxes application which can be found at
-;; http://boxes.thomasjensen.com/
+;; https://boxes.thomasjensen.com/
 
 ;; To use this, put it somewhere in your load path and add the following
 ;; lines to your .emacs:

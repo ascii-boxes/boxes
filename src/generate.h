@@ -4,7 +4,7 @@
  *  Date created:     June 23, 1999 (Wednesday, 20:12h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
  *  Language:         ANSI C
- *  Web Site:         http://boxes.thomasjensen.com/
+ *  Web Site:         https://boxes.thomasjensen.com/
  *  Purpose:          Box generation, i.e. the drawing of boxes
  *
  *  License: o This program is free software; you can redistribute it and/or

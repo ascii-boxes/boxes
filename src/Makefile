@@ -4,7 +4,7 @@
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
 #               Win32 Modifications by Ron Aaron <ron@mossbayeng.com>
 #   Format:     GNU make
-#   Web Site:   http://boxes.thomasjensen.com/
+#   Web Site:   https://boxes.thomasjensen.com/
 #   Platforms:  win32
 #   Purpose:    Makefile for boxes, the box drawing program
 #

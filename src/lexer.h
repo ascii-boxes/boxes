@@ -4,7 +4,7 @@
  *  Date created:     July 01, 1999 (Thursday, 13:43h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
  *  Language:         ANSI C
- *  Web Site:         http://boxes.thomasjensen.com/
+ *  Web Site:         https://boxes.thomasjensen.com/
  *  Purpose:          Export symbols used by the parser files only
  *
  *  License: o This program is free software; you can redistribute it and/or

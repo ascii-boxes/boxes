@@ -3,7 +3,7 @@
 #   Creation:   August 13, 1999 (Friday, 22:13h)
 #   Author:     Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
 #   Format:     GNU make
-#   Web Site:   http://boxes.thomasjensen.com/
+#   Web Site:   https://boxes.thomasjensen.com/
 #   Purpose:    Makefile for boxes, the box drawing program
 #               generation of regexp handling library
 # 

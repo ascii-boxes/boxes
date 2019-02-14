@@ -4,7 +4,7 @@
  *  Date created:  July 4, 1999 (Sunday, 21:04h)
  *  Author:        Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
  *  Language:      ANSI C
- *  Web Site:      http://boxes.thomasjensen.com/
+ *  Web Site:      https://boxes.thomasjensen.com/
  *  Purpose:       Please compiler and ease porting
  *
  *  License: o This program is free software; you can redistribute it and/or

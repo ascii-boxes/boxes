@@ -3,7 +3,7 @@
  *  Date created:     March 18, 1999 (Thursday, 15:09h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
  *  Language:         ANSI C
- *  Web Site:         http://boxes.thomasjensen.com/
+ *  Web Site:         https://boxes.thomasjensen.com/
  *  Purpose:          Filter to draw boxes around input text (and remove it).
  *
  *  License: o This program is free software; you can redistribute it
@@ -155,7 +155,7 @@ static void usage_long (FILE *st)
 {
     fprintf (st, "%s - draws any kind of box around your text (and removes it)\n", PROJECT);
     fprintf (st, "        (c) Thomas Jensen <boxes@thomasjensen.com>\n");
-    fprintf (st, "        Web page: http://boxes.thomasjensen.com/\n");
+    fprintf (st, "        Web page: https://boxes.thomasjensen.com/\n");
     usage (st);
 }
 

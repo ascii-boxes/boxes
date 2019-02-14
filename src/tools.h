@@ -4,7 +4,7 @@
  *  Date created:     June 20, 1999 (Sunday, 16:57h)
  *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
  *  Language:         ANSI C
- *  Web Site:         http://boxes.thomasjensen.com/
+ *  Web Site:         https://boxes.thomasjensen.com/
  *  Purpose:          Tool functions for error reporting and some string
  *                    handling and other needful things
  *
