@@ -1,3 +1,0 @@
-gcc version 3.3.3 (SuSE Linux)
-bison (GNU Bison) 1.875
-flex version 2.5.4
