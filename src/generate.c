@@ -30,12 +30,6 @@
 #include "generate.h"
 
 
-static const char rcsid_generate_c[] =
-    "$Id: generate.c,v 1.11 2006/07/22 19:21:13 tsjensen Exp $";
-
-
-
-
 static int horiz_precalc (const sentry_t *sarr,
         size_t *topiltf, size_t *botiltf, size_t *hspace)
 /*

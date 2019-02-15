@@ -29,9 +29,6 @@
 #include "boxes.h"
 #include "tools.h"
 
-static const char rcsid_shape_c[] =
-    "$Id: shape.c,v 1.6 2006/07/12 05:27:29 tsjensen Exp $";
-
 
 
 char *shape_name[] = {

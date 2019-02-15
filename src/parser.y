@@ -32,10 +32,6 @@
 #include "lexer.h"
 
 
-const char rcsid_parser_y[] =
-    "$Id: parser.y,v 1.25 2006/07/23 16:11:39 tsjensen Exp $";
-
-
 static int pflicht = 0;
 static int time_for_se_check = 0;
 static int anz_shapespec = 0;            /* number of user-specified shapes */

@@ -29,10 +29,6 @@
 #include <regexp.h>
 #include "regmagic.h"
 
-char rcsid_regsub_c[] =
-    "$Id: regsub.c,v 1.7 2006/07/23 16:15:55 tsjensen Exp $";
-
-
 
 #ifndef CHARBITS
 #define UCHARAT(p)      ((int)*(unsigned char *)(p))

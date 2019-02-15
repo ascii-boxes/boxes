@@ -64,11 +64,6 @@ extern int optind, opterr, optopt;       /* for getopt() */
  *   of small shapes which can be packed pretty tightly anyway.
  */
 
-static const char rcsid_boxes_c[] =
-    "$Id: boxes.c,v 1.39 2006/08/28 15:53:46 tsjensen Exp $";
-
-
-
 
 /*       _\|/_
          (o o)

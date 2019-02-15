@@ -30,10 +30,6 @@
 #include "tools.h"
 
 
-static const char rcsid_tools_c[] =
-    "$Id: tools.c,v 1.7 2006/07/22 19:27:15 tsjensen Exp $";
-
-
 
 int yyerror (const char *fmt, ...)
 /*

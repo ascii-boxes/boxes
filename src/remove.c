@@ -29,10 +29,6 @@
 #include "tools.h"
 #include "remove.h"
 
-static const char rcsid_remove_c[] =
-    "$Id: remove.c,v 1.8 2006/07/22 19:19:26 tsjensen Exp $";
-
-
 
 
 static int best_match (const line_t *line,

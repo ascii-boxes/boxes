@@ -1,8 +1,6 @@
 /*
  * Definitions etc. for regexp(3) routines.
  *
- * Version: $Id: regexp.h,v 1.5 1999/06/25 18:53:51 tsjensen Exp $
- *
  * Caveat:  this is V8 regexp(3) [actually, a reimplementation thereof],
  * not the System V one.
  */

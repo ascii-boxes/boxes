@@ -38,8 +38,6 @@
 #define LEX_MAX_WARN 3                   /* number of lex errors per design */
 
 
-static const char rcsid_lexer_l[] =
-    "$Id: lexer.l,v 1.19 2006/07/22 19:31:25 tsjensen Exp $";
 int tjlineno = 1;
 
 static int yyerrcnt = 0;
