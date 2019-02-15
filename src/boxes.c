@@ -1,43 +1,19 @@
 /*
- *  File:             boxes.c
- *  Date created:     March 18, 1999 (Thursday, 15:09h)
- *  Author:           Copyright (C) 1999 Thomas Jensen <boxes@thomasjensen.com>
- *  Language:         ANSI C
- *  Web Site:         https://boxes.thomasjensen.com/
- *  Purpose:          Filter to draw boxes around input text (and remove it).
+ * boxes - Command line filter to draw/remove ASCII boxes around text
+ * Copyright (C) 1999  Thomas Jensen and the boxes contributors
  *
- *  License: o This program is free software; you can redistribute it
- *             and/or modify it under the terms of the GNU General Public
- *             License as published by the Free Software Foundation; either
- *             version 2 of the License, or (at your option) any later
- *             version.
- *           o This program is distributed in the hope that it will be
- *             useful, but WITHOUT ANY WARRANTY; without even the implied
- *             warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- *             PURPOSE. See the GNU General Public License for more details.
- *           o You should have received a copy of the GNU General Public
- *             License along with this program; if not, write to the Free
- *             Software Foundation, Inc., 59 Temple Place, Suite 330,
- *             Boston, MA  02111-1307  USA
- *
- *           - This version is leaking small bits of memory. Since boxes
- *             runs as a filter in its own process, the leaks are irrelevant.
- *           - The decision to number box shapes in clockwise order was a
- *             major design mistake. Treatment of box parts of the same
- *             alignment (N-S and E-W) is usually combined in one function,
- *             which must now deal with the numbering being reversed all the
- *             time. This is nasty, but changing the shape order would
- *             pretty much mean a total rewrite of the code, so we'll have
- *             to live with it.
- *           - All shapes defined in a box design must be used in any box of
- *             that design at least once. In other words, there must not be
- *             a shape which is defined in the config file but cannot be
- *             found in an actual box of that design. This sort of limits
- *             how small your boxes can get. However, in practice it is not
- *             a problem, because boxes which must be small usually consist
- *             of small shapes which can be packed pretty tightly anyway.
- *             And again, changing this would pretty much mean a total
- *             rewrite.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License, version 2, as published
+ * by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
@@ -71,6 +47,22 @@ extern int optind, opterr, optopt;       /* for getopt() */
     #define BOXES_CONFIG ".boxes"
 #endif
 
+/*
+ * Some source comments (AD 1999):
+ *
+ * - The decision to number box shapes in clockwise order was a
+ *   major design mistake. Treatment of box parts of the same
+ *   alignment (N-S and E-W) is usually combined in one function,
+ *   which must now deal with the numbering being reversed all the
+ *   time.
+ * - All shapes defined in a box design must be used in any box of
+ *   that design at least once. In other words, there must not be
+ *   a shape which is defined in the config file but cannot be
+ *   found in an actual box of that design. This sort of limits
+ *   how small your boxes can get. However, in practice it is not
+ *   a problem, because boxes which must be small usually consist
+ *   of small shapes which can be packed pretty tightly anyway.
+ */
 
 static const char rcsid_boxes_c[] =
     "$Id: boxes.c,v 1.39 2006/08/28 15:53:46 tsjensen Exp $";
