@@ -1051,7 +1051,8 @@ void output_input (const int trim_only)
             indent = 0;
         }
         
-        fprintf (opt.outfile, "%s%s\n", indentspc, input.lines[j].text + indent);
+        fprintf (opt.outfile, "%s%s%s", indentspc, input.lines[j].text + indent,
+            (input.final_newline || j < input.anz_lines-1 ? "\n" : ""));
         BFREE (indentspc);
     }
 }

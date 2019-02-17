@@ -1043,7 +1043,7 @@ int output_box (const sentry_t *thebox)
             BFREE (restored_indent);
         }
 
-        fprintf (opt.outfile, "%s\n", obuf);
+        fprintf (opt.outfile, "%s%s", obuf, (input.final_newline || j < nol-skip_end-1 ? "\n" : ""));
     }
 
     BFREE (indentspc);

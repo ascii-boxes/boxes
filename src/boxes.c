@@ -1328,6 +1328,32 @@ static int apply_substitutions (const int mode)
 
 
 
+static int has_linebreak (const char *s, const int len)
+/*
+ *  Determine if the given line of raw text is ended by a line break.
+ *
+ *  s: the string to check
+ *  len: length of s
+ *
+ *  RETURNS:  != 0   line break found
+ *            == 0   line break not found
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int result = 0;
+    if (s != NULL && len > 0) {
+        char the_last = s[len - 1];
+        result = the_last == '\r' || the_last == '\n';
+        #if defined(DEBUG)
+            fprintf(stderr, "has_linebreak: (%d) %d\n", the_last, result);
+        #endif
+    }
+    return result;
+}
+
+
+
 static int read_all_input (const int use_stdin)
 /*
  *  Read entire input (possibly from stdin) and store it in 'input' array.
@@ -1375,6 +1401,7 @@ static int read_all_input (const int use_stdin)
             }
 
             input.lines[input.anz_lines].len = strlen (buf);
+            input.final_newline = has_linebreak(buf, input.lines[input.anz_lines].len);
 
             if (opt.r) {
                 input.lines[input.anz_lines].len -= 1;
@@ -1488,8 +1515,9 @@ static int read_all_input (const int use_stdin)
         }
         fprintf (stderr, "] (%d)\n", input.lines[i].tabpos_len);
     }
-    fprintf (stderr, "\nLongest line: %d characters.\n", input.maxline);
-    fprintf (stderr, " Indentation: %2d spaces.\n", input.indent);
+    fprintf (stderr, "\n Longest line: %d characters.\n", input.maxline);
+    fprintf (stderr, "  Indentation: %2d spaces.\n", input.indent);
+    fprintf (stderr, "Final newline:  %d.\n", input.final_newline);
 #endif
 
     return 0;
