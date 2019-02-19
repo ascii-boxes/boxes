@@ -675,11 +675,7 @@ static int process_commandline (int argc, char *argv[])
                     opt.reqheight = strtol (pdummy+1, NULL, 10);
                     *pdummy = 'x';
                 }
-                if(errno){
-                    fprintf (stderr, "%s: box size: %s, '%s'\n",
-                            PROJECT, strerror(idummy), optarg);
-                    return 1;
-                } else if ((opt.reqwidth == 0 && opt.reqheight == 0)
+                if(errno || (opt.reqwidth == 0 && opt.reqheight == 0)
                   || opt.reqwidth < 0 || opt.reqheight < 0) {
                     fprintf (stderr, "%s: invalid box size specification -- %s\n",
                             PROJECT, optarg);
