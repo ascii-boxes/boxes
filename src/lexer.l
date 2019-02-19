@@ -59,6 +59,7 @@ static void inflate_inbuf();
 %option noyywrap
 %option never-interactive
 %option caseless
+%option noinput
 %option noyylineno
 
 
