@@ -20,9 +20,10 @@
 
 # The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/share/boxes
+GIT_STATUS = ($(shell git rev-parse --short HEAD)$(shell if [ $$(git status -s -uall | wc -l) -ge 1 ] ; then echo ", dirty" ; fi))
 BVERSION   = 1.2.1-SNAPSHOT
 
-ALL_FILES  = LICENSE README.md README.Win32.txt boxes-config
+ALL_FILES  = LICENSE README.md README.Win32.md boxes-config
 DOC_FILES  = doc/boxes.1 doc/boxes.el
 PKG_NAME   = boxes-$(BVERSION)
 
@@ -46,7 +47,7 @@ infomsg:
 replaceinfos: src/boxes.h doc/boxes.1
 
 src/boxes.h: src/boxes.h.in src/regexp/regexp.h Makefile
-	sed -e 's/--BVERSION--/$(BVERSION)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' src/boxes.h.in > src/boxes.h
+	sed -e 's/--BVERSION--/$(BVERSION) $(GIT_STATUS)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' src/boxes.h.in > src/boxes.h
 
 doc/boxes.1: doc/boxes.1.in Makefile
 	sed -e 's/--BVERSION--/$(BVERSION)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' doc/boxes.1.in > doc/boxes.1

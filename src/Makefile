@@ -48,11 +48,11 @@ debug: flags_$(BOXES_PLATFORM)
 boxes: $(ALL_OBJ)
 	$(MAKE) -C regexp CC=$(CC) libregexp.a
 	$(CC) $(LDFLAGS) $(ALL_OBJ) -o $(BOXES_EXECUTABLE_NAME) -lregexp
-	if [ $(STRIP) == true ] ; then strip $(BOXES_EXECUTABLE_NAME) ; fi
+	if [ "$(STRIP)" = "true" ] ; then strip $(BOXES_EXECUTABLE_NAME) ; fi
 
 boxes.exe: $(ALL_OBJ)
 	$(CC) $(LDFLAGS) $(ALL_OBJ) -o $(BOXES_EXECUTABLE_NAME) -lkernel32
-	if [ $(STRIP) == true ] ; then strip $(BOXES_EXECUTABLE_NAME) ; fi
+	if [ "$(STRIP)" = "true" ] ; then strip $(BOXES_EXECUTABLE_NAME) ; fi
 
 
 flags_unix:
