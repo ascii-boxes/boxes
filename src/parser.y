@@ -19,7 +19,9 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// Yacc parser for boxes configuration files
+/*
+ * Yacc parser for boxes configuration files
+ */
 
 #include "config.h"
 #include <stdio.h>

@@ -18,7 +18,9 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// Please compiler and ease porting
+/*
+ * Please compiler and ease porting
+ */
 
 #ifndef CONFIG_H
 #define CONFIG_H

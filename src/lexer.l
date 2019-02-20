@@ -19,7 +19,9 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// flex lexical analyzer for boxes configuration files
+/*
+ * flex lexical analyzer for boxes configuration files
+ */
 
 #include "config.h"
 #include <string.h>

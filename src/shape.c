@@ -18,7 +18,9 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// Shape handling and information functions
+/*
+ * Shape handling and information functions
+ */
 
 #include "config.h"
 #include <stdlib.h>

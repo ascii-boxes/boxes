@@ -4,7 +4,6 @@
  *  Author:           Henry Spencer.
  *                    Extensions and modifications by Thomas Jensen
  *  Language:         K&R C (traditional)
- *  Web Site:         https://boxes.thomasjensen.com/
  *  Purpose:          Perform substitutions after a regexp match
  *  License:          - Not derived from licensed software.
  *                    - Permission is granted to anyone to use this

@@ -18,8 +18,10 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// Tool functions for error reporting and some string handling and other
-// needful things
+/*
+ * Tool functions for error reporting and some string handling and other
+ * needful things
+ */
 
 #ifndef TOOLS_H
 #define TOOLS_H

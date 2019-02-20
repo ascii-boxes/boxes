@@ -18,7 +18,9 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// Project-wide globals and data structures
+/*
+ * Project-wide globals and data structures
+ */
 
 #ifndef BOXES_H
 #define BOXES_H

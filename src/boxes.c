@@ -111,7 +111,7 @@ static void usage (FILE *st)
     fprintf (st, "        -l       list available box designs w/ samples\n");
     fprintf (st, "        -m       mend box, i.e. remove it and redraw it afterwards\n");
     fprintf (st, "        -p fmt   padding [default: none]\n");
-    //fprintf (st, "        -q       modify command for needs of the web UI (undocumented)\n");
+    /* fprintf (st, "        -q       modify command for needs of the web UI (undocumented)\n"); */
     fprintf (st, "        -r       remove box\n");
     fprintf (st, "        -s wxh   box size (width w and/or height h)\n");
     fprintf (st, "        -t str   tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);

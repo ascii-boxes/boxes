@@ -18,7 +18,9 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// Provide tool functions for error reporting and some string handling
+/*
+ * Provide tool functions for error reporting and some string handling
+ */
 
 #include "config.h"
 #include <errno.h>

@@ -18,7 +18,9 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// Box generation, i.e. the drawing of boxes
+/*
+ * Box generation, i.e. the drawing of boxes
+ */
 
 #include "config.h"
 #include <stdlib.h>

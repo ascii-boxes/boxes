@@ -18,7 +18,9 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// Box removal, i.e. the deletion of boxes
+/*
+ * Box removal, i.e. the deletion of boxes
+ */
 
 #include "config.h"
 #include <stdlib.h>

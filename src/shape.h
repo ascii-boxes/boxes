@@ -18,7 +18,9 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// Shape handling and information functions
+/*
+ * Shape handling and information functions
+ */
 
 #ifndef SHAPE_H
 #define SHAPE_H

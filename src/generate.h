@@ -18,7 +18,9 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// Box generation, i.e. the drawing of boxes
+/*
+ * Box generation, i.e. the drawing of boxes
+ */
 
 #ifndef GENERATE_H
 #define GENERATE_H

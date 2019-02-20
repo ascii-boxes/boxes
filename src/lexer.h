@@ -18,7 +18,9 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-// Export symbols used by the parser files only
+/*
+ * Export symbols used by the parser files only
+ */
 
 #ifndef LEXER_H
 #define LEXER_H
