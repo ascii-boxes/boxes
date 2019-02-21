@@ -1,9 +1,9 @@
-# boxes 1.2 Win32 port Information
+# boxes Win32 port Information
 
 **Date:** 16-Mar-2017
 
-This is the Win32 Version of boxes 1.2, built from the official source
-tarball. Many thanks to **Ron Aaron** for making this Windows build possible!
+This is the Win32 Version of boxes, built from the official source tarball.
+Many thanks to **Ron Aaron** for making this Windows build possible!
 
 General information may be found in the generic README file provided with
 this archive and at https://boxes.thomasjensen.com/, the boxes home page.
