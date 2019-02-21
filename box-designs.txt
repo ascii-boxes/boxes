@@ -1,4 +1,4 @@
-52 Available Styles in "boxes-config":
+58 Available Styles in "boxes-config":
 --------------------------------------
 
 ada-box
@@ -210,6 +210,23 @@ Joan G. Stark <spunk1111@juno.com>, coded by Thomas Jensen <boxes(at)thomasjense
     '-------------------------------------------'
 
 
+f90-box
+(public domain), coded by Matt Thompson <fortran(at)gmail(dot)com>:
+
+    !!!!!!!!!!!!!
+    !           !
+    !           !
+    !!!!!!!!!!!!!
+
+
+f90-cmt
+(public domain), coded by Matt Thompson <fortran(at)gmail(dot)com>:
+
+    !
+    !  regular comments used in Fortran 90+
+    !
+
+
 face
 Dmitry Bolshakov <bdimych@protonmail.com>:
 
@@ -220,6 +237,17 @@ Dmitry Bolshakov <bdimych@protonmail.com>:
     ( face face face )
     ( face face face )
      '--------------'
+
+
+fence
+Dmitry Bolshakov <bdimych@protonmail.com>:
+
+     /\ /\ /\ /\ /\ 
+    |__|__|__|__|__|
+    |  |  |  |  |  |
+    |  | fence  |  |
+    |__|__|__|__|__|
+    |__|__|__|__|__|
 
 
 girl
@@ -288,6 +316,42 @@ unknown artist, coded by Karl E. Jorgensen <karl@jorgensen.com>:
                        \ (    (   )
                         \_)    ) /
                               (_/
+
+
+important
+Dmitry Bolshakov <bdimych@protonmail.com>:
+
+     /\ !!!!!!!!!!! /\ 
+    |! |           |! |
+    |! | important |! |
+    |__|           |__|
+    (__)!!!!!!!!!!!(__)
+
+
+important2
+Dmitry Bolshakov <bdimych@protonmail.com>:
+
+     /\  /\ !!!!!!!!!!!! /\  /\ 
+    |! ||! |!!!!!!!!!!!!|! ||! |
+    |! ||! |            |! ||! |
+    |! ||! | important2 |! ||! |
+    |! ||! |            |! ||! |
+    |__||__|!!!!!!!!!!!!|__||__|
+    (__)(__)!!!!!!!!!!!!(__)(__)
+
+
+important3
+Dmitry Bolshakov <bdimych@protonmail.com>:
+
+     /\  /\  /\ !!!!!!!!!!!! /\  /\  /\ 
+    |! ||! ||! |!!!!!!!!!!!!|! ||! ||! |
+    |! ||! ||! |!!!!!!!!!!!!|! ||! ||! |
+    |! ||! ||! |            |! ||! ||! |
+    |! ||! ||! | important3 |! ||! ||! |
+    |! ||! ||! |            |! ||! ||! |
+    |! ||! ||! |!!!!!!!!!!!!|! ||! ||! |
+    |__||__||__|!!!!!!!!!!!!|__||__||__|
+    (__)(__)(__)!!!!!!!!!!!!(__)(__)(__)
 
 
 java-cmt

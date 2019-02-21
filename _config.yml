@@ -8,7 +8,7 @@ plugins:
   - jekyll-paginate
 
 # url is currently only used only for the RSS feed in feed.xml
-url: http://boxes.thomasjensen.com/
+url: https://boxes.thomasjensen.com/
 
 # baseurl will often be '', but for a project page on gh-pages, it needs to
 # be the project name.
@@ -37,6 +37,8 @@ kramdown:
   input: GFM
 
 exclude: ['README.md', 'LICENSE', 'src/', 'doc/']
+
+currentVersion: 1.3
 
 # boxes custom variables
 defaults:
