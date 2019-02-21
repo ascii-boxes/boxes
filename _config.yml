@@ -6,9 +6,10 @@ description: Command line ASCII boxes unlimited!
 plugins:
   - jemoji
   - jekyll-paginate
+  - jekyll-sitemap
 
 # url is currently only used only for the RSS feed in feed.xml
-url: https://boxes.thomasjensen.com/
+url: https://boxes.thomasjensen.com
 
 # baseurl will often be '', but for a project page on gh-pages, it needs to
 # be the project name.
@@ -28,8 +29,9 @@ gaaccount: 'UA-23698164-5'
 disqus: ''
 comments: false
 
-permalink: /:year/:month/:title
+permalink: /:year/:month/:title:output_ext
 paginate: 10
+future: true
 
 highlighter: rouge
 markdown: kramdown

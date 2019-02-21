@@ -11,9 +11,7 @@
     <!-- start page -->
     <meta name="description" content="{{ page.sedesc }}" />
     <meta name="keywords" content="software, ascii, ascii art, filter, command line, box, boxes, box drawing" />
-    <link rel="canonical" href="https://{{ page.sitehost }}/" />
-    {% else %}
-    <link rel="canonical" href="https://{{ page.sitehost }}{{ page.url }}" />
+    <link rel="canonical" href="{{ site.url }}" />
     {% endif %}
     {% include analytics.html %}
     <script type="text/javascript">
