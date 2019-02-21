@@ -2308,8 +2308,8 @@ END unicornthink
 BOX unicornsay
 
 author "Mike Meyer <boxes@meyer.fm>"
-revision "1.1"
-revdate "November 08, 2014 (Saturday, 11:08h)"
+revision "1.2"
+revdate "February 21, 2019 (Thursday, 18:45h)"
 created "September 02, 2013 (Monday, 14:43h)"
 
 sample
@@ -2330,41 +2330,36 @@ sample
 ends
 
 shapes {
-    nw  ("   __",
-         "  /  ")
-    n   ("____",
-         "    ")
+    nw  (" ",
+         "/")
+    n   ("_",
+         " ")
     ne  ("__        ",
          "  \\       ")
 
-    sw  ("  \\__",
-         "     ",
-         "     ",
-         "     ",
-         "     ",
-         "     ",
-         "     ",
-         "     ",
-         "     ",
-         "     ")
+    sw  ("\\",
+         " ",
+         " ",
+         " ",
+         " ",
+         " ",
+         " ",
+         " ",
+         " ",
+         " ")
 
-    s   ("_____",
-         "     ",
-         "     ",
-         "     ",
-         "     ",
-         "     ",
-         "     ",
-         "     ",
-         "     ",
-         "     ")
+    s   ("_",
+         " ",
+         " ",
+         " ",
+         " ",
+         " ",
+         " ",
+         " ",
+         " ",
+         " ")
 
-    nnw ("____",
-         "    ")
-    nne ("_____",
-         "     ")
-
-    w   ("  |  ")
+    w   ("|")
     e   ("  |       ")
     se  ("'\\        ",
          " \\\\       ",
@@ -2376,17 +2371,6 @@ shapes {
          "'  _.'  | ",
          "'-'/    \\ ",
          "          ")
-
-    ssw ("____",
-         "    ",
-         "    ",
-         "    ",
-         "    ",
-         "    ",
-         "    ",
-         "    ",
-         "    ",
-         "    ")
 
     sse ("_  __",
          " |/  ",
@@ -2401,6 +2385,10 @@ shapes {
 }
 
 elastic (n, s, e, w)
+
+padding {
+    left 1
+}
 
 END unicornsay
 
