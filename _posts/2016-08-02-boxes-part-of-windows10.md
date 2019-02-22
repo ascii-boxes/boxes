@@ -14,7 +14,7 @@ Debian packages; and Debian being the foundation of Ubuntu. So, like I said, it 
 help being a little proud of the fact! <!--break-->
 
 <p>The Ubuntu Subsystem is optional and thus needs to be activated manually. Microsoft provides a reasonably simple
-<a href="https://msdn.microsoft.com/commandline/wsl/install_guide"
+<a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10"
 target="_blank">guide</a> on how to do that. After starting a bash in the Ubuntu Subsystem,
 you can activate <i>boxes</i> by typing:</p>
 
