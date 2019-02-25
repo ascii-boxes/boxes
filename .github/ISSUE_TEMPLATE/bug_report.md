@@ -12,7 +12,7 @@ A clear and concise description of what the bug is, including the precise error 
 **To Reproduce**  
 Steps to reproduce the behavior:
 - Value of the environment variable `BOXES`
-- How *boxes* is invoked, ideally as a command which can be copy&pasted, for example
+- How *boxes* is invoked, including input text, ideally as a command which can be copy&pasted, for example
 
       echo foo | boxes -s 11 -ac -d stone
 
