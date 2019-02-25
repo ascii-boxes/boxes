@@ -10,7 +10,7 @@ assignees: ''
 A clear and concise description of what the bug is, including the precise error message where applicable.
 
 **To Reproduce**  
-Steps to reproduce the behavior:
+Steps to reproduce the behavior, including, but not limited to:
 - Value of the environment variable `BOXES`
 - How *boxes* is invoked, including input text, ideally as a command which can be copy&pasted, for example
 
