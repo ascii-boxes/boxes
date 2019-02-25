@@ -11,10 +11,12 @@ A clear and concise description of what the bug is, including the precise error 
 
 **To Reproduce**  
 Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+- Value of the environment variable `BOXES`
+- How *boxes* is invoked, ideally as a command which can be copy&pasted, for example
+
+      echo foo | boxes -s 11 -ac -d stone
+
+- See error error message
 
 **Expected behavior**  
 A clear and concise description of what you expected to happen.
