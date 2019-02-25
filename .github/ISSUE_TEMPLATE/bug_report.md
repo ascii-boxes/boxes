@@ -16,10 +16,10 @@ Steps to reproduce the behavior:
 
       echo foo | boxes -s 11 -ac -d stone
 
-- See error error message
+- The output text produced by *boxes*, error message if applicable
 
 **Expected behavior**  
-A clear and concise description of what you expected to happen.
+A clear and concise description of what you expected to happen, for example the text that you expected *boxes* to produce
 
 **Screenshots**  
 If possible, add screenshots to help explain your problem.
