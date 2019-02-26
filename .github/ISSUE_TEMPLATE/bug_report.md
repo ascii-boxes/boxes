@@ -14,7 +14,7 @@ Steps to reproduce the behavior, including, but not limited to:
 
       echo foo | boxes -s 11 -ac -d stone
 
-  If invoked via an editor plugin, give its name and configuration
+  If invoked via an editor plugin, give name of editor and plugin, and its configuration
 - If a custom box design is involved, its configuration
 - The output text produced by *boxes*
 - The error message your are getting, if any
