@@ -1,0 +1,19 @@
+:ARGS
+-ac -q -s 18 -p a3 -i box
+:INPUT
+  foo
+  barf
+:OUTPUT-FILTER
+:EXPECTED
+  /****************/
+  /*              */
+  /*              */
+  /*              */
+  /*     foo      */
+  /*     barf     */
+  /*              */
+  /*              */
+  /*              */
+  /****************/
+4 9 9
+:EOF

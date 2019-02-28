@@ -1397,6 +1397,7 @@ static int read_all_input (const int use_stdin)
             }
 
             input.lines[input.anz_lines].len = strlen (buf);
+            input.lines[input.anz_lines].num_leading_blanks = 0;
             input.final_newline = has_linebreak(buf, input.lines[input.anz_lines].len);
 
             if (opt.r) {

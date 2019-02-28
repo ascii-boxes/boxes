@@ -1,0 +1,13 @@
+:ARGS
+-q -t 8k
+:INPUT
+	foo
+	barf
+:OUTPUT-FILTER
+:EXPECTED
+	/********/
+	/* foo  */
+	/* barf */
+	/********/
+1 4 4
+:EOF

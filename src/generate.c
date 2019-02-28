@@ -25,6 +25,7 @@
 #include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include "shape.h"
 #include "boxes.h"
@@ -692,10 +693,13 @@ static int justify_line (line_t *line, int skew)
     size_t shift;
     size_t oldlen = line->len;
 
-    if (opt.justify == '\0')
+    if (empty_line(line)) {
+        line->num_leading_blanks = SIZE_MAX;
         return 0;
-    if (empty_line(line))
+    }
+    if (opt.justify == '\0') {
         return 0;
+    }
 
     for (p=line->text; *p==' ' || *p=='\t'; ++p);
     newlen = line->len - (p-line->text);
@@ -706,10 +710,12 @@ static int justify_line (line_t *line, int skew)
             if (opt.design->indentmode == 't') {
                 memmove (line->text+input.indent, p, newlen+1);
                 line->len = newlen + input.indent;
+                line->num_leading_blanks = input.indent;
             }
             else {
                 memmove (line->text, p, newlen+1);
                 line->len = newlen;
+                line->num_leading_blanks = 0;
             }
             break;
 
@@ -750,6 +756,7 @@ static int justify_line (line_t *line, int skew)
             BFREE (line->text);
             line->text = newtext;
             line->len = shift + newlen;
+            line->num_leading_blanks = shift;
             break;
 
         case 'r':
@@ -774,6 +781,7 @@ static int justify_line (line_t *line, int skew)
             BFREE (line->text);
             line->text = newtext;
             line->len = input.maxline;
+            line->num_leading_blanks = shift;
             break;
 
         default:
@@ -811,24 +819,25 @@ int output_box (const sentry_t *thebox)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    size_t j;
-    size_t nol = thebox[BRIG].height;    /* number of output lines */
-    char   trailspc[LINE_MAX+1];
-    char  *indentspc;
-    int    indentspclen;
-    size_t vfill, vfill1, vfill2;        /* empty lines/columns in box */
-    size_t hfill;
-    char  *hfill1, *hfill2;              /* space before/after text */
-    size_t hpl, hpr;
-    size_t r;
-    int    rc;
-    char   obuf[LINE_MAX+1];             /* final output buffer */
-    size_t obuf_len;                     /* length of content of obuf */
-    size_t skip_start;                   /* lines to skip for box top */
-    size_t skip_end;                     /* lines to skip for box bottom */
-    size_t skip_left;                    /* true if left box part is to be skipped */
-    int    ntabs, nspcs;                 /* needed for unexpand of tabs */
-    char  *restored_indent;
+    size_t  j;
+    size_t  nol = thebox[BRIG].height;   /* number of output lines */
+    char    trailspc[LINE_MAX+1];
+    char   *indentspc;
+    int     indentspclen;
+    size_t  vfill, vfill1, vfill1_save, vfill2; /* empty lines/columns in box */
+    size_t  hfill;
+    char   *hfill1, *hfill2;             /* space before/after text */
+    size_t  hpl, hpr;
+    size_t  r;
+    int     rc;
+    char    obuf[LINE_MAX+1];            /* final output buffer */
+    size_t  obuf_len;                    /* length of content of obuf */
+    size_t  skip_start;                  /* lines to skip for box top */
+    size_t  skip_end;                    /* lines to skip for box bottom */
+    size_t  skip_left;                   /* true if left box part is to be skipped */
+    int     ntabs, nspcs;                /* needed for unexpand of tabs */
+    char   *restored_indent;
+    size_t *contentPos;                  /* column of first char of input text in output text */
 
     #ifdef DEBUG
         fprintf (stderr, "Padding used: left %d, top %d, right %d, bottom %d\n",
@@ -900,6 +909,7 @@ int output_box (const sentry_t *thebox)
     vfill1 += opt.design->padding[BTOP];
     vfill2 += opt.design->padding[BBOT];
     vfill  += opt.design->padding[BTOP] + opt.design->padding[BBOT];
+    vfill1_save = vfill1;
 
     /*
      *  Provide strings for horizontal text alignment.
@@ -975,6 +985,7 @@ int output_box (const sentry_t *thebox)
     /*
      *  Generate actual output
      */
+    contentPos = calloc (input.anz_lines, sizeof(size_t));
     for (j=skip_start; j<nol-skip_end; ++j) {
 
         if (j < thebox[BTOP].height) {   /* box top */
@@ -1008,6 +1019,14 @@ int output_box (const sentry_t *thebox)
                 r = input.maxline - input.lines[ti].len;
                 trailspc[r] = '\0';
                 restored_indent = tabbify_indent (ti, indentspc, indentspclen);
+                if (input.lines[ti].num_leading_blanks == SIZE_MAX) {
+                    contentPos[ti] = SIZE_MAX;
+                } else {
+                    contentPos[ti] = strlen(restored_indent)
+                            + (skip_left? 0: strlen(thebox[BLEF].chars[j]))
+                            + strlen(hfill1)
+                            + input.lines[ti].num_leading_blanks;
+                }
                 concat_strings (obuf, LINE_MAX+1, 7, restored_indent,
                         skip_left?"":thebox[BLEF].chars[j], hfill1,
                         ti >= 0? input.lines[ti].text : "", hfill2,
@@ -1048,6 +1067,17 @@ int output_box (const sentry_t *thebox)
         fprintf (opt.outfile, "%s%s", obuf, (input.final_newline || j < nol-skip_end-1 ? "\n" : ""));
     }
 
+    /* add info line for web ui if requested with -q */
+    if (opt.q) {
+        fprintf (opt.outfile, "%d ", thebox[BTOP].height + vfill1_save - skip_start);
+        for (j = 0; j < input.anz_lines; j++) {
+            fprintf (opt.outfile, "%d%s",
+                (contentPos[j] == SIZE_MAX ? (int) -1 : (int) contentPos[j]),
+                j < input.anz_lines-1 ? " ": "\n");
+        }
+    }
+
+    BFREE (contentPos);
     BFREE (indentspc);
     BFREE (hfill1);
     BFREE (hfill2);

@@ -1,0 +1,14 @@
+:ARGS
+-ac -q -s 18x5 -p h3
+:INPUT
+foo
+barf
+:OUTPUT-FILTER
+:EXPECTED
+/****************/
+/*     foo      */
+/*     barf     */
+/*              */
+/****************/
+1 7 7
+:EOF

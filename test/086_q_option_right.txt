@@ -1,0 +1,13 @@
+:ARGS
+-ar -q -s 12
+:INPUT
+foo
+barf
+:OUTPUT-FILTER
+:EXPECTED
+/**********/
+/*    foo */
+/*   barf */
+/**********/
+1 6 5
+:EOF

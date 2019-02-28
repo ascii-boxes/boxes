@@ -1,0 +1,13 @@
+:ARGS
+-q -d right
+:INPUT
+foo
+
+  bar
+:OUTPUT-FILTER
+:EXPECTED
+foo      /*@TJ@*/
+         /*@TJ@*/
+  bar    /*@TJ@*/
+0 0 -1 0
+:EOF

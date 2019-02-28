@@ -148,6 +148,7 @@ typedef struct {
     char   *text;                        /* line content, tabs expanded */
     size_t *tabpos;                      /* tab positions in expanded work strings */
     size_t  tabpos_len;                  /* number of tabs in a line */
+    size_t  num_leading_blanks;          /* number of spaces at the start of the line after justification */
 } line_t;
 
 #ifndef FILE_LEXER_L
