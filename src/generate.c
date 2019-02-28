@@ -1069,7 +1069,7 @@ int output_box (const sentry_t *thebox)
 
     /* add info line for web ui if requested with -q */
     if (opt.q) {
-        fprintf (opt.outfile, "%d ", thebox[BTOP].height + vfill1_save - skip_start);
+        fprintf (opt.outfile, "%d ", (int) (thebox[BTOP].height + vfill1_save - skip_start));
         for (j = 0; j < input.anz_lines; j++) {
             fprintf (opt.outfile, "%d%s",
                 (contentPos[j] == SIZE_MAX ? (int) -1 : (int) contentPos[j]),
