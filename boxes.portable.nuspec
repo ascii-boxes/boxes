@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+    <metadata>
+        <id>boxes.portable</id>
+        <title>boxes (Portable)</title>
+        <version>0.0.0</version>
+        <authors>The Boxes Contributors</authors>
+        <owners>Thomas Jensen</owners>
+        <summary>Command Line ASCII Boxes Unlimited!</summary>
+        <description><![CDATA[*Boxes* is a command line program that draws a box around its input text. It can remove
+and repair those boxes, too. You can easily make your own box designs if you wish, but many designs are
+already provided.
+
+*Boxes* is a portable application (hence the `.portable` suffix in the choco package ID). It is installed into
+the package directory `%ChocolateyInstall%\lib\boxes`. Chocolatey makes *boxes* available to you on the `PATH`
+via its `%ChocolateyInstall%\bin` directory. This is the only official *boxes* choco package.
+
+### Examples
+
+After *boxes* is installed, try calling it like this:
+
+`C:\>echo Hello World | boxes`
+```
+/***************/
+/* Hello World */
+/***************/
+```
+
+or like this:
+
+`C:\>echo Hello World! | boxes -d unicornsay`
+```
+ _______________
+/               \
+| Hello World!  |
+\_________  __'\
+          |/   \\
+           \    \\  .
+                |\\/|
+                / " '\
+                . .   .
+               /    ) |
+              '  _.'  |
+              '-'/    \
+```
+
+A more complex call might look like this:
+
+`C:\>echo Spring is in the Air! | boxes -d spring -p h4 -ac`
+```
+      ,
+  /\^/`\
+ | \/   |
+ | |    |                                           jgs
+ \ \    /                                         _ _
+  '\\//'                                        _{ ' }_
+    ||            Spring is in the Air!        { `.!.` }
+    ||                                         ',_/Y\_,'
+    ||  ,                                        {_,_}
+|\  ||  |\                                         |
+| | ||  | |                                      (\|  /)
+| | || / /                                        \| //
+ \ \||/ /                                          |//
+  `\\//`   \   \./    \\   \./    \\   \./    \ \\ |/ /
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+### Modifying boxes.cfg
+
+At some point, you may wish to modify existing box designs or even add your own.  
+When that happens, you may find that you don't have the necessary access permissions to modify boxes.cfg in
+`%ChocolateyInstall%\lib\boxes` directly. In that case, make a copy of boxes.cfg and place it in one of the
+precedent locations, where *boxes* finds it before the original. When reading the config file, *boxes* will try
+these locations (in order):
+
+1. The file specified by the environment variable `BOXES`.
+2. A file called boxes.cfg in the directory specified by the environment variable `HOME`.
+3. The boxes.cfg installed by choco.
+
+&nbsp;
+]]></description>
+        <projectUrl>https://boxes.thomasjensen.com/</projectUrl>
+        <tags>ascii ascii-art filter command-line cli</tags>
+        <iconUrl>https://boxes.thomasjensen.com/images/boxes-sq-256.png</iconUrl>
+        <!-- <license type="expression">GPL-2.0-only</license> -->
+        <licenseUrl>https://www.gnu.org/licenses/old-licenses/gpl-2.0.html</licenseUrl>
+        <language>en</language>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <releaseNotes>https://boxes.thomasjensen.com/2019/02/boxes-v1.3-released.html</releaseNotes>
+        <projectSourceUrl>https://github.com/ascii-boxes/boxes</projectSourceUrl>
+        <docsUrl>https://boxes.thomasjensen.com/docs/</docsUrl>
+        <bugTrackerUrl>https://github.com/ascii-boxes/boxes/issues</bugTrackerUrl>
+    </metadata>
+    <files>
+        <file src="tools\**" target="tools" />
+    </files>
+</package>

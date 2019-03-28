@@ -1,0 +1,22 @@
+﻿VERIFICATION
+Verification is intended to assist the Chocolatey moderators and community
+in verifying that this package's contents are trustworthy.
+
+
+     .+"+.+"+.+"+.+"+.+"+.
+    (                     )
+     )     b o x e s     (
+    (                     )
+     "+.+"+.+"+.+"+.+"+.+"
+
+This package is maintained by the original author of the contained software.
+The nuspec of this package is located at https://github.com/ascii-boxes/boxes/blob/master/boxes.portable.nuspec .
+
+Verification instructions:
+
+1. Download Windows binary from project GitHub site:
+   https://github.com/ascii-boxes/boxes/releases
+2. Compare with contents of this package.
+   The files "boxes.exe" and "boxes.cfg" should be binary identical.
+
+That's all, really. Boxes is a simple, portable command-line application which consists only of these two files.

@@ -29,6 +29,7 @@ PKG_NAME   = boxes-$(BVERSION)
 
 .PHONY: clean build win32 debug win32.debug infomsg replaceinfos test package win32.package package_common
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 build debug: infomsg replaceinfos
 	$(MAKE) -C src BOXES_PLATFORM=unix $@
@@ -39,6 +40,7 @@ win32: infomsg replaceinfos
 win32.debug: infomsg replaceinfos
 	$(MAKE) -C src BOXES_PLATFORM=win32 debug
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 infomsg:
 	@echo "| For compilation info please refer to the boxes compilation FAQ"
@@ -52,6 +54,7 @@ src/boxes.h: src/boxes.h.in src/regexp/regexp.h Makefile
 doc/boxes.1: doc/boxes.1.in Makefile
 	sed -e 's/--BVERSION--/$(BVERSION)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' doc/boxes.1.in > doc/boxes.1
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 $(PKG_NAME).tar.gz:
 	mkdir -p $(PKG_NAME)/doc
@@ -68,11 +71,35 @@ package: build
 win32.package: win32
 	$(MAKE) BOXES_PLATFORM=win32 $(PKG_NAME).tar.gz
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+choco: tools/LICENSE.txt tools/boxes.cfg tools/boxes.exe tools/README.md tools/README.Win32.md
+	choco pack --version=$(BVERSION)
+
+tools/LICENSE.txt: LICENSE
+	cp LICENSE tools/LICENSE.txt
+
+tools/boxes.cfg: boxes-config
+	cp boxes-config tools/boxes.cfg
+
+tools/boxes.exe: src/boxes.exe
+	cp src/boxes.exe tools/
+
+tools/README.md: README.md
+	cp README.md tools/
+
+tools/README.Win32.md: README.Win32.md
+	cp README.Win32.md tools/
+
+src/boxes.exe: win32
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 clean:
-	rm -f doc/boxes.1 src/boxes.h
+	rm -f doc/boxes.1 src/boxes.h tools/boxes.cfg tools/LICENSE.txt tools/boxes.exe tools/README*.md boxes.portable.*.nupkg
 	$(MAKE) -C src clean
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 test:
 	cd test; ./testrunner.sh -suite
