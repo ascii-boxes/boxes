@@ -88,6 +88,7 @@ these locations (in order):
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <releaseNotes>https://boxes.thomasjensen.com/2019/02/boxes-v1.3-released.html</releaseNotes>
         <projectSourceUrl>https://github.com/ascii-boxes/boxes</projectSourceUrl>
+        <packageSourceUrl>https://github.com/ascii-boxes/boxes/blob/master/boxes.portable.nuspec</packageSourceUrl>
         <docsUrl>https://boxes.thomasjensen.com/docs/</docsUrl>
         <bugTrackerUrl>https://github.com/ascii-boxes/boxes/issues</bugTrackerUrl>
     </metadata>
