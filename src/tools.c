@@ -28,6 +28,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"

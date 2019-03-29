@@ -74,10 +74,9 @@
 
 #ifdef VMS
 # include <unixlib.h>
-# if HAVE_STRING_H - 0
-#  include <string.h>
-# endif
 #endif
+
+#include <string.h>
 
 #ifndef _
 /* This is for other GNU distributions with internationalized messages.
@@ -696,17 +695,19 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 		  }
 	      else
 		{
-		  if (opterr)
-		   if (argv[optind - 1][1] == '-')
+		  if (opterr) {
+		   if (argv[optind - 1][1] == '-') {
 		    /* --option */
 		    fprintf (stderr,
 		     _("%s: option `--%s' doesn't allow an argument\n"),
 		     argv[0], pfound->name);
-		   else
+		   } else {
 		    /* +option or -option */
 		    fprintf (stderr,
 		     _("%s: option `%c%s' doesn't allow an argument\n"),
 		     argv[0], argv[optind - 1][0], pfound->name);
+		   }
+		  }
 
 		  nextchar += strlen (nextchar);
 
