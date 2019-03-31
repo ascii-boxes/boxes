@@ -2638,9 +2638,9 @@ END scroll-akn
 
 BOX face
 
-author "Dmitry Bolshakov <bdimych@protonmail.com>"
+author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 designer "Dmitry Bolshakov <bdimych@protonmail.com>"
-created "2014-02-13 08:41:11"
+created  "2014-02-13 08:41:11"
 revision "1.0"
 
 sample
@@ -2683,8 +2683,8 @@ END face
 BOX fence
 
 designer "Dmitry Bolshakov <bdimych@protonmail.com>"
-author "Dmitry Bolshakov <bdimych@protonmail.com>"
-created "2017-04-10"
+author   "Dmitry Bolshakov <bdimych@protonmail.com>"
+created  "2017-04-10"
 revision "1.0"
 
 sample
@@ -2732,8 +2732,8 @@ END fence
 BOX important
 
 designer "Dmitry Bolshakov <bdimych@protonmail.com>"
-author "Dmitry Bolshakov <bdimych@protonmail.com>"
-created "2017-04-10"
+author   "Dmitry Bolshakov <bdimych@protonmail.com>"
+created  "2017-04-10"
 revision "1.0"
 
 sample
@@ -2774,8 +2774,8 @@ END important
 BOX important2
 
 designer "Dmitry Bolshakov <bdimych@protonmail.com>"
-author "Dmitry Bolshakov <bdimych@protonmail.com>"
-created "2017-04-10"
+author   "Dmitry Bolshakov <bdimych@protonmail.com>"
+created  "2017-04-10"
 revision "1.0"
 
 sample
@@ -2820,8 +2820,8 @@ END important2
 BOX important3
 
 designer "Dmitry Bolshakov <bdimych@protonmail.com>"
-author "Dmitry Bolshakov <bdimych@protonmail.com>"
-created "2017-04-10"
+author   "Dmitry Bolshakov <bdimych@protonmail.com>"
+created  "2017-04-10"
 revision "1.0"
 
 sample
@@ -2892,7 +2892,7 @@ shapes {
 
 padding { h 1 }
 
-elastic (n,s,e, w)
+elastic (n, s, e, w)
 
 END f90-box
 
@@ -2914,14 +2914,106 @@ sample
 ends
 
 shapes {
-     w ("!")
+    w ("!")
 }
 
-padding { left 1}
+padding { left 1 }
 
 elastic (w)
 
 END f90-cmt
+
+
+# ============================================================================
+
+
+BOX bear
+
+designer "Hayley Jane Wakenshaw"
+author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
+created  "2019-03-31"
+revision "1.0"
+
+sample
+                         ,---.           ,---.
+                        / /"`.\.--"""--./,'"\ \
+                        \ \    _       _    / /
+                         `./  / __   __ \  \,'
+                          /    /_O)_(_O\    \
+                          |  .-'  ___  `-.  |
+                       .--|       \_/       |--.
+                     ,'    \   \   |   /   /    `.
+                    /       `.  `--^--'  ,'       \
+                 .-"""""-.    `--.___.--'     .-"""""-.
+    .-----------/         \------------------/         \--------------.
+    | .---------\         /------------------\         /------------. |
+    | |          `-`--`--'                    `--'--'-'             | |
+    | |                                                             | |
+    | |                                                             | |
+    | |                                                             | |
+    | |                                                             | |
+    | |                                                             | |
+    | |                                                             | |
+    | |                                                             | |
+    | |                                                             | |
+    | |_____________________________________________________________| |
+    |_________________________________________________________________|
+                       )__________|__|__________(
+                      |            ||            |
+                      |____________||____________|
+                        ),-----.(      ),-----.(  hjw
+                      ,'   ==.   \    /  .==    `.
+                     /            )  (            \
+                     `==========='    `==========='
+ends
+
+
+shapes {
+     nw ("   ", "   ", "   ", "   ", "   ", "   ", "   ", "   ", "   ", "   ", ".--", "| .", "| |")
+    nnw (" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "-", "-", " ")
+
+      n ("         ,---.           ,---.          ",
+         "        / /\"`.\\.--\"\"\"--./,'\"\\ \\         ",
+         "        \\ \\    _       _    / /         ",
+         "         `./  / __   __ \\  \\,'          ",
+         "          /    /_O)_(_O\\    \\           ",
+         "          |  .-'  ___  `-.  |           ",
+         "       .--|       \\_/       |--.        ",
+         "     ,'    \\   \\   |   /   /    `.      ",
+         "    /       `.  `--^--'  ,'       \\     ",
+         " .-\"\"\"\"\"-.    `--.___.--'     .-\"\"\"\"\"-. ",
+         "/         \\------------------/         \\",
+         "\\         /------------------\\         /",
+         " `-`--`--'                    `--'--'-' ")
+
+    nne (" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "-", "-", " ")
+     ne ("   ", "   ", "   ", "   ", "   ", "   ", "   ", "   ", "   ", "   ", "--.", ". |", "| |")
+
+      w ("| |")
+      e ("| |")
+
+     sw ("| |", "|__", "   ", "   ", "   ", "   ", "   ", "   ", "   ")
+    ssw ("_", "_", " ", " ", " ", " ", " ", " ", " ")
+ 
+      s ("__________________________________",
+         "__________________________________",
+         "    )__________|__|__________(    ",
+         "   |            ||            |   ",
+         "   |____________||____________|   ",
+         "     ),-----.(      ),-----.(  hjw",
+         "   ,'   ==.   \\    /   .==   `.   ",
+         "  /            )  (            \\  ",
+         "  `==========='    `==========='  ")
+
+    sse ("_", "_", " ", " ", " ", " ", " ", " ", " ")
+     se ("| |", "__|", "   ", "   ", "   ", "   ", "   ", "   ", "   ")
+}
+
+elastic (nne, nnw, e, w, sse, ssw)
+
+padding { horiz 1 }
+
+END bear
 
 
 # ============================================================================
