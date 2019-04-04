@@ -73,7 +73,7 @@ win32.package: win32
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-choco: tools/LICENSE.txt tools/boxes.cfg tools/boxes.exe tools/README.md tools/README.Win32.md
+choco: tools/LICENSE.txt tools/boxes.cfg tools/boxes.exe
 	choco pack --version=$(BVERSION)
 
 tools/LICENSE.txt: LICENSE
@@ -84,12 +84,6 @@ tools/boxes.cfg: boxes-config
 
 tools/boxes.exe: src/boxes.exe
 	cp src/boxes.exe tools/
-
-tools/README.md: README.md
-	cp README.md tools/
-
-tools/README.Win32.md: README.Win32.md
-	cp README.Win32.md tools/
 
 src/boxes.exe: win32
 
