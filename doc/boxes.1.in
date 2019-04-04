@@ -1,9 +1,9 @@
-.\" @(#)boxes.1 1.3 10/19/12
+.\" @(#)boxes.1 1.3 04/04/2019
 .\"
 .\" boxes.1.in
 .\" Thomas Jensen
 .\"
-.TH boxes 1 "March 16 2017"
+.TH boxes 1 "April 04 2019"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter
@@ -20,13 +20,16 @@ text inside. Since boxes may be open on any side,
 .I boxes
 can also be used to create regional comments in any programming language.
 New box designs of all sorts can easily be added and shared by appending to
-a free format configuration file.
-.br
+a configuration file.
+.LP
 .I boxes
-was originally intended to be used with the
-.I vim(1)
-text editor, but it can be tied to any text editor which supports filters,
-as well as called from the command line as a standalone tool.
+is a command line tool, but also integrates with any text editor that
+supports filters. The
+.I boxes
+website has examples on how to configure editor integration for various
+text editors:
+.br
+<URL:https://boxes.thomasjensen.com/docs/install.html>
 .\" =======================================================================
 .SH OPTIONS
 Options offered by
@@ -300,27 +303,28 @@ will try to read the system\-wide config file (see FILES).
 .PP
 The syntax of
 .I boxes
-config files is described on the website (see below). They are quite
-self\-explanatory, though.
+config files is described on the website.
 .\" =======================================================================
 .SH AVAILABILITY
-.I Boxes
-is available from its website at
-<URL:https://boxes.thomasjensen.com/>. The website also features a number
+The
+.I boxes
+website is <URL:https://boxes.thomasjensen.com/>. It contains a number
 of examples illustrating this manual page as well as more in\-depth
 documentation.
-.PP
-Check out
-.I vim(1)
-at <URL:http://www.vim.org/>!
 .\" =======================================================================
 .SH AUTHOR
 .I Boxes
-was made by Thomas Jensen <boxes@thomasjensen.com>.
+was made by Thomas Jensen and many great contributors.
 .br
-Please see the
+For a full list, see
+.br
+<URL:https://boxes.thomasjensen.com/contributing.html#contributors>
+.br
+and <URL:https://github.com/ascii-boxes/boxes/graphs/contributors>.
+.br
+Please refer to the
 .I boxes
-website for a current email address.
+website for the maintainer's current email address.
 .\" =======================================================================
 .SH VERSION
 This is
@@ -328,10 +332,8 @@ This is
 version --BVERSION--.
 .\" =======================================================================
 .SH BUGS
-Although it is doing fine in most cases, imho the design autodetector
-needs some more work.
-.br
-Should you notice any other unspecified behavior, please tell the author!
+Any currently known bugs, and also any current feature requests are tracked
+on GitHub: <URL:https://github.com/ascii-boxes/boxes/issues>
 .\" =======================================================================
 .SH ENVIRONMENT
 .I Boxes
@@ -349,12 +351,10 @@ configuration file, if different from ~/.boxes.
 .TP 1.0i
 $HOME/.boxes
 .I boxes
-configuration file
+configuration file (takes precedence over system-wide configuration file)
 .TP 1.0i
 --GLOBALCONF--
 system\-wide configuration file
 .\" =======================================================================
 .SH "SEE ALSO"
-.I tal(1)
-,
-.I vim(1)
+.I figlet(6)
