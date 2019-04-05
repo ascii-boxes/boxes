@@ -5,7 +5,7 @@ title: Manpage of boxes(1)
 
 <div class="well bxpage">
 <H1>boxes</H1>
-Section: User Commands  (1)<BR>Updated: March 16 2017<BR>
+Section: User Commands  (1)<BR>Updated: April 04 2019<BR>
 [ <A HREF="#index">Index</A> | <A HREF="index.html">Return to Main Contents</A> ]
 
 <A NAME="lbAB">&nbsp;</A>
@@ -32,20 +32,28 @@ text inside. Since boxes may be open on any side,
 
 can also be used to create regional comments in any programming language.
 New box designs of all sorts can easily be added and shared by appending to
-a free format configuration file.
-<BR>
+a configuration file.
+<P>
 
 <I>boxes</I>
 
-was originally intended to be used with the <I>vim(1)</I>
-text editor, but it can be tied to any text editor which supports filters,
-as well as called from the command line as a standalone tool.
+is a command line tool, but also integrates with any text editor that
+supports filters. The
+<I>boxes</I>
+
+website has examples on how to configure editor integration for various
+text editors:
+<BR>
+
+<A HREF="https://boxes.thomasjensen.com/docs/install.html">https://boxes.thomasjensen.com/docs/install.html</A>
 
 <A NAME="lbAE">&nbsp;</A>
 <H2>OPTIONS</H2>
 
-Options offered by <I>boxes</I> are the following:
+Options offered by
+<I>boxes</I>
 
+are the following:
 <DL COMPACT>
 <DT><B>-a </B><I>string</I>
 
@@ -56,7 +64,7 @@ contain whitespace and must consist of one or more of the following
 components:
 <BR>
 
-<P>
+
 <B>h</B>x
 
 - horizontal alignment of the input text block inside a potentially larger
@@ -121,7 +129,7 @@ and
 arguments for input text block positioning.
 <BR>
 
-<P>
+
 Short hand notations (can be combined with the above arguments):
 <BR>
 
@@ -146,7 +154,7 @@ Short hand notations (can be combined with the above arguments):
 
 <BR>
 
-<P>
+
 The factory default setting for
 <B>-a</B>
 
@@ -246,7 +254,7 @@ Mend box. This removes a (potentially broken) box as with
 
 and redraws it afterwards. The mended box is drawn according to the
 options given. This may be important to know when it comes to restoring
-padding, identation, etc. for the mended box. Implies
+padding, indentation, etc. for the mended box. Implies
 <B>-k</B>
 
 false.
@@ -370,7 +378,7 @@ how to treat the leading tabs. The following options are available:
 turn as many spaces as possible into tabs.
 <BR>
 
-<P>
+
 In order to maintain backwards compatibility, the
 <B>-t</B>
 
@@ -393,8 +401,10 @@ in order to have your leading tabs unexpanded. In the box content, tabs are
 always converted into spaces. The tab distance in this example is 4.
 
 <DT><B>-v</B>
+
 <DD>
 Print out current version number.
+
 </DL>
 <A NAME="lbAF">&nbsp;</A>
 <H2>CONFIGURATION FILES</H2>
@@ -420,47 +430,51 @@ will try to read the system-wide config file (see FILES).
 The syntax of
 <I>boxes</I>
 
-config files is described on the website (see below). They are quite
-self-explanatory, though.
+config files is described on the website.
 
 <A NAME="lbAG">&nbsp;</A>
 <H2>AVAILABILITY</H2>
 
-<I>Boxes</I>
+The
+<I>boxes</I>
 
-is available from its website at
-<A HREF="https://{{ page.sitehost }}/">https://{{ page.sitehost }}/</A>.
-The website also features a number
+website is <A HREF="https://boxes.thomasjensen.com/">https://boxes.thomasjensen.com/</A>. It contains a number
 of examples illustrating this manual page as well as more in-depth
 documentation.
-<P>
-
-Check out <I>vim(1)</I>
-at <A HREF="http://www.vim.org/" target="_blank">vim.org</A>!
 
 <A NAME="lbAH">&nbsp;</A>
 <H2>AUTHOR</H2>
 
 <I>Boxes</I>
 
-was made by Thomas Jensen &lt; boxes at thomasjensen dot com &gt;.
+was made by Thomas Jensen and many great contributors.
 <BR>
 
-Please see the <I>boxes</I> website for the most current email address.
+For a full list, see
+<A HREF="https://boxes.thomasjensen.com/contributing.html#contributors">https://boxes.thomasjensen.com/contributing.html#contributors</A>
+<BR>
+
+and <A HREF="https://github.com/ascii-boxes/boxes/graphs/contributors">https://github.com/ascii-boxes/boxes/graphs/contributors</A>.
+<BR>
+
+Please refer to the
+<I>boxes</I>
+
+website for the maintainer's current email address.
 
 <A NAME="lbAI">&nbsp;</A>
 <H2>VERSION</H2>
 
-This is <I>boxes</I> version {{ site.currentVersion }}.
+This is
+<I>boxes</I>
+
+version 1.3.
 
 <A NAME="lbAJ">&nbsp;</A>
 <H2>BUGS</H2>
 
-Although it is doing fine in most cases, imho the design autodetector
-needs some more work.
-<BR>
-
-Should you notice any other unspecified behavior, please tell the author!
+Any currently known bugs, and also any current feature requests are tracked
+on GitHub:<br> <A HREF="https://github.com/ascii-boxes/boxes/issues">https://github.com/ascii-boxes/boxes/issues</A>
 
 <A NAME="lbAK">&nbsp;</A>
 <H2>ENVIRONMENT</H2>
@@ -474,7 +488,9 @@ The user's home directory.
 <DT>BOXES<DD>
 Name of
 <I>boxes</I>
-configuration file, if different from <tt>~/.boxes</tt>.
+
+configuration file, if different from ~/.boxes.
+
 </DL>
 <A NAME="lbAL">&nbsp;</A>
 <H2>FILES</H2>
@@ -483,11 +499,17 @@ configuration file, if different from <tt>~/.boxes</tt>.
 <DT>$HOME/.boxes<DD>
 <I>boxes</I>
 
-configuration file
+configuration file (takes precedence over system-wide configuration file)
 <DT>/usr/share/boxes<DD>
 system-wide configuration file
 
 </DL>
+<A NAME="lbAM">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<I><A HREF="https://linux.die.net/man/6/figlet">figlet</A>(6)</I>
+
+<P>
 
 <HR>
 <A NAME="index">&nbsp;</A><H2>Index</H2>
@@ -508,9 +530,9 @@ system-wide configuration file
 
 <HR>
 This document was created by
-<A HREF="http://users.actrix.gen.nz/michael/vhman2html.html" target="_blank">man2html</A>,
+<A HREF="https://linux.die.net/man/1/man2html" target="_blank">man2html</A>,
 using the manual pages.<BR>
-Time: 22:17:25 GMT, March 16, 2017<br/>
-Page created April 06, 1999, last touched: 16-Mar-2017.
+Time: 19:21:27 GMT, April 05, 2019<br/>
+Page created April 06, 1999, last touched: 05-Apr-2019.
 
 </div>
