@@ -12,7 +12,7 @@ and repair those boxes, too. You can easily make your own box designs if you wis
 already provided.
 
 *Boxes* is a portable application (hence the `.portable` suffix in the choco package ID). It is installed into
-the package directory `%ChocolateyInstall%\lib\boxes`. Chocolatey makes *boxes* available to you on the `PATH`
+the package directory `%ChocolateyInstall%\lib\boxes.portable`. Chocolatey makes *boxes* available to you on the `PATH`
 via its `%ChocolateyInstall%\bin` directory. This is the only official *boxes* choco package.
 
 ### Examples
@@ -69,8 +69,8 @@ A more complex call might look like this:
 
 At some point, you may wish to modify existing box designs or even add your own.  
 When that happens, you may find that you don't have the necessary access permissions to modify boxes.cfg in
-`%ChocolateyInstall%\lib\boxes` directly. In that case, make a copy of boxes.cfg and place it in one of the
-precedent locations, where *boxes* finds it before the original. When reading the config file, *boxes* will try
+`%ChocolateyInstall%\lib\boxes.portable\tools` directly. In that case, make a copy of boxes.cfg and place it in one of
+the precedent locations, where *boxes* finds it before the original. When reading the config file, *boxes* will try
 these locations (in order):
 
 1. The file specified by the environment variable `BOXES`.
