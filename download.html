@@ -13,17 +13,23 @@ The current release is **version {{ site.currentVersion }}**. For older revision
 
 *boxes* binaries are available on multiple platforms:
 
-**Windows**\\
-[ZIP File with binary](https://github.com/{{ site.github }}/releases/download/v{{ site.currentVersion }}/boxes-{{ site.currentVersion }}-intel-win32.zip),
-just extract and put it somewhere on the PATH.
+**Windows**
 
-**MacOS X**\\
-Just type `brew install boxes`.\\
-This works for both 32bit and 64bit MacOS.
+- Option 1 - Using [Chocolatey](https://chocolatey.org/): Just type `choco install boxes.portable`
+- Option 2 - Install from ZIP:
+  [Download ZIP](https://github.com/{{ site.github }}/releases/download/v{{ site.currentVersion }}/boxes-{{
+  site.currentVersion }}-intel-win32.zip), extract and put it somewhere on the PATH. Make sure to put boxes.exe and
+  boxes.cfg in the same directory.
 
-**Linux**\\
-Just type `apt-get install boxes`.\\
-This works for Debian and debian-based Linuxes, such as Ubuntu, including the Windows 10 Ubuntu Subsystem.
+**MacOS X**
+
+- Just type `brew install boxes`.\\
+  This works for both 32bit and 64bit MacOS.
+
+**Linux**
+
+- Just type `apt-get install boxes`.\\
+  This works for Debian and debian-based Linuxes, such as Ubuntu, including the Windows 10 Ubuntu Subsystem.
 
 
 ## Miscellaneous
