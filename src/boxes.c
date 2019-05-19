@@ -141,9 +141,8 @@ static void usage_long (FILE *st)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    fprintf (st, "%s - draws any kind of box around your text (and removes it)\n", PROJECT);
-    fprintf (st, "        (c) Thomas Jensen <boxes@thomasjensen.com>\n");
-    fprintf (st, "        Web page: https://boxes.thomasjensen.com/\n");
+    fprintf (st, "%s - draws any kind of box around your text (or removes it)\n", PROJECT);
+    fprintf (st, "        Website: https://boxes.thomasjensen.com/\n");
     usage (st);
 }
 
