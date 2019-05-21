@@ -922,6 +922,20 @@ static int build_design (design_t **adesigns, const char *cld)
 }
 
 
+static char* escape (const char* org, const int pLength)
+{
+    char* result = (char *) calloc (1, 2 * strlen(org) + 1);
+    int orgIdx, resultIdx;
+    for (orgIdx=0, resultIdx=0; orgIdx<pLength; ++orgIdx, ++resultIdx) {
+        if (org[orgIdx] == '\\' || org[orgIdx] == '"') {
+            result[resultIdx++] = '\\';
+        }
+        result[resultIdx] = org[orgIdx];
+    }
+    result[resultIdx] = '\0';
+    return result;
+}
+
 
 static int style_sort (const void *p1, const void *p2)
 {
@@ -945,10 +959,8 @@ static int list_styles()
     if (opt.design_choice_by_user) {
 
         design_t *d = opt.design;
-        int until = -1;
         int sstart = 0;
         size_t w = 0;
-        size_t j;
         char space[LINE_MAX+1];
 
         memset (&space, ' ', LINE_MAX);
@@ -1065,58 +1077,23 @@ static int list_styles()
             fprintf (opt.outfile, "Sample:\n%s\n", d->sample);
         }
         else {
-            fprintf (opt.outfile, "Defined Shapes:       ");
-            until = -1;
-            sstart = 0;
-            do {
-                sstart = until + 1;
-                for (w=0, i=sstart; i<ANZ_SHAPES; ++i) {
-                    if (isempty(d->shape+i))
-                        continue;
-                    w += 6;
-                    w += d->shape[i].width;
-                    w += strlen(shape_name[i]);
-                    if (i == 0)
-                        w -= 2;
-                    else if (w > 56) {       /* assuming an 80 character screen */
-                        until = i - 1;
-                        break;
-                    }
+            int first_shape = 1;
+            for (i=0; i<ANZ_SHAPES; ++i) {
+                if (isdeepempty(d->shape+i)) {
+                    continue;
                 }
-                if (i == ANZ_SHAPES)
-                    until = ANZ_SHAPES - 1;
-                for (w=0, i=sstart; i<=until; ++i) {
-                    if (d->shape[i].height > w)
-                        w = d->shape[i].height;
+                for (w=0; w<d->shape[i].height; ++w) {
+                    char* escaped_line = escape(d->shape[i].chars[w], d->shape[i].width);
+                    fprintf (opt.outfile, "%-24s%3s%c \"%s\"%c\n",
+                        (first_shape==1 && w==0? "Defined Shapes:": ""),
+                        (w==0? shape_name[i]: ""), (w==0? ':':' '),
+                        escaped_line,
+                        (w<d->shape[i].height-1? ',': ' ')
+                    );
+                    BFREE (escaped_line);
                 }
-                for (j=0; j<w; ++j) {
-                    if (j > 0 || sstart > 0)
-                        fprintf (opt.outfile, "                      ");
-                    for (i=sstart; i<=until; ++i) {
-                        if (isempty(d->shape+i))
-                            continue;
-                        fprintf (opt.outfile, "  ");
-                        if (j == 0)
-                            fprintf (opt.outfile, "%s: ", shape_name[i]);
-                        else {
-                            space[strlen(shape_name[i])+2] = '\0';
-                            fprintf (opt.outfile, "%s", space);
-                            space[strlen(shape_name[i])+2] = ' ';
-                        }
-                        if (j < d->shape[i].height) {
-                            fprintf (opt.outfile, "\"%s\"", d->shape[i].chars[j]);
-                        }
-                        else {
-                            space[d->shape[i].width+2] = '\0';
-                            fprintf (opt.outfile, "%s", space);
-                            space[d->shape[i].width+2] = ' ';
-                        }
-                    }
-                    fprintf (opt.outfile, "\n");
-                }
-                if (until < ANZ_SHAPES-1 && d->maxshapeheight > 2)
-                    fprintf (opt.outfile, "\n");
-            } while (until < ANZ_SHAPES-1);
+                first_shape = 0;
+            }
         }
     }
 
