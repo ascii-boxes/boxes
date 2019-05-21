@@ -16,6 +16,5 @@ Minimum Box Dimensions: 3 x 3  (width x height)
 Default Padding:        left 1
 Default Killblank:      no
 Elastic Shapes:         N, E, S, W
-Defined Shapes:         NW: " "  N: " "  NE: " "  E: " "  SE: " "  S: " "
-                        SW: " "  W: "#"
+Defined Shapes:           W: "#" 
 :EOF
