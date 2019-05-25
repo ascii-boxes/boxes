@@ -870,6 +870,9 @@ static int build_design (design_t **adesigns, const char *cld)
     dp->indentmode = DEF_INDENTMODE;
     dp->padding[BLEF] = 1;
 
+    dp->tags = (char *) calloc (10, sizeof(char));
+    strcpy(dp->tags, "transient");
+
     dp->shape[W].height = 1;
     dp->shape[W].width = strlen(cld);
     dp->shape[W].elastic = 1;
@@ -1057,6 +1060,9 @@ static int list_styles()
         fprintf (opt.outfile, "Default Killblank:      %s\n",
                 empty_side (opt.design->shape, BTOP) &&
                 empty_side (opt.design->shape, BBOT)? "no": "yes");
+
+        fprintf (opt.outfile, "Tags:                   %s\n",
+                d->tags ? d->tags : "(none)");
 
         fprintf (opt.outfile, "Elastic Shapes:         ");
         sstart = 0;

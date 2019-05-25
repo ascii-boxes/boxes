@@ -284,7 +284,7 @@ Once    { yylval.c = 'o'; return YRXPFLAG; }
 }
 
 
-author|designer|created|revision|revdate|indent {
+author|designer|tags|created|revision|revdate|indent {
     /*
      *  general key words
      */

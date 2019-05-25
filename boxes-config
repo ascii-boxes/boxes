@@ -35,6 +35,7 @@ designer "(public domain)"
 revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:25h)"
 created "March 18, 1999 (Thursday, 15:25h)"
+tags "programming, box"
 
 sample
     /*************/
@@ -73,6 +74,7 @@ revision "1.0"
 revdate  "March 12, 1999 (Friday, 17:05h)"
 escaped  "aaa\"bbb\\\"ccc#"	         # the string aaa"bbb\"ccc#
 #escaped2 "aaa\\"bbb"        	# unterminated
+tags "artwork, box, scroll"
 
 sample
      ________________________
@@ -116,6 +118,7 @@ author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.1"
 revdate  "July 20, 1999 (Tuesday, 21:06h)"
 created  "March 17, 1999 (Wednesday, 15:27h)"
+tags "artwork, box"
 
 sample
      __^__                 __^__
@@ -159,6 +162,7 @@ author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 created "March 17, 1999 (Wednesday, 15:40h)"
 revdate "March 17, 1999 (Wednesday, 15:40h)"
 revision "1.0"
+tags "artwork, box"
 
 sample
      .+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.
@@ -197,6 +201,7 @@ author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.2"
 revdate  "August 18, 1999 (Wednesday, 17:00h)"
 created  "March 17, 1999 (Wednesday, 17:04h)"
+tags "artwork, box, scroll"
 
 SAMPLE
      / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \
@@ -257,6 +262,7 @@ designer "(public domain)"
 revision "1.1"
 revdate  "August 22, 1999 (Sunday, 12:44h)"
 created  "March 18, 1999 (Thursday, 15:24h)"
+tags "simple, box"
 
 sample
     *************
@@ -286,6 +292,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
+tags "programming, comment"
 
 sample
     /*                               */
@@ -319,6 +326,7 @@ designer "(public domain)"
 revision "1.1"
 revdate  "August 18, 1999 (Wednesday, 17:01h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
+tags "programming, comment"
 
 sample
     /*
@@ -354,6 +362,7 @@ designer "AlpT (@freaknet.org)"
 revision "1.0"
 revdate  "Fri Jun  9 11:04:42 CEST 2006"
 created  "Fri Jun  9 11:04:42 CEST 2006"
+tags "programming, comment"
 
 sample
     /**
@@ -393,6 +402,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "October 25, 1999 (Monday 10:16h)"
 created  "October 25, 1999 (Monday 10:16h)"
+tags "programming, comment"
 
 sample
     /**
@@ -428,6 +438,7 @@ designer "(public domain)"
 revision "1.2"
 revdate  "October 19, 2012 (Friday, 17:32h)"
 created  "March 18, 1999 (Thursday, 15:26h)"
+tags "programming, box"
 
 sample
     <!-- - - - - - - - - - - -->
@@ -464,6 +475,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "March 18, 1999 (Thursday, 15:27h)"
 created  "March 18, 1999 (Thursday, 15:27h)"
+tags "programming, box"
 
 sample
     #############
@@ -496,6 +508,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "August 22, 1999 (Sunday, 12:51h)"
 created  "March 30, 1999 (Tuesday, 15:55h)"
+tags "artwork, box"
 
 sample
                             _ ._  _ , _ ._
@@ -548,6 +561,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "August 18, 1999 (Wednesday, 17:02h)"
 created  "March 30, 1999 (Tuesday, 15:59h)"
+tags "artwork, box"
 
 Sample
            /\          /\          /\          /\
@@ -627,6 +641,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "August 22, 1999 (Sunday, 12:57h)"
 created  "March 18, 1999 (Thursday, 15:27h)"
+tags "artwork, box, sign"
 
 sample
                 .--,       .--,
@@ -692,6 +707,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
 revdate  "March 30, 1999 (Tuesday, 17:10h)"
 created  "March 30, 1999 (Tuesday, 17:10h)"
+tags "artwork, box"
 
 sample
                                .
@@ -742,6 +758,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "August 22, 1999 (Sunday, 13:02h)"
 created  "April 02, 1999 (Friday, 15:02h)"
+tags "artwork, box, sign"
 
 sample
                     .-"""-.
@@ -807,6 +824,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
 revdate  "April 02, 1999 (Friday, 19:13h)"
 created  "April 02, 1999 (Friday, 19:13h)"
+tags "artwork, box, sign"
 
 sample
                     .-"""-.
@@ -868,6 +886,7 @@ designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.1"
 revdate  "July 16, 1999 (Friday, 18:55h)"
 created  "April 02, 1999 (Friday, 19:26h)"
+tags "programming, comment, deprecated"
 
 SAmple
     static char *foo (const int a, const int b)
@@ -922,6 +941,7 @@ designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate  "April 09, 1999 (Friday, 19:06h)"
 created  "April 09, 1999 (Friday, 19:06h)"
+tags "programming, comment, deprecated"
 
 sample
     %{-----------------------------------------------------------------+
@@ -959,6 +979,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "August 18, 1999 (Wednesday, 17:04h)"
 created  "April 09, 1999 (Friday, 20:05h)"
+tags "artwork, box"
 
 sample
             <\/><\/><\/>
@@ -1011,6 +1032,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
 revdate  "April 09, 1999 (Friday, 19:45h)"
 created  "April 09, 1999 (Friday, 19:45h)"
+tags "artwork, box, sign"
 
 sample
                 __   _,--="=--,_   __
@@ -1065,6 +1087,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
 revdate  "April 09, 1999 (Friday, 19:45h)"
 created  "April 09, 1999 (Friday, 19:45h)"
+tags "artwork, box, sign"
 
 sample
                   /\             /\
@@ -1121,6 +1144,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
 revdate  "April 09, 1999 (Friday, 19:24h)"
 created  "April 09, 1999 (Friday, 19:24h)"
+tags "artwork, box, sign"
 
 sample
                     .-"```"-.
@@ -1184,6 +1208,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
 revdate  "April 09, 1999 (Friday, 19:24h)"
 created  "April 09, 1999 (Friday, 19:24h)"
+tags "artwork, box, sign"
 
 sample
                      .-"``"-.
@@ -1248,6 +1273,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "August 18, 1999 (Wednesday, 17:05h)"
 created  "April 09, 1999 (Friday, 15:53h)"
+tags "artwork"
 
 sample
           ,
@@ -1318,6 +1344,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
 revdate  "April 05, 1999 (Monday, 21:55h)"
 created  "April 05, 1999 (Monday, 21:55h)"
+tags "artwork, box"
 
 sample
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
@@ -1363,6 +1390,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
 revdate  "April 05, 1999 (Monday, 21:55h)"
 created  "April 05, 1999 (Monday, 21:55h)"
+tags "artwork, box"
 
 sample
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -1400,6 +1428,7 @@ author "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate "April 12, 1999 (Monday, 12:52h)"
 created "April 12, 1999 (Monday, 12:52h)"
+tags "programming, box"
 
 sample
    /*       _\|/_
@@ -1445,6 +1474,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
+tags "programming, comment"
 
 sample
     //
@@ -1474,6 +1504,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
+tags "programming, comment"
 
 sample
     #
@@ -1502,6 +1533,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
+tags "programming, comment"
 
 sample
     <!--                                     -->
@@ -1529,6 +1561,7 @@ designer "Bram Moolenaar"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
+tags "programming, comment"
 
 sample
     "
@@ -1559,6 +1592,7 @@ designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
+tags "programming, comment, deprecated"
 
 sample
     This can be used for marking code changes with your initials
@@ -1590,6 +1624,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "March 15, 2000 (Wednesday 12:17h)"
 created  "March 15, 2000 (Wednesday 12:17h)"
+tags "programming, comment"
 
 sample
     --
@@ -1619,6 +1654,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "March 15, 2000 (Wednesday 12:24h)"
 created  "March 15, 2000 (Wednesday 12:24h)"
+tags "programming, box"
 
 sample
     ---------------
@@ -1652,6 +1688,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "December 01, 2016 (Thursday 15:20h)"
 created  "December 01, 2016 (Thursday 15:20h)"
+tags "programming, comment"
 
 sample
     %
@@ -1681,6 +1718,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "December 01, 2016 (Thursday 15:21h)"
 created  "December 01, 2016 (Thursday 15:21h)"
+tags "programming, box"
 
 sample
     %=============%
@@ -1714,6 +1752,7 @@ designer "Christian Molls <CMolls@gmx.net>"
 revdate  "Tue Aug 15 23:02:02 CEST 2000"
 created  "Tue Aug 15 23:01:50 CEST 2000"
 revision "1.0"
+tags "artwork"
 
 sample
     ,----[ mp3-wav ]
@@ -1750,6 +1789,7 @@ designer "(public domain)"
 revision "1.0"
 revdate "Tue Sep 19 12:06:51 CEST 2000"
 created "Tue Sep 19 12:06:51 CEST 2000"
+tags "programming, box"
 
 sample
     /****************
@@ -1786,6 +1826,7 @@ author   "Fredrik Steen <fsteen@stone.nu>"
 designer "Fredrik Steen <fsteen@stone.nu>"
 revision "1.0"
 created  "April 25, 2001 (Wed 11:00)"
+tags "artwork, box"
 
 sample
     +-------------+
@@ -1818,6 +1859,7 @@ designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 revision "1.2"
 revdate  "August 22, 1999 (Sunday, 13:22h)"
 created  "March 18, 1999 (Thursday, 15:25h)"
+tags "programming, box"
 
 sample
     /*************/
@@ -1857,6 +1899,7 @@ designer "(public domain)"
 revision "1.0"
 revdate "February 20, 2006 (Monday, 20:36h)"
 created "February 20, 2006 (Monday, 20:36h)"
+tags "programming, comment"
 
 sample
     ;;
@@ -1883,6 +1926,7 @@ BOX ccel
 author   "Elmar Loos <elInfo@gmx.net>"
 designer "Elmar Loos <elInfo@gmx.net>"
 revision "1.0"
+tags "artwork"
 
 sample
     ///////////////
@@ -1914,6 +1958,7 @@ BOX underline
 author   "Elmar Loos <elInfo@gmx.net>"
 designer "Elmar Loos <elInfo@gmx.net>"
 revision "1.0"
+tags "programming, comment"
 
 sample
     // Bla, foo bar!
@@ -1938,6 +1983,7 @@ BOX ian_jones
 author "Karl E. Jorgensen <karl@jorgensen.com>"
 created "Fri Jul 20 16:52:39 BST 2001"
 revision "0.1"
+tags "artwork, box, sign"
 
 sample
                             \\\///
@@ -2026,6 +2072,7 @@ author "Mike Meyer <boxes@meyer.fm>"
 revision "1.1"
 revdate "November 08, 2014 (Saturday, 11:08h)"
 created "September 02, 2013 (Monday, 14:43h)"
+tags "artwork, speech"
 
 sample
 
@@ -2129,6 +2176,7 @@ author "Mike Meyer <boxes@meyer.fm>"
 revision "1.2"
 revdate "February 21, 2019 (Thursday, 18:45h)"
 created "September 02, 2013 (Monday, 14:43h)"
+tags "artwork, speech"
 
 sample
 
@@ -2221,6 +2269,7 @@ designer "Michael Tiernan <Michael.Tiernan@gMail.com>"
 revision "1.5"
 revdate  "Wed May 14 11:41:27 EDT 2014"
 created  "Wed May 14 11:41:27 EDT 2014"
+tags "artwork, box"
 
 sample
     (*************)
@@ -2256,19 +2305,11 @@ END caml
 BOX twisted
 
 author   "Tristano Ajmone <tajmone@gmail.com>"
-designer "Michael Naylor"
+designer "Michael Naylor <mnaylor@math.fsu.edu>"
 revision "1.0"
 created  "Saturday, 02-Jan-16 12:42:31 UTC+1"
 revdate  "Saturday, 02-Jan-16 12:42:31 UTC+1"
-tags     "geometry, frame"
-
-# Minimum Text-Area in output: 17x8
-# Minimum Frame size: 21x42
-
-# This ASCII Frame is a derivative adaptation from a frame created by
-#    michael naylor - mnaylor@math.fsu.edu
-# freely downloaded from:
-#    http://www.retrojunkie.com/asciiart/designs/borders.htm
+tags     "artwork, box"
 
 sample
 ._____. ._____. .________________________________________. ._____. ._____.
@@ -2412,7 +2453,7 @@ author   "Tristano Ajmone <tajmone@gmail.com>"
 designer "akn"
 created  "Saturday, 02-Jan-16 03:34:03 UTC+1"
 revision "1.0"
-tags     "scroll"
+tags     "artwork, box, scroll"
 
 sample
  /"\/\_..---------------------------------._/\/"\
@@ -2460,6 +2501,7 @@ author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 created  "2014-02-13 08:41:11"
 revision "1.0"
+tags     "artwork, box"
 
 sample
      .--(0)    (0)--.
@@ -2504,6 +2546,7 @@ designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 created  "2017-04-10"
 revision "1.0"
+tags     "artwork, box"
 
 sample
      /\ /\ /\ /\ /\ 
@@ -2553,6 +2596,7 @@ designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 created  "2017-04-10"
 revision "1.0"
+tags     "artwork, box"
 
 sample
      /\ !!!!!!!!!!! /\ 
@@ -2595,6 +2639,7 @@ designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 created  "2017-04-10"
 revision "1.0"
+tags     "artwork, box"
 
 sample
      /\  /\ !!!!!!!!!!!! /\  /\ 
@@ -2641,6 +2686,7 @@ designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 created  "2017-04-10"
 revision "1.0"
+tags     "artwork, box"
 
 sample
      /\  /\  /\ !!!!!!!!!!!! /\  /\  /\ 
@@ -2693,6 +2739,7 @@ author   "Matt Thompson <fortran(at)gmail(dot)com>"
 designer "(public domain)"
 revision "1.0"
 created  "2018-02-08"
+tags     "programming, box"
 
 sample
     !!!!!!!!!!!!!
@@ -2724,6 +2771,7 @@ author   "Matt Thompson <fortran(at)gmail(dot)com>"
 designer "(public domain)"
 revision "1.0"
 created  "2018-02-08"
+tags     "programming, comment"
 
 sample
     !
@@ -2751,6 +2799,7 @@ designer "Hayley Jane Wakenshaw"
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 created  "2019-03-31"
 revision "1.0"
+tags     "artwork, box, sign"
 
 sample
                          ,---.           ,---.

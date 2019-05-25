@@ -271,6 +271,7 @@ static void recover()
      BFREE (designs[design_idx].revision);
      BFREE (designs[design_idx].revdate);
      BFREE (designs[design_idx].sample);
+     BFREE (designs[design_idx].tags);
      memset (designs+design_idx, 0, sizeof(design_t));
      designs[design_idx].indentmode = DEF_INDENTMODE;
 }
@@ -506,6 +507,13 @@ entry: KEYWORD STRING
         else if (strcasecmp ($1, "revdate") == 0) {
             designs[design_idx].revdate = (char *) strdup ($2);
             if (designs[design_idx].revdate == NULL) {
+                perror (PROJECT);
+                YYABORT;
+            }
+        }
+        else if (strcasecmp ($1, "tags") == 0) {
+            designs[design_idx].tags = (char *) strdup ($2);
+            if (designs[design_idx].tags == NULL) {
                 perror (PROJECT);
                 YYABORT;
             }
