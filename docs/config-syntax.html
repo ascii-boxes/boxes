@@ -6,7 +6,8 @@ title: Docs - Config File Syntax
 # Config File Syntax
 
 The *boxes* config file is a succession of box design definitions.
-Everything following a pound sign (`#`) is considered a **comment** (unless, of course, the pound sign is part of a string or something).
+Everything following a pound sign (`#`) is considered a **comment** (unless, of course, the pound sign is part of a
+string or something).
 *Boxes* config files are case insensitive, i.e. upper/lower case does not matter.
 
 ### Box Design
@@ -21,18 +22,24 @@ Every box design definition must have at least a `SHAPE` block, an `ELASTIC` lis
 <PRE><b>SAMPLE</b>
     sample_image_of_box
 <b>ENDS</b></PRE>
-This is the box image used for the list of available designs. The reason why an image is not simply generated is that this way, the box can be shown in an environment in which it might actually be used, e.g. with some C code around (see the [boxes config file](https://github.com/{{ site.github }}/blob/master/boxes-config){:target="_blank"} for many examples).
-The `ENDS` statement must stand on a line of its own, although it may be indented. Such a line cannot occur as part of the sample itself.
+This is the box image used for the list of available designs. The reason why an image is not simply generated is that
+this way, the box can be shown in an environment in which it might actually be used, e.g. with some C code around (see
+the [boxes config file](https://github.com/{{ site.github }}/blob/master/boxes-config){:target="_blank"} for many
+examples).
+
+The `ENDS` statement must stand on a line of its own, although it may be indented. Such a line cannot occur as part of
+the sample itself.\\
 The `SAMPLE` block is a required entry in every box design definition.
 
-### Shape Block
+### Shapes Block
 
-<PRE><b>SHAPE</b> {
+<PRE><b>SHAPES</b> {
     <i>shape_name</i> (string_list)
     <i>shape_name</i> (string_list)
     ...
 }</PRE>
-<i>`shape_name`</i> may be one of `nw`, `nnw`, `n`, `nne`, `ne`, `ene`, `e`, `ese`, `se`, `sse`, `s`, `ssw`, `sw`, `wsw`, `w`, or `wnw`, corresponding to the [figure shown earlier](config-general.html).
+<i>`shape_name`</i> may be one of `nw`, `nnw`, `n`, `nne`, `ne`, `ene`, `e`, `ese`, `se`, `sse`, `s`, `ssw`, `sw`,
+`wsw`, `w`, or `wnw`, corresponding to the [figure shown earlier](config-general.html).
 The `string_list` represents the shape itself, line by line. Note that all lines must have equal length. Add extra spaces if necessary. Not also that double quotes (`"`) which appear as part of a string must be escaped by a preceding backslash, so as not to terminate the string early. Consequently, all occurrences of backslashes must also be escaped by adding additional backslashes. The recommended process for creating a string is thus:
 
 1. Type in the string as you think it should look.
@@ -102,6 +109,11 @@ The search pattern may be a regular expression, and the replacement string may i
 There may be many `REPLACE`/`REVERSE` statements in one design definition. They will be executed one after the other, starting from the top.
 
 Note that as in all strings, backslashes must be doubled, i.e. *boxes* "consumes one layer of backslashes". This is why in the first example, there are two backslashes at the beginning of the search pattern, when only one would have been needed to escape the star operator. Alternately, you may use the [`delimiter` statement](#delim) to change the string delimiting and escape character.
+
+You may choose if the replacement is performed *once* per line or as many times as necessary to replace all occurrences
+of the sarch pattern (*global*). Put this indication in front of the search pattern (the default is `global`):
+
+    replace once "foo" with "bar"
 
 For more information on how to use regular expressions, please see `man 5 regexp`, under "Basic Regular Expressions" or any other source.
 
