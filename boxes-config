@@ -2882,6 +2882,39 @@ padding { horiz 1 }
 
 END bear
 
+# ============================================================================
+
+BOX jstone
+author "Ed Schaller"
+designer "schallee_@_darkmist.net"
+revision "1.0"
+revdate "3 Oct 2019"
+created "3 Oct 2019"
+tags "programming, box"
+
+sample
+	/*----------------+
+	 | toast is yummy |
+	 +----------------*/
+ends
+
+shapes {
+	nw ("/*")	n  ("-")	ne ("+ ")
+	w  (" |")			e  ("| ")
+	sw (" +")	s  ("-")	se ("*/")
+}
+
+elastic (n,e,s,w)
+
+delim ?"
+replace "\*/" with "*\/"
+reverse "\*\\/" to "*/"
+
+padding {
+	horiz 1
+}
+
+END jstone
 
 # ============================================================================
 
