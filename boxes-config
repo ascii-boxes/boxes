@@ -2932,14 +2932,16 @@ sample
     """""""""""""""""""""""""""""""""""""""""""""""""""""""
 ends
 
+delim ?'
+
 shapes {
-    nw ("\"") n ("\"") ne ("\"")
-     w ("\"")          e ("\"")
-    sw ("\"") s ("\"") se ("\"")
+    nw ('"') n ('"') ne ('"')
+     w ('"')          e ('"')
+    sw ('"') s ('"') se ('"')
 }
 
-replace "\"" with "\\\""               # quote closing comment tags
-reverse "\\\\\"" to "\""
+replace '"' with '\"'               # quote closing comment tags
+reverse '\\\"' to '"'
 
 padding {
     horiz 1
