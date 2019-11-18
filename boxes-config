@@ -2918,4 +2918,39 @@ END jstone
 
 # ============================================================================
 
+BOX vim-box
+
+author "Ricky Anderson <ricky.anderson2696@gmail.com>"
+designer "(public domain)"
+revision "1.0"
+created  "2019-11-17"
+tags     "programming, box"
+
+sample
+    """""""""""""""""""""""""""""""""""""""""""""""""""""""
+    " Header seperator on your vim config's file (.vimrc) "
+    """""""""""""""""""""""""""""""""""""""""""""""""""""""
+ends
+
+delim ?'
+
+shapes {
+    nw ('"') n ('"') ne ('"')
+     w ('"')          e ('"')
+    sw ('"') s ('"') se ('"')
+}
+
+replace '"' with '\"'               # quote closing comment tags
+reverse '\\\"' to '"'
+
+padding {
+    horiz 1
+}
+
+elastic (n, e, s, w)
+
+END vim-box
+
+# ============================================================================
+
 #EOF                                                  vim: set ai sw=4:
