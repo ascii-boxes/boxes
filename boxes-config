@@ -2938,6 +2938,9 @@ shapes {
     sw ("\"") s ("\"") se ("\"")
 }
 
+replace "\"" with "\\\""               # quote closing comment tags
+reverse "\\\\\"" to "\""
+
 padding {
     horiz 1
 }
