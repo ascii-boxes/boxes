@@ -13,9 +13,10 @@ Although *boxes* can be useful when used on the command line, the more frequent 
 your editor. So, how can *boxes* be tied to your editor?
 
 Example config file entries are featured so far for [Vim](https://www.vim.org/), [Jed](https://www.jedsoft.org/jed/),
-[Emacs](https://www.gnu.org/software/emacs/), and [Sublime Text](https://www.sublimetext.com/). If you know how to to
-this in other editors, please feel free to add that information to this page via GitHub or just let me know in the
-GitHub issues.
+[Emacs](https://www.gnu.org/software/emacs/), [Sublime Text](https://www.sublimetext.com/), and
+[NotePad++](https://notepad-plus-plus.org/). If you know how to to this in other editors, please feel free to add that
+information to this page via GitHub or just let me know in the GitHub issues.
+
 
 ## Integration with Vim
 
@@ -68,6 +69,14 @@ the start).
     autocmd BufEnter .vimrc*,.exrc vmap ,mc !boxes -d vim-cmt<CR>
     autocmd BufEnter .vimrc*,.exrc nmap ,xc !!boxes -d vim-cmt -r<CR>
     autocmd BufEnter .vimrc*,.exrc vmap ,xc !boxes -d vim-cmt -r<CR>
+
+**Syntax Highlighting in Vim**
+
+There is a [Vim syntax file](https://raw.githubusercontent.com/{{ site.github }}/master/boxes.vim) for *boxes*
+configuration files, which you can install to have the *boxes* config colorized. On Windows, the file must be placed
+in the directory *VIM_INSTALL_DIR\vimfiles\syntax*.  
+Activate by `set syn=boxes`.
+
 
 <a name="jed">&nbsp;</a>
 
