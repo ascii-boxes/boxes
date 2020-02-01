@@ -1,17 +1,24 @@
+" boxes - command line ASCII boxes unlimited!
+" Copyright (C) 1999-2020 Thomas Jensen and the boxes contributors
+"
+" This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+" License, version 2, as published by the Free Software Foundation.
+" This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+" warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+" You should have received a copy of the GNU General Public License along with this program; if not, write to the Free
+" Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+"
 " Vim syntax file
-" Language:      "boxes" configuration file
-" Maintainer:    Thomas Jensen <boxes@thomasjensen.com>
-" Latest Change: September 12, 1999 (Sunday, 01:14h)
-" Vim Version:   5.4
-" Filenames:     .boxes boxes-config boxes
-" URL:           https://github.com/ascii-boxes/boxes/blob/master/boxes.vim
-"
-" Problems:    - Strings must start and end with double quotes (") and the
-"                escape character is always backslash (\), which does not
-"                allow correct colorization of strings following a DELIM.
-"
-"              + Region ends are matched inside contained strings
-"                SOLVED! Thanks Dr. Charles E. Campbell!
+" ---------------
+" Latest version available from:
+"         https://github.com/ascii-boxes/boxes/blob/master/boxes.vim
+" Status: This syntax file is still under development (you could say "beta") and has a few known issues (below).
+"         We think it's good enough to be used in the wild.
+"         Even though it is not officially part of a boxes release, and simply intended to be downloaded via the link
+"         above, we think it's great when it gets packaged and installed with boxes!
+" Known Issues:
+"         https://github.com/ascii-boxes/boxes/issues?q=is%3Aissue+is%3Aopen+Vim+Syntax
+" _____________________________________________________________________________________________________________________
 
 
 " Removes any old syntax stuff hanging around
@@ -21,7 +28,7 @@ syntax clear
 syntax case ignore
 
 " Set the keyword characters
-set iskeyword=a-z,A-Z
+setlocal iskeyword=a-z,A-Z
 
 
 "
@@ -119,7 +126,6 @@ endif
 "  The current buffer now uses "boxes" syntax highlighting
 "
 let b:current_syntax = "boxes"
-
 
 
 
