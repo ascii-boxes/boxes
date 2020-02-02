@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <regexp.h>
+#include "regexp.h"
 #include "regmagic.h"
 
 
