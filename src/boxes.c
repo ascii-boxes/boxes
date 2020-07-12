@@ -1278,9 +1278,13 @@ static int apply_substitutions (const int mode)
                 perror (PROJECT);
                 return 1;
             }
+
+            input.lines[k].vischar += buf_len - input.lines[k].len;
             input.lines[k].len = buf_len;
-            if (input.lines[k].len > input.maxline)
-                input.maxline = input.lines[k].len;
+
+            if (input.lines[k].vischar > input.maxline)
+                input.maxline = input.lines[k].vischar;
+
             #ifdef REGEXP_DEBUG
                 fprintf (stderr, "input.lines[%d] == {%d, \"%s\"}\n", k,
                         input.lines[k].len, input.lines[k].text);
@@ -1350,6 +1354,9 @@ static int read_all_input (const int use_stdin)
  */
 {
     char    buf[LINE_MAX+2];             /* input buffer */
+    char    c;
+    size_t  invis;                       /* counts invisible characters */
+    int     ansipos;                     /* progression of ansi sequence */
     size_t  input_size = 0;              /* number of elements allocated */
     line_t *tmp = NULL;
     char   *temp = NULL;                 /* string resulting from tab exp. */
@@ -1411,10 +1418,50 @@ static int read_all_input (const int use_stdin)
             }
 
             /*
+             * Find ANSI CSI/ESC sequences
+             */
+            invis = 0;
+            ansipos = 0;
+            for (i=0; i<input.lines[input.anz_lines].len; ++i) {
+                c = input.lines[input.anz_lines].text[i];
+                if (ansipos == 0 && c == 0x1b){
+                    /* Found an ESC char, count it as invisible and move 1 forward in the
+                     * detection of CSI sequences */
+                    ansipos++;
+                    invis++;
+                } else if (ansipos == 1 && c == '[') {
+                    /* Found '[' char after ESC. A CSI sequence has started. */
+                    ansipos++;
+                    invis++;
+                } else if (ansipos == 1 && c >= 0x40 && c <= 0x5f) {
+                    /* Found a byte designating the end of a two-byte
+                     * escape sequence */
+                    invis++;
+                    ansipos = 0;
+                } else if (ansipos == 2) {
+                    /* Inside CSI sequence - Keep counting bytes as invisible */
+                    invis++;
+
+                    /* A char between 0x40 and 0x7e signals the end of an CSI or escape sequence */
+                    if (c >= 0x40 && c <= 0x7e)
+                        ansipos = 0;
+                }
+            }
+
+            /* Save the count of invisible chars and visible chars.
+             * I'm happy about suggestions for a more elegant handling
+             * of this and the use of .invis and .vischar (and .len)
+             * in the other functions.
+             */
+            input.lines[input.anz_lines].invis = invis;
+            input.lines[input.anz_lines].vischar = input.lines[input.anz_lines].len - invis;
+
+            /*
              *  Update length of longest line
              */
-            if (input.lines[input.anz_lines].len > input.maxline)
-                input.maxline = input.lines[input.anz_lines].len;
+            if (input.lines[input.anz_lines].vischar > input.maxline) {
+                input.maxline = input.lines[input.anz_lines].vischar;
+            }
 
             /*
              *  next please

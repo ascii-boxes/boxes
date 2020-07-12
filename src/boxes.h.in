@@ -147,6 +147,8 @@ extern opt_t opt;
 typedef struct {
     size_t  len;                         /* length of text in characters */
     char   *text;                        /* line content, tabs expanded */
+    size_t invis;                        /* number of characters part of an ansi sequence */
+    size_t vischar;                      /* number of normal printable characters */
     size_t *tabpos;                      /* tab positions in expanded work strings */
     size_t  tabpos_len;                  /* number of tabs in a line */
     size_t  num_leading_blanks;          /* number of spaces at the start of the line after justification */
