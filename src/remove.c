@@ -805,13 +805,13 @@ int remove_box()
     input.maxline += opt.design->shape[NE].width;
     for (j=0; j<input.anz_lines; ++j) {
         input.lines[j].text = (char *)
-            realloc (input.lines[j].text, input.maxline+1);
+            realloc (input.lines[j].text, input.maxline+input.lines[j].invis+1);
         if (input.lines[j].text == NULL) {
             perror (PROJECT);
             return 1;
         }
         memset (input.lines[j].text + input.lines[j].len, ' ',
-                input.maxline - input.lines[j].len);
+                input.maxline - input.lines[j].len + input.lines[j].invis);
         input.lines[j].text[input.maxline] = '\0';
         input.lines[j].len = input.maxline;
     }
@@ -983,8 +983,9 @@ int remove_box()
     }
     input.maxline = 0;
     for (j=0; j<input.anz_lines; ++j) {
-        if (input.lines[j].len > input.maxline)
-            input.maxline = input.lines[j].len;
+        if (input.lines[j].len - input.lines[j].invis > input.maxline) {
+            input.maxline = input.lines[j].len - input.lines[j].invis;
+        }
     }
     memset (input.lines + input.anz_lines, 0,
             (BMAX (textstart - boxstart, 0) + BMAX (boxend - textend, 0)) *

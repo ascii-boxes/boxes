@@ -709,30 +709,32 @@ static int justify_line (line_t *line, int skew)
         case 'l':
             if (opt.design->indentmode == 't') {
                 memmove (line->text+input.indent, p, newlen+1);
-                line->len = newlen + input.indent;
+                line->vischar = newlen + input.indent - line->invis;
+                line->len = line->vischar;
                 line->num_leading_blanks = input.indent;
             }
             else {
                 memmove (line->text, p, newlen+1);
-                line->len = newlen;
+                line->vischar = newlen - line->invis;
+                line->len = line->vischar;
                 line->num_leading_blanks = 0;
             }
             break;
 
         case 'c':
             if (opt.design->indentmode == 't') {
-                shift = (input.maxline-input.indent-newlen) / 2 + input.indent;
+                shift = (input.maxline - input.indent - newlen + line->invis) / 2 + input.indent;
                 skew -= input.indent;
-                if ((input.maxline-input.indent-newlen) % 2 && skew == 1)
+                if ((input.maxline-input.indent - newlen) % 2 && skew == 1)
                     ++shift;
             }
             else {
-                shift = (input.maxline - newlen) / 2;
-                if ((input.maxline - newlen) % 2 && skew == 1)
+                shift = (input.maxline - newlen + line->invis) / 2;
+                if ((input.maxline - newlen +line->invis) % 2 && skew == 1)
                     ++shift;
             }
 
-            newtext = (char *) calloc (shift + newlen + 1, sizeof(char));
+            newtext = (char *) calloc (shift + newlen + line->invis + 1, sizeof(char));
             if (newtext == NULL) {
                 perror (PROJECT);
                 return 2;
@@ -750,18 +752,19 @@ static int justify_line (line_t *line, int skew)
                         newlen, shift, spaces);
             #endif
             strncpy (newtext, spaces, shift);
-            strncat (newtext, p, newlen);
-            newtext[shift+newlen] = '\0';
+            strncat (newtext, p, newlen+line->invis);
+            newtext[shift+newlen+line->invis] = '\0';
             BFREE (spaces);
             BFREE (line->text);
             line->text = newtext;
-            line->len = shift + newlen;
+            line->len = shift + newlen - line->invis;
+            line->vischar = line->len;
             line->num_leading_blanks = shift;
             break;
 
         case 'r':
-            shift = input.maxline - newlen;
-            newtext = (char *) calloc (input.maxline+1, sizeof(char));
+            shift = input.maxline - (newlen - line->invis);
+            newtext = (char *) calloc (input.maxline+1000, sizeof(char));
             if (newtext == NULL) {
                 perror (PROJECT);
                 return 2;
@@ -776,10 +779,11 @@ static int justify_line (line_t *line, int skew)
             spaces[shift] = '\0';
             strncpy (newtext, spaces, shift);
             strncat (newtext, p, newlen);
-            newtext[input.maxline] = '\0';
+            newtext[input.maxline+line->invis] = '\0';
             BFREE (spaces);
             BFREE (line->text);
             line->text = newtext;
+            line->vischar = input.maxline;
             line->len = input.maxline;
             line->num_leading_blanks = shift;
             break;
@@ -796,8 +800,9 @@ static int justify_line (line_t *line, int skew)
         size_t k;
         input.maxline = 0;
         for (k=0; k<input.anz_lines; ++k) {
-            if (input.lines[k].len > input.maxline)
+            if (input.lines[k].len > input.maxline) {
                 input.maxline = input.lines[k].len;
+            }
         }
     }
 
@@ -1016,7 +1021,7 @@ int output_box (const sentry_t *thebox)
                 rc = justify_line (input.lines+ti, hpr-hpl);
                 if (rc)
                     return rc;
-                r = input.maxline - input.lines[ti].len;
+                r = input.maxline - input.lines[ti].vischar;
                 trailspc[r] = '\0';
                 restored_indent = tabbify_indent (ti, indentspc, indentspclen);
                 if (input.lines[ti].num_leading_blanks == SIZE_MAX) {
