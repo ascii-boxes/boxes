@@ -1,0 +1,9 @@
+:ARGS
+:INPUT
+ab[31mcd[0mef
+:OUTPUT-FILTER
+:EXPECTED
+/**********/
+/* ab[31mcd[0mef */
+/**********/
+:EOF
