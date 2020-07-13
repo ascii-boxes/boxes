@@ -1510,6 +1510,7 @@ static int read_all_input (const int use_stdin)
                 memmove (input.lines[i].text, input.lines[i].text+input.indent,
                         input.lines[i].len-input.indent+1);
                 input.lines[i].len -= input.indent;
+                input.lines[i].vischar -= input.indent;
             }
         }
         input.maxline -= input.indent;
