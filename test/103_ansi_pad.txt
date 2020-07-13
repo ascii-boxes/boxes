@@ -1,0 +1,28 @@
+:ARGS
+-pa5
+:INPUT
+normal
+with [31msome[0m formating
+formating past [1mline end
+and into[22m next
+normal again
+:OUTPUT-FILTER
+:EXPECTED
+/***********************************/
+/*                                 */
+/*                                 */
+/*                                 */
+/*                                 */
+/*                                 */
+/*     normal                      */
+/*     with [31msome[0m formating         */
+/*     formating past [1mline end     */
+/*     and into[22m next               */
+/*     normal again                */
+/*                                 */
+/*                                 */
+/*                                 */
+/*                                 */
+/*                                 */
+/***********************************/
+:EOF
