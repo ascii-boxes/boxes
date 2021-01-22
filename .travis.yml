@@ -11,6 +11,8 @@ addons:
     packages:
     - flex
     - bison
+    - libunistring-dev
+    - libpcre2-dev
 
 branches:
   only:
