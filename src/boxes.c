@@ -964,10 +964,10 @@ static int list_styles()
         design_t *d = opt.design;
         int sstart = 0;
         size_t w = 0;
-        char space[LINE_MAX+1];
+        char space[LINE_MAX_BYTES+1];
 
-        memset (&space, ' ', LINE_MAX);
-        space[LINE_MAX] = '\0';
+        memset (&space, ' ', LINE_MAX_BYTES);
+        space[LINE_MAX_BYTES] = '\0';
 
         fprintf (opt.outfile, "Complete Design Information for \"%s\":\n",
                 d->name);
@@ -1175,7 +1175,7 @@ static int get_indent (const line_t *lines, const size_t lanz)
  */
 {
     size_t j;
-    int    res = LINE_MAX;               /* result */
+    int    res = LINE_MAX_BYTES;               /* result */
     int    nonblank = 0;                 /* true if one non-blank line found */
 
     if (lines == NULL) {
@@ -1221,7 +1221,7 @@ static int apply_substitutions (const int mode)
     size_t     anz_rules;
     reprule_t *rules;
     size_t     j, k;
-    char       buf[LINE_MAX*2];
+    char       buf[LINE_MAX_BYTES*2];
     size_t     buf_len;                  /* length of string in buf */
 
     if (opt.design == NULL)
@@ -1260,12 +1260,12 @@ static int apply_substitutions (const int mode)
             #ifdef REGEXP_DEBUG
                 fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
                         rules[j].prog, input.lines[k].text,
-                        input.lines[k].len, rules[j].repstr, LINE_MAX*2,
+                        input.lines[k].len, rules[j].repstr, LINE_MAX_BYTES*2,
                         rules[j].mode);
             #endif
             errno = 0;
             buf_len = myregsub (rules[j].prog, input.lines[k].text,
-                    input.lines[k].len, rules[j].repstr, buf, LINE_MAX*2,
+                    input.lines[k].len, rules[j].repstr, buf, LINE_MAX_BYTES*2,
                     rules[j].mode);
             #ifdef REGEXP_DEBUG
                 fprintf (stderr, "%d\n", buf_len);
@@ -1353,7 +1353,7 @@ static int read_all_input (const int use_stdin)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    char    buf[LINE_MAX+2];             /* input buffer */
+    char    buf[LINE_MAX_BYTES+2];             /* input buffer */
     char    c;
     size_t  invis;                       /* counts invisible characters */
     int     ansipos;                     /* progression of ansi sequence */
@@ -1364,7 +1364,7 @@ static int read_all_input (const int use_stdin)
     size_t  i;
     int     rc;
 
-    input.indent = LINE_MAX;
+    input.indent = LINE_MAX_BYTES;
     input.maxline = 0;
 
     if (use_stdin) {
@@ -1373,7 +1373,7 @@ static int read_all_input (const int use_stdin)
         /*
          *  Start reading
          */
-        while (fgets (buf, LINE_MAX+1, opt.infile))
+        while (fgets (buf, LINE_MAX_BYTES+1, opt.infile))
         {
             if (input_size % 100 == 0) {
                 input_size += 100;

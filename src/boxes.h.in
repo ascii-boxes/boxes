@@ -5,12 +5,12 @@
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, version 2, as published
  * by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -51,17 +51,17 @@
 #define MAX_TABSTOP     16
 
 /*
- *  max. supported line length
+ *  max. supported line length in bytes
  *  This is how many characters of a line will be read. Anything beyond
  *  will be discarded. The line feed character at the end does not count.
  *  (This should have been done via sysconf(), but I didn't do it in order
  *  to ease porting to non-unix platforms.)
  */
-#if defined(LINE_MAX) && (LINE_MAX < 1024)
-#undef LINE_MAX
+#if defined(LINE_MAX_BYTES) && (LINE_MAX_BYTES < 1024)
+#undef LINE_MAX_BYTES
 #endif
-#ifndef LINE_MAX
-#define LINE_MAX        2048
+#ifndef LINE_MAX_BYTES
+#define LINE_MAX_BYTES        2048
 #endif
 
 
@@ -163,7 +163,7 @@ typedef struct {
     int    final_newline;                /* true if the last line of input ends with newline */
 } input_t;
 
-#define INPUT_INITIALIZER {NULL, 0, 0, LINE_MAX, 0}
+#define INPUT_INITIALIZER {NULL, 0, 0, LINE_MAX_BYTES, 0}
 
 extern input_t input;
 #endif /*!FILE_LEXER_L*/

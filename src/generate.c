@@ -826,7 +826,7 @@ int output_box (const sentry_t *thebox)
 {
     size_t  j;
     size_t  nol = thebox[BRIG].height;   /* number of output lines */
-    char    trailspc[LINE_MAX+1];
+    char    trailspc[LINE_MAX_BYTES+1];
     char   *indentspc;
     int     indentspclen;
     size_t  vfill, vfill1, vfill1_save, vfill2; /* empty lines/columns in box */
@@ -835,7 +835,7 @@ int output_box (const sentry_t *thebox)
     size_t  hpl, hpr;
     size_t  r;
     int     rc;
-    char    obuf[LINE_MAX+1];            /* final output buffer */
+    char    obuf[LINE_MAX_BYTES+1];            /* final output buffer */
     size_t  obuf_len;                    /* length of content of obuf */
     size_t  skip_start;                  /* lines to skip for box top */
     size_t  skip_end;                    /* lines to skip for box bottom */
@@ -891,8 +891,8 @@ int output_box (const sentry_t *thebox)
      *  Provide string of spaces for filling of space between text and
      *  right side of box
      */
-    memset (trailspc, (int)' ', LINE_MAX);
-    trailspc[LINE_MAX] = '\0';
+    memset (trailspc, (int)' ', LINE_MAX_BYTES);
+    trailspc[LINE_MAX_BYTES] = '\0';
 
     /*
      *  Compute number of empty lines in box (vfill).
@@ -995,7 +995,7 @@ int output_box (const sentry_t *thebox)
 
         if (j < thebox[BTOP].height) {   /* box top */
             restored_indent = tabbify_indent (0, indentspc, indentspclen);
-            concat_strings (obuf, LINE_MAX+1, 4, restored_indent,
+            concat_strings (obuf, LINE_MAX_BYTES+1, 4, restored_indent,
                     skip_left?"":thebox[BLEF].chars[j], thebox[BTOP].chars[j],
                     thebox[BRIG].chars[j]);
         }
@@ -1004,7 +1004,7 @@ int output_box (const sentry_t *thebox)
             r = thebox[BTOP].width;
             trailspc[r] = '\0';
             restored_indent = tabbify_indent (0, indentspc, indentspclen);
-            concat_strings (obuf, LINE_MAX+1, 4, restored_indent,
+            concat_strings (obuf, LINE_MAX_BYTES+1, 4, restored_indent,
                     skip_left?"":thebox[BLEF].chars[j], trailspc,
                     thebox[BRIG].chars[j]);
             trailspc[r] = ' ';
@@ -1032,7 +1032,7 @@ int output_box (const sentry_t *thebox)
                             + strlen(hfill1)
                             + input.lines[ti].num_leading_blanks;
                 }
-                concat_strings (obuf, LINE_MAX+1, 7, restored_indent,
+                concat_strings (obuf, LINE_MAX_BYTES+1, 7, restored_indent,
                         skip_left?"":thebox[BLEF].chars[j], hfill1,
                         ti >= 0? input.lines[ti].text : "", hfill2,
                         trailspc, thebox[BRIG].chars[j]);
@@ -1041,7 +1041,7 @@ int output_box (const sentry_t *thebox)
                 r = thebox[BTOP].width;
                 trailspc[r] = '\0';
                 restored_indent = tabbify_indent (input.anz_lines - 1, indentspc, indentspclen);
-                concat_strings (obuf, LINE_MAX+1, 4, restored_indent,
+                concat_strings (obuf, LINE_MAX_BYTES+1, 4, restored_indent,
                         skip_left?"":thebox[BLEF].chars[j], trailspc,
                         thebox[BRIG].chars[j]);
             }
@@ -1050,7 +1050,7 @@ int output_box (const sentry_t *thebox)
 
         else {                           /* box bottom */
             restored_indent = tabbify_indent (input.anz_lines - 1, indentspc, indentspclen);
-            concat_strings (obuf, LINE_MAX+1, 4, restored_indent,
+            concat_strings (obuf, LINE_MAX_BYTES+1, 4, restored_indent,
                     skip_left?"":thebox[BLEF].chars[j],
                     thebox[BBOT].chars[j-(nol-thebox[BBOT].height)],
                     thebox[BRIG].chars[j]);
@@ -1058,8 +1058,8 @@ int output_box (const sentry_t *thebox)
 
         obuf_len = strlen (obuf);
 
-        if (obuf_len > LINE_MAX) {
-            size_t newlen = LINE_MAX;
+        if (obuf_len > LINE_MAX_BYTES) {
+            size_t newlen = LINE_MAX_BYTES;
             btrim (obuf, &newlen);
         }
         else {

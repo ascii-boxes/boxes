@@ -248,7 +248,7 @@ size_t expand_tabs_into (const char *input_buffer, const size_t in_len,
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-   static char temp [LINE_MAX*MAX_TABSTOP+1];  /* work string */
+   static char temp [LINE_MAX_BYTES*MAX_TABSTOP+1];  /* work string */
    size_t ii;                            /* position in input string */
    size_t io;                            /* position in work string */
    size_t jp;                            /* tab expansion jump point */
@@ -269,7 +269,7 @@ size_t expand_tabs_into (const char *input_buffer, const size_t in_len,
       }
    }
 
-   for (ii=0, io=0, tabnum=0; ii < in_len && ((int) io) < (LINE_MAX*tabstop-1); ++ii) {
+   for (ii=0, io=0, tabnum=0; ii < in_len && ((int) io) < (LINE_MAX_BYTES*tabstop-1); ++ii) {
       if (input_buffer[ii] == '\t') {
          if (*tabpos_len > 0) {
             (*tabpos)[tabnum++] = io;

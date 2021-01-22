@@ -126,7 +126,7 @@ int genshape (const size_t width, const size_t height, char ***chars)
 {
     size_t j;
 
-    if (width <= 0 || height <= 0 || width > LINE_MAX) {
+    if (width <= 0 || height <= 0 || width > LINE_MAX_BYTES) {
         fprintf (stderr, "%s: internal error\n", PROJECT);
         return 1;
     }
