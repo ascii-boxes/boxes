@@ -57,11 +57,11 @@
  *  (This should have been done via sysconf(), but I didn't do it in order
  *  to ease porting to non-unix platforms.)
  */
-#if defined(LINE_MAX_BYTES) && (LINE_MAX_BYTES < 1024)
+#if defined(LINE_MAX_BYTES) && (LINE_MAX_BYTES < 2048)
 #undef LINE_MAX_BYTES
 #endif
 #ifndef LINE_MAX_BYTES
-#define LINE_MAX_BYTES        2048
+#define LINE_MAX_BYTES        4096
 #endif
 
 
