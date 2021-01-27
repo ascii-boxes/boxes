@@ -5,12 +5,12 @@
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, version 2, as published
  * by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -27,7 +27,15 @@
 #include <strings.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include <uniconv.h>
+#include <unistdio.h>
+#include <unistr.h>
+#include <unitypes.h>
+#include <uniwidth.h>
+
 #include <unistd.h>
+
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
@@ -83,6 +91,14 @@ int design_idx = 0;                      /* anz_designs-1 */
 int anz_designs = 0;                     /* no of designs after parsing */
 
 opt_t opt;                               /* command line options */
+
+char *encoding;                          /* the character encoding that we use */
+
+ucs4_t char_tab     = 0x00000009;        /* ucs4_t character '\t' (tab)  */
+ucs4_t char_space   = 0x00000020;        /* ucs4_t character ' '  (space) */
+ucs4_t char_cr      = 0x0000000d;        /* ucs4_t character '\r' (carriage return) */
+ucs4_t char_newline = 0x0000000a;        /* ucs4_t character '\n' (newline) */
+ucs4_t char_nul     = 0x00000000;        /* ucs4_t character '\0' (zero) */
 
 input_t input = INPUT_INITIALIZER;       /* input lines */
 
@@ -1353,16 +1369,18 @@ static int read_all_input (const int use_stdin)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    char    buf[LINE_MAX_BYTES+2];             /* input buffer */
-    char    c;
-    size_t  invis;                       /* counts invisible characters */
-    int     ansipos;                     /* progression of ansi sequence */
-    size_t  input_size = 0;              /* number of elements allocated */
-    line_t *tmp = NULL;
-    char   *temp = NULL;                 /* string resulting from tab exp. */
-    size_t  newlen;                      /* line length after tab expansion */
-    size_t  i;
-    int     rc;
+    char     buf[LINE_MAX_BYTES + 2];    /* input buffer */
+    size_t   len_bytes;
+    char     c;
+    size_t   invis;                      /* counts invisible characters */
+    int      ansipos;                    /* progression of ansi sequence */
+    size_t   input_size = 0;             /* number of elements allocated */
+    line_t  *tmp = NULL;
+    char    *temp = NULL;                /* string resulting from tab exp. */
+    uint8_t *mbtemp = NULL;              /* temp string for preparing the multi-byte input */
+    size_t   newlen;                     /* line length after tab expansion */
+    size_t   i;
+    int      rc;
 
     input.indent = LINE_MAX_BYTES;
     input.maxline = 0;
@@ -1386,12 +1404,14 @@ static int read_all_input (const int use_stdin)
                 input.lines = tmp;
             }
 
-            input.lines[input.anz_lines].len = strlen (buf);
+            len_bytes = strlen(buf);
+            mbtemp = u8_strconv_from_locale(buf);
+            input.lines[input.anz_lines].len = u8_strwidth(mbtemp, encoding);
             input.lines[input.anz_lines].num_leading_blanks = 0;
-            input.final_newline = has_linebreak(buf, input.lines[input.anz_lines].len);
+            input.final_newline = has_linebreak(buf, len_bytes);
 
             if (opt.r) {
-                input.lines[input.anz_lines].len -= 1;
+                input.lines[input.anz_lines].len -= 1;    /* TODO HERE */
                 if (buf[input.lines[input.anz_lines].len] == '\n')
                     buf[input.lines[input.anz_lines].len] = '\0';
             }
@@ -1581,6 +1601,12 @@ int main (int argc, char *argv[])
         exit (EXIT_SUCCESS);
     if (rc)
         exit (EXIT_FAILURE);
+
+    /*
+     * Store system character encoding
+     */
+    setlocale(LC_ALL, "");    /* switch from default "C" encoding to system encoding */
+    encoding = locale_charset();
 
     /*
      *  Parse config file, then reset design pointer

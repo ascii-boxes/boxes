@@ -29,6 +29,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+
+#include <unistr.h>
+#include <unitypes.h>
+
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
@@ -235,13 +239,13 @@ int empty_line(const line_t *line)
 
 
 
-size_t expand_tabs_into(const char *input_buffer, const size_t in_len,
-                        const int tabstop, char **text, size_t **tabpos, size_t *tabpos_len)
+size_t expand_tabs_into(const uint32_t *input_buffer, const size_t in_len,
+                        const int tabstop, uint32_t **text, size_t **tabpos, size_t *tabpos_len)
 /*
  *  Expand tab chars in input_buffer and store result in text.
  *
  *  input_buffer   Line of text with tab chars
- *  in_len         length of the string in input_buffer
+ *  in_len         length of the string in input_buffer in characters
  *  tabstop        tab stop distance
  *  text           address of the pointer that will take the result
  *  tabpos         array of ints giving the positions of the first
@@ -257,22 +261,24 @@ size_t expand_tabs_into(const char *input_buffer, const size_t in_len,
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    static char temp[LINE_MAX_BYTES * MAX_TABSTOP + 1];  /* work string */
-    size_t ii;                            /* position in input string */
-    size_t io;                            /* position in work string */
-    size_t jp;                            /* tab expansion jump point */
-    size_t tabnum;                        /* number of tabs in input */
+    static uint32_t temp[LINE_MAX_BYTES * MAX_TABSTOP + 1];  /* work string */
+    size_t io;       /* character position in work string */
+    size_t tabnum;   /* index of the current tab */
 
     *text = NULL;
 
-    for (ii = 0, *tabpos_len = 0; ii < in_len; ++ii) {
-        if (input_buffer[ii] == '\t') {
-            (*tabpos_len)++;
-        }
-    }
     if (opt.tabexp != 'k') {
         *tabpos_len = 0;
+    } else {
+        ucs4_t puc;
+        const uint32_t *rest = input_buffer;
+        while (rest = u32_next(&puc, rest)) {
+            if (u32_cmp(&char_tab, &puc, 1) == 0) {
+                (*tabpos_len)++;
+            }
+        }
     }
+
     if (*tabpos_len > 0) {
         *tabpos = (size_t *) calloc((*tabpos_len) + 1, sizeof(size_t));
         if (*tabpos == NULL) {
@@ -280,23 +286,26 @@ size_t expand_tabs_into(const char *input_buffer, const size_t in_len,
         }
     }
 
-    for (ii = 0, io = 0, tabnum = 0; ii < in_len && ((int) io) < (LINE_MAX_BYTES * tabstop - 1); ++ii) {
-        if (input_buffer[ii] == '\t') {
+    ucs4_t puc;
+    const uint32_t *rest = input_buffer;
+    io = 0;
+    while (rest = u32_next(&puc, rest)) {
+        if (u32_cmp(&char_tab, &puc, 1) == 0) { /* Is it a tab char? */
             if (*tabpos_len > 0) {
                 (*tabpos)[tabnum++] = io;
             }
-            for (jp = io + tabstop - (io % tabstop); io < jp; ++io) {
-                temp[io] = ' ';
-            }
+            size_t num_spc = tabstop - (io % tabstop);
+            u32_set(temp + io, char_space, num_spc);
+            io += num_spc;
         }
         else {
-            temp[io] = input_buffer[ii];
+            u32_set(temp + io, puc, 1);
             ++io;
         }
     }
-    temp[io] = '\0';
+    temp[io] = 0;
 
-    *text = (char *) strdup(temp);
+    *text = u32_strdup(temp);
     if (*text == NULL) {
         return 0;
     }
