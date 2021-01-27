@@ -5,12 +5,12 @@
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, version 2, as published
  * by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  * for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -34,21 +34,25 @@
 
 
 char *shape_name[] = {
-    "NW", "NNW", "N", "NNE", "NE", "ENE", "E", "ESE",
-    "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW"
+        "NW", "NNW", "N", "NNE", "NE", "ENE", "E", "ESE",
+        "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW"
 };
 
-shape_t north_side[SHAPES_PER_SIDE] = { NW, NNW, N, NNE, NE };  /* clockwise */
-shape_t  east_side[SHAPES_PER_SIDE] = { NE, ENE, E, ESE, SE };
-shape_t south_side[SHAPES_PER_SIDE] = { SE, SSE, S, SSW, SW };
-shape_t  west_side[SHAPES_PER_SIDE] = { SW, WSW, W, WNW, NW };
-shape_t corners[ANZ_CORNERS] = { NW, NE, SE, SW };
-shape_t *sides[] = { north_side, east_side, south_side, west_side };
+shape_t north_side[SHAPES_PER_SIDE] = {NW, NNW, N, NNE, NE};  /* clockwise */
+
+shape_t east_side[SHAPES_PER_SIDE] = {NE, ENE, E, ESE, SE};
+
+shape_t south_side[SHAPES_PER_SIDE] = {SE, SSE, S, SSW, SW};
+
+shape_t west_side[SHAPES_PER_SIDE] = {SW, WSW, W, WNW, NW};
+
+shape_t corners[ANZ_CORNERS] = {NW, NE, SE, SW};
+
+shape_t *sides[] = {north_side, east_side, south_side, west_side};
 
 
 
-
-shape_t findshape (const sentry_t *sarr, const int num)
+shape_t findshape(const sentry_t *sarr, const int num)
 /*
  *  Find a non-empty shape and return its name
  *
@@ -63,11 +67,12 @@ shape_t findshape (const sentry_t *sarr, const int num)
 {
     int i;
 
-    for (i=0; i<num; ++i) {
-        if (isempty(sarr+i))
+    for (i = 0; i < num; ++i) {
+        if (isempty(sarr + i)) {
             continue;
-        else
+        } else {
             break;
+        }
     }
 
     return (shape_t) i;
@@ -75,7 +80,7 @@ shape_t findshape (const sentry_t *sarr, const int num)
 
 
 
-int on_side (const shape_t s, const int idx)
+int on_side(const shape_t s, const int idx)
 /*
  *  Compute the side that shape s is on.
  *
@@ -92,13 +97,14 @@ int on_side (const shape_t s, const int idx)
     int i;
     int found = 0;
 
-    for (side=0; side<ANZ_SIDES; ++side) {
-        for (i=0; i<SHAPES_PER_SIDE; ++i) {
+    for (side = 0; side < ANZ_SIDES; ++side) {
+        for (i = 0; i < SHAPES_PER_SIDE; ++i) {
             if (sides[side][i] == s) {
-                if (found == idx)
+                if (found == idx) {
                     return side;
-                else
+                } else {
                     ++found;
+                }
             }
         }
     }
@@ -108,7 +114,7 @@ int on_side (const shape_t s, const int idx)
 
 
 
-int genshape (const size_t width, const size_t height, char ***chars)
+int genshape(const size_t width, const size_t height, char ***chars)
 /*
  *  Generate a shape consisting of spaces only.
  *
@@ -127,26 +133,25 @@ int genshape (const size_t width, const size_t height, char ***chars)
     size_t j;
 
     if (width <= 0 || height <= 0 || width > LINE_MAX_BYTES) {
-        fprintf (stderr, "%s: internal error\n", PROJECT);
+        fprintf(stderr, "%s: internal error\n", PROJECT);
         return 1;
     }
 
-    *chars = (char **) calloc (height, sizeof(char *));
+    *chars = (char **) calloc(height, sizeof(char *));
     if (*chars == NULL) {
-        perror (PROJECT);
+        perror(PROJECT);
         return 2;
     }
 
-    for (j=0; j<height; ++j) {
-        (*chars)[j] = (char *) calloc (width+1, sizeof(char));
+    for (j = 0; j < height; ++j) {
+        (*chars)[j] = (char *) calloc(width + 1, sizeof(char));
         if ((*chars)[j] == NULL) {
-            perror (PROJECT);
-            for (/*empty*/; j>0; --j)
-                BFREE ((*chars)[j-1]);
+            perror(PROJECT);
+            for (/*empty*/; j > 0; --j) BFREE ((*chars)[j - 1]);
             BFREE (*chars);
             return 3;
         }
-        memset ((*chars)[j], ' ', width);
+        memset((*chars)[j], ' ', width);
     }
 
     return 0;
@@ -154,7 +159,7 @@ int genshape (const size_t width, const size_t height, char ***chars)
 
 
 
-void freeshape (sentry_t *shape)
+void freeshape(sentry_t *shape)
 /*
  *  Free all memory allocated by the shape and set the struct to
  *  SENTRY_INITIALIZER. Do not free memory of the struct.
@@ -164,8 +169,9 @@ void freeshape (sentry_t *shape)
 {
     size_t j;
 
-    for (j=0; j<shape->height; ++j)
+    for (j = 0; j < shape->height; ++j) {
         BFREE (shape->chars[j]);
+    }
     BFREE (shape->chars);
 
     *shape = SENTRY_INITIALIZER;
@@ -173,26 +179,27 @@ void freeshape (sentry_t *shape)
 
 
 
-int isempty (const sentry_t *shape)
+int isempty(const sentry_t *shape)
 /*
  *  Return true if shape is empty.
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    if (shape == NULL)
+    if (shape == NULL) {
         return 1;
-    else if (shape->chars == NULL)
+    } else if (shape->chars == NULL) {
         return 1;
-    else if (shape->width == 0 || shape->height == 0)
+    } else if (shape->width == 0 || shape->height == 0) {
         return 1;
-    else
+    } else {
         return 0;
+    }
 }
 
 
 
-int isdeepempty (const sentry_t *shape)
+int isdeepempty(const sentry_t *shape)
 /*
  *  Return true if shape is empty, also checking if lines consist of spaces
  *  only.
@@ -202,13 +209,15 @@ int isdeepempty (const sentry_t *shape)
 {
     size_t j;
 
-    if (isempty (shape))
+    if (isempty(shape)) {
         return 1;
+    }
 
-    for (j=0; j<shape->height; ++j) {
+    for (j = 0; j < shape->height; ++j) {
         if (shape->chars[j]) {
-            if (strspn (shape->chars[j], " ") != shape->width)
+            if (strspn(shape->chars[j], " ") != shape->width) {
                 return 0;
+            }
         }
     }
 
@@ -217,7 +226,7 @@ int isdeepempty (const sentry_t *shape)
 
 
 
-size_t highest (const sentry_t *sarr, const int n, ...)
+size_t highest(const sentry_t *sarr, const int n, ...)
 /*
  *  Return height (vert.) of highest shape in given list.
  *
@@ -235,16 +244,17 @@ size_t highest (const sentry_t *sarr, const int n, ...)
     size_t max = 0;                      /* current maximum height */
 
     #if defined(DEBUG) && 0
-        fprintf (stderr, "highest (%d, ...)\n", n);
+    fprintf (stderr, "highest (%d, ...)\n", n);
     #endif
 
     va_start (ap, n);
 
-    for (i=0; i<n; ++i) {
+    for (i = 0; i < n; ++i) {
         shape_t r = va_arg (ap, shape_t);
-        if (!isempty (sarr + r)) {
-            if (sarr[r].height > max)
+        if (!isempty(sarr + r)) {
+            if (sarr[r].height > max) {
                 max = sarr[r].height;
+            }
         }
     }
 
@@ -255,7 +265,7 @@ size_t highest (const sentry_t *sarr, const int n, ...)
 
 
 
-size_t widest (const sentry_t *sarr, const int n, ...)
+size_t widest(const sentry_t *sarr, const int n, ...)
 /*
  *  Return width (horiz.) of widest shape in given list.
  *
@@ -273,19 +283,20 @@ size_t widest (const sentry_t *sarr, const int n, ...)
     size_t max = 0;                      /* current maximum width */
 
     #if defined(DEBUG) && 0
-        fprintf (stderr, "widest (%d, ...)\n", n);
+    fprintf (stderr, "widest (%d, ...)\n", n);
     #endif
 
     va_start (ap, n);
 
-    for (i=0; i<n; ++i) {
+    for (i = 0; i < n; ++i) {
         shape_t r = va_arg (ap, shape_t);
-        if (!isempty (sarr + r)) {
-            if (sarr[r].width > max)
+        if (!isempty(sarr + r)) {
+            if (sarr[r].width > max) {
                 max = sarr[r].width;
+            }
         }
     }
-    
+
     va_end (ap);
 
     return max;
@@ -293,7 +304,7 @@ size_t widest (const sentry_t *sarr, const int n, ...)
 
 
 
-shape_t leftmost (const int aside, const int cnt)
+shape_t leftmost(const int aside, const int cnt)
 /*
  *  Return leftmost existing shape in specification for side aside
  *  (BTOP or BBOT), skipping cnt shapes. Corners are not considered.
@@ -307,18 +318,21 @@ shape_t leftmost (const int aside, const int cnt)
     int c = 0;
     int s;
 
-    if (cnt < 0)
+    if (cnt < 0) {
         return ANZ_SHAPES;
+    }
 
     if (aside == BTOP) {
         s = 0;
         do {
             ++s;
-            while (s < SHAPES_PER_SIDE-1 &&
-                    isempty(opt.design->shape + north_side[s]))
-                ++s;
-            if (s == SHAPES_PER_SIDE-1)
+            while (s < SHAPES_PER_SIDE - 1 &&
+                    isempty(opt.design->shape + north_side[s])) {
+                        ++s;
+            }
+            if (s == SHAPES_PER_SIDE - 1) {
                 return ANZ_SHAPES;
+            }
         } while (c++ < cnt);
         return north_side[s];
     }
@@ -327,10 +341,12 @@ shape_t leftmost (const int aside, const int cnt)
         s = SHAPES_PER_SIDE - 1;
         do {
             --s;
-            while (s && isempty(opt.design->shape + south_side[s]))
+            while (s && isempty(opt.design->shape + south_side[s])) {
                 --s;
-            if (!s)
+            }
+            if (!s) {
                 return ANZ_SHAPES;
+            }
         } while (c++ < cnt);
         return south_side[s];
     }
@@ -340,7 +356,7 @@ shape_t leftmost (const int aside, const int cnt)
 
 
 
-int empty_side (sentry_t *sarr, const int aside)
+int empty_side(sentry_t *sarr, const int aside)
 /*
  *  Return true if the shapes on the given side consist entirely out of
  *  spaces - and spaces only, tabs are considered non-empty.
@@ -356,11 +372,12 @@ int empty_side (sentry_t *sarr, const int aside)
 {
     int i;
 
-    for (i=0; i<SHAPES_PER_SIDE; ++i) {
-        if (isdeepempty (sarr + sides[aside][i]))
+    for (i = 0; i < SHAPES_PER_SIDE; ++i) {
+        if (isdeepempty(sarr + sides[aside][i])) {
             continue;
-        else
-            return 0;                    /* side is not empty */
+        } else {
+            return 0;
+        }                    /* side is not empty */
     }
 
     return 1;                            /* side is empty */
