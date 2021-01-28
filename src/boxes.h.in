@@ -145,25 +145,18 @@ typedef struct {                         /* Command line options: */
 extern opt_t opt;
 
 
-extern char *encoding;                   /* the character encoding that we use */
-
-extern ucs4_t char_tab;                  /* ucs4_t character '\t' (tab)  */
-extern ucs4_t char_space;                /* ucs4_t character ' '  (space) */
-extern ucs4_t char_cr;                   /* ucs4_t character '\r' (carriage return) */
-extern ucs4_t char_newline;              /* ucs4_t character '\n' (newline) */
-extern ucs4_t char_nul;                  /* ucs4_t character '\0' (zero) */
-
-
 typedef struct {
-    size_t   len;                        /* length of text in columns (character positions in a text terminal) */
-    char    *text;                       /* ASCII line content, tabs expanded, multi-byte chars replaced with 'x' */
-    uint8_t *mbtext;                     /* multi-byte (original) line content, tabs expanded. We use UTF-8 so that our old regex code can find ASCII characters in it. */
-    size_t   invis;                      /* number of characters part of an ansi sequence */
-    size_t   vischar;                    /* number of normal printable characters */
-    size_t  *tabpos;                     /* tab positions in expanded work strings */
-    size_t   tabpos_len;                 /* number of tabs in a line */
-    size_t   num_leading_blanks;         /* number of spaces at the start of the line after justification */
+    size_t    len;                       /* length of text in columns (character positions in a text terminal) */
+    char     *text;                      /* ASCII line content, tabs expanded, multi-byte chars replaced with one or more 'x' */
+    uint32_t *mbtext;                    /* multi-byte (original) line content, tabs expanded. We use UTF-32 in order to enable pointer arithmetic. */
+    size_t    num_chars;                 /* number of characters in mbtext, visible + invisible */
+    size_t    invis;                     /* number of characters part of an ansi sequence (aka "invisible") */
+    size_t    vischar;                   /* number of normal printable characters (aka "visible") */
+    size_t   *tabpos;                    /* tab positions in expanded work strings, or NULL if not needed */
+    size_t    tabpos_len;                /* number of tabs in a line */
+    size_t    num_leading_blanks;        /* number of spaces at the start of the line after justification */
 } line_t;
+
 
 #ifndef FILE_LEXER_L
 typedef struct {

@@ -30,11 +30,13 @@
 #include <string.h>
 #include <strings.h>
 
+#include <unictype.h>
 #include <unistr.h>
 #include <unitypes.h>
 
 #include "shape.h"
 #include "boxes.h"
+#include "unicode.h"
 #include "tools.h"
 
 
@@ -239,13 +241,12 @@ int empty_line(const line_t *line)
 
 
 
-size_t expand_tabs_into(const uint32_t *input_buffer, const size_t in_len,
-                        const int tabstop, uint32_t **text, size_t **tabpos, size_t *tabpos_len)
+size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_t **text,
+                        size_t **tabpos, size_t *tabpos_len)
 /*
  *  Expand tab chars in input_buffer and store result in text.
  *
  *  input_buffer   Line of text with tab chars
- *  in_len         length of the string in input_buffer in characters
  *  tabstop        tab stop distance
  *  text           address of the pointer that will take the result
  *  tabpos         array of ints giving the positions of the first
@@ -262,18 +263,21 @@ size_t expand_tabs_into(const uint32_t *input_buffer, const size_t in_len,
  */
 {
     static uint32_t temp[LINE_MAX_BYTES * MAX_TABSTOP + 1];  /* work string */
-    size_t io;       /* character position in work string */
-    size_t tabnum;   /* index of the current tab */
+    size_t io;         /* character position in work string */
+    size_t tabnum = 0; /* index of the current tab */
 
     *text = NULL;
 
     if (opt.tabexp != 'k') {
+        /* We need to know the exact tab positions only if expansion type 'k' is requested (keep tabs as much as they
+         * were as possible). Else we'll just convert spaces and tabs without having to know where exactly the tabs
+         * were in the first place. */
         *tabpos_len = 0;
     } else {
         ucs4_t puc;
         const uint32_t *rest = input_buffer;
-        while (rest = u32_next(&puc, rest)) {
-            if (u32_cmp(&char_tab, &puc, 1) == 0) {
+        while ((rest = u32_next(&puc, rest))) {
+            if (puc == char_tab) {
                 (*tabpos_len)++;
             }
         }
@@ -289,8 +293,8 @@ size_t expand_tabs_into(const uint32_t *input_buffer, const size_t in_len,
     ucs4_t puc;
     const uint32_t *rest = input_buffer;
     io = 0;
-    while (rest = u32_next(&puc, rest)) {
-        if (u32_cmp(&char_tab, &puc, 1) == 0) { /* Is it a tab char? */
+    while ((rest = u32_next(&puc, rest))) {
+        if (puc == char_tab) {
             if (*tabpos_len > 0) {
                 (*tabpos)[tabnum++] = io;
             }
@@ -299,7 +303,7 @@ size_t expand_tabs_into(const uint32_t *input_buffer, const size_t in_len,
             io += num_spc;
         }
         else {
-            u32_set(temp + io, puc, 1);
+            set_char_at(temp, io, puc);
             ++io;
         }
     }
@@ -328,6 +332,34 @@ void btrim(char *text, size_t *len)
             || text[idx] == '\t' || text[idx] == ' ')) /**/
     {
         text[idx--] = '\0';
+    }
+
+    *len = idx + 1;
+}
+
+
+
+void btrim32(uint32_t *text, size_t *len)
+/*
+ *  Remove trailing whitespace from line (unicode version).
+ *
+ *      text     string to trim
+ *      len      pointer to the length of the string in characters
+ *
+ *  Both the string and the length will be modified as trailing whitespace is removed.
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    int idx = (int) (*len - 1);
+
+    for (; idx >= 0; --idx) {
+        ucs4_t c = text[idx];
+        if (uc_is_c_whitespace(c) || uc_is_property_white_space(c) || uc_is_property_bidi_whitespace(c)) {
+            set_char_at(text, idx, char_nul);
+        } else {
+            break;
+        }
     }
 
     *len = idx + 1;

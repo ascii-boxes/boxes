@@ -26,9 +26,9 @@ GEN_HDR    = parser.h boxes.h
 GEN_SRC    = parser.c lex.yy.c
 GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
 ORIG_HDRCL = boxes.h.in config.h
-ORIG_HDR   = $(ORIG_HDRCL) lexer.h tools.h shape.h generate.h remove.h
+ORIG_HDR   = $(ORIG_HDRCL) lexer.h tools.h shape.h generate.h remove.h unicode.h
 ORIG_GEN   = lexer.l parser.y
-ORIG_NORM  = boxes.c tools.c shape.c generate.c remove.c
+ORIG_NORM  = boxes.c tools.c shape.c generate.c remove.c unicode.c
 ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
 ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 OTH_FILES  = Makefile
@@ -47,7 +47,7 @@ debug: flags_$(BOXES_PLATFORM)
 
 boxes: $(ALL_OBJ)
 	$(MAKE) -C regexp CC=$(CC) libregexp.a
-	$(CC) $(LDFLAGS) $(ALL_OBJ) -o $(BOXES_EXECUTABLE_NAME) -lregexp
+	$(CC) $(LDFLAGS) $(ALL_OBJ) -o $(BOXES_EXECUTABLE_NAME) -lunistring -lpcre2-32 -lregexp
 	if [ "$(STRIP)" = "true" ] ; then strip $(BOXES_EXECUTABLE_NAME) ; fi
 
 boxes.exe: $(ALL_OBJ)
@@ -81,8 +81,9 @@ lex.yy.c: lexer.l boxes.h
 	rm lexer.tmp.c
 
 
-boxes.o: boxes.c boxes.h regexp/regexp.h shape.h tools.h generate.h remove.h config.h
+boxes.o: boxes.c boxes.h regexp/regexp.h shape.h tools.h unicode.h generate.h remove.h config.h
 tools.o: tools.c tools.h boxes.h shape.h config.h
+unicode.o: unicode.c unicode.h config.h
 shape.o: shape.c shape.h boxes.h config.h tools.h
 generate.o: generate.c generate.h boxes.h shape.h tools.h config.h
 remove.o: remove.c remove.h boxes.h shape.h tools.h config.h

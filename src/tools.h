@@ -43,10 +43,12 @@ void regerror(char *msg);
 
 int empty_line(const line_t *line);
 
-size_t expand_tabs_into(const uint32_t *input_buffer, const size_t in_len,
-                        const int tabstop, uint32_t **text, size_t **tabpos, size_t *tabpos_len);
+size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_t **text,
+                        size_t **tabpos, size_t *tabpos_len);
 
 void btrim(char *text, size_t *len);
+
+void btrim32(uint32_t *text, size_t *len);
 
 char *my_strnrstr(const char *s1, const char *s2, const size_t s2_len,
                   int skip);

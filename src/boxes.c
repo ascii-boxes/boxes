@@ -21,6 +21,7 @@
 #include "config.h"
 #include <errno.h>
 #include <limits.h>
+#include <locale.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,6 +30,7 @@
 #include <sys/stat.h>
 
 #include <uniconv.h>
+#include <unictype.h>
 #include <unistdio.h>
 #include <unistr.h>
 #include <unitypes.h>
@@ -42,6 +44,7 @@
 #include "regexp.h"
 #include "generate.h"
 #include "remove.h"
+#include "unicode.h"
 
 #ifdef __MINGW32__
     #include <windows.h>
@@ -91,14 +94,6 @@ int design_idx = 0;                      /* anz_designs-1 */
 int anz_designs = 0;                     /* no of designs after parsing */
 
 opt_t opt;                               /* command line options */
-
-char *encoding;                          /* the character encoding that we use */
-
-ucs4_t char_tab     = 0x00000009;        /* ucs4_t character '\t' (tab)  */
-ucs4_t char_space   = 0x00000020;        /* ucs4_t character ' '  (space) */
-ucs4_t char_cr      = 0x0000000d;        /* ucs4_t character '\r' (carriage return) */
-ucs4_t char_newline = 0x0000000a;        /* ucs4_t character '\n' (newline) */
-ucs4_t char_nul     = 0x00000000;        /* ucs4_t character '\0' (zero) */
 
 input_t input = INPUT_INITIALIZER;       /* input lines */
 
@@ -1175,12 +1170,12 @@ static int list_styles()
 
 
 
-static int get_indent (const line_t *lines, const size_t lanz)
+static int get_indent (const line_t *lines, const size_t lines_size)
 /*
  *  Determine indentation of given lines in spaces.
  *
- *      lines   the lines to examine
- *      lanz    number of lines to examine
+ *      lines      the lines to examine
+ *      lines_size number of lines to examine
  *
  *  Lines are assumed to be free of trailing whitespace.
  *
@@ -1190,31 +1185,32 @@ static int get_indent (const line_t *lines, const size_t lanz)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    size_t j;
-    int    res = LINE_MAX_BYTES;               /* result */
-    int    nonblank = 0;                 /* true if one non-blank line found */
+    int res = LINE_MAX_BYTES;  /* result */
+    int nonblank = 0;          /* true if one non-blank line found */
 
     if (lines == NULL) {
-        fprintf (stderr, "%s: internal error\n", PROJECT);
+        fprintf(stderr, "%s: internal error\n", PROJECT);
         return -1;
     }
-    if (lanz == 0)
+    if (lines_size == 0) {
         return 0;
+    }
 
-    for (j=0; j<lanz; ++j) {
+    for (size_t j = 0; j < lines_size; ++j) {
         if (lines[j].len > 0) {
-            size_t ispc;
             nonblank = 1;
-            ispc = strspn (lines[j].text, " ");
-            if ((int) ispc < res)
+            size_t ispc = strspn(lines[j].text, " ");
+            if ((int) ispc < res) {
                 res = ispc;
+            }
         }
     }
 
-    if (nonblank)
-        return res;                      /* success */
-    else
-        return 0;                        /* success, but only blank lines */
+    if (nonblank) {
+        return res;            /* success */
+    } else {
+        return 0;              /* success, but only blank lines */
+    }
 }
 
 
@@ -1327,12 +1323,12 @@ static int apply_substitutions (const int mode)
 
 
 
-static int has_linebreak (const char *s, const int len)
+static int has_linebreak (const uint32_t *s, const int len)
 /*
  *  Determine if the given line of raw text is ended by a line break.
  *
  *  s: the string to check
- *  len: length of s
+ *  len: length of s in characters
  *
  *  RETURNS:  != 0   line break found
  *            == 0   line break not found
@@ -1342,13 +1338,67 @@ static int has_linebreak (const char *s, const int len)
 {
     int result = 0;
     if (s != NULL && len > 0) {
-        char the_last = s[len - 1];
-        result = the_last == '\r' || the_last == '\n';
+        ucs4_t the_last = s[len - 1];
+        result = u32_cmp(&char_cr, &the_last, 1) == 0 || u32_cmp(&char_newline, &the_last, 1) == 0;
         #if defined(DEBUG)
-            fprintf(stderr, "has_linebreak: (%d) %d\n", the_last, result);
+            fprintf(stderr, "has_linebreak: (%#010x) %d\n", (int) the_last, result);
         #endif
     }
     return result;
+}
+
+
+
+static size_t count_invisible_chars(const uint32_t *s, const size_t buflen, size_t *num_esc, char **ascii)
+{
+    size_t invis = 0;  /* counts invisible characters */
+    int ansipos = 0;   /* progression of ansi sequence */
+    *num_esc = 0;      /* counts the number of escape sequences found */
+
+    if (is_empty(s)) {
+        (*ascii) = (char *) strdup("");
+        return 0;
+    }
+    (*ascii) = (char *) calloc(buflen, sizeof(char));
+    char *p = *ascii;
+
+    ucs4_t c;
+    const uint32_t *rest = s;
+    while ((rest = u32_next(&c, rest))) {
+        if (ansipos == 0 && c == 0x0000001b) {
+            /* Found an ESC char, count it as invisible and move 1 forward in the detection of CSI sequences */
+            ansipos++;
+            invis++;
+            (*num_esc)++;
+        } else if (ansipos == 1 && c == '[') {
+            /* Found '[' char after ESC. A CSI sequence has started. */
+            ansipos++;
+            invis++;
+        } else if (ansipos == 1 && c >= 0x40 && c <= 0x5f) {
+            /* Found a byte designating the end of a two-byte escape sequence */
+            invis++;
+            ansipos = 0;
+        } else if (ansipos == 2) {
+            /* Inside CSI sequence - Keep counting bytes as invisible */
+            invis++;
+
+            /* A char between 0x40 and 0x7e signals the end of an CSI or escape sequence */
+            if (c >= 0x40 && c <= 0x7e) {
+                ansipos = 0;
+            }
+        } else if (is_ascii_printable(c)) {
+            *p = c & 0xff;
+            ++p;
+        } else {
+            int cols = uc_width(c, encoding);
+            if (cols > 0) {
+                memset(p, (int) 'x', cols);
+                p += cols;
+            }
+        }
+    }
+    *p = '\0';
+    return invis;
 }
 
 
@@ -1369,18 +1419,12 @@ static int read_all_input (const int use_stdin)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    char     buf[LINE_MAX_BYTES + 2];    /* input buffer */
-    size_t   len_bytes;
-    char     c;
-    size_t   invis;                      /* counts invisible characters */
-    int      ansipos;                    /* progression of ansi sequence */
-    size_t   input_size = 0;             /* number of elements allocated */
-    line_t  *tmp = NULL;
-    char    *temp = NULL;                /* string resulting from tab exp. */
-    uint8_t *mbtemp = NULL;              /* temp string for preparing the multi-byte input */
-    size_t   newlen;                     /* line length after tab expansion */
-    size_t   i;
-    int      rc;
+    char buf[LINE_MAX_BYTES + 2];    /* input buffer */
+    size_t len_chars;
+    size_t input_size = 0;           /* number of elements allocated */
+    uint32_t *mbtemp = NULL;         /* temp string for preparing the multi-byte input */
+    size_t i;
+    int rc;
 
     input.indent = LINE_MAX_BYTES;
     input.maxline = 0;
@@ -1391,96 +1435,72 @@ static int read_all_input (const int use_stdin)
         /*
          *  Start reading
          */
-        while (fgets (buf, LINE_MAX_BYTES+1, opt.infile))
-        {
+        while (fgets(buf, LINE_MAX_BYTES + 1, opt.infile)) {
             if (input_size % 100 == 0) {
                 input_size += 100;
-                tmp = (line_t *) realloc (input.lines, input_size*sizeof(line_t));
+                line_t *tmp = (line_t *) realloc(input.lines, input_size * sizeof(line_t));
                 if (tmp == NULL) {
-                    perror (PROJECT);
+                    perror(PROJECT);
                     BFREE (input.lines);
                     return 1;
                 }
                 input.lines = tmp;
             }
 
-            len_bytes = strlen(buf);
-            mbtemp = u8_strconv_from_locale(buf);
-            input.lines[input.anz_lines].len = u8_strwidth(mbtemp, encoding);
-            input.lines[input.anz_lines].num_leading_blanks = 0;
-            input.final_newline = has_linebreak(buf, len_bytes);
+            mbtemp = u32_strconv_from_locale(buf);
+            len_chars = u32_strlen(mbtemp);
+            input.final_newline = has_linebreak(mbtemp, len_chars);
 
             if (opt.r) {
-                input.lines[input.anz_lines].len -= 1;    /* TODO HERE */
-                if (buf[input.lines[input.anz_lines].len] == '\n')
-                    buf[input.lines[input.anz_lines].len] = '\0';
+                if (is_char_at(mbtemp, len_chars - 1, char_newline)) {
+                    set_char_at(mbtemp, len_chars - 1, char_nul);
+                    --len_chars;
+                }
             }
             else {
-                btrim (buf, &(input.lines[input.anz_lines].len));
+                btrim32(mbtemp, &len_chars);
             }
 
-            if (input.lines[input.anz_lines].len > 0) {
-                newlen = expand_tabs_into (buf,
-                        input.lines[input.anz_lines].len, opt.tabstop, &temp,
-                        &(input.lines[input.anz_lines].tabpos),
-                        &(input.lines[input.anz_lines].tabpos_len));
-                if (newlen == 0) {
-                    perror (PROJECT);
+            /*
+             * Expand tabs
+             */
+            if (len_chars > 0) {
+                uint32_t *temp = NULL;
+                len_chars = expand_tabs_into(mbtemp, opt.tabstop, &temp,
+                                             &(input.lines[input.anz_lines].tabpos),
+                                             &(input.lines[input.anz_lines].tabpos_len));
+                if (len_chars == 0) {
+                    perror(PROJECT);
                     BFREE (input.lines);
                     return 1;
                 }
-                input.lines[input.anz_lines].text = temp;
-                input.lines[input.anz_lines].len = newlen;
+                input.lines[input.anz_lines].mbtext = temp;
                 temp = NULL;
             }
             else {
-                input.lines[input.anz_lines].text = (char *) strdup (buf);
+                input.lines[input.anz_lines].mbtext = mbtemp;
             }
+            input.lines[input.anz_lines].num_chars = len_chars;
 
             /*
              * Find ANSI CSI/ESC sequences
              */
-            invis = 0;
-            ansipos = 0;
-            for (i=0; i<input.lines[input.anz_lines].len; ++i) {
-                c = input.lines[input.anz_lines].text[i];
-                if (ansipos == 0 && c == 0x1b){
-                    /* Found an ESC char, count it as invisible and move 1 forward in the
-                     * detection of CSI sequences */
-                    ansipos++;
-                    invis++;
-                } else if (ansipos == 1 && c == '[') {
-                    /* Found '[' char after ESC. A CSI sequence has started. */
-                    ansipos++;
-                    invis++;
-                } else if (ansipos == 1 && c >= 0x40 && c <= 0x5f) {
-                    /* Found a byte designating the end of a two-byte
-                     * escape sequence */
-                    invis++;
-                    ansipos = 0;
-                } else if (ansipos == 2) {
-                    /* Inside CSI sequence - Keep counting bytes as invisible */
-                    invis++;
-
-                    /* A char between 0x40 and 0x7e signals the end of an CSI or escape sequence */
-                    if (c >= 0x40 && c <= 0x7e)
-                        ansipos = 0;
-                }
-            }
-
-            /* Save the count of invisible chars and visible chars.
-             * I'm happy about suggestions for a more elegant handling
-             * of this and the use of .invis and .vischar (and .len)
-             * in the other functions.
-             */
+            size_t num_esc = 0;
+            size_t invis = count_invisible_chars(input.lines[input.anz_lines].mbtext, strlen(buf), &num_esc,
+                                                 &(input.lines[input.anz_lines].text));
             input.lines[input.anz_lines].invis = invis;
-            input.lines[input.anz_lines].vischar = input.lines[input.anz_lines].len - invis;
+            input.lines[input.anz_lines].vischar = len_chars - invis;
+
+            /* u32_strwidth() does not count control characters, i.e. ESC characters, for which we must correct */
+            input.lines[input.anz_lines].len =
+                    u32_strwidth(input.lines[input.anz_lines].mbtext, encoding) - invis + num_esc;
+            input.lines[input.anz_lines].num_leading_blanks = 0;
 
             /*
              *  Update length of longest line
              */
-            if (input.lines[input.anz_lines].vischar > input.maxline) {
-                input.maxline = input.lines[input.anz_lines].vischar;
+            if (input.lines[input.anz_lines].len > input.maxline) {
+                input.maxline = input.lines[input.anz_lines].len;
             }
 
             /*
@@ -1489,8 +1509,8 @@ static int read_all_input (const int use_stdin)
             ++input.anz_lines;
         }
 
-        if (ferror (stdin)) {
-            perror (PROJECT);
+        if (ferror(stdin)) {
+            perror(PROJECT);
             BFREE (input.lines);
             return 1;
         }
@@ -1498,39 +1518,51 @@ static int read_all_input (const int use_stdin)
 
     else {
         /* recalculate input statistics for redrawing the mended box */
-        for (i=0; i<input.anz_lines; ++i) {
-            input.lines[i].len = strlen (input.lines[i].text);
-            if (input.lines[i].len > input.maxline)
+        for (i = 0; i < input.anz_lines; ++i) {
+            size_t num_esc = 0;
+            char *dummy;
+            size_t invis = count_invisible_chars(input.lines[i].mbtext, strlen(input.lines[i].text), &num_esc, &dummy);
+            BFREE(dummy);
+            input.lines[i].len = u32_strwidth(input.lines[i].mbtext, encoding) - invis + num_esc;
+            input.lines[i].num_chars = u32_strlen(input.lines[i].mbtext);
+            if (input.lines[i].len > input.maxline) {
                 input.maxline = input.lines[i].len;
+            }
         }
     }
 
     /*
      *  Exit if there was no input at all
      */
-    if (input.lines == NULL || input.lines[0].text == NULL)
+    if (input.lines == NULL || input.lines[0].text == NULL) {
         return 0;
+    }
 
     /*
      *  Compute indentation
      */
-    rc = get_indent (input.lines, input.anz_lines);
-    if (rc >= 0)
+    rc = get_indent(input.lines, input.anz_lines);
+    if (rc >= 0) {
         input.indent = (size_t) rc;
-    else
+    } else {
         return 1;
+    }
 
     /*
      *  Remove indentation, unless we want to preserve it (when removing
      *  a box or if the user wants to retain it inside the box)
      */
     if (opt.design->indentmode != 't' && opt.r == 0) {
-        for (i=0; i<input.anz_lines; ++i) {
-            if (input.lines[i].len >= input.indent) {
-                memmove (input.lines[i].text, input.lines[i].text+input.indent,
-                        input.lines[i].len-input.indent+1);
+        for (i = 0; i < input.anz_lines; ++i) {
+            if (input.lines[i].num_chars >= input.indent) {
+                memmove(input.lines[i].text, input.lines[i].text + input.indent,
+                        input.lines[i].len - input.indent + 1);
                 input.lines[i].len -= input.indent;
                 input.lines[i].vischar -= input.indent;
+
+                u32_move(input.lines[i].mbtext, input.lines[i].mbtext + input.indent,
+                         input.lines[i].num_chars - input.indent + 1);
+                input.lines[i].num_chars -= input.indent;
             }
         }
         input.maxline -= input.indent;
@@ -1540,32 +1572,38 @@ static int read_all_input (const int use_stdin)
      *  Apply regular expression substitutions
      */
     if (opt.r == 0) {
-        if (apply_substitutions(0) != 0)
+        if (apply_substitutions(0) != 0) { // TODO HERE
             return 1;
+        }
     }
 
-#if 0
+#if 1
     /*
      *  Debugging Code: Display contents of input structure
      */
+    fprintf (stderr, "Encoding: %s\n", encoding);
+    fprintf (stderr, "Input Lines:\n");
+    fprintf (stderr, "     [num_chars] \"real text\" [num_cols] \"ascii_text\"\n");
     for (i=0; i<input.anz_lines; ++i) {
-        fprintf (stderr, "%3d [%02d] \"%s\"", i, input.lines[i].len,
-                input.lines[i].text);
+        fprintf (stderr, "%4d [%02d] \"%s\"  [%02d] \"%s\"", (int) i,
+                 (int) input.lines[i].num_chars, u32_strconv_to_locale(input.lines[i].mbtext),
+                 (int) input.lines[i].len, input.lines[i].text);
         fprintf (stderr, "\tTabs: [");
         if (input.lines[i].tabpos != NULL) {
             size_t j;
             for (j=0; j<input.lines[i].tabpos_len; ++j) {
-                fprintf (stderr, "%d", input.lines[i].tabpos[j]);
+                fprintf (stderr, "%d", (int) input.lines[i].tabpos[j]);
                 if (j < input.lines[i].tabpos_len - 1) {
                     fprintf (stderr, ", ");
                 }
             }
         }
-        fprintf (stderr, "] (%d)\n", input.lines[i].tabpos_len);
+        fprintf (stderr, "] (%d)", (int) input.lines[i].tabpos_len);
+        fprintf (stderr, "\tvis=%d, invis=%d\n", (int) input.lines[i].vischar, (int) input.lines[i].invis);
     }
-    fprintf (stderr, "\n Longest line: %d characters.\n", input.maxline);
-    fprintf (stderr, "  Indentation: %2d spaces.\n", input.indent);
-    fprintf (stderr, "Final newline:  %d.\n", input.final_newline);
+    fprintf (stderr, " Longest line: %d columns\n", (int) input.maxline);
+    fprintf (stderr, "  Indentation: %2d spaces\n", (int) input.indent);
+    fprintf (stderr, "Final newline: %s\n", input.final_newline ? "yes" : "no");
 #endif
 
     return 0;
@@ -1607,6 +1645,9 @@ int main (int argc, char *argv[])
      */
     setlocale(LC_ALL, "");    /* switch from default "C" encoding to system encoding */
     encoding = locale_charset();
+    #ifdef DEBUG
+        fprintf (stderr, "Character Encoding = %s\n", encoding);
+    #endif
 
     /*
      *  Parse config file, then reset design pointer
