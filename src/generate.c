@@ -27,6 +27,10 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+
+#include <uniconv.h>
+#include <unistr.h>
+
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
@@ -706,48 +710,50 @@ static int justify_line(line_t *line, int skew)
  *
  *  line is assumed to be already free of trailing whitespace.
  *
- *  RETURNS:  == 0  success, input array was modified
- *            != 0  error
+ *  RETURNS:  number of space characters which must be added to (> 0)
+ *            or removed from (< 0) the beginning of the line
+ *            A return value of 0 means "nothing to do".
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    char *p;                        /* pointer to first non-whitespace char */
-    char *newtext;
-    size_t newlen;
-    char *spaces;
-    size_t shift;
-    size_t oldlen = line->len;
-
     if (empty_line(line)) {
         line->num_leading_blanks = SIZE_MAX;
         return 0;
     }
     if (opt.justify == '\0') {
+        line->num_leading_blanks = 0;
         return 0;
     }
 
-    for (p = line->text; *p == ' ' || *p == '\t'; ++p) {
-    }
-    newlen = line->len - (p - line->text);
+    #if defined(DEBUG) || 0
+        fprintf (stderr, "justify_line(%c):  Input: real: (%02d) \"%s\", text: (%02d) \"%s\", invisible=%d, skew=%d",
+             opt.justify ? opt.justify : '0', (int) line->num_chars, u32_strconv_to_locale(line->mbtext),
+             (int) line->len, line->text, (int) line->invis, skew);
+    #endif
+
+    int result = 0;
+    size_t initial_space_size = strspn(line->text, " \t");
+    size_t newlen = line->len - initial_space_size;
+    size_t shift;
 
     switch (opt.justify) {
 
         case 'l':
             if (opt.design->indentmode == 't') {
-                memmove(line->text + input.indent, p, newlen + 1);
-                line->len = newlen + input.indent;
+                /* text indented inside of box */
                 line->num_leading_blanks = input.indent;
+                result = (int) input.indent - (int) initial_space_size;
             }
             else {
-                memmove(line->text, p, newlen + 1);
-                line->len = newlen;
                 line->num_leading_blanks = 0;
+                result = -1 * (int) initial_space_size;
             }
             break;
 
         case 'c':
             if (opt.design->indentmode == 't') {
+                /* text indented inside of box */
                 shift = (input.maxline - input.indent - newlen) / 2 + input.indent;
                 skew -= input.indent;
                 if ((input.maxline - input.indent - newlen) % 2 && skew == 1) {
@@ -760,78 +766,26 @@ static int justify_line(line_t *line, int skew)
                     ++shift;
                 }
             }
-
-            newtext = (char *) calloc(shift + newlen + 1, sizeof(char));
-            if (newtext == NULL) {
-                perror(PROJECT);
-                return 2;
-            }
-            spaces = (char *) malloc(shift + 1);
-            if (spaces == NULL) {
-                perror(PROJECT);
-                BFREE (newtext);
-                return 3;
-            }
-            memset(spaces, ' ', shift);
-            spaces[shift] = '\0';
-#if defined(DEBUG) && 0
-        fprintf (stderr, "j(c): newlen=%d, shift=%d, spaces=\"%s\"\n",
-                newlen, shift, spaces);
-#endif
-            strncpy(newtext, spaces, shift);
-            strncat(newtext, p, newlen);
-            newtext[shift + newlen] = '\0';
-            BFREE (spaces);
-            BFREE (line->text);
-            line->text = newtext;
-            line->len = shift + newlen;
             line->num_leading_blanks = shift;
+            result = (int) shift - (int) initial_space_size;
             break;
 
         case 'r':
             shift = input.maxline - newlen;
-            newtext = (char *) calloc (input.maxline+1, sizeof(char));
-            if (newtext == NULL) {
-                perror(PROJECT);
-                return 2;
-            }
-            spaces = (char *) malloc(shift + 1);
-            if (spaces == NULL) {
-                perror(PROJECT);
-                BFREE (newtext);
-                return 3;
-            }
-            memset(spaces, ' ', shift);
-            spaces[shift] = '\0';
-            strncpy(newtext, spaces, shift);
-            strncat(newtext, p, newlen);
-            newtext[input.maxline] = '\0';
-            BFREE (spaces);
-            BFREE (line->text);
-            line->text = newtext;
-            line->len = input.maxline;
             line->num_leading_blanks = shift;
+            result = (int) shift - (int) initial_space_size;
             break;
 
         default:
-            fprintf(stderr, "%s: internal error\n", PROJECT);
-            return 1;
+            fprintf(stderr, "%s: internal error (unknown justify option: %c)\n", PROJECT, opt.justify);
+            line->num_leading_blanks = 0;
+            result = 0;
     }
 
-    /*
-     *  If we might have broken the maxline value, recalculate it.
-     */
-    if (opt.justify != 'r' && oldlen == input.maxline) {
-        size_t k;
-        input.maxline = 0;
-        for (k = 0; k < input.anz_lines; ++k) {
-            if (input.lines[k].len > input.maxline) {
-                input.maxline = input.lines[k].len;
-            }
-        }
-    }
-
-    return 0;
+    #if defined(DEBUG) || 0
+        fprintf (stderr, " -> %d  (%d leading spaces)\n", result, (int) line->num_leading_blanks);
+    #endif
+    return result;
 }
 
 
@@ -851,15 +805,12 @@ int output_box(const sentry_t *thebox)
 {
     size_t j;
     size_t nol = thebox[BRIG].height;   /* number of output lines */
-    char trailspc[LINE_MAX_BYTES + 1];
     char *indentspc;
     int indentspclen;
     size_t vfill, vfill1, vfill1_save, vfill2; /* empty lines/columns in box */
     size_t hfill;
     char *hfill1, *hfill2;              /* space before/after text */
     size_t hpl, hpr;
-    size_t r;
-    int rc;
     char obuf[LINE_MAX_BYTES + 1];      /* final output buffer */
     size_t obuf_len;                    /* length of content of obuf */
     size_t skip_start;                  /* lines to skip for box top */
@@ -911,13 +862,6 @@ int output_box(const sentry_t *thebox)
             return 1;
         }
     }
-
-    /*
-     *  Provide string of spaces for filling of space between text and
-     *  right side of box
-     */
-    memset(trailspc, (int) ' ', LINE_MAX_BYTES);
-    trailspc[LINE_MAX_BYTES] = '\0';
 
     /*
      *  Compute number of empty lines in box (vfill).
@@ -1029,29 +973,17 @@ int output_box(const sentry_t *thebox)
         }
 
         else if (vfill1) {               /* top vfill */
-            r = thebox[BTOP].width;
-            trailspc[r] = '\0';
             restored_indent = tabbify_indent(0, indentspc, indentspclen);
             concat_strings(obuf, LINE_MAX_BYTES + 1, 4, restored_indent,
-                           skip_left ? "" : thebox[BLEF].chars[j], trailspc,
+                           skip_left ? "" : thebox[BLEF].chars[j], nspaces(thebox[BTOP].width),
                            thebox[BRIG].chars[j]);
-            trailspc[r] = ' ';
             --vfill1;
         }
 
         else if (j < nol - thebox[BBOT].height) {
             long ti = j - thebox[BTOP].height - (vfill - vfill2);
             if (ti < (long) input.anz_lines) {      /* box content (lines) */
-#if defined(DEBUG) && 0
-                fprintf (stderr, "justify_line ({\"%s\",%d}, %d);\n",
-                        input.lines[ti].text, input.lines[ti].len, hpr-hpl);
-#endif
-                rc = justify_line(input.lines + ti, hpr - hpl);
-                if (rc) {
-                    return rc;
-                }
-                r = input.maxline - input.lines[ti].len;
-                trailspc[r] = '\0';
+                int shift = justify_line(input.lines + ti, hpr - hpl);
                 restored_indent = tabbify_indent(ti, indentspc, indentspclen);
                 if (input.lines[ti].num_leading_blanks == SIZE_MAX) {
                     contentPos[ti] = SIZE_MAX;
@@ -1061,20 +993,19 @@ int output_box(const sentry_t *thebox)
                             + strlen(hfill1)
                             + input.lines[ti].num_leading_blanks;
                 }
-                concat_strings(obuf, LINE_MAX_BYTES + 1, 7, restored_indent,
+                concat_strings(obuf, LINE_MAX_BYTES + 1, 8, restored_indent,
                                skip_left ? "" : thebox[BLEF].chars[j], hfill1,
-                               ti >= 0 ? input.lines[ti].text : "", hfill2,
-                               trailspc, thebox[BRIG].chars[j]);
-            }
-            else {                       /* bottom vfill */
-                r = thebox[BTOP].width;
-                trailspc[r] = '\0';
-                restored_indent = tabbify_indent(input.anz_lines - 1, indentspc, indentspclen);
-                concat_strings(obuf, LINE_MAX_BYTES + 1, 4, restored_indent,
-                               skip_left ? "" : thebox[BLEF].chars[j], trailspc,
+                               ti >= 0 && shift > 0 ? nspaces(shift) : "",
+                               ti >= 0 ? u32_strconv_to_locale(input.lines[ti].mbtext - (shift < 0 ? shift : 0)) : "",
+                               hfill2, nspaces(input.maxline - input.lines[ti].len - shift),
                                thebox[BRIG].chars[j]);
             }
-            trailspc[r] = ' ';
+            else {                       /* bottom vfill */
+                restored_indent = tabbify_indent(input.anz_lines - 1, indentspc, indentspclen);
+                concat_strings(obuf, LINE_MAX_BYTES + 1, 4, restored_indent,
+                               skip_left ? "" : thebox[BLEF].chars[j], nspaces(thebox[BTOP].width),
+                               thebox[BRIG].chars[j]);
+            }
         }
 
         else {                           /* box bottom */

@@ -19,12 +19,13 @@
  */
 
 /*
- * Tool functions for error reporting and some string handling and other
- * needful things
+ * Tool functions for error reporting and some string handling and other needful things
  */
 
 #ifndef TOOLS_H
 #define TOOLS_H
+
+#include <unitypes.h>
 
 
 #define BMAX(a, b) ((a)>(b)? (a):(b))    /* return the larger value */
@@ -61,6 +62,9 @@ void concat_strings(char *dst, int max_len, int count, ...);
 
 char *tabbify_indent(const size_t lineno, char *indentspc, const size_t indentspc_len);
 
+char *nspaces(const size_t n);
+
+uint32_t *nspaces32(const size_t n);
 
 #endif
 

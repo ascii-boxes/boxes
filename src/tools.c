@@ -196,7 +196,7 @@ void concat_strings(char *dst, int max_len, int count, ...)
         /*
          * Concatenate 'src' onto 'dst', as long as we have room.
          */
-        while (*src && max_len > 1) {
+        while (*src && max_len > 1) {    // TODO Can this be improved via strcpy
             *dst++ = *src++;
             max_len--;
         }
@@ -474,6 +474,25 @@ char *tabbify_indent(const size_t lineno, char *indentspc, const size_t indentsp
     }
 
     return result;
+}
+
+
+
+char *nspaces(const size_t n)
+{
+    char *spaces = (char *) memset(malloc(n + 1), (int) ' ', n);
+    spaces[n] = '\0';
+    return spaces;
+}
+
+
+
+uint32_t *nspaces32(const size_t n)
+{
+    uint32_t *spaces = (uint32_t *) malloc((n + 1) * sizeof(uint32_t));
+    u32_set(spaces, char_space, n);
+    u32_set(spaces + n, char_nul, 1);
+    return spaces;
 }
 
 
