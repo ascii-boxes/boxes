@@ -1291,11 +1291,10 @@ static int apply_substitutions (const int mode)
                 return 1;
             }
 
-            input.lines[k].vischar += buf_len - input.lines[k].len;
             input.lines[k].len = buf_len;
 
-            if (input.lines[k].vischar > input.maxline)
-                input.maxline = input.lines[k].vischar;
+            if (input.lines[k].len > input.maxline)
+                input.maxline = input.lines[k].len;
 
             #ifdef REGEXP_DEBUG
                 fprintf (stderr, "input.lines[%d] == {%d, \"%s\"}\n", k,
@@ -1351,7 +1350,7 @@ static int has_linebreak (const uint32_t *s, const int len)
 
 static size_t count_invisible_chars(const uint32_t *s, const size_t buflen, size_t *num_esc, char **ascii)
 {
-    size_t invis = 0;  /* counts invisible characters */
+    size_t invis = 0;  /* counts invisible column positions */
     int ansipos = 0;   /* progression of ansi sequence */
     *num_esc = 0;      /* counts the number of escape sequences found */
 
@@ -1489,11 +1488,9 @@ static int read_all_input (const int use_stdin)
             size_t invis = count_invisible_chars(input.lines[input.anz_lines].mbtext, strlen(buf), &num_esc,
                                                  &(input.lines[input.anz_lines].text));
             input.lines[input.anz_lines].invis = invis;
-            input.lines[input.anz_lines].vischar = len_chars - invis;
-
             /* u32_strwidth() does not count control characters, i.e. ESC characters, for which we must correct */
-            input.lines[input.anz_lines].len =
-                    u32_strwidth(input.lines[input.anz_lines].mbtext, encoding) - invis + num_esc;
+            size_t mbtext_cols = u32_strwidth(input.lines[input.anz_lines].mbtext, encoding);
+            input.lines[input.anz_lines].len = mbtext_cols - invis + num_esc;
             input.lines[input.anz_lines].num_leading_blanks = 0;
 
             /*
@@ -1558,7 +1555,6 @@ static int read_all_input (const int use_stdin)
                 memmove(input.lines[i].text, input.lines[i].text + input.indent,
                         input.lines[i].len - input.indent + 1);
                 input.lines[i].len -= input.indent;
-                input.lines[i].vischar -= input.indent;
 
                 u32_move(input.lines[i].mbtext, input.lines[i].mbtext + input.indent,
                          input.lines[i].num_chars - input.indent + 1);
@@ -1572,12 +1568,12 @@ static int read_all_input (const int use_stdin)
      *  Apply regular expression substitutions
      */
     if (opt.r == 0) {
-        if (apply_substitutions(0) != 0) { // TODO HERE
+        if (apply_substitutions(0) != 0) { // TODO
             return 1;
         }
     }
 
-#if 1
+#if 0
     /*
      *  Debugging Code: Display contents of input structure
      */
@@ -1599,7 +1595,7 @@ static int read_all_input (const int use_stdin)
             }
         }
         fprintf (stderr, "] (%d)", (int) input.lines[i].tabpos_len);
-        fprintf (stderr, "\tvis=%d, invis=%d\n", (int) input.lines[i].vischar, (int) input.lines[i].invis);
+        fprintf (stderr, "\tinvisible=%d\n", (int) input.lines[i].invis);
     }
     fprintf (stderr, " Longest line: %d columns\n", (int) input.maxline);
     fprintf (stderr, "  Indentation: %2d spaces\n", (int) input.indent);
