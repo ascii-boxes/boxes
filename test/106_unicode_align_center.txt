@@ -1,0 +1,50 @@
+:ARGS
+-ac
+:INPUT
+         a
+     ab
+     abc
+   abcd
+   abcde
+   abcdef
+   abcdefg
+   abcdefgh
+         試
+     常盤
+   運作能
+   申見売映
+   海棋事行変
+          ä
+     äb
+     äbç
+   äbçd
+   äbçdé
+   äbçdéf
+   äbçdéfg
+   äbçdéfgh
+:OUTPUT-FILTER
+:EXPECTED
+   /**************/
+   /*     a      */
+   /*     ab     */
+   /*    abc     */
+   /*    abcd    */
+   /*   abcde    */
+   /*   abcdef   */
+   /*  abcdefg   */
+   /*  abcdefgh  */
+   /*     試     */
+   /*    常盤    */
+   /*   運作能   */
+   /*  申見売映  */
+   /* 海棋事行変 */
+   /*     ä      */
+   /*     äb     */
+   /*    äbç     */
+   /*    äbçd    */
+   /*   äbçdé    */
+   /*   äbçdéf   */
+   /*  äbçdéfg   */
+   /*  äbçdéfgh  */
+   /**************/
+:EOF

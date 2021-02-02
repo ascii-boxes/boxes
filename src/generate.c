@@ -34,6 +34,7 @@
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
+#include "unicode.h"
 #include "generate.h"
 
 
@@ -993,10 +994,11 @@ int output_box(const sentry_t *thebox)
                             + strlen(hfill1)
                             + input.lines[ti].num_leading_blanks;
                 }
+                uint32_t *mbtext_shifted = advance32(input.lines[ti].mbtext, shift < 0 ? (size_t) (-shift) : 0);
                 concat_strings(obuf, LINE_MAX_BYTES + 1, 8, restored_indent,
                                skip_left ? "" : thebox[BLEF].chars[j], hfill1,
                                ti >= 0 && shift > 0 ? nspaces(shift) : "",
-                               ti >= 0 ? u32_strconv_to_locale(input.lines[ti].mbtext - (shift < 0 ? shift : 0)) : "",
+                               ti >= 0 ? u32_strconv_to_locale(mbtext_shifted) : "",
                                hfill2, nspaces(input.maxline - input.lines[ti].len - shift),
                                thebox[BRIG].chars[j]);
             }

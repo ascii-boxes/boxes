@@ -1364,7 +1364,7 @@ static size_t count_invisible_chars(const uint32_t *s, const size_t buflen, size
     ucs4_t c;
     const uint32_t *rest = s;
     while ((rest = u32_next(&c, rest))) {
-        if (ansipos == 0 && c == 0x0000001b) {
+        if (ansipos == 0 && c == char_esc) {
             /* Found an ESC char, count it as invisible and move 1 forward in the detection of CSI sequences */
             ansipos++;
             invis++;
@@ -1556,8 +1556,7 @@ static int read_all_input (const int use_stdin)
                         input.lines[i].len - input.indent + 1);
                 input.lines[i].len -= input.indent;
 
-                u32_move(input.lines[i].mbtext, input.lines[i].mbtext + input.indent,
-                         input.lines[i].num_chars - input.indent + 1);
+                input.lines[i].mbtext = advance32(input.lines[i].mbtext, input.indent);
                 input.lines[i].num_chars -= input.indent;
             }
         }

@@ -31,6 +31,7 @@ extern const ucs4_t char_tab;                  /* ucs4_t character '\t' (tab)  *
 extern const ucs4_t char_space;                /* ucs4_t character ' '  (space) */
 extern const ucs4_t char_cr;                   /* ucs4_t character '\r' (carriage return) */
 extern const ucs4_t char_newline;              /* ucs4_t character '\n' (newline) */
+extern const ucs4_t char_esc;                  /* ucs4_t character 0x1b (escape)  */
 extern const ucs4_t char_nul;                  /* ucs4_t character '\0' (zero) */
 
 
@@ -42,6 +43,16 @@ void set_char_at(uint32_t *text, const size_t idx, const ucs4_t char_to_set);
 int is_empty(const uint32_t *text);
 
 int is_ascii_printable(const ucs4_t c);
+
+/** Return a freshly allocated empty UTF-32 string. */
+uint32_t *new_empty_string32();
+
+/**
+ * Determine a new position in the given string s with the given offset of visible characters.
+ * If the character right in front of the target character is invisible, then the pointer is moved to the start of
+ * that invisible sequence. The purpose is to catch any escape sequences which would for example color the character.
+ */
+uint32_t *advance32(uint32_t *s, const size_t offset);
 
 
 #endif
