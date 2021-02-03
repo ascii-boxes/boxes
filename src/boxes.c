@@ -46,6 +46,8 @@
 #include "remove.h"
 #include "unicode.h"
 
+
+
 #ifdef __MINGW32__
     #include <windows.h>
 #endif
@@ -59,23 +61,6 @@ extern int optind, opterr, optopt;       /* for getopt() */
     #define BOXES_CONFIG ".boxes"
 #endif
 
-/*
- * Some source comments (AD 1999):
- *
- * - The decision to number box shapes in clockwise order was a
- *   major design mistake. Treatment of box parts of the same
- *   alignment (N-S and E-W) is usually combined in one function,
- *   which must now deal with the numbering being reversed all the
- *   time.
- * - All shapes defined in a box design must be used in any box of
- *   that design at least once. In other words, there must not be
- *   a shape which is defined in the config file but cannot be
- *   found in an actual box of that design. This sort of limits
- *   how small your boxes can get. However, in practice it is not
- *   a problem, because boxes which must be small usually consist
- *   of small shapes which can be packed pretty tightly anyway.
- */
-
 
 /*       _\|/_
          (o o)
@@ -84,18 +69,18 @@ extern int optind, opterr, optopt;       /* for getopt() */
  +--------------------------------------------------------------------------*/
 
 extern int yyparse();
-extern FILE *yyin;                       /* lex input file */
+extern FILE *yyin;                   /* lex input file */
 
-char *yyfilename = NULL;                 /* file name of config file used */
+char *yyfilename = NULL;             /* file name of config file used */
 
-design_t *designs = NULL;                /* available box designs */
+design_t *designs = NULL;            /* available box designs */
 
-int design_idx = 0;                      /* anz_designs-1 */
-int anz_designs = 0;                     /* no of designs after parsing */
+int design_idx = 0;                  /* anz_designs-1 */
+int anz_designs = 0;                 /* no of designs after parsing */
 
-opt_t opt;                               /* command line options */
+opt_t opt;                           /* command line options */
 
-input_t input = INPUT_INITIALIZER;       /* input lines */
+input_t input = INPUT_INITIALIZER;   /* input lines */
 
 
 /*       _\|/_
@@ -105,61 +90,61 @@ input_t input = INPUT_INITIALIZER;       /* input lines */
  +--------------------------------------------------------------------------*/
 
 
-static void usage (FILE *st)
+static void usage(FILE *st)
 /*
  *  Print usage information on stream st.
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    fprintf (st, "Usage:  %s [options] [infile [outfile]]\n", PROJECT);
-    fprintf (st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
-    fprintf (st, "        -c str   use single shape box design where str is the W shape\n");
-    fprintf (st, "        -d name  box design [default: first one in file]\n");
-    fprintf (st, "        -f file  configuration file\n");
-    fprintf (st, "        -h       print usage information\n");
-    fprintf (st, "        -i mode  indentation mode [default: box]\n");
-    fprintf (st, "        -k bool  leading/trailing blank line retention on removal\n");
-    fprintf (st, "        -l       list available box designs w/ samples\n");
-    fprintf (st, "        -m       mend box, i.e. remove it and redraw it afterwards\n");
-    fprintf (st, "        -p fmt   padding [default: none]\n");
-    /* fprintf (st, "        -q       modify command for needs of the web UI (undocumented)\n"); */
-    fprintf (st, "        -r       remove box\n");
-    fprintf (st, "        -s wxh   box size (width w and/or height h)\n");
-    fprintf (st, "        -t str   tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
-    fprintf (st, "        -v       print version information\n");
+    fprintf(st, "Usage:  %s [options] [infile [outfile]]\n", PROJECT);
+    fprintf(st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
+    fprintf(st, "        -c str   use single shape box design where str is the W shape\n");
+    fprintf(st, "        -d name  box design [default: first one in file]\n");
+    fprintf(st, "        -f file  configuration file\n");
+    fprintf(st, "        -h       print usage information\n");
+    fprintf(st, "        -i mode  indentation mode [default: box]\n");
+    fprintf(st, "        -k bool  leading/trailing blank line retention on removal\n");
+    fprintf(st, "        -l       list available box designs w/ samples\n");
+    fprintf(st, "        -m       mend box, i.e. remove it and redraw it afterwards\n");
+    fprintf(st, "        -p fmt   padding [default: none]\n");
+    /* fprintf(st, "        -q       modify command for needs of the web UI (undocumented)\n"); */
+    fprintf(st, "        -r       remove box\n");
+    fprintf(st, "        -s wxh   box size (width w and/or height h)\n");
+    fprintf(st, "        -t str   tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
+    fprintf(st, "        -v       print version information\n");
 }
 
 
 
-static void usage_short (FILE *st)
+static void usage_short(FILE *st)
 /*
  *  Print abbreviated usage information on stream st.
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    fprintf (st, "Usage: %s [options] [infile [outfile]]\n", PROJECT);
-    fprintf (st, "Try `%s -h' for more information.\n", PROJECT);
+    fprintf(st, "Usage: %s [options] [infile [outfile]]\n", PROJECT);
+    fprintf(st, "Try `%s -h' for more information.\n", PROJECT);
 }
 
 
 
-static void usage_long (FILE *st)
+static void usage_long(FILE *st)
 /*
  *  Print usage information on stream st, including a header text.
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    fprintf (st, "%s - draws any kind of box around your text (or removes it)\n", PROJECT);
-    fprintf (st, "        Website: https://boxes.thomasjensen.com/\n");
-    usage (st);
+    fprintf(st, "%s - draws any kind of box around your text (or removes it)\n", PROJECT);
+    fprintf(st, "        Website: https://boxes.thomasjensen.com/\n");
+    usage(st);
 }
 
 
 
-static int is_dir (const char *path)
+static int is_dir(const char *path)
 /*
  *  Return true if file specified by path is a directory
  *
@@ -178,9 +163,9 @@ static int is_dir (const char *path)
     struct stat sinf;
     int rc;
 
-    rc = stat (path, &sinf);
+    rc = stat(path, &sinf);
     if (rc) {
-        perror (PROJECT);
+        perror(PROJECT);
         return -1;
     }
 
@@ -210,40 +195,41 @@ static int get_config_file()
 {
     FILE *new_yyin = NULL;
     char *s;                             /* points to data from environment */
-    int   rc;
+    int rc;
     #ifdef __MINGW32__
     char exepath[256];                   /* for constructing config file path */
     #endif
 
-    if (yyin != stdin)
+    if (yyin != stdin) {
         return 0;                        /* we're already ok */
+    }
 
     /*
      *  Try getting it from the BOXES environment variable
      */
-    s = getenv ("BOXES");
+    s = getenv("BOXES");
     if (s) {
-        new_yyin = fopen (s, "r");
+        new_yyin = fopen(s, "r");
         if (new_yyin == NULL) {
-            fprintf (stderr, "%s: Couldn't open config file '%s' "
+            fprintf(stderr, "%s: Couldn't open config file '%s' "
                     "for input (taken from $BOXES).\n", PROJECT, s);
             return 1;
         }
-        rc = is_dir (s);
+        rc = is_dir(s);
         if (rc == -1) {
-            fclose (new_yyin);
+            fclose(new_yyin);
             return 1;
         }
         else if (rc) {
-            fprintf (stderr, "%s: Alleged config file '%s' is a directory "
+            fprintf(stderr, "%s: Alleged config file '%s' is a directory "
                     "(taken from $BOXES)\n", PROJECT, s);
-            fclose (new_yyin);
+            fclose(new_yyin);
             return 1;
         }
-        yyfilename = (char *) strdup (s);
+        yyfilename = (char *) strdup(s);
         if (yyfilename == NULL) {
-            perror (PROJECT);
-            fclose (new_yyin);
+            perror(PROJECT);
+            fclose(new_yyin);
             return 1;
         }
         yyin = new_yyin;
@@ -253,33 +239,33 @@ static int get_config_file()
     /*
      *  Try getting it from ~/.boxes
      */
-    s = getenv ("HOME");
+    s = getenv("HOME");
     if (s) {
-        rc = chdir (s);
+        rc = chdir(s);
         if (rc) {
-            perror (PROJECT);
+            perror(PROJECT);
             return 1;
         }
-        new_yyin = fopen (BOXES_CONFIG, "r");
+        new_yyin = fopen(BOXES_CONFIG, "r");
         if (new_yyin) {
-            rc = is_dir (BOXES_CONFIG);
+            rc = is_dir(BOXES_CONFIG);
             if (rc == -1) {
-                fclose (new_yyin);
+                fclose(new_yyin);
                 return 1;
             }
             else {
                 if (rc == 0) {
-                    yyfilename = (char *) strdup (BOXES_CONFIG);
+                    yyfilename = (char *) strdup(BOXES_CONFIG);
                     if (yyfilename == NULL) {
-                        perror (PROJECT);
-                        fclose (new_yyin);
+                        perror(PROJECT);
+                        fclose(new_yyin);
                         return 1;
                     }
                     yyin = new_yyin;
                     return 0;
                 }
                 else {
-                    fclose (new_yyin);
+                    fclose(new_yyin);
                     new_yyin = NULL;
                 }
             }
@@ -287,9 +273,8 @@ static int get_config_file()
     }
     else {
         #ifndef __MINGW32__
-        /* Do not print this warning on windows. */
-        fprintf (stderr, "%s: warning: Environment variable HOME not set!\n",
-                PROJECT);
+            /* Do not print this warning on windows. */
+            fprintf(stderr, "%s: warning: Environment variable HOME not set!\n", PROJECT);
         #endif
     }
 
@@ -319,28 +304,28 @@ static int get_config_file()
         }
         new_yyin = fopen (exepath, "r");
     #else
-        new_yyin = fopen (GLOBALCONF, "r");
+        new_yyin = fopen(GLOBALCONF, "r");
     #endif
     if (new_yyin) {
         #ifdef __MINGW32__
             yyfilename = (char *) strdup (exepath);
         #else
-            rc = is_dir (GLOBALCONF);
+            rc = is_dir(GLOBALCONF);
             if (rc == -1) {
-                fclose (new_yyin);
+                fclose(new_yyin);
                 return 1;
             }
             else if (rc) {
-                fprintf (stderr, "%s: Alleged system-wide config file '%s' "
+                fprintf(stderr, "%s: Alleged system-wide config file '%s' "
                         "is a directory\n", PROJECT, GLOBALCONF);
-                fclose (new_yyin);
+                fclose(new_yyin);
                 return 1;
             }
-            yyfilename = (char *) strdup (GLOBALCONF);
+            yyfilename = (char *) strdup(GLOBALCONF);
         #endif
         if (yyfilename == NULL) {
-            perror (PROJECT);
-            fclose (new_yyin);
+            perror(PROJECT);
+            fclose(new_yyin);
             return 1;
         }
         yyin = new_yyin;
@@ -350,13 +335,13 @@ static int get_config_file()
     /*
      *  Darn. No luck today.
      */
-    fprintf (stderr, "%s: Can't find config file.\n", PROJECT);
+    fprintf(stderr, "%s: Can't find config file.\n", PROJECT);
     return 2;
 }
 
 
 
-static int process_commandline (int argc, char *argv[])
+static int process_commandline(int argc, char *argv[])
 /*
  *  Process command line options.
  *
@@ -369,33 +354,33 @@ static int process_commandline (int argc, char *argv[])
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    int    oc;                           /* option character */
-    FILE  *f;                            /* potential input file */
-    int    idummy;
-    char  *pdummy;
-    char   c;
-    int    errfl = 0;                    /* true on error */
+    int oc;                           /* option character */
+    FILE *f;                          /* potential input file */
+    int idummy;
+    char *pdummy;
+    char c;
+    int errfl = 0;                    /* true on error */
     size_t optlen;
-    int    rc;
+    int rc;
 
     /*
      *  Set default values
      */
-    memset (&opt, 0, sizeof(opt_t));
+    memset(&opt, 0, sizeof(opt_t));
     opt.tabstop = DEF_TABSTOP;
     opt.tabexp = 'e';
     opt.killblank = -1;
-    for (idummy=0; idummy<ANZ_SIDES; ++idummy)
+    for (idummy = 0; idummy < ANZ_SIDES; ++idummy) {
         opt.padding[idummy] = -1;
+    }
     yyin = stdin;
 
     /*
      *  Intercept '--help' and '-?' cases first, as they are not supported by getopt()
      */
     if (argc >= 2 && argv[1] != NULL
-        && (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-?") == 0))
-    {
-        usage_long (stdout);
+            && (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-?") == 0)) {
+        usage_long(stdout);
         return 42;
     }
 
@@ -403,7 +388,7 @@ static int process_commandline (int argc, char *argv[])
      *  Parse Command Line
      */
     do {
-        oc = getopt (argc, argv, "a:c:d:f:hi:k:lmp:qrs:t:v");
+        oc = getopt(argc, argv, "a:c:d:f:hi:k:lmp:qrs:t:v");
 
         switch (oc) {
 
@@ -414,7 +399,7 @@ static int process_commandline (int argc, char *argv[])
                 errfl = 0;
                 pdummy = optarg;
                 while (*pdummy) {
-                    if (pdummy[1] == '\0' && !strchr ("lLcCrR", *pdummy)) {
+                    if (pdummy[1] == '\0' && !strchr("lLcCrR", *pdummy)) {
                         errfl = 1;
                         break;
                     }
@@ -465,14 +450,14 @@ static int process_commandline (int argc, char *argv[])
                             errfl = 1;
                             break;
                     }
-                    if (errfl)
+                    if (errfl) {
                         break;
-                    else
+                    } else {
                         ++pdummy;
+                    }
                 }
                 if (errfl) {
-                    fprintf (stderr, "%s: Illegal text format -- %s\n",
-                            PROJECT, optarg);
+                    fprintf(stderr, "%s: Illegal text format -- %s\n", PROJECT, optarg);
                     return 1;
                 }
                 break;
@@ -481,18 +466,17 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Command line design definition
                  */
-                opt.cld = (char *) strdup (optarg);
+                opt.cld = (char *) strdup(optarg);
                 if (opt.cld == NULL) {
-                    perror (PROJECT);
+                    perror(PROJECT);
                     return 1;
                 }
                 else {
                     line_t templine = {0};
-                    templine.len = strlen (opt.cld);
+                    templine.len = strlen(opt.cld);
                     templine.text = opt.cld;
                     if (empty_line(&templine)) {
-                        fprintf (stderr, "%s: boxes may not consist entirely "
-                                "of whitespace\n", PROJECT);
+                        fprintf(stderr, "%s: boxes may not consist entirely of whitespace\n", PROJECT);
                         return 1;
                     }
                 }
@@ -503,10 +487,10 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Box design selection
                  */
-                BFREE (opt.design);
-                opt.design = (design_t *) ((char *) strdup (optarg));
+            BFREE (opt.design);
+                opt.design = (design_t *) ((char *) strdup(optarg));
                 if (opt.design == NULL) {
-                    perror (PROJECT);
+                    perror(PROJECT);
                     return 1;
                 }
                 opt.design_choice_by_user = 1;
@@ -516,27 +500,25 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Input File
                  */
-                f = fopen (optarg, "r");
+                f = fopen(optarg, "r");
                 if (f == NULL) {
-                    fprintf (stderr, "%s: Couldn\'t open config file \'%s\' "
-                            "for input.\n", PROJECT, optarg);
+                    fprintf(stderr, "%s: Couldn\'t open config file \'%s\' for input.\n", PROJECT, optarg);
                     return 1;
                 }
-                rc = is_dir (optarg);
+                rc = is_dir(optarg);
                 if (rc == -1) {
-                    fclose (f);
+                    fclose(f);
                     return 1;
                 }
                 else if (rc) {
-                    fprintf (stderr, "%s: Alleged config file '%s' is a "
-                            "directory\n", PROJECT, optarg);
-                    fclose (f);
+                    fprintf(stderr, "%s: Alleged config file '%s' is a directory\n", PROJECT, optarg);
+                    fclose(f);
                     return 1;
                 }
-                yyfilename = (char *) strdup (optarg);
+                yyfilename = (char *) strdup(optarg);
                 if (yyfilename == NULL) {
-                    perror (PROJECT);
-                    fclose (f);
+                    perror(PROJECT);
+                    fclose(f);
                     return 1;
                 }
                 yyin = f;
@@ -546,37 +528,37 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Display usage information and terminate
                  */
-                usage_long (stdout);
+                usage_long(stdout);
                 return 42;
 
             case 'i':
                 /*
                  *  Indentation mode
                  */
-                optlen = strlen (optarg);
-                if (optlen <= 3 && !strncasecmp ("box", optarg, optlen))
+                optlen = strlen(optarg);
+                if (optlen <= 3 && !strncasecmp("box", optarg, optlen)) {
                     opt.indentmode = 'b';
-                else if (optlen <= 4 && !strncasecmp ("text", optarg, optlen))
+                } else if (optlen <= 4 && !strncasecmp("text", optarg, optlen)) {
                     opt.indentmode = 't';
-                else if (optlen <= 4 && !strncasecmp ("none", optarg, optlen))
+                } else if (optlen <= 4 && !strncasecmp("none", optarg, optlen)) {
                     opt.indentmode = 'n';
-                else {
-                    fprintf (stderr, "%s: invalid indentation mode\n", PROJECT);
+                } else {
+                    fprintf(stderr, "%s: invalid indentation mode\n", PROJECT);
                     return 1;
                 }
                 break;
 
-            /*
-             *  Kill blank lines or not [default: design-dependent]
-             */
+                /*
+                 *  Kill blank lines or not [default: design-dependent]
+                 */
             case 'k':
                 if (opt.killblank == -1) {
-                    if (strisyes (optarg))
+                    if (strisyes(optarg)) {
                         opt.killblank = 1;
-                    else if (strisno (optarg))
+                    } else if (strisno(optarg)) {
                         opt.killblank = 0;
-                    else {
-                        fprintf (stderr, "%s: -k: invalid parameter\n", PROJECT);
+                    } else {
+                        fprintf(stderr, "%s: -k: invalid parameter\n", PROJECT);
                         return 1;
                     }
                 }
@@ -611,7 +593,7 @@ static int process_commandline (int argc, char *argv[])
                     }
                     c = *pdummy;
                     errno = 0;
-                    idummy = (int) strtol (pdummy+1, &pdummy, 10);
+                    idummy = (int) strtol(pdummy + 1, &pdummy, 10);
                     if (errno || idummy < 0) {
                         errfl = 1;
                         break;
@@ -647,12 +629,12 @@ static int process_commandline (int argc, char *argv[])
                             errfl = 1;
                             break;
                     }
-                    if (errfl)
+                    if (errfl) {
                         break;
+                    }
                 }
                 if (errfl) {
-                    fprintf (stderr, "%s: invalid padding specification - "
-                            "%s\n", PROJECT, optarg);
+                    fprintf(stderr, "%s: invalid padding specification - %s\n", PROJECT, optarg);
                     return 1;
                 }
                 break;
@@ -675,20 +657,24 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Specify desired box target size
                  */
-                pdummy = strchr (optarg, 'x');
-                if (!pdummy) pdummy = strchr (optarg, 'X');
-                if(pdummy) {
+                pdummy = strchr(optarg, 'x');
+                if (!pdummy) {
+                    pdummy = strchr(optarg, 'X');
+                }
+                if (pdummy) {
                     *pdummy = '\0';
                 }
                 errno = 0;
-                if (optarg != pdummy) opt.reqwidth = strtol (optarg, NULL, 10);
+                if (optarg != pdummy) {
+                    opt.reqwidth = strtol(optarg, NULL, 10);
+                }
                 if (pdummy) {
-                    opt.reqheight = strtol (pdummy+1, NULL, 10);
+                    opt.reqheight = strtol(pdummy + 1, NULL, 10);
                     *pdummy = 'x';
                 }
-                if(errno || (opt.reqwidth == 0 && opt.reqheight == 0)
-                  || opt.reqwidth < 0 || opt.reqheight < 0) {
-                    fprintf (stderr, "%s: invalid box size specification -- %s\n",
+                if (errno || (opt.reqwidth == 0 && opt.reqheight == 0)
+                        || opt.reqwidth < 0 || opt.reqheight < 0) {
+                    fprintf(stderr, "%s: invalid box size specification -- %s\n",
                             PROJECT, optarg);
                     return 1;
                 }
@@ -698,9 +684,9 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Tab handling. Format is n[eku]
                  */
-                idummy = (int) strtol (optarg, &pdummy, 10);
+                idummy = (int) strtol(optarg, &pdummy, 10);
                 if (idummy < 1 || idummy > MAX_TABSTOP) {
-                    fprintf (stderr, "%s: invalid tab stop distance -- %d\n",
+                    fprintf(stderr, "%s: invalid tab stop distance -- %d\n",
                             PROJECT, idummy);
                     return 1;
                 }
@@ -729,7 +715,7 @@ static int process_commandline (int argc, char *argv[])
                     }
                 }
                 if (errfl) {
-                    fprintf (stderr, "%s: invalid tab handling specification - "
+                    fprintf(stderr, "%s: invalid tab handling specification - "
                             "%s\n", PROJECT, optarg);
                     return 1;
                 }
@@ -739,14 +725,15 @@ static int process_commandline (int argc, char *argv[])
                 /*
                  *  Print version number
                  */
-                printf ("%s version %s\n", PROJECT, VERSION);
+                printf("%s version %s\n", PROJECT, VERSION);
                 return 42;
 
-            case ':': case '?':
+            case ':':
+            case '?':
                 /*
                  *  Missing argument or illegal option - do nothing else
                  */
-                usage_short (stderr);
+                usage_short(stderr);
                 return 1;
 
             case EOF:
@@ -756,7 +743,7 @@ static int process_commandline (int argc, char *argv[])
                 break;
 
             default:                     /* This case must never be */
-                fprintf (stderr, "%s: internal error\n", PROJECT);
+                fprintf(stderr, "%s: internal error\n", PROJECT);
                 return 1;
         }
     } while (oc != EOF);
@@ -773,38 +760,37 @@ static int process_commandline (int argc, char *argv[])
         opt.outfile = stdout;
     }
 
-    else if (argv[optind+1] && argv[optind+2]) {       /* illegal third file */
-        fprintf (stderr, "%s: illegal parameter -- %s\n",
-                PROJECT, argv[optind+2]);
-        usage_short (stderr);
+    else if (argv[optind + 1] && argv[optind + 2]) {       /* illegal third file */
+        fprintf(stderr, "%s: illegal parameter -- %s\n", PROJECT, argv[optind + 2]);
+        usage_short(stderr);
         return 1;
     }
 
     else {
-        if (strcmp (argv[optind], "-") == 0) {
+        if (strcmp(argv[optind], "-") == 0) {
             opt.infile = stdin;          /* use stdin for input */
         }
         else {
-            opt.infile = fopen (argv[optind], "r");
+            opt.infile = fopen(argv[optind], "r");
             if (opt.infile == NULL) {
-                fprintf (stderr, "%s: Can\'t open input file -- %s\n", PROJECT,
-                        argv[optind]);
+                fprintf(stderr, "%s: Can\'t open input file -- %s\n", PROJECT, argv[optind]);
                 return 9;                /* can't read infile */
             }
         }
 
-        if (argv[optind+1] == NULL) {
+        if (argv[optind + 1] == NULL) {
             opt.outfile = stdout;        /* no outfile given */
         }
-        else if (strcmp (argv[optind+1], "-") == 0) {
+        else if (strcmp(argv[optind + 1], "-") == 0) {
             opt.outfile = stdout;        /* use stdout for output */
         }
         else {
-            opt.outfile = fopen (argv[optind+1], "w");
+            opt.outfile = fopen(argv[optind + 1], "w");
             if (opt.outfile == NULL) {
-                perror (PROJECT);
-                if (opt.infile != stdin)
-                    fclose (opt.infile);
+                perror(PROJECT);
+                if (opt.infile != stdin) {
+                    fclose(opt.infile);
+                }
                 return 10;
             }
         }
@@ -815,30 +801,26 @@ static int process_commandline (int argc, char *argv[])
      */
     if (opt.cld == NULL) {
         rc = get_config_file();          /* sets yyin and yyfilename     */
-        if (rc)                          /* may change working directory */
+        if (rc) {                        /* may change working directory */
             return rc;
+        }
     }
 
     #if defined(DEBUG) || 0
-        fprintf (stderr, "Command line option settings (excerpt):\n");
-        fprintf (stderr, "- Padding: l:%d t:%d r:%d b:%d\n", opt.padding[BLEF],
-                opt.padding[BTOP], opt.padding[BRIG], opt.padding[BBOT]);
-        fprintf (stderr, "- Requested box size: %ldx%ld\n", opt.reqwidth,
-                opt.reqheight);
-        fprintf (stderr, "- Tabstop distance: %d\n", opt.tabstop);
-        fprintf (stderr, "- Tab handling: \'%c\'\n", opt.tabexp);
-        fprintf (stderr, "- Alignment: horiz %c, vert %c\n",
-                opt.halign?opt.halign:'?', opt.valign?opt.valign:'?');
-        fprintf (stderr, "- Indentmode: \'%c\'\n",
-                opt.indentmode? opt.indentmode: '?');
-        fprintf (stderr, "- Line justification: \'%c\'\n",
-                opt.justify? opt.justify: '?');
-        fprintf (stderr, "- Kill blank lines: %d\n", opt.killblank);
-        fprintf (stderr, "- Remove box: %d\n", opt.r);
-        fprintf (stderr, "- Special handling for Web UI: %d\n", opt.q);
-        fprintf (stderr, "- Mend box: %d\n", opt.mend);
-        fprintf (stderr, "- Design Definition W shape: %s\n",
-                opt.cld? opt.cld: "n/a");
+    fprintf (stderr, "Command line option settings (excerpt):\n");
+    fprintf (stderr, "- Padding: l:%d t:%d r:%d b:%d\n", opt.padding[BLEF],
+            opt.padding[BTOP], opt.padding[BRIG], opt.padding[BBOT]);
+    fprintf (stderr, "- Requested box size: %ldx%ld\n", opt.reqwidth, opt.reqheight);
+    fprintf (stderr, "- Tabstop distance: %d\n", opt.tabstop);
+    fprintf (stderr, "- Tab handling: \'%c\'\n", opt.tabexp);
+    fprintf (stderr, "- Alignment: horiz %c, vert %c\n", opt.halign?opt.halign:'?', opt.valign?opt.valign:'?');
+    fprintf (stderr, "- Indentmode: \'%c\'\n", opt.indentmode? opt.indentmode: '?');
+    fprintf (stderr, "- Line justification: \'%c\'\n", opt.justify? opt.justify: '?');
+    fprintf (stderr, "- Kill blank lines: %d\n", opt.killblank);
+    fprintf (stderr, "- Remove box: %d\n", opt.r);
+    fprintf (stderr, "- Special handling for Web UI: %d\n", opt.q);
+    fprintf (stderr, "- Mend box: %d\n", opt.mend);
+    fprintf (stderr, "- Design Definition W shape: %s\n", opt.cld? opt.cld: "n/a");
     #endif
 
     return 0;
@@ -846,7 +828,7 @@ static int process_commandline (int argc, char *argv[])
 
 
 
-static int build_design (design_t **adesigns, const char *cld)
+static int build_design(design_t **adesigns, const char *cld)
 /*
  *  Build a box design.
  *
@@ -867,9 +849,9 @@ static int build_design (design_t **adesigns, const char *cld)
     int i;
     int rc;
 
-    *adesigns = (design_t *) calloc (1, sizeof(design_t));
+    *adesigns = (design_t *) calloc(1, sizeof(design_t));
     if (*adesigns == NULL) {
-        perror (PROJECT);
+        perror(PROJECT);
         return 1;
     }
     dp = *adesigns;                      /* for readability */
@@ -881,51 +863,58 @@ static int build_design (design_t **adesigns, const char *cld)
     dp->indentmode = DEF_INDENTMODE;
     dp->padding[BLEF] = 1;
 
-    dp->tags = (char *) calloc (10, sizeof(char));
+    dp->tags = (char *) calloc(10, sizeof(char));
     strcpy(dp->tags, "transient");
 
     dp->shape[W].height = 1;
     dp->shape[W].width = strlen(cld);
     dp->shape[W].elastic = 1;
-    rc = genshape (dp->shape[W].width, dp->shape[W].height, &(dp->shape[W].chars));
-    if (rc)
+    rc = genshape(dp->shape[W].width, dp->shape[W].height, &(dp->shape[W].chars));
+    if (rc) {
         return rc;
-    strcpy (dp->shape[W].chars[0], cld);
+    }
+    strcpy(dp->shape[W].chars[0], cld);
 
-    for (i=0; i<ANZ_SHAPES; ++i) {
+    for (i = 0; i < ANZ_SHAPES; ++i) {
         c = dp->shape + i;
 
         if (i == NNW || i == NNE || i == WNW || i == ENE || i == W
-                || i == WSW || i == ESE || i == SSW || i == SSE)
-            continue;
+                || i == WSW || i == ESE || i == SSW || i == SSE) {
+                    continue;
+        }
 
         switch (i) {
-            case NW:  case SW:
+            case NW:
+            case SW:
                 c->width = dp->shape[W].width;
                 c->height = 1;
                 c->elastic = 0;
                 break;
 
-            case NE:  case SE:
+            case NE:
+            case SE:
                 c->width = 1;
                 c->height = 1;
                 c->elastic = 0;
                 break;
 
-            case N:  case S:  case E:
+            case N:
+            case S:
+            case E:
                 c->width = 1;
                 c->height = 1;
                 c->elastic = 1;
                 break;
 
             default:
-                fprintf (stderr, "%s: internal error\n", PROJECT);
+                fprintf(stderr, "%s: internal error\n", PROJECT);
                 return 1;                /* never happens ;-) */
         }
 
-        rc = genshape (c->width, c->height, &(c->chars));
-        if (rc)
+        rc = genshape(c->width, c->height, &(c->chars));
+        if (rc) {
             return rc;
+        }
     }
 
     dp->maxshapeheight = 1;
@@ -936,11 +925,12 @@ static int build_design (design_t **adesigns, const char *cld)
 }
 
 
-static char* escape (const char* org, const int pLength)
+
+static char *escape(const char *org, const int pLength)
 {
-    char* result = (char *) calloc (1, 2 * strlen(org) + 1);
+    char *result = (char *) calloc(1, 2 * strlen(org) + 1);
     int orgIdx, resultIdx;
-    for (orgIdx=0, resultIdx=0; orgIdx<pLength; ++orgIdx, ++resultIdx) {
+    for (orgIdx = 0, resultIdx = 0; orgIdx < pLength; ++orgIdx, ++resultIdx) {
         if (org[orgIdx] == '\\' || org[orgIdx] == '"') {
             result[resultIdx++] = '\\';
         }
@@ -951,11 +941,14 @@ static char* escape (const char* org, const int pLength)
 }
 
 
-static int style_sort (const void *p1, const void *p2)
+
+static int style_sort(const void *p1, const void *p2)
 {
-    return strcasecmp ((const char *) ((*((design_t **) p1))->name),
-                       (const char *) ((*((design_t **) p2))->name));
+    return strcasecmp((const char *) ((*((design_t **) p1))->name),
+                      (const char *) ((*((design_t **) p2))->name));
 }
+
+
 
 static int list_styles()
 /*
@@ -975,137 +968,145 @@ static int list_styles()
         design_t *d = opt.design;
         int sstart = 0;
         size_t w = 0;
-        char space[LINE_MAX_BYTES+1];
+        char space[LINE_MAX_BYTES + 1];
 
-        memset (&space, ' ', LINE_MAX_BYTES);
+        memset(&space, ' ', LINE_MAX_BYTES);
         space[LINE_MAX_BYTES] = '\0';
 
-        fprintf (opt.outfile, "Complete Design Information for \"%s\":\n",
+        fprintf(opt.outfile, "Complete Design Information for \"%s\":\n",
                 d->name);
-        fprintf (opt.outfile, "-----------------------------------");
-        for (i=strlen(d->name); i>0; --i)
-            fprintf (opt.outfile, "-");
-        fprintf (opt.outfile, "\n");
+        fprintf(opt.outfile, "-----------------------------------");
+        for (i = strlen(d->name); i > 0; --i) {
+            fprintf(opt.outfile, "-");
+        }
+        fprintf(opt.outfile, "\n");
 
-        fprintf (opt.outfile, "Author:                 %s\n",
-                d->author? d->author: "(unknown author)");
-        fprintf (opt.outfile, "Original Designer:      %s\n",
-                 d->designer? d->designer: "(unknown artist)");
-        fprintf (opt.outfile, "Creation Date:          %s\n",
-                d->created? d->created: "(unknown)");
+        fprintf(opt.outfile, "Author:                 %s\n",
+                d->author ? d->author : "(unknown author)");
+        fprintf(opt.outfile, "Original Designer:      %s\n",
+                d->designer ? d->designer : "(unknown artist)");
+        fprintf(opt.outfile, "Creation Date:          %s\n",
+                d->created ? d->created : "(unknown)");
 
-        fprintf (opt.outfile, "Current Revision:       %s%s%s\n",
-                d->revision? d->revision: "",
-                d->revision && d->revdate? " as of ": "",
-                d->revdate? d->revdate: (d->revision? "": "(unknown)"));
+        fprintf(opt.outfile, "Current Revision:       %s%s%s\n",
+                d->revision ? d->revision : "",
+                d->revision && d->revdate ? " as of " : "",
+                d->revdate ? d->revdate : (d->revision ? "" : "(unknown)"));
 
-        fprintf (opt.outfile, "Indentation Mode:       ");
+        fprintf(opt.outfile, "Indentation Mode:       ");
         switch (d->indentmode) {
             case 'b':
-                fprintf (opt.outfile, "box (indent box)\n");
+                fprintf(opt.outfile, "box (indent box)\n");
                 break;
             case 't':
-                fprintf (opt.outfile, "text (retain indentation inside of box)\n");
+                fprintf(opt.outfile, "text (retain indentation inside of box)\n");
                 break;
             default:
-                fprintf (opt.outfile, "none (discard indentation)\n");
+                fprintf(opt.outfile, "none (discard indentation)\n");
                 break;
         }
 
-        fprintf (opt.outfile, "Replacement Rules:      ");
+        fprintf(opt.outfile, "Replacement Rules:      ");
         if (d->anz_reprules > 0) {
-            for (i=0; i<(int)d->anz_reprules; ++i) {
-                fprintf (opt.outfile, "%d. (%s) \"%s\" WITH \"%s\"\n", i+1,
-                        d->reprules[i].mode == 'g'? "glob": "once",
+            for (i = 0; i < (int) d->anz_reprules; ++i) {
+                fprintf(opt.outfile, "%d. (%s) \"%s\" WITH \"%s\"\n", i + 1,
+                        d->reprules[i].mode == 'g' ? "glob" : "once",
                         d->reprules[i].search, d->reprules[i].repstr);
-                if (i < (int) d->anz_reprules - 1)
-                    fprintf (opt.outfile, "                        ");
+                if (i < (int) d->anz_reprules - 1) {
+                    fprintf(opt.outfile, "                        ");
+                }
             }
         }
         else {
-            fprintf (opt.outfile, "none\n");
+            fprintf(opt.outfile, "none\n");
         }
-        fprintf (opt.outfile, "Reversion Rules:        ");
+        fprintf(opt.outfile, "Reversion Rules:        ");
         if (d->anz_revrules > 0) {
-            for (i=0; i<(int)d->anz_revrules; ++i) {
-                fprintf (opt.outfile, "%d. (%s) \"%s\" TO \"%s\"\n", i+1,
-                        d->revrules[i].mode == 'g'? "glob": "once",
+            for (i = 0; i < (int) d->anz_revrules; ++i) {
+                fprintf(opt.outfile, "%d. (%s) \"%s\" TO \"%s\"\n", i + 1,
+                        d->revrules[i].mode == 'g' ? "glob" : "once",
                         d->revrules[i].search, d->revrules[i].repstr);
-                if (i < (int) d->anz_revrules - 1)
-                    fprintf (opt.outfile, "                        ");
+                if (i < (int) d->anz_revrules - 1) {
+                    fprintf(opt.outfile, "                        ");
+                }
             }
         }
         else {
-            fprintf (opt.outfile, "none\n");
+            fprintf(opt.outfile, "none\n");
         }
 
-        fprintf (opt.outfile, "Minimum Box Dimensions: %d x %d  (width x height)\n",
+        fprintf(opt.outfile, "Minimum Box Dimensions: %d x %d  (width x height)\n",
                 (int) d->minwidth, (int) d->minheight);
 
-        fprintf (opt.outfile, "Default Padding:        ");
+        fprintf(opt.outfile, "Default Padding:        ");
         if (d->padding[BTOP] || d->padding[BRIG]
                 || d->padding[BBOT] || d->padding[BLEF]) {
             if (d->padding[BLEF]) {
-                fprintf (opt.outfile, "left %d", d->padding[BLEF]);
-                if (d->padding[BTOP] || d->padding[BRIG] || d->padding[BBOT])
-                    fprintf (opt.outfile, ", ");
+                fprintf(opt.outfile, "left %d", d->padding[BLEF]);
+                if (d->padding[BTOP] || d->padding[BRIG] || d->padding[BBOT]) {
+                    fprintf(opt.outfile, ", ");
+                }
             }
             if (d->padding[BTOP]) {
-                fprintf (opt.outfile, "top %d", d->padding[BTOP]);
-                if (d->padding[BRIG] || d->padding[BBOT])
-                    fprintf (opt.outfile, ", ");
+                fprintf(opt.outfile, "top %d", d->padding[BTOP]);
+                if (d->padding[BRIG] || d->padding[BBOT]) {
+                    fprintf(opt.outfile, ", ");
+                }
             }
             if (d->padding[BRIG]) {
-                fprintf (opt.outfile, "right %d", d->padding[BRIG]);
-                if (d->padding[BBOT])
-                    fprintf (opt.outfile, ", ");
+                fprintf(opt.outfile, "right %d", d->padding[BRIG]);
+                if (d->padding[BBOT]) {
+                    fprintf(opt.outfile, ", ");
+                }
             }
-            if (d->padding[BBOT])
-                fprintf (opt.outfile, "bottom %d", d->padding[BBOT]);
-            fprintf (opt.outfile, "\n");
+            if (d->padding[BBOT]) {
+                fprintf(opt.outfile, "bottom %d", d->padding[BBOT]);
+            }
+            fprintf(opt.outfile, "\n");
         }
         else {
-            fprintf (opt.outfile, "none\n");
+            fprintf(opt.outfile, "none\n");
         }
 
-        fprintf (opt.outfile, "Default Killblank:      %s\n",
-                empty_side (opt.design->shape, BTOP) &&
-                empty_side (opt.design->shape, BBOT)? "no": "yes");
+        fprintf(opt.outfile, "Default Killblank:      %s\n",
+                empty_side(opt.design->shape, BTOP) &&
+                        empty_side(opt.design->shape, BBOT) ? "no" : "yes");
 
-        fprintf (opt.outfile, "Tags:                   %s\n",
+        fprintf(opt.outfile, "Tags:                   %s\n",
                 d->tags ? d->tags : "(none)");
 
-        fprintf (opt.outfile, "Elastic Shapes:         ");
+        fprintf(opt.outfile, "Elastic Shapes:         ");
         sstart = 0;
-        for (i=0; i<ANZ_SHAPES; ++i) {
-            if (isempty(d->shape+i))
+        for (i = 0; i < ANZ_SHAPES; ++i) {
+            if (isempty(d->shape + i)) {
                 continue;
+            }
             if (d->shape[i].elastic) {
-                fprintf (opt.outfile, "%s%s", sstart? ", ": "", shape_name[i]);
+                fprintf(opt.outfile, "%s%s", sstart ? ", " : "", shape_name[i]);
                 sstart = 1;
             }
         }
-        fprintf (opt.outfile, "\n");
+        fprintf(opt.outfile, "\n");
 
         /*
          *  Display all shapes
          */
         if (opt.q) {
-            fprintf (opt.outfile, "Sample:\n%s\n", d->sample);
+            fprintf(opt.outfile, "Sample:\n%s\n", d->sample);
         }
         else {
             int first_shape = 1;
-            for (i=0; i<ANZ_SHAPES; ++i) {
-                if (isdeepempty(d->shape+i)) {
+            for (i = 0; i < ANZ_SHAPES; ++i) {
+                if (isdeepempty(d->shape + i)) {
                     continue;
                 }
-                for (w=0; w<d->shape[i].height; ++w) {
-                    char* escaped_line = escape(d->shape[i].chars[w], d->shape[i].width);
-                    fprintf (opt.outfile, "%-24s%3s%c \"%s\"%c\n",
-                        (first_shape==1 && w==0? "Defined Shapes:": ""),
-                        (w==0? shape_name[i]: ""), (w==0? ':':' '),
-                        escaped_line,
-                        (w<d->shape[i].height-1? ',': ' ')
+                for (w = 0; w < d->shape[i].height; ++w) {
+                    char *escaped_line = escape(d->shape[i].chars[w], d->shape[i].width);
+                    fprintf(opt.outfile, "%-24s%3s%c \"%s\"%c\n",
+                            (first_shape == 1 && w == 0 ? "Defined Shapes:" : ""),
+                            (w == 0 ? shape_name[i] : ""), (w == 0 ? ':' : ' '),
+                            escaped_line,
+                            (w < d->shape[i].height - 1 ? ',' : ' ')
                     );
                     BFREE (escaped_line);
                 }
@@ -1119,28 +1120,30 @@ static int list_styles()
         design_t **list;                 /* temp list for sorting */
         char buf[42];
 
-        list = (design_t **) calloc (design_idx+1, sizeof(design_t *));
+        list = (design_t **) calloc(design_idx + 1, sizeof(design_t *));
         if (list == NULL) {
-            perror (PROJECT);
+            perror(PROJECT);
             return 1;
         }
 
-        for (i=0; i<anz_designs; ++i)
+        for (i = 0; i < anz_designs; ++i) {
             list[i] = &(designs[i]);
-        qsort (list, design_idx+1, sizeof(design_t *), style_sort);
+        }
+        qsort(list, design_idx + 1, sizeof(design_t *), style_sort);
 
-        sprintf (buf, "%d", anz_designs);
+        sprintf(buf, "%d", anz_designs);
 
         if (!opt.q) {
-            fprintf (opt.outfile, "%d Available Style%s in \"%s\":\n",
-                    anz_designs, anz_designs==1?"":"s", yyfilename);
-            fprintf (opt.outfile, "-----------------------%s",
-                    anz_designs==1? "": "-");
-            for (i=strlen(yyfilename)+strlen(buf); i>0; --i)
-                fprintf (opt.outfile, "-");
-            fprintf (opt.outfile, "\n\n");
+            fprintf(opt.outfile, "%d Available Style%s in \"%s\":\n",
+                    anz_designs, anz_designs == 1 ? "" : "s", yyfilename);
+            fprintf(opt.outfile, "-----------------------%s",
+                    anz_designs == 1 ? "" : "-");
+            for (i = strlen(yyfilename) + strlen(buf); i > 0; --i) {
+                fprintf(opt.outfile, "-");
+            }
+            fprintf(opt.outfile, "\n\n");
         }
-        for (i=0; i<anz_designs; ++i) {
+        for (i = 0; i < anz_designs; ++i) {
             if (opt.q) {
                 fprintf(opt.outfile, "%s\n", list[i]->name);
             }
@@ -1170,7 +1173,7 @@ static int list_styles()
 
 
 
-static int get_indent (const line_t *lines, const size_t lines_size)
+static int get_indent(const line_t *lines, const size_t lines_size)
 /*
  *  Determine indentation of given lines in spaces.
  *
@@ -1215,7 +1218,7 @@ static int get_indent (const line_t *lines, const size_t lines_size)
 
 
 
-static int apply_substitutions (const int mode)
+static int apply_substitutions(const int mode)
 /*
  *  Apply regular expression substitutions to input text.
  *
@@ -1230,14 +1233,15 @@ static int apply_substitutions (const int mode)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    size_t     anz_rules;
+    size_t anz_rules;
     reprule_t *rules;
-    size_t     j, k;
-    char       buf[LINE_MAX_BYTES*2];
-    size_t     buf_len;                  /* length of string in buf */
+    size_t j, k;
+    char buf[LINE_MAX_BYTES * 2];
+    size_t buf_len;                  /* length of string in buf */
 
-    if (opt.design == NULL)
+    if (opt.design == NULL) {
         return 1;
+    }
 
     if (mode == 0) {
         anz_rules = opt.design->anz_reprules;
@@ -1248,7 +1252,7 @@ static int apply_substitutions (const int mode)
         rules = opt.design->revrules;
     }
     else {
-        fprintf (stderr, "%s: internal error\n", PROJECT);
+        fprintf(stderr, "%s: internal error\n", PROJECT);
         return 2;
     }
 
@@ -1257,48 +1261,52 @@ static int apply_substitutions (const int mode)
      */
     errno = 0;
     opt.design->current_rule = rules;
-    for (j=0; j<anz_rules; ++j, ++(opt.design->current_rule)) {
-        rules[j].prog = regcomp (rules[j].search);
+    for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
+        rules[j].prog = regcomp(rules[j].search);
     }
     opt.design->current_rule = NULL;
-    if (errno) return 3;
+    if (errno) {
+        return 3;
+    }
 
     /*
      *  Apply regular expression substitutions to input lines
      */
-    for (k=0; k<input.anz_lines; ++k) {
+    for (k = 0; k < input.anz_lines; ++k) {
         opt.design->current_rule = rules;
-        for (j=0; j<anz_rules; ++j, ++(opt.design->current_rule)) {
+        for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
             #ifdef REGEXP_DEBUG
-                fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
-                        rules[j].prog, input.lines[k].text,
-                        input.lines[k].len, rules[j].repstr, LINE_MAX_BYTES*2,
-                        rules[j].mode);
+            fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
+                    rules[j].prog, input.lines[k].text,
+                    input.lines[k].len, rules[j].repstr, LINE_MAX_BYTES*2,
+                    rules[j].mode);
             #endif
             errno = 0;
-            buf_len = myregsub (rules[j].prog, input.lines[k].text,
-                    input.lines[k].len, rules[j].repstr, buf, LINE_MAX_BYTES*2,
-                    rules[j].mode);
+            buf_len = myregsub(rules[j].prog, input.lines[k].text,
+                               input.lines[k].len, rules[j].repstr, buf, LINE_MAX_BYTES * 2,
+                               rules[j].mode);
             #ifdef REGEXP_DEBUG
                 fprintf (stderr, "%d\n", buf_len);
             #endif
-            if (errno) return 1;
+            if (errno) {
+                return 1;
+            }
 
             BFREE (input.lines[k].text);
-            input.lines[k].text = (char *) strdup (buf);
+            input.lines[k].text = (char *) strdup(buf);
             if (input.lines[k].text == NULL) {
-                perror (PROJECT);
+                perror(PROJECT);
                 return 1;
             }
 
             input.lines[k].len = buf_len;
 
-            if (input.lines[k].len > input.maxline)
+            if (input.lines[k].len > input.maxline) {
                 input.maxline = input.lines[k].len;
+            }
 
             #ifdef REGEXP_DEBUG
-                fprintf (stderr, "input.lines[%d] == {%d, \"%s\"}\n", k,
-                        input.lines[k].len, input.lines[k].text);
+                fprintf (stderr, "input.lines[%d] == {%d, \"%s\"}\n", k, input.lines[k].len, input.lines[k].text);
             #endif
         }
         opt.design->current_rule = NULL;
@@ -1310,11 +1318,12 @@ static int apply_substitutions (const int mode)
      */
     if (opt.design->indentmode == 't') {
         int rc;
-        rc = get_indent (input.lines, input.anz_lines);
-        if (rc >= 0)
+        rc = get_indent(input.lines, input.anz_lines);
+        if (rc >= 0) {
             input.indent = (size_t) rc;
-        else
+        } else {
             return 4;
+        }
     }
 
     return 0;
@@ -1322,7 +1331,7 @@ static int apply_substitutions (const int mode)
 
 
 
-static int has_linebreak (const uint32_t *s, const int len)
+static int has_linebreak(const uint32_t *s, const int len)
 /*
  *  Determine if the given line of raw text is ended by a line break.
  *
@@ -1402,7 +1411,7 @@ static size_t count_invisible_chars(const uint32_t *s, const size_t buflen, size
 
 
 
-static int read_all_input (const int use_stdin)
+static int read_all_input(const int use_stdin)
 /*
  *  Read entire input (possibly from stdin) and store it in 'input' array.
  *
@@ -1605,19 +1614,20 @@ static int read_all_input (const int use_stdin)
 }
 
 
+
 /*       _\|/_
          (o o)
  +----oOO-{_}-OOo------------------------------------------------------------+
  |                       P r o g r a m   S t a r t                           |
  +--------------------------------------------------------------------------*/
 
-int main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-    int    rc;                           /* general return code */
+    int rc;                           /* general return code */
     size_t pad;
-    int    i;
-    int    saved_designwidth;            /* opt.design->minwith backup, used for mending */
-    int    saved_designheight;           /* opt.design->minheight backup, used for mending */
+    int i;
+    int saved_designwidth;            /* opt.design->minwith backup, used for mending */
+    int saved_designheight;           /* opt.design->minheight backup, used for mending */
 
     #ifdef DEBUG
         fprintf (stderr, "BOXES STARTING ...\n");
@@ -1629,11 +1639,13 @@ int main (int argc, char *argv[])
     #ifdef DEBUG
         fprintf (stderr, "Processing Command Line ...\n");
     #endif
-    rc = process_commandline (argc, argv);
-    if (rc == 42)
-        exit (EXIT_SUCCESS);
-    if (rc)
-        exit (EXIT_FAILURE);
+    rc = process_commandline(argc, argv);
+    if (rc == 42) {
+        exit(EXIT_SUCCESS);
+    }
+    if (rc) {
+        exit(EXIT_FAILURE);
+    }
 
     /*
      * Store system character encoding
@@ -1652,13 +1664,15 @@ int main (int argc, char *argv[])
     #endif
     if (opt.cld == NULL) {
         rc = yyparse();
-        if (rc)
-            exit (EXIT_FAILURE);
+        if (rc) {
+            exit(EXIT_FAILURE);
+        }
     }
     else {
-        rc = build_design (&designs, opt.cld);
-        if (rc)
-            exit (EXIT_FAILURE);
+        rc = build_design(&designs, opt.cld);
+        if (rc) {
+            exit(EXIT_FAILURE);
+        }
         anz_designs = 1;
     }
     BFREE (opt.design);
@@ -1669,7 +1683,7 @@ int main (int argc, char *argv[])
      */
     if (opt.l) {
         rc = list_styles();
-        exit (rc);
+        exit(rc);
     }
 
     /*
@@ -1677,31 +1691,39 @@ int main (int argc, char *argv[])
      *  Increase box width/height by width/height of empty sides in order
      *  to match appearance of box with the user's expectations (if -s).
      */
-    if (opt.reqheight > (long) opt.design->minheight)
+    if (opt.reqheight > (long) opt.design->minheight) {
         opt.design->minheight = opt.reqheight;
-    if (opt.reqwidth > (long) opt.design->minwidth)
+    }
+    if (opt.reqwidth > (long) opt.design->minwidth) {
         opt.design->minwidth = opt.reqwidth;
+    }
     if (opt.reqwidth) {
-        if (empty_side (opt.design->shape, BRIG))
-            opt.design->minwidth  += opt.design->shape[SE].width;
-        if (empty_side (opt.design->shape, BLEF))
-            opt.design->minwidth  += opt.design->shape[NW].width;
+        if (empty_side(opt.design->shape, BRIG)) {
+            opt.design->minwidth += opt.design->shape[SE].width;
+        }
+        if (empty_side(opt.design->shape, BLEF)) {
+            opt.design->minwidth += opt.design->shape[NW].width;
+        }
     }
     if (opt.reqheight) {
-        if (empty_side (opt.design->shape, BTOP))
+        if (empty_side(opt.design->shape, BTOP)) {
             opt.design->minheight += opt.design->shape[NW].height;
-        if (empty_side (opt.design->shape, BBOT))
+        }
+        if (empty_side(opt.design->shape, BBOT)) {
             opt.design->minheight += opt.design->shape[SE].height;
+        }
     }
-    if (opt.indentmode)
+    if (opt.indentmode) {
         opt.design->indentmode = opt.indentmode;
+    }
     saved_designwidth = opt.design->minwidth;
     saved_designheight = opt.design->minheight;
 
     do {
-        if (opt.mend == 1)  /* Mending a box works in two phases: */
-            opt.r = 0;      /* opt.mend == 2: remove box          */
-        --opt.mend;         /* opt.mend == 1: add it back         */
+        if (opt.mend == 1) {  /* Mending a box works in two phases: */
+            opt.r = 0;        /* opt.mend == 2: remove box          */
+        }
+        --opt.mend;           /* opt.mend == 1: add it back         */
         opt.design->minwidth = saved_designwidth;
         opt.design->minheight = saved_designheight;
 
@@ -1711,33 +1733,37 @@ int main (int argc, char *argv[])
         #ifdef DEBUG
             fprintf (stderr, "Reading all input ...\n");
         #endif
-        rc = read_all_input (opt.mend);
-        if (rc)
-            exit (EXIT_FAILURE);
-        if (input.anz_lines == 0)
-            exit (EXIT_SUCCESS);
+        rc = read_all_input(opt.mend);
+        if (rc) {
+            exit(EXIT_FAILURE);
+        }
+        if (input.anz_lines == 0) {
+            exit(EXIT_SUCCESS);
+        }
 
         /*
          *  Adjust box size to fit requested padding value
          *  Command line-specified box size takes precedence over padding.
          */
-        for (i=0; i<ANZ_SIDES; ++i) {
-            if (opt.padding[i] > -1)
+        for (i = 0; i < ANZ_SIDES; ++i) {
+            if (opt.padding[i] > -1) {
                 opt.design->padding[i] = opt.padding[i];
+            }
         }
-        pad  = opt.design->padding[BTOP] + opt.design->padding[BBOT];
+        pad = opt.design->padding[BTOP] + opt.design->padding[BBOT];
         if (pad > 0) {
             pad += input.anz_lines;
             pad += opt.design->shape[NW].height + opt.design->shape[SW].height;
             if (pad > opt.design->minheight) {
                 if (opt.reqheight) {
-                    for (i=0; i<(int)(pad-opt.design->minheight); ++i) {
-                        if (opt.design->padding[i%2?BBOT:BTOP])
-                            opt.design->padding[i%2?BBOT:BTOP] -= 1;
-                        else if (opt.design->padding[i%2?BTOP:BBOT])
-                            opt.design->padding[i%2?BTOP:BBOT] -= 1;
-                        else
+                    for (i = 0; i < (int) (pad - opt.design->minheight); ++i) {
+                        if (opt.design->padding[i % 2 ? BBOT : BTOP]) {
+                            opt.design->padding[i % 2 ? BBOT : BTOP] -= 1;
+                        } else if (opt.design->padding[i % 2 ? BTOP : BBOT]) {
+                            opt.design->padding[i % 2 ? BTOP : BBOT] -= 1;
+                        } else {
                             break;
+                        }
                     }
                 }
                 else {
@@ -1751,13 +1777,14 @@ int main (int argc, char *argv[])
             pad += opt.design->shape[NW].width + opt.design->shape[NE].width;
             if (pad > opt.design->minwidth) {
                 if (opt.reqwidth) {
-                    for (i=0; i<(int)(pad-opt.design->minwidth); ++i) {
-                        if (opt.design->padding[i%2?BRIG:BLEF])
-                            opt.design->padding[i%2?BRIG:BLEF] -= 1;
-                        else if (opt.design->padding[i%2?BLEF:BRIG])
-                            opt.design->padding[i%2?BLEF:BRIG] -= 1;
-                        else
+                    for (i = 0; i < (int) (pad - opt.design->minwidth); ++i) {
+                        if (opt.design->padding[i % 2 ? BRIG : BLEF]) {
+                            opt.design->padding[i % 2 ? BRIG : BLEF] -= 1;
+                        } else if (opt.design->padding[i % 2 ? BLEF : BRIG]) {
+                            opt.design->padding[i % 2 ? BLEF : BRIG] -= 1;
+                        } else {
                             break;
+                        }
                     }
                 }
                 else {
@@ -1774,19 +1801,21 @@ int main (int argc, char *argv[])
                 fprintf (stderr, "Removing Box ...\n");
             #endif
             if (opt.killblank == -1) {
-                if (empty_side (opt.design->shape, BTOP)
-                        && empty_side (opt.design->shape, BBOT))
+                if (empty_side(opt.design->shape, BTOP) && empty_side(opt.design->shape, BBOT)) {
                     opt.killblank = 0;
-                else
+                } else {
                     opt.killblank = 1;
+                }
             }
             rc = remove_box();
-            if (rc)
-                exit (EXIT_FAILURE);
-            rc = apply_substitutions (1);
-            if (rc)
-                exit (EXIT_FAILURE);
-            output_input (opt.mend > 0);
+            if (rc) {
+                exit(EXIT_FAILURE);
+            }
+            rc = apply_substitutions(1);
+            if (rc) {
+                exit(EXIT_FAILURE);
+            }
+            output_input(opt.mend > 0);
         }
 
         else {
@@ -1798,15 +1827,16 @@ int main (int argc, char *argv[])
             #ifdef DEBUG
                 fprintf (stderr, "Generating Box ...\n");
             #endif
-            thebox = (sentry_t *) calloc (ANZ_SIDES, sizeof(sentry_t));
+            thebox = (sentry_t *) calloc(ANZ_SIDES, sizeof(sentry_t));
             if (thebox == NULL) {
-                perror (PROJECT);
-                exit (EXIT_FAILURE);
+                perror(PROJECT);
+                exit(EXIT_FAILURE);
             }
-            rc = generate_box (thebox);
-            if (rc)
-                exit (EXIT_FAILURE);
-            output_box (thebox);
+            rc = generate_box(thebox);
+            if (rc) {
+                exit(EXIT_FAILURE);
+            }
+            output_box(thebox);
         }
     } while (opt.mend > 0);
 
