@@ -64,7 +64,6 @@ char *tabbify_indent(const size_t lineno, char *indentspc, const size_t indentsp
 
 char *nspaces(const size_t n);
 
-uint32_t *nspaces32(const size_t n);
 
 #endif
 

@@ -487,14 +487,4 @@ char *nspaces(const size_t n)
 
 
 
-uint32_t *nspaces32(const size_t n)
-{
-    uint32_t *spaces = (uint32_t *) malloc((n + 1) * sizeof(uint32_t));
-    u32_set(spaces, char_space, n);
-    u32_set(spaces + n, char_nul, 1);
-    return spaces;
-}
-
-
-
 /*EOF*/                                                  /* vim: set sw=4: */
