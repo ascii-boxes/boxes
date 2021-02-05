@@ -48,7 +48,7 @@ infomsg:
 
 replaceinfos: src/boxes.h doc/boxes.1
 
-src/boxes.h: src/boxes.h.in src/regexp/regexp.h Makefile
+src/boxes.h: src/boxes.h.in src/regulex.h src/shape.h Makefile
 	sed -e 's/--BVERSION--/$(BVERSION) $(GIT_STATUS)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' src/boxes.h.in > src/boxes.h
 
 doc/boxes.1: doc/boxes.1.in Makefile

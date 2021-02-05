@@ -25,6 +25,9 @@
 #ifndef UNICODE_H
 #define UNICODE_H
 
+#include <unitypes.h>
+
+
 extern const char *encoding;                   /* the character encoding that we use */
 
 extern const ucs4_t char_tab;                  /* ucs4_t character '\t' (tab)  */

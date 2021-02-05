@@ -1874,14 +1874,11 @@ shapes {
     sw ("/*") s ("*") se ("*/")
 }
 
-replace "^( *)([^ ])" with "\\1\\2 "
-replace "([^ ])  ([^ ])" with "\\1   \\2"
-reverse "^( *)([^ ]*) " to "\\1\\2"       # \1 to leave indentation untouched
-reverse "([^ ])  ([^ ])" to "\\1 \\2"
+replace "(.)(?!$)" with "$1 "
+reverse "^( *)([^ ]*) " to "$1$2"       # $1 to leave indentation untouched # TODO
 
 padding {
-    left 2
-    right 1
+    horiz 2
 }
 
 elastic (n,e,s,w)
@@ -2253,7 +2250,7 @@ shapes {
 elastic (n, s, e, w)
 
 padding {
-    left 1
+    left 2
 }
 
 END unicornsay
@@ -2549,7 +2546,7 @@ revision "1.0"
 tags     "artwork, box"
 
 sample
-     /\ /\ /\ /\ /\ 
+     /\ /\ /\ /\ /\
     |__|__|__|__|__|
     |  |  |  |  |  |
     |  | fence  |  |
@@ -2599,7 +2596,7 @@ revision "1.0"
 tags     "artwork, box"
 
 sample
-     /\ !!!!!!!!!!! /\ 
+     /\ !!!!!!!!!!! /\
     |! |           |! |
     |! | important |! |
     |__|           |__|
@@ -2642,7 +2639,7 @@ revision "1.0"
 tags     "artwork, box"
 
 sample
-     /\  /\ !!!!!!!!!!!! /\  /\ 
+     /\  /\ !!!!!!!!!!!! /\  /\
     |! ||! |!!!!!!!!!!!!|! ||! |
     |! ||! |            |! ||! |
     |! ||! | important2 |! ||! |
@@ -2689,7 +2686,7 @@ revision "1.0"
 tags     "artwork, box"
 
 sample
-     /\  /\  /\ !!!!!!!!!!!! /\  /\  /\ 
+     /\  /\  /\ !!!!!!!!!!!! /\  /\  /\
     |! ||! ||! |!!!!!!!!!!!!|! ||! ||! |
     |! ||! ||! |!!!!!!!!!!!!|! ||! ||! |
     |! ||! ||! |            |! ||! ||! |
@@ -2861,7 +2858,7 @@ shapes {
 
      sw ("| |", "|__", "   ", "   ", "   ", "   ", "   ", "   ", "   ")
     ssw ("_", "_", " ", " ", " ", " ", " ", " ", " ")
- 
+
       s ("__________________________________",
          "__________________________________",
          "    )__________|__|__________(    ",

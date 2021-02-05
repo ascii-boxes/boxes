@@ -25,13 +25,14 @@
 #ifndef BOXES_H
 #define BOXES_H
 
-/* #define DEBUG */
-/* #define REGEXP_DEBUG */
-/* #define PARSER_DEBUG */
-/* #define LEXER_DEBUG */
+/* #define DEBUG 1 */
+#define REGEXP_DEBUG 1
+/* #define PARSER_DEBUG 1 */
+/* #define LEXER_DEBUG 1 */
 
 #include <unitypes.h>
-#include "regexp/regexp.h"
+#include "regulex.h"
+#include "shape.h"
 
 
 
@@ -80,11 +81,11 @@
 
 
 typedef struct {
-    char   *search;
-    char   *repstr;
-    regexp *prog;                        /* compiled search pattern */
-    int     line;                        /* line of definition in config file */
-    char    mode;                        /* 'g' or 'o' */
+    char       *search;
+    char       *repstr;
+    pcre2_code *prog;                    /* compiled search pattern */
+    int         line;                    /* line of definition in config file */
+    char        mode;                    /* 'g' or 'o' */
 } reprule_t;
 
 
@@ -147,11 +148,12 @@ extern opt_t opt;
 
 typedef struct {
     size_t    len;                       /* length of visible text in columns (visible character positions in a text terminal), which is the same as the length of the 'text' field */
-    char     *text;                      /* ASCII line content, tabs expanded, multi-byte chars replaced with one or more 'x' */
+    char     *text;                      /* ASCII line content, tabs expanded, ansi escapes removed, multi-byte chars replaced with one or more 'x' */
     size_t    invis;                     /* number of invisble columns/characters (part of an ansi sequence) */
 
     uint32_t *mbtext;                    /* multi-byte (original) line content, tabs expanded. We use UTF-32 in order to enable pointer arithmetic. */
     size_t    num_chars;                 /* total number of characters in mbtext, visible + invisible */
+    uint32_t *mbtext_org;                /* mbtext as originally allocated, so that we can free it again */
 
     size_t   *tabpos;                    /* tab positions in expanded work strings, or NULL if not needed */
     size_t    tabpos_len;                /* number of tabs in a line */

@@ -28,7 +28,6 @@
 
 #include <unictype.h>
 #include <unistr.h>
-#include <unitypes.h>
 
 #include "unicode.h"
 

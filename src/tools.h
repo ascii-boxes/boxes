@@ -27,14 +27,16 @@
 
 #include <unitypes.h>
 
+#include "boxes.h"
+
 
 #define BMAX(a, b) ((a)>(b)? (a):(b))    /* return the larger value */
 
 #define BFREE(p) {                       /* free memory and clear pointer */ \
-    if (p) {          \
-        free (p);     \
-        (p) = NULL;   \
-    }                 \
+    if (p) {              \
+        free((void *) p); \
+        (p) = NULL;       \
+    }                     \
 }
 
 

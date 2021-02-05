@@ -26,9 +26,9 @@ GEN_HDR    = parser.h boxes.h
 GEN_SRC    = parser.c lex.yy.c
 GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
 ORIG_HDRCL = boxes.h.in config.h
-ORIG_HDR   = $(ORIG_HDRCL) lexer.h tools.h shape.h generate.h remove.h unicode.h
+ORIG_HDR   = $(ORIG_HDRCL) lexer.h tools.h shape.h generate.h remove.h unicode.h regulex.h
 ORIG_GEN   = lexer.l parser.y
-ORIG_NORM  = boxes.c tools.c shape.c generate.c remove.c unicode.c
+ORIG_NORM  = boxes.c tools.c shape.c generate.c remove.c unicode.c regulex.c
 ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
 ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 OTH_FILES  = Makefile
@@ -46,8 +46,7 @@ debug: flags_$(BOXES_PLATFORM)
 	$(MAKE) BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" CFLAGS_ADDTL="-g $(CFLAGS_ADDTL)" STRIP=false flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
 
 boxes: $(ALL_OBJ)
-	$(MAKE) -C regexp CC=$(CC) libregexp.a
-	$(CC) $(LDFLAGS) $(ALL_OBJ) -o $(BOXES_EXECUTABLE_NAME) -lunistring -lpcre2-32 -lregexp
+	$(CC) $(LDFLAGS) $(ALL_OBJ) -o $(BOXES_EXECUTABLE_NAME) -lunistring -lpcre2-32
 	if [ "$(STRIP)" = "true" ] ; then strip $(BOXES_EXECUTABLE_NAME) ; fi
 
 boxes.exe: $(ALL_OBJ)
@@ -56,22 +55,22 @@ boxes.exe: $(ALL_OBJ)
 
 
 flags_unix:
-	$(eval CFLAGS := -I. -Iregexp -Wall -W $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := -Lregexp $(LDFLAGS_ADDTL))
+	$(eval CFLAGS := -I. -Wall -W $(CFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS_ADDTL))
 	$(eval BOXES_EXECUTABLE_NAME := boxes)
 	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
 
 flags_win32:
-	$(eval CFLAGS := -Os -s -m32 -I. -Iregexp -Wall -W $(CFLAGS_ADDTL))
+	$(eval CFLAGS := -Os -s -m32 -I. -Wall -W $(CFLAGS_ADDTL))
 	$(eval LDFLAGS := -s -m32)
 	$(eval BOXES_EXECUTABLE_NAME := boxes.exe)
-	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o) regexp/regexp.o regexp/regsub.o misc/getopt.o)
+	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o) misc/getopt.o)
 
 flags_:
 	@echo Please call make from the top level directory.
 	exit 1
 
-parser.c parser.h: parser.y boxes.h regexp/regexp.h
+parser.c parser.h: parser.y boxes.h
 	$(YACC) -o parser.c -d parser.y
 
 lex.yy.c: lexer.l boxes.h
@@ -81,16 +80,15 @@ lex.yy.c: lexer.l boxes.h
 	rm lexer.tmp.c
 
 
-boxes.o: boxes.c boxes.h regexp/regexp.h shape.h tools.h unicode.h generate.h remove.h config.h
+boxes.o: boxes.c boxes.h regulex.h shape.h tools.h unicode.h generate.h remove.h config.h
 tools.o: tools.c tools.h boxes.h shape.h config.h
 unicode.o: unicode.c unicode.h config.h
 shape.o: shape.c shape.h boxes.h config.h tools.h
 generate.o: generate.c generate.h boxes.h shape.h tools.h config.h
 remove.o: remove.c remove.h boxes.h shape.h tools.h config.h
+regulex.o: regulex.c regulex.h config.h
 lex.yy.o: lex.yy.c parser.h tools.h shape.h lexer.h config.h
 parser.o: parser.c parser.h tools.h shape.h lexer.h config.h
-regexp/regexp.o: regexp/regexp.c
-regexp/regsub.o: regexp/regsub.c
 misc/getopt.o: misc/getopt.c
 
 
@@ -102,7 +100,6 @@ clean: flags_unix
 	rm -f $(ALL_OBJ)
 	rm -f $(GEN_FILES)
 	rm -f core boxes boxes.exe
-	$(MAKE) -C regexp clean
 
 
 #EOF

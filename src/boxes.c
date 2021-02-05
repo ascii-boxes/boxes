@@ -41,8 +41,8 @@
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
-#include "regexp.h"
 #include "generate.h"
+#include "regulex.h"
 #include "remove.h"
 #include "unicode.h"
 
@@ -1218,6 +1218,73 @@ static int get_indent(const line_t *lines, const size_t lines_size)
 
 
 
+/**
+ * Analyze the multi-byte string in order to determine its metrics:
+ * - number of visible columns it occupies
+ * - number of escape characters (== number of escape sequences)
+ * - the ASCII equivalent of the string
+ * - the number of invisible characters in the string
+ *
+ * @param <s> the multi-byte string to analyze
+ * @param <num_esc> pointer to where the number of escape sequences should be stored
+ * @param <ascii> pointer to where the ASCII equivalent of the string should be stored
+ * @returns the number of invisible characters in <s>
+ */
+static size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii)
+{
+    size_t invis = 0;  /* counts invisible column positions */
+    int ansipos = 0;   /* progression of ansi sequence */
+    *num_esc = 0;      /* counts the number of escape sequences found */
+
+    if (is_empty(s)) {
+        (*ascii) = (char *) strdup("");
+        return 0;
+    }
+    size_t buflen = (size_t) u32_strwidth(s, encoding);
+    (*ascii) = (char *) calloc(buflen, sizeof(char));     /* maybe a little too much, but certainly enough */
+    char *p = *ascii;
+
+    ucs4_t c;
+    const uint32_t *rest = s;
+    while ((rest = u32_next(&c, rest))) {
+        if (ansipos == 0 && c == char_esc) {
+            /* Found an ESC char, count it as invisible and move 1 forward in the detection of CSI sequences */
+            ansipos++;
+            invis++;
+            (*num_esc)++;
+        } else if (ansipos == 1 && c == '[') {
+            /* Found '[' char after ESC. A CSI sequence has started. */
+            ansipos++;
+            invis++;
+        } else if (ansipos == 1 && c >= 0x40 && c <= 0x5f) {
+            /* Found a byte designating the end of a two-byte escape sequence */
+            invis++;
+            ansipos = 0;
+        } else if (ansipos == 2) {
+            /* Inside CSI sequence - Keep counting bytes as invisible */
+            invis++;
+
+            /* A char between 0x40 and 0x7e signals the end of an CSI or escape sequence */
+            if (c >= 0x40 && c <= 0x7e) {
+                ansipos = 0;
+            }
+        } else if (is_ascii_printable(c)) {
+            *p = c & 0xff;
+            ++p;
+        } else {
+            int cols = uc_width(c, encoding);
+            if (cols > 0) {
+                memset(p, (int) 'x', cols);
+                p += cols;
+            }
+        }
+    }
+    *p = '\0';
+    return invis;
+}
+
+
+
 static int apply_substitutions(const int mode)
 /*
  *  Apply regular expression substitutions to input text.
@@ -1236,8 +1303,6 @@ static int apply_substitutions(const int mode)
     size_t anz_rules;
     reprule_t *rules;
     size_t j, k;
-    char buf[LINE_MAX_BYTES * 2];
-    size_t buf_len;                  /* length of string in buf */
 
     if (opt.design == NULL) {
         return 1;
@@ -1262,7 +1327,10 @@ static int apply_substitutions(const int mode)
     errno = 0;
     opt.design->current_rule = rules;
     for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
-        rules[j].prog = regcomp(rules[j].search);
+        rules[j].prog = compile_pattern(rules[j].search);
+        if (rules[j].prog == NULL) {
+            return 5;
+        }
     }
     opt.design->current_rule = NULL;
     if (errno) {
@@ -1276,37 +1344,37 @@ static int apply_substitutions(const int mode)
         opt.design->current_rule = rules;
         for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
             #ifdef REGEXP_DEBUG
-            fprintf (stderr, "myregsub (0x%p, \"%s\", %d, \"%s\", buf, %d, \'%c\') == ",
-                    rules[j].prog, input.lines[k].text,
-                    input.lines[k].len, rules[j].repstr, LINE_MAX_BYTES*2,
-                    rules[j].mode);
+            fprintf (stderr, "regex_replace(0x%p, \"%s\", \"%s\", %d, \'%c\') == ",
+                    rules[j].prog, rules[j].repstr, u32_strconv_to_locale(input.lines[k].mbtext),
+                    (int) input.lines[k].num_chars, rules[j].mode);
             #endif
-            errno = 0;
-            buf_len = myregsub(rules[j].prog, input.lines[k].text,
-                               input.lines[k].len, rules[j].repstr, buf, LINE_MAX_BYTES * 2,
-                               rules[j].mode);
+            uint32_t *newtext = regex_replace(rules[j].prog, rules[j].repstr,
+                                              input.lines[k].mbtext, input.lines[k].num_chars, rules[j].mode == 'g');
             #ifdef REGEXP_DEBUG
-                fprintf (stderr, "%d\n", buf_len);
+                fprintf (stderr, "\"%s\"\n", newtext ? u32_strconv_to_locale(newtext) : "NULL");
             #endif
-            if (errno) {
+            if (newtext == NULL) {
                 return 1;
             }
 
-            BFREE (input.lines[k].text);
-            input.lines[k].text = (char *) strdup(buf);
-            if (input.lines[k].text == NULL) {
-                perror(PROJECT);
-                return 1;
-            }
+            BFREE(input.lines[k].mbtext_org);  /* original address allocated for mbtext */
+            input.lines[k].mbtext = newtext;
+            input.lines[k].mbtext_org = newtext;
 
-            input.lines[k].len = buf_len;
-
+            size_t num_esc = 0;
+            char *ascii;     // TODO HERE extract into function analyze/asciify(line_t) ?
+            size_t invis = count_invisible_chars(input.lines[k].mbtext, &num_esc, &ascii);
+            input.lines[k].len = u32_strwidth(input.lines[k].mbtext, encoding) - invis + num_esc;
+            input.lines[k].num_chars = u32_strlen(input.lines[k].mbtext);
+            BFREE(input.lines[k].text);
+            input.lines[k].text = ascii;
             if (input.lines[k].len > input.maxline) {
                 input.maxline = input.lines[k].len;
             }
 
             #ifdef REGEXP_DEBUG
-                fprintf (stderr, "input.lines[%d] == {%d, \"%s\"}\n", k, input.lines[k].len, input.lines[k].text);
+                fprintf (stderr, "input.lines[%d] == {%d, \"%s\"}\n", (int) k,
+                    (int) input.lines[k].num_chars, u32_strconv_to_locale(input.lines[k].mbtext));
             #endif
         }
         opt.design->current_rule = NULL;
@@ -1357,60 +1425,6 @@ static int has_linebreak(const uint32_t *s, const int len)
 
 
 
-static size_t count_invisible_chars(const uint32_t *s, const size_t buflen, size_t *num_esc, char **ascii)
-{
-    size_t invis = 0;  /* counts invisible column positions */
-    int ansipos = 0;   /* progression of ansi sequence */
-    *num_esc = 0;      /* counts the number of escape sequences found */
-
-    if (is_empty(s)) {
-        (*ascii) = (char *) strdup("");
-        return 0;
-    }
-    (*ascii) = (char *) calloc(buflen, sizeof(char));
-    char *p = *ascii;
-
-    ucs4_t c;
-    const uint32_t *rest = s;
-    while ((rest = u32_next(&c, rest))) {
-        if (ansipos == 0 && c == char_esc) {
-            /* Found an ESC char, count it as invisible and move 1 forward in the detection of CSI sequences */
-            ansipos++;
-            invis++;
-            (*num_esc)++;
-        } else if (ansipos == 1 && c == '[') {
-            /* Found '[' char after ESC. A CSI sequence has started. */
-            ansipos++;
-            invis++;
-        } else if (ansipos == 1 && c >= 0x40 && c <= 0x5f) {
-            /* Found a byte designating the end of a two-byte escape sequence */
-            invis++;
-            ansipos = 0;
-        } else if (ansipos == 2) {
-            /* Inside CSI sequence - Keep counting bytes as invisible */
-            invis++;
-
-            /* A char between 0x40 and 0x7e signals the end of an CSI or escape sequence */
-            if (c >= 0x40 && c <= 0x7e) {
-                ansipos = 0;
-            }
-        } else if (is_ascii_printable(c)) {
-            *p = c & 0xff;
-            ++p;
-        } else {
-            int cols = uc_width(c, encoding);
-            if (cols > 0) {
-                memset(p, (int) 'x', cols);
-                p += cols;
-            }
-        }
-    }
-    *p = '\0';
-    return invis;
-}
-
-
-
 static int read_all_input(const int use_stdin)
 /*
  *  Read entire input (possibly from stdin) and store it in 'input' array.
@@ -1444,7 +1458,7 @@ static int read_all_input(const int use_stdin)
          *  Start reading
          */
         while (fgets(buf, LINE_MAX_BYTES + 1, opt.infile)) {
-            if (input_size % 100 == 0) {
+            if (input.anz_lines % 100 == 0) {
                 input_size += 100;
                 line_t *tmp = (line_t *) realloc(input.lines, input_size * sizeof(line_t));
                 if (tmp == NULL) {
@@ -1483,18 +1497,20 @@ static int read_all_input(const int use_stdin)
                     return 1;
                 }
                 input.lines[input.anz_lines].mbtext = temp;
+                BFREE(mbtemp);
                 temp = NULL;
             }
             else {
                 input.lines[input.anz_lines].mbtext = mbtemp;
             }
+            input.lines[input.anz_lines].mbtext_org = input.lines[input.anz_lines].mbtext;
             input.lines[input.anz_lines].num_chars = len_chars;
 
             /*
              * Find ANSI CSI/ESC sequences
              */
             size_t num_esc = 0;
-            size_t invis = count_invisible_chars(input.lines[input.anz_lines].mbtext, strlen(buf), &num_esc,
+            size_t invis = count_invisible_chars(input.lines[input.anz_lines].mbtext, &num_esc,
                                                  &(input.lines[input.anz_lines].text));
             input.lines[input.anz_lines].invis = invis;
             /* u32_strwidth() does not count control characters, i.e. ESC characters, for which we must correct */
@@ -1526,8 +1542,8 @@ static int read_all_input(const int use_stdin)
         /* recalculate input statistics for redrawing the mended box */
         for (i = 0; i < input.anz_lines; ++i) {
             size_t num_esc = 0;
-            char *dummy;
-            size_t invis = count_invisible_chars(input.lines[i].mbtext, strlen(input.lines[i].text), &num_esc, &dummy);
+            char *dummy;     // TODO extract into function
+            size_t invis = count_invisible_chars(input.lines[i].mbtext, &num_esc, &dummy);
             BFREE(dummy);
             input.lines[i].len = u32_strwidth(input.lines[i].mbtext, encoding) - invis + num_esc;
             input.lines[i].num_chars = u32_strlen(input.lines[i].mbtext);
@@ -1576,7 +1592,7 @@ static int read_all_input(const int use_stdin)
      *  Apply regular expression substitutions
      */
     if (opt.r == 0) {
-        if (apply_substitutions(0) != 0) { // TODO
+        if (apply_substitutions(0) != 0) {
             return 1;
         }
     }
