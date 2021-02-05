@@ -1285,6 +1285,21 @@ static size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **a
 
 
 
+static void analyze_line_ascii(line_t *line)
+{
+    size_t num_esc = 0;
+    char *ascii;
+    size_t invis = count_invisible_chars(line->mbtext, &num_esc, &ascii);
+    line->invis = invis;
+    /* u32_strwidth() does not count control characters, i.e. ESC characters, for which we must correct */
+    line->len = u32_strwidth(line->mbtext, encoding) - invis + num_esc;
+    line->num_chars = u32_strlen(line->mbtext);
+    BFREE(line->text);
+    line->text = ascii;
+}
+
+
+
 static int apply_substitutions(const int mode)
 /*
  *  Apply regular expression substitutions to input text.
@@ -1361,13 +1376,7 @@ static int apply_substitutions(const int mode)
             input.lines[k].mbtext = newtext;
             input.lines[k].mbtext_org = newtext;
 
-            size_t num_esc = 0;
-            char *ascii;     // TODO HERE extract into function analyze/asciify(line_t) ?
-            size_t invis = count_invisible_chars(input.lines[k].mbtext, &num_esc, &ascii);
-            input.lines[k].len = u32_strwidth(input.lines[k].mbtext, encoding) - invis + num_esc;
-            input.lines[k].num_chars = u32_strlen(input.lines[k].mbtext);
-            BFREE(input.lines[k].text);
-            input.lines[k].text = ascii;
+            analyze_line_ascii(input.lines + k);
             if (input.lines[k].len > input.maxline) {
                 input.maxline = input.lines[k].len;
             }
@@ -1507,27 +1516,14 @@ static int read_all_input(const int use_stdin)
             input.lines[input.anz_lines].num_chars = len_chars;
 
             /*
-             * Find ANSI CSI/ESC sequences
+             * Build ASCII equivalent of the multi-byte string, update line stats
              */
-            size_t num_esc = 0;
-            size_t invis = count_invisible_chars(input.lines[input.anz_lines].mbtext, &num_esc,
-                                                 &(input.lines[input.anz_lines].text));
-            input.lines[input.anz_lines].invis = invis;
-            /* u32_strwidth() does not count control characters, i.e. ESC characters, for which we must correct */
-            size_t mbtext_cols = u32_strwidth(input.lines[input.anz_lines].mbtext, encoding);
-            input.lines[input.anz_lines].len = mbtext_cols - invis + num_esc;
+            analyze_line_ascii(input.lines + input.anz_lines);
             input.lines[input.anz_lines].num_leading_blanks = 0;
-
-            /*
-             *  Update length of longest line
-             */
             if (input.lines[input.anz_lines].len > input.maxline) {
                 input.maxline = input.lines[input.anz_lines].len;
             }
 
-            /*
-             *  next please
-             */
             ++input.anz_lines;
         }
 
@@ -1541,12 +1537,7 @@ static int read_all_input(const int use_stdin)
     else {
         /* recalculate input statistics for redrawing the mended box */
         for (i = 0; i < input.anz_lines; ++i) {
-            size_t num_esc = 0;
-            char *dummy;     // TODO extract into function
-            size_t invis = count_invisible_chars(input.lines[i].mbtext, &num_esc, &dummy);
-            BFREE(dummy);
-            input.lines[i].len = u32_strwidth(input.lines[i].mbtext, encoding) - invis + num_esc;
-            input.lines[i].num_chars = u32_strlen(input.lines[i].mbtext);
+            analyze_line_ascii(input.lines + i);
             if (input.lines[i].len > input.maxline) {
                 input.maxline = input.lines[i].len;
             }
