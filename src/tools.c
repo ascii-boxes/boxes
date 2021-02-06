@@ -30,9 +30,11 @@
 #include <string.h>
 #include <strings.h>
 
+#include <uniconv.h>
 #include <unictype.h>
 #include <unistr.h>
 #include <unitypes.h>
+#include <uniwidth.h>
 
 #include "shape.h"
 #include "boxes.h"
@@ -485,6 +487,154 @@ char *nspaces(const size_t n)
     return spaces;
 }
 
+
+
+/**
+ *  Debugging Code: Display contents of input structure
+ */
+void print_input_lines(const char *heading)
+{
+    fprintf(stderr, "Input Lines%s:\n", heading != NULL ? heading : "");
+    fprintf(stderr, "     [num_chars] \"real text\" [num_cols] \"ascii_text\"\n");
+    for (size_t i = 0; i < input.anz_lines; ++i) {
+        fprintf(stderr, "%4d [%02d] \"%s\"  [%02d] \"%s\"", (int) i,
+                (int) input.lines[i].num_chars, u32_strconv_to_locale(input.lines[i].mbtext),
+                (int) input.lines[i].len, input.lines[i].text);
+        fprintf(stderr, "\tTabs: [");
+        if (input.lines[i].tabpos != NULL) {
+            for (size_t j = 0; j < input.lines[i].tabpos_len; ++j) {
+                fprintf(stderr, "%d", (int) input.lines[i].tabpos[j]);
+                if (j < input.lines[i].tabpos_len - 1) {
+                    fprintf(stderr, ", ");
+                }
+            }
+        }
+        fprintf(stderr, "] (%d)", (int) input.lines[i].tabpos_len);
+        fprintf(stderr, "\tinvisible=%d\n", (int) input.lines[i].invis);
+
+        fprintf(stderr, "          posmap=");
+        if (input.lines[i].posmap != NULL) {
+            fprintf(stderr, "[");
+            for (size_t j = 0; j < input.lines[i].len; j++) {
+                fprintf(stderr, "%d%s", (int) input.lines[i].posmap[j], j == (input.lines[i].len - 1) ? "" : ", ");
+            }
+            fprintf(stderr, "]\n");
+        } else {
+            fprintf(stderr, "null\n");
+        }
+    }
+    fprintf(stderr, " Longest line: %d columns\n", (int) input.maxline);
+    fprintf(stderr, "  Indentation: %2d spaces\n", (int) input.indent);
+    fprintf(stderr, "Final newline: %s\n", input.final_newline ? "yes" : "no");
+}
+
+
+
+/**
+ * Analyze the multi-byte string in order to determine its metrics:
+ * - number of visible columns it occupies
+ * - number of escape characters (== number of escape sequences)
+ * - the ASCII equivalent of the string
+ * - the number of invisible characters in the string
+ *
+ * @param <s> the multi-byte string to analyze
+ * @param <num_esc> pointer to where the number of escape sequences should be stored
+ * @param <ascii> pointer to where the ASCII equivalent of the string should be stored
+ * @param <posmap> pointer to the position map, which maps each position in <ascii> to a position in <s>
+ * @returns the number of invisible characters in <s>
+ */
+static size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, size_t **posmap)
+{
+    size_t invis = 0;  /* counts invisible column positions */
+    int ansipos = 0;   /* progression of ansi sequence */
+    *num_esc = 0;      /* counts the number of escape sequences found */
+
+    if (is_empty(s)) {
+        (*ascii) = (char *) strdup("");
+        (*posmap) = NULL;
+        return 0;
+    }
+
+    size_t buflen = (size_t) u32_strwidth(s, encoding) + 1;
+    size_t map_size = BMAX((size_t) 5, buflen);
+    size_t map_idx = 0;
+    size_t *map = (size_t *) calloc(map_size, sizeof(size_t));  /* might not be enough if many double-wide chars */
+    (*ascii) = (char *) calloc(buflen, sizeof(char));     /* maybe a little too much, but certainly enough */
+    char *p = *ascii;
+
+    ucs4_t c;
+    size_t mb_idx = 0;
+    const uint32_t *rest = s;
+    while ((rest = u32_next(&c, rest))) {
+        if (map_idx >= map_size - 4) {
+            map_size = map_size * 2 + 1;
+            map = (size_t *) realloc(map, map_size * sizeof(size_t));
+        }
+
+        if (ansipos == 0 && c == char_esc) {
+            /* Found an ESC char, count it as invisible and move 1 forward in the detection of CSI sequences */
+            ansipos++;
+            invis++;
+            (*num_esc)++;
+        } else if (ansipos == 1 && c == '[') {
+            /* Found '[' char after ESC. A CSI sequence has started. */
+            ansipos++;
+            invis++;
+        } else if (ansipos == 1 && c >= 0x40 && c <= 0x5f) {
+            /* Found a byte designating the end of a two-byte escape sequence */
+            invis++;
+            ansipos = 0;
+        } else if (ansipos == 2) {
+            /* Inside CSI sequence - Keep counting bytes as invisible */
+            invis++;
+
+            /* A char between 0x40 and 0x7e signals the end of an CSI or escape sequence */
+            if (c >= 0x40 && c <= 0x7e) {
+                ansipos = 0;
+            }
+
+        } else if (is_ascii_printable(c)) {
+            *p = c & 0xff;
+            map[map_idx++] = mb_idx;
+            ++p;
+        } else {
+            int cols = uc_width(c, encoding);
+            if (cols > 0) {
+                memset(p, (int) 'x', cols);
+                for (int i = 0; i < cols; i++) {
+                    map[map_idx++] = mb_idx;
+                }
+                p += cols;
+            }
+        }
+        ++mb_idx;
+    }
+    *p = '\0';
+    (*posmap) = map;
+    return invis;
+}
+
+
+
+void analyze_line_ascii(line_t *line)
+{
+    size_t num_esc = 0;
+    char *ascii;
+    size_t *map;
+    size_t invis = count_invisible_chars(line->mbtext, &num_esc, &ascii, &(map));
+    line->invis = invis;
+    /* u32_strwidth() does not count control characters, i.e. ESC characters, for which we must correct */
+    line->len = u32_strwidth(line->mbtext, encoding) - invis + num_esc;
+    line->num_chars = u32_strlen(line->mbtext);
+    BFREE(line->text);
+    line->text = ascii;
+    BFREE(line->posmap);
+    line->posmap = map;
+
+    if (line->len > input.maxline) {
+        input.maxline = line->len;
+    }
+}
 
 
 /*EOF*/                                                  /* vim: set sw=4: */

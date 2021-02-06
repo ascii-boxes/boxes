@@ -101,8 +101,8 @@ static int horiz_precalc(const sentry_t *sarr,
 #ifdef DEBUG
     fprintf (stderr, "in horiz_precalc:\n    ");
     fprintf (stderr, "opt.design->minwidth %d, input.maxline %d, target_width"
-            " %d, tnumsh %d, bnumsh %d\n", opt.design->minwidth,
-            input.maxline, target_width, tnumsh, bnumsh);
+            " %d, tnumsh %d, bnumsh %d\n", (int) opt.design->minwidth,
+             (int) input.maxline, (int) target_width, tnumsh, bnumsh);
 #endif
 
     twidth = 0;
@@ -533,17 +533,17 @@ static int horiz_generate(sentry_t *tresult, sentry_t *bresult)
 
 #ifdef DEBUG
     fprintf (stderr, "Top side box rect width %d, height %d.\n",
-            tresult->width, tresult->height);
+             (int) tresult->width, (int) tresult->height);
     fprintf (stderr, "Top columns to fill: %s %d, %s %d, %s %d.\n",
-            shape_name[north_side[1]], tiltf[0],
-            shape_name[north_side[2]], tiltf[1],
-            shape_name[north_side[3]], tiltf[2]);
+            shape_name[north_side[1]], (int) tiltf[0],
+            shape_name[north_side[2]], (int) tiltf[1],
+            shape_name[north_side[3]], (int) tiltf[2]);
     fprintf (stderr, "Bottom side box rect width %d, height %d.\n",
-            bresult->width, bresult->height);
+             (int) bresult->width, (int) bresult->height);
     fprintf (stderr, "Bottom columns to fill: %s %d, %s %d, %s %d.\n",
-            shape_name[south_side[1]], biltf[0],
-            shape_name[south_side[2]], biltf[1],
-            shape_name[south_side[3]], biltf[2]);
+            shape_name[south_side[1]], (int) biltf[0],
+            shape_name[south_side[2]], (int) biltf[1],
+            shape_name[south_side[3]], (int) biltf[2]);
 #endif
 
     tresult->chars = (char **) calloc(tresult->height, sizeof(char *));
@@ -561,21 +561,21 @@ static int horiz_generate(sentry_t *tresult, sentry_t *bresult)
         return rc;
     }
 
-#if defined(DEBUG) && 1
+#ifdef DEBUG
     {
         /*
          *  Debugging code - Output horizontal sides of box
          */
         size_t j;
-        fprintf (stderr, "TOP SIDE:\n");
-        for (j=0; j<tresult->height; ++j) {
-            fprintf (stderr, "  %2d: \'%s\'\n", j,
-                    tresult->chars[j]? tresult->chars[j] : "(null)");
+        fprintf(stderr, "TOP SIDE:\n");
+        for (j = 0; j < tresult->height; ++j) {
+            fprintf(stderr, "  %2d: \'%s\'\n", (int) j,
+                    tresult->chars[j] ? tresult->chars[j] : "(null)");
         }
-        fprintf (stderr, "BOTTOM SIDE:\n");
-        for (j=0; j<bresult->height; ++j) {
-            fprintf (stderr, "  %2d: \'%s\'\n", j,
-                    bresult->chars[j]? bresult->chars[j] : "(null)");
+        fprintf(stderr, "BOTTOM SIDE:\n");
+        for (j = 0; j < bresult->height; ++j) {
+            fprintf(stderr, "  %2d: \'%s\'\n", (int) j,
+                    bresult->chars[j] ? bresult->chars[j] : "(null)");
         }
     }
 #endif
@@ -616,18 +616,18 @@ static int vert_generate(sentry_t *lresult, sentry_t *rresult)
             opt.design->shape[NE].height + opt.design->shape[SE].height;
 
 #ifdef DEBUG
-    fprintf (stderr, "Left side box rect width %d, height %d, vspace %d.\n",
-            lresult->width, lresult->height, vspace);
-    fprintf (stderr, "Left lines to fill: %s %d, %s %d, %s %d.\n",
-            shape_name[west_side[1]], leftiltf[0],
-            shape_name[west_side[2]], leftiltf[1],
-            shape_name[west_side[3]], leftiltf[2]);
-    fprintf (stderr, "Right side box rect width %d, height %d, vspace %d.\n",
-            rresult->width, rresult->height, vspace);
-    fprintf (stderr, "Right lines to fill: %s %d, %s %d, %s %d.\n",
-            shape_name[east_side[1]], rightiltf[0],
-            shape_name[east_side[2]], rightiltf[1],
-            shape_name[east_side[3]], rightiltf[2]);
+    fprintf(stderr, "Left side box rect width %d, height %d, vspace %d.\n",
+            (int) lresult->width, (int) lresult->height, (int) vspace);
+    fprintf(stderr, "Left lines to fill: %s %d, %s %d, %s %d.\n",
+            shape_name[west_side[1]], (int) leftiltf[0],
+            shape_name[west_side[2]], (int) leftiltf[1],
+            shape_name[west_side[3]], (int) leftiltf[2]);
+    fprintf(stderr, "Right side box rect width %d, height %d, vspace %d.\n",
+            (int) rresult->width, (int) rresult->height, (int) vspace);
+    fprintf(stderr, "Right lines to fill: %s %d, %s %d, %s %d.\n",
+            shape_name[east_side[1]], (int) rightiltf[0],
+            shape_name[east_side[2]], (int) rightiltf[1],
+            shape_name[east_side[3]], (int) rightiltf[2]);
 #endif
 
     lresult->chars = (char **) calloc(lresult->height, sizeof(char *));
@@ -648,15 +648,15 @@ static int vert_generate(sentry_t *lresult, sentry_t *rresult)
          *  Debugging code - Output left and right side of box
          */
         size_t j;
-        fprintf (stderr, "LEFT SIDE:\n");
-        for (j=0; j<lresult->height; ++j) {
-            fprintf (stderr, "  %2d: \'%s\'\n", j,
-                    lresult->chars[j]? lresult->chars[j] : "(null)");
+        fprintf(stderr, "LEFT SIDE:\n");
+        for (j = 0; j < lresult->height; ++j) {
+            fprintf(stderr, "  %2d: \'%s\'\n", (int) j,
+                    lresult->chars[j] ? lresult->chars[j] : "(null)");
         }
-        fprintf (stderr, "RIGHT SIDE:\n");
-        for (j=0; j<rresult->height; ++j) {
-            fprintf (stderr, "  %2d: \'%s\'\n", j,
-                    rresult->chars[j]? rresult->chars[j] : "(null)");
+        fprintf(stderr, "RIGHT SIDE:\n");
+        for (j = 0; j < rresult->height; ++j) {
+            fprintf(stderr, "  %2d: \'%s\'\n", (int) j,
+                    rresult->chars[j] ? rresult->chars[j] : "(null)");
         }
     }
 #endif
@@ -933,10 +933,10 @@ int output_box(const sentry_t *thebox)
     hfill2[hpr] = '\0';
 
 #if defined(DEBUG)
-    fprintf (stderr, "Alignment: hfill %d hpl %d hpr %d, vfill %d "
-        "vfill1 %d vfill2 %d.\n", hfill, hpl, hpr, vfill, vfill1, vfill2);
-    fprintf (stderr, "           hfill1 = \"%s\";  hfill2 = \"%s\";  "
-            "indentspc = \"%s\";\n", hfill1, hfill2, indentspc);
+    fprintf(stderr, "Alignment: hfill %d hpl %d hpr %d, vfill %d vfill1 %d vfill2 %d.\n",
+            (int) hfill, (int) hpl, (int) hpr, (int) vfill, (int) vfill1, (int) vfill2);
+    fprintf(stderr, "           hfill1 = \"%s\";  hfill2 = \"%s\";  indentspc = \"%s\";\n",
+            hfill1, hfill2, indentspc);
 #endif
 
     /*
@@ -955,10 +955,10 @@ int output_box(const sentry_t *thebox)
     if (empty_side(opt.design->shape, BLEF)) {
         skip_left = opt.design->shape[NW].width;
     } /* could simply be 1, though */
-#if defined(DEBUG)
-    fprintf (stderr, "skip_start = %d;  skip_end = %d;  skip_left = %d;  "
-            "nol = %d;\n", skip_start, skip_end, skip_left, nol);
-#endif
+    #if defined(DEBUG)
+        fprintf(stderr, "skip_start = %d;  skip_end = %d;  skip_left = %d;  nol = %d;\n",
+                (int) skip_start, (int) skip_end, (int) skip_left, (int) nol);
+    #endif
 
     /*
      *  Generate actual output

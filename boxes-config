@@ -51,7 +51,7 @@ shapes {
 }
 
 delim ?"
-replace "\*/" with "*\/"               # quote closing comment tags
+replace "\*/" with "*\\/"         # escape closing comment tags
 reverse "\*\\/" to "*/"
 
 padding {
@@ -945,8 +945,8 @@ tags "programming, comment, deprecated"
 
 sample
     %{-----------------------------------------------------------------+
-     | IBM Net.Data Macro Sample - Perl and SQL Backends               |
-     | Thomas Jensen, February 17, 1998 (Tuesday, 16:40h)              |
+     | IBM Net.Data Macro Comment                                      |
+     | Created February 17, 1998 (Tuesday, 16:40h)                     |
      +-----------------------------------------------------------------%}
 ends
 
@@ -1875,7 +1875,7 @@ shapes {
 }
 
 replace "(.)(?!$)" with "$1 "
-reverse "^( *)([^ ]*) " to "$1$2"       # $1 to leave indentation untouched # TODO
+reverse "([^ ]) " to "$1"
 
 padding {
     horiz 2

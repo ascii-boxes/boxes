@@ -26,9 +26,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <uniconv.h>
+#include <unistr.h>
+
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
+#include "unicode.h"
 #include "remove.h"
 
 
@@ -72,8 +76,8 @@ static int best_match(const line_t *line,
     nume += opt.design->shape[ESE].height;
 
     #ifdef DEBUG
-    fprintf (stderr, "Number of WEST side shape lines: %d\n", numw);
-    fprintf (stderr, "Number of EAST side shape lines: %d\n", nume);
+    fprintf (stderr, "Number of WEST side shape lines: %d\n", (int) numw);
+    fprintf (stderr, "Number of EAST side shape lines: %d\n", (int) nume);
     #endif
 
     /*
@@ -156,10 +160,10 @@ static int best_match(const line_t *line,
                 k = 0;
                 cs = opt.design->shape + east_side[++w];
             }
-#ifdef DEBUG
-            fprintf (stderr, "\nj %d, k %d, w %d, cs->chars[k] = \"%s\"\n",
-                    j, k, w, cs->chars[k]?cs->chars[k]:"(null)");
-#endif
+            #ifdef DEBUG
+                fprintf(stderr, "\nj %d, k %d, w %d, cs->chars[k] = \"%s\"\n",
+                        (int) j, (int) k, w, cs->chars[k] ? cs->chars[k] : "(null)");
+            #endif
 
             chkline.text = cs->chars[k];
             chkline.len = cs->width;
@@ -248,8 +252,8 @@ static int hmm(const int aside, const size_t follow,
     int rc;
 
     #ifdef DEBUG
-    fprintf (stderr, "hmm (%s, %d, \'%c\', \'%c\', %d)\n",
-            aside==BTOP?"BTOP":"BBOT", follow, p[0], *ecs, cnt);
+        fprintf(stderr, "hmm (%s, %d, \'%c\', \'%c\', %d)\n",
+                aside == BTOP ? "BTOP" : "BBOT", (int) follow, p[0], *ecs, cnt);
     #endif
 
     if (p > ecs) {                         /* last shape tried was too long */
@@ -358,11 +362,10 @@ static int detect_horiz(const int aside, size_t *hstart, size_t *hend)
             && line >= input.lines; ++lcnt) {
         goeast = gowest = 0;
 
-#ifdef DEBUG
-        fprintf (stderr, "----- Processing line index %2d ----------"
-                "-------------------------------------\n",
-                aside == BTOP? lcnt: input.anz_lines - lcnt - 1);
-#endif
+        #ifdef DEBUG
+            fprintf(stderr, "----- Processing line index %2d -----------------------------------------------\n",
+                    (int) (aside == BTOP ? lcnt : input.anz_lines - lcnt - 1));
+        #endif
 
         do {
             /*
@@ -412,14 +415,13 @@ static int detect_horiz(const int aside, size_t *hstart, size_t *hend)
             /* Now, wcs is either NULL (if west side is empty)         */
             /* or not NULL (if west side is not empty). In any case, p */
             /* points to where we start searching for the east corner. */
-#ifdef DEBUG
-            if (wcs) {
-                fprintf (stderr, "West corner shape matched at "
-                        "position %d.\n", wcs - line->text);
-            } else {
-                fprintf (stderr, "West box side is empty.\n");
-            }
-#endif
+            #ifdef DEBUG
+                if (wcs) {
+                    fprintf(stderr, "West corner shape matched at position %d.\n", (int) (wcs - line->text));
+                } else {
+                    fprintf(stderr, "West box side is empty.\n");
+                }
+            #endif
             /*
              *  Look for east corner shape
              */
@@ -444,9 +446,9 @@ static int detect_horiz(const int aside, size_t *hstart, size_t *hend)
                     continue;
                 }
             }
-#ifdef DEBUG
-            fprintf (stderr, "East corner shape matched at position %d.\n", ecs-line->text);
-#endif
+            #ifdef DEBUG
+                fprintf(stderr, "East corner shape matched at position %d.\n", (int) (ecs - line->text));
+            #endif
 
             /*
              *  Check if text between corner shapes is valid
@@ -455,9 +457,9 @@ static int detect_horiz(const int aside, size_t *hstart, size_t *hend)
             if (!mmok) {
                 ++goeast;
             }
-#ifdef DEBUG
-            fprintf (stderr, "Text between corner shapes is %s.\n", mmok? "VALID": "NOT valid");
-#endif
+            #ifdef DEBUG
+                fprintf(stderr, "Text between corner shapes is %s.\n", mmok ? "VALID" : "NOT valid");
+            #endif
         } while (!mmok);
 
         /*
@@ -800,6 +802,21 @@ static design_t *detect_design()
 
 
 
+static void add_spaces_to_line(line_t* line, const size_t n)
+{
+    if (n == 0) {
+        return;
+    }
+    line->mbtext_org = (uint32_t *) realloc(line->mbtext_org, (line->num_chars + n + 1) * sizeof(uint32_t));
+    line->mbtext = line->mbtext_org;
+    u32_set(line->mbtext + line->num_chars, char_space, n);
+    set_char_at(line->mbtext, line->num_chars + n, char_nul);
+    line->num_chars += n;
+    analyze_line_ascii(line);
+}
+
+
+
 int remove_box()
 /*
  *  Remove box from input.
@@ -810,12 +827,12 @@ int remove_box()
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    size_t textstart = 0;            /* index of 1st line of box body */
-    size_t textend = 0;              /* index of 1st line of south side */
-    size_t boxstart = 0;             /* index of 1st line of box */
-    size_t boxend = 0;               /* index of 1st line trailing the box */
+    size_t textstart = 0;         /* index of 1st line of box body */
+    size_t textend = 0;           /* index of 1st line of south side */
+    size_t boxstart = 0;          /* index of 1st line of box */
+    size_t boxend = 0;            /* index of 1st line trailing the box */
     int m;                        /* true if a match was found */
-    size_t j;                        /* loop counter */
+    size_t j;                     /* loop counter */
     int did_something = 0;        /* true if there was something to remove */
 
     /*
@@ -827,14 +844,12 @@ int remove_box()
         design_t *tmp = detect_design();
         if (tmp) {
             opt.design = tmp;
-#ifdef DEBUG
-            fprintf (stderr, "Design autodetection: Removing box of "
-                    "design \"%s\".\n", opt.design->name);
-#endif
+            #ifdef DEBUG
+                fprintf(stderr, "Design autodetection: Removing box of design \"%s\".\n", opt.design->name);
+            #endif
         }
         else {
-            fprintf(stderr, "%s: Box design autodetection failed. Use -d "
-                    "option.\n", PROJECT);
+            fprintf(stderr, "%s: Box design autodetection failed. Use -d option.\n", PROJECT);
             return 1;
         }
     }
@@ -847,31 +862,14 @@ int remove_box()
      *  whose east sides consist of lots of spaces (the given value). So we
      *  add a number of spaces equal to the east side width.
      */
-    input.maxline += opt.design->shape[NE].width;
+    const size_t normalized_len = input.maxline + opt.design->shape[NE].width;
     for (j = 0; j < input.anz_lines; ++j) {
-        input.lines[j].text = (char *)
-                realloc(input.lines[j].text, input.maxline + input.lines[j].invis + 1);
-        if (input.lines[j].text == NULL) {
-            perror(PROJECT);
-            return 1;
-        }
-        memset(input.lines[j].text + input.lines[j].len, ' ',
-               input.maxline - input.lines[j].len + input.lines[j].invis);
-        input.lines[j].text[input.maxline] = '\0';
-        input.lines[j].len = input.maxline;
+        add_spaces_to_line(input.lines + j, normalized_len - input.lines[j].len);
     }
-
-    /*
-     *  Debugging Code: Display contents of input structure
-     */
-#if defined(DEBUG) && 1
-    for (j=0; j<input.anz_lines; ++j) {
-        fprintf (stderr, "%3d [%02d] \"%s\"\n", j, input.lines[j].len,
-                input.lines[j].text);
-    }
-    fprintf (stderr, "\nLongest line: %d characters.\n", input.maxline);
-    fprintf (stderr, " Indentation: %2d spaces.\n", input.indent);
-#endif
+    #ifdef DEBUG
+        fprintf(stderr, "Normalized all lines to %d columns (maxline + east width).\n", (int) input.maxline);
+        print_input_lines(" (remove_box)");
+    #endif
 
     /*
      *  Phase 1: Try to find out how many lines belong to the top of the box
@@ -880,14 +878,14 @@ int remove_box()
     textstart = 0;
     if (empty_side(opt.design->shape, BTOP)) {
         #ifdef DEBUG
-        fprintf (stderr, "----> Top box side is empty: boxstart == textstart == 0.\n");
+            fprintf(stderr, "----> Top box side is empty: boxstart == textstart == 0.\n");
         #endif
     }
     else {
         detect_horiz(BTOP, &boxstart, &textstart);
         #ifdef DEBUG
-        fprintf (stderr, "----> First line of box is %d, ", boxstart);
-        fprintf (stderr, "first line of box body (text) is %d.\n", textstart);
+            fprintf(stderr, "----> First line of box is %d, ", (int) boxstart);
+            fprintf(stderr, "first line of box body (text) is %d.\n", (int) textstart);
         #endif
     }
 
@@ -899,8 +897,7 @@ int remove_box()
         textend = input.anz_lines;
         boxend = input.anz_lines;
         #ifdef DEBUG
-        fprintf (stderr, "----> Bottom box side is empty: boxend == textend == %d.\n",
-                input.anz_lines);
+            fprintf(stderr, "----> Bottom box side is empty: boxend == textend == %d.\n", (int) input.anz_lines);
         #endif
     }
     else {
@@ -912,8 +909,8 @@ int remove_box()
             boxend = input.anz_lines;
         }
         #ifdef DEBUG
-        fprintf (stderr, "----> Last line of box body (text) is %d, ", textend-1);
-        fprintf (stderr, "last line of box is %d.\n", boxend-1);
+            fprintf(stderr, "----> Last line of box body (text) is %d, ", (int) (textend - 1));
+            fprintf(stderr, "last line of box is %d.\n", (int) (boxend - 1));
         #endif
     }
 
@@ -925,7 +922,7 @@ int remove_box()
         char *p;
 
         #ifdef DEBUG
-        fprintf (stderr, "Calling best_match() for line %d:\n", j);
+            fprintf(stderr, "Calling best_match() for line %d:\n", (int) j);
         #endif
         m = best_match(input.lines + j, &ws, &we, &es, &ee);
         if (m < 0) {
@@ -934,30 +931,33 @@ int remove_box()
         }
         else if (m == 0) {
             #ifdef DEBUG
-            fprintf (stderr, "\033[00;33;01mline %2d: no side match\033[00m\n", j);
+                fprintf(stderr, "\033[00;33;01mline %2d: no side match\033[00m\n", (int) j);
             #endif
         }
         else {
             #ifdef DEBUG
-            fprintf (stderr, "\033[00;33;01mline %2d: west: %d (\'%c\') to "
-                "%d (\'%c\') [len %d];  east: %d (\'%c\') to %d (\'%c\')"
-                " [len %d]\033[00m\n", j,
-                ws? ws-input.lines[j].text:0,   ws?ws[0]:'?',
-                we? we-input.lines[j].text-1:0, we?we[-1]:'?',
-                ws&&we? (we-input.lines[j].text-(ws-input.lines[j].text)):0,
-                es? es-input.lines[j].text:0,   es?es[0]:'?',
-                ee? ee-input.lines[j].text-1:0, ee?ee[-1]:'?',
-                es&&ee? (ee-input.lines[j].text-(es-input.lines[j].text)):0);
+            fprintf(stderr, "\033[00;33;01mline %2d: west: %d (\'%c\') to %d (\'%c\') [len %d];  "
+                            "east: %d (\'%c\') to %d (\'%c\') [len %d]\033[00m\n", (int) j,
+                    (int) (ws       ?  ws - input.lines[j].text : 0),     ws ? ws[0]  : '?',
+                    (int) (we       ?  we - input.lines[j].text - 1 : 0), we ? we[-1] : '?',
+                    (int) (ws && we ? (we - input.lines[j].text - (ws - input.lines[j].text)) : 0),
+                    (int) (es       ?  es - input.lines[j].text : 0),     es ? es[0]  : '?',
+                    (int) (ee       ?  ee - input.lines[j].text - 1 : 0), ee ? ee[-1] : '?',
+                    (int) (es && ee ? (ee - input.lines[j].text - (es - input.lines[j].text)) : 0));
             #endif
             if (ws && we) {
                 did_something = 1;
                 for (p = ws; p < we; ++p) {
+                    size_t idx = p - input.lines[j].text;
                     *p = ' ';
+                    set_char_at(input.lines[j].mbtext, input.lines[j].posmap[idx], char_space);
                 }
             }
             if (es && ee) {
                 for (p = es; p < ee; ++p) {
+                    size_t idx = p - input.lines[j].text;
                     *p = ' ';
+                    set_char_at(input.lines[j].mbtext, input.lines[j].posmap[idx], char_space);
                 }
             }
         }
@@ -978,19 +978,23 @@ int remove_box()
                 }
             }
             #ifdef DEBUG
-            fprintf (stderr, "memmove (\"%s\", \"%s\", %d);\n",
-                    input.lines[j].text, input.lines[j].text + c,
-                    input.lines[j].len - c + 1);
+                fprintf(stderr, "memmove(\"%s\", \"%s\", %d);\n",
+                        input.lines[j].text, input.lines[j].text + c, (int) (input.lines[j].len - c + 1));
             #endif
             memmove(input.lines[j].text, input.lines[j].text + c,
-                    input.lines[j].len - c + 1);        /* +1 for zero byte */
+                    input.lines[j].len - c + 1);         /* +1 for zero byte */
             input.lines[j].len -= c;
+
+            /* TODO the next line may kill an escape code to color the next char */
+            u32_move(input.lines[j].mbtext, input.lines[j].mbtext + input.lines[j].posmap[c],
+                     input.lines[j].num_chars - c + 1);  /* +1 for zero byte */
+            input.lines[j].num_chars -= c;
         }
     }
     #ifdef DEBUG
-    if (!did_something)
-        fprintf (stderr,
-                "There is nothing to remove (did_something == 0).\n");
+        if (!did_something) {
+            fprintf(stderr, "There is nothing to remove (did_something == 0).\n");
+        }
     #endif
 
     /*
@@ -999,13 +1003,13 @@ int remove_box()
     if (opt.killblank) {
         while (empty_line(input.lines + textstart) && textstart < textend) {
             #ifdef DEBUG
-            fprintf (stderr, "Killing leading blank line in box body.\n");
+                fprintf(stderr, "Killing leading blank line in box body.\n");
             #endif
             ++textstart;
         }
         while (empty_line(input.lines + textend - 1) && textend > textstart) {
             #ifdef DEBUG
-            fprintf (stderr, "Killing trailing blank line in box body.\n");
+                fprintf(stderr, "Killing trailing blank line in box body.\n");
             #endif
             --textend;
         }
@@ -1034,19 +1038,13 @@ int remove_box()
         }
     }
     memset(input.lines + input.anz_lines, 0,
-           (BMAX (textstart - boxstart, 0) + BMAX (boxend - textend, 0)) *
-                   sizeof(line_t));
+           (BMAX (textstart - boxstart, (size_t) 0) + BMAX (boxend - textend, (size_t) 0)) * sizeof(line_t));
 
-#ifdef DEBUG
-    #if 0
-        for (j=0; j<input.anz_lines; ++j) {
-            fprintf (stderr, "%3d [%02d] \"%s\"\n", j, input.lines[j].len,
-                    input.lines[j].text);
-        }
+    #ifdef DEBUG
+        print_input_lines(" (remove_box) after box removal");
+        fprintf(stderr, "Number of lines shrunk by %d.\n",
+                (int) (BMAX (textstart - boxstart, (size_t) 0) + BMAX (boxend - textend, (size_t) 0)));
     #endif
-    fprintf (stderr, "Number of lines shrunk by %d.\n",
-            BMAX (textstart - boxstart, 0) + BMAX (boxend - textend, 0));
-#endif
 
     return 0;                            /* all clear */
 }
@@ -1061,24 +1059,23 @@ void output_input(const int trim_only)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    size_t j;
     size_t indent;
-    char *indentspc;
     int ntabs, nspcs;
 
     #ifdef DEBUG
-    fprintf (stderr, "output_input() - enter (trim_only=%d)\n", trim_only);
+        fprintf(stderr, "output_input() - enter (trim_only=%d)\n", trim_only);
     #endif
-    for (j = 0; j < input.anz_lines; ++j) {
+    for (size_t j = 0; j < input.anz_lines; ++j) {
         if (input.lines[j].text == NULL) {
             continue;
         }
         btrim(input.lines[j].text, &(input.lines[j].len));
+        btrim32(input.lines[j].mbtext, &(input.lines[j].num_chars));
         if (trim_only) {
             continue;
         }
 
-        indentspc = NULL;
+        char *indentspc = NULL;
         if (opt.tabexp == 'u') {
             indent = strspn(input.lines[j].text, " ");
             ntabs = indent / opt.tabstop;
@@ -1101,7 +1098,7 @@ void output_input(const int trim_only)
             indent = 0;
         }
 
-        fprintf(opt.outfile, "%s%s%s", indentspc, input.lines[j].text + indent,
+        fprintf(opt.outfile, "%s%s%s", indentspc, u32_strconv_to_locale(advance32(input.lines[j].mbtext, indent)),
                 (input.final_newline || j < input.anz_lines - 1 ? "\n" : ""));
         BFREE (indentspc);
     }

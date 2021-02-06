@@ -30,7 +30,11 @@
 #include "boxes.h"
 
 
-#define BMAX(a, b) ((a)>(b)? (a):(b))    /* return the larger value */
+#define BMAX(a, b) ({                    /* return the larger value */ \
+    __typeof__ (a) _a = (a); \
+    __typeof__ (b) _b = (b); \
+    _a > _b ? _a : _b;       \
+})
 
 #define BFREE(p) {                       /* free memory and clear pointer */ \
     if (p) {              \
@@ -65,6 +69,10 @@ void concat_strings(char *dst, int max_len, int count, ...);
 char *tabbify_indent(const size_t lineno, char *indentspc, const size_t indentspc_len);
 
 char *nspaces(const size_t n);
+
+void print_input_lines(const char *heading);
+
+void analyze_line_ascii(line_t *line);
 
 
 #endif
