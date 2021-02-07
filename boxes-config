@@ -1856,8 +1856,8 @@ BOX headline
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
-revision "1.2"
-revdate  "August 22, 1999 (Sunday, 13:22h)"
+revision "1.3"
+revdate  "February 09, 2021 (Tuesday, 22:00h)"
 created  "March 18, 1999 (Thursday, 15:25h)"
 tags "programming, box"
 
@@ -1874,11 +1874,17 @@ shapes {
     sw ("/*") s ("*") se ("*/")
 }
 
-replace "(.)(?!$)" with "$1 "
-reverse "([^ ]) " to "$1"
+delim _"
+replace "((?:\x1b\[[0-9;]*m)+(?!\x1b).(?!$))|((?:\x1b\[[0-9;]*m)+$)|([^\x1b](?!$))" with "$0 "
+reverse "^        " to "          "
+reverse "^      " to "        "
+reverse "^    " to "      "
+reverse "^  " to "    "
+reverse "((?:\x1b\[[0-9;]*m)*(?!\x1b).) " to "$1"
 
 padding {
-    horiz 2
+    left 2
+    right 1
 }
 
 elastic (n,e,s,w)
