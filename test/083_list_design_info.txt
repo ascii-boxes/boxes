@@ -10,7 +10,7 @@ Original Designer:      (public domain)
 Creation Date:          March 18, 1999 (Thursday, 15:25h)
 Current Revision:       1.0 as of March 18, 1999 (Thursday, 15:25h)
 Indentation Mode:       box (indent box)
-Replacement Rules:      1. (glob) "\*/" WITH "*\/"
+Replacement Rules:      1. (glob) "\*/" WITH "*\\/"
 Reversion Rules:        1. (glob) "\*\\/" TO "*/"
 Minimum Box Dimensions: 5 x 3  (width x height)
 Default Padding:        left 1, right 1

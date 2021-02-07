@@ -343,7 +343,7 @@ void btrim(char *text, size_t *len)
 
 void btrim32(uint32_t *text, size_t *len)
 /*
- *  Remove trailing whitespace from line (unicode version).
+ *  Remove trailing whitespace from line (unicode and escape sequence enabled version).
  *
  *      text     string to trim
  *      len      pointer to the length of the string in characters
@@ -353,18 +353,34 @@ void btrim32(uint32_t *text, size_t *len)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    int idx = (int) (*len - 1);
+    if (text == NULL || len == 0) {
+        return;
+    }
 
-    for (; idx >= 0; --idx) {
-        ucs4_t c = text[idx];
-        if (uc_is_c_whitespace(c) || uc_is_property_white_space(c) || uc_is_property_bidi_whitespace(c)) {
-            set_char_at(text, idx, char_nul);
-        } else {
-            break;
+    const uint32_t *rest = text;
+    int last_char_pos = -1;
+    size_t step_invis;
+
+    for (ucs4_t c = text[0]; c != char_nul; c = rest[0]) {
+        if (c != char_esc) {
+            if (!uc_is_c_whitespace(c) && !uc_is_property_white_space(c) && !uc_is_property_bidi_whitespace(c)) {
+                last_char_pos = (int) (rest - text);
+            }
+        }
+        rest = advance_next32(rest, &step_invis);
+    }
+
+    /* If the last character is followed by an escape sequence, keep it (but only one). */
+    if (last_char_pos >= 0) {
+        rest = text + last_char_pos + 1;
+        if (rest[0] == char_esc) {
+            advance_next32(rest, &step_invis);
+            last_char_pos += step_invis;
         }
     }
 
-    *len = idx + 1;
+    set_char_at(text, (size_t) (last_char_pos + 1), char_nul);
+    *len = (size_t) (last_char_pos + 1);
 }
 
 
@@ -546,7 +562,6 @@ void print_input_lines(const char *heading)
 static size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, size_t **posmap)
 {
     size_t invis = 0;  /* counts invisible column positions */
-    int ansipos = 0;   /* progression of ansi sequence */
     *num_esc = 0;      /* counts the number of escape sequences found */
 
     if (is_empty(s)) {
@@ -562,42 +577,25 @@ static size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **a
     (*ascii) = (char *) calloc(buflen, sizeof(char));     /* maybe a little too much, but certainly enough */
     char *p = *ascii;
 
-    ucs4_t c;
     size_t mb_idx = 0;
+    size_t step_invis;
     const uint32_t *rest = s;
-    while ((rest = u32_next(&c, rest))) {
+
+    for (ucs4_t c = s[0]; c != char_nul; c = rest[0]) {
         if (map_idx >= map_size - 4) {
             map_size = map_size * 2 + 1;
             map = (size_t *) realloc(map, map_size * sizeof(size_t));
         }
 
-        if (ansipos == 0 && c == char_esc) {
-            /* Found an ESC char, count it as invisible and move 1 forward in the detection of CSI sequences */
-            ansipos++;
-            invis++;
+        if (c == char_esc) {
             (*num_esc)++;
-        } else if (ansipos == 1 && c == '[') {
-            /* Found '[' char after ESC. A CSI sequence has started. */
-            ansipos++;
-            invis++;
-        } else if (ansipos == 1 && c >= 0x40 && c <= 0x5f) {
-            /* Found a byte designating the end of a two-byte escape sequence */
-            invis++;
-            ansipos = 0;
-        } else if (ansipos == 2) {
-            /* Inside CSI sequence - Keep counting bytes as invisible */
-            invis++;
-
-            /* A char between 0x40 and 0x7e signals the end of an CSI or escape sequence */
-            if (c >= 0x40 && c <= 0x7e) {
-                ansipos = 0;
-            }
-
-        } else if (is_ascii_printable(c)) {
+        }
+        else if (is_ascii_printable(c)) {
             *p = c & 0xff;
             map[map_idx++] = mb_idx;
             ++p;
-        } else {
+        }
+        else {
             int cols = uc_width(c, encoding);
             if (cols > 0) {
                 memset(p, (int) 'x', cols);
@@ -607,8 +605,13 @@ static size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **a
                 p += cols;
             }
         }
-        ++mb_idx;
+
+        rest = advance_next32(rest, &step_invis);
+
+        mb_idx += BMAX((size_t) 1, step_invis);
+        invis += step_invis;
     }
+
     *p = '\0';
     (*posmap) = map;
     return invis;

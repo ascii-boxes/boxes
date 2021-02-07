@@ -51,9 +51,27 @@ int is_ascii_printable(const ucs4_t c);
 uint32_t *new_empty_string32();
 
 /**
+ * Return the next position in <s> in accordance with escape sequences. The result can be the next normal character,
+ * or again an escape sequence, if it directly follows the first.
+ *
+ * @param <s> The pointer to the start position. Is assumed to point either at the ESC at the start of an escape
+ *      sequence, or to be positioned outside an escape sequence.
+ * @param <invis> Will contain the number of invisible characters skipped in order to get to the new position.
+ *      This will be 0 unless <s> pointed to an ESC char, in which case it contains the length in characters of that
+ *      escape sequence.
+ * @return The next position, or 0 if the end of the string was reached
+ */
+uint32_t *advance_next32(const uint32_t *s, size_t *invis);
+
+/**
  * Determine a new position in the given string s with the given offset of visible characters.
  * If the character right in front of the target character is invisible, then the pointer is moved to the start of
  * that invisible sequence. The purpose is to catch any escape sequences which would for example color the character.
+ *
+ * @param <s> The pointer to the start position. Is assumed to point either at the ESC at the start of an escape
+ *      sequence, or to be positioned outside an escape sequence.
+ * @param <offset> the number of visible character positions to advance the pointer
+ * @return a pointer to the new position in s, or 0 if the end of the string was reached
  */
 uint32_t *advance32(uint32_t *s, const size_t offset);
 

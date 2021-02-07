@@ -100,6 +100,48 @@ uint32_t *new_empty_string32()
 
 
 
+uint32_t *advance_next32(const uint32_t *s, size_t *invis)
+{
+    if (is_empty(s)) {
+        return (uint32_t *) s;
+    }
+
+    int ansipos = 0;
+    (*invis) = 0;
+    ucs4_t c;
+    const uint32_t *rest = s;
+    while ((rest = u32_next(&c, rest))) {
+        if (ansipos == 0 && c == char_esc) {
+            /* Found an ESC char, count it as invisible and move 1 forward in the detection of CSI sequences */
+            (*invis)++;
+            ansipos++;
+        } else if (ansipos == 1 && c == '[') {
+            /* Found '[' char after ESC. A CSI sequence has started. */
+            (*invis)++;
+            ansipos++;
+        } else if (ansipos == 1 && c >= 0x40 && c <= 0x5f) {
+            /* Found a byte designating the end of a two-byte escape sequence */
+            (*invis)++;
+            ansipos = 0;
+            break;
+        } else if (ansipos == 2) {
+            /* Inside CSI sequence - Keep counting chars as invisible */
+            (*invis)++;
+
+            /* A char between 0x40 and 0x7e signals the end of an CSI or escape sequence */
+            if (c >= 0x40 && c <= 0x7e) {
+                ansipos = 0;
+                break;
+            }
+        } else {
+            break;
+        }
+    }
+    return (uint32_t *) rest;
+}
+
+
+
 uint32_t *advance32(uint32_t *s, const size_t offset)
 {
     if (is_empty(s)) {
@@ -109,50 +151,28 @@ uint32_t *advance32(uint32_t *s, const size_t offset)
         return s;
     }
 
-    ucs4_t c;                  /* the current character we're looking at */
-    const uint32_t *cStr = s;  /* pointer to c in s */
-    size_t idx = 0;            /* the count of visible characters */
-    const uint32_t *last_esc;  /* pointer to the start of the last escape sequence encountered */
-    const uint32_t *rest = s;  /* pointer to the next character coming up, needed only for u32_next() api */
-    int visible = 1;           /* flag indicating whether the previous char was a visible char */
-    int ansipos = 0;           /* progression of ansi sequence */
+    size_t count = 0;                 /* the count of visible characters */
+    int visible = 1;                  /* flag indicating whether the previous char was a visible char */
+    const uint32_t *last_esc = NULL;  /* pointer to the start of the last escape sequence encountered */
+    const uint32_t *rest = s;         /* pointer to the next character coming up */
+    size_t step_invis = 0;            /* unused, but required for advance_next32() call */
 
-    while ((rest = u32_next(&c, rest))) {
-        if (ansipos == 0 && c == char_esc) {
-            /* Found an ESC char, count it as invisible and move 1 forward in the detection of CSI sequences */
-            last_esc = cStr;
+    for (ucs4_t c = s[0]; c != char_nul; c = rest[0]) {
+        if (c == char_esc) {
+            last_esc = rest;
             visible = 0;
-            ansipos++;
-        } else if (ansipos == 1 && c == '[') {
-            /* Found '[' char after ESC. A CSI sequence has started. */
-            ansipos++;
-            visible = 0;
-        } else if (ansipos == 1 && c >= 0x40 && c <= 0x5f) {
-            /* Found a char designating the end of a two-byte escape sequence */
-            visible = 0;
-            ansipos = 0;
-        } else if (ansipos == 2) {
-            /* Inside CSI sequence - Keep counting chars as invisible */
-            visible = 0;
-
-            /* A char between 0x40 and 0x7e signals the end of an CSI or escape sequence */
-            if (c >= 0x40 && c <= 0x7e) {
-                ansipos = 0;
-            }
         } else {
-            /* a visible char */
-            if (idx == offset) {
-                if (!visible) {
+            if (count++ == offset) {
+                if (!visible && last_esc != NULL) {
                     return (uint32_t *) last_esc;
                 }
-                return (uint32_t *) cStr;
+                break;
             }
-            ++idx;
             visible = 1;
         }
-        cStr = rest;
+        rest = advance_next32(rest, &step_invis);
     }
-    return new_empty_string32();  /* offset too large, not enough characters in string */
+    return (uint32_t *) rest;         /* may point to zero terminator when offset too large */
 }
 
 
