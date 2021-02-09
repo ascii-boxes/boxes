@@ -30,7 +30,6 @@
 #include <string.h>
 #include <strings.h>
 
-#include <uniconv.h>
 #include <unictype.h>
 #include <unistr.h>
 #include <unitypes.h>
@@ -514,7 +513,7 @@ void print_input_lines(const char *heading)
     fprintf(stderr, "     [num_chars] \"real text\" [num_cols] \"ascii_text\"\n");
     for (size_t i = 0; i < input.anz_lines; ++i) {
         fprintf(stderr, "%4d [%02d] \"%s\"  [%02d] \"%s\"", (int) i,
-                (int) input.lines[i].num_chars, u32_strconv_to_locale(input.lines[i].mbtext),
+                (int) input.lines[i].num_chars, u32_strconv_to_output(input.lines[i].mbtext),
                 (int) input.lines[i].len, input.lines[i].text);
         fprintf(stderr, "\tTabs: [");
         if (input.lines[i].tabpos != NULL) {

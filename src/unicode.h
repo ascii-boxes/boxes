@@ -28,16 +28,31 @@
 #include <unitypes.h>
 
 
-extern const char *encoding;                   /* the character encoding that we use */
 
-extern const ucs4_t char_tab;                  /* ucs4_t character '\t' (tab)  */
-extern const ucs4_t char_space;                /* ucs4_t character ' '  (space) */
-extern const ucs4_t char_cr;                   /* ucs4_t character '\r' (carriage return) */
-extern const ucs4_t char_newline;              /* ucs4_t character '\n' (newline) */
-extern const ucs4_t char_esc;                  /* ucs4_t character 0x1b (escape)  */
-extern const ucs4_t char_nul;                  /* ucs4_t character '\0' (zero) */
+/** The boxes config file is still encoded with a single-byte character set. Officially, it is ASCII!
+ *  However, people might not conform to this, so we use ISO_8859-15 as a reasonable superset. */
+extern const char *config_encoding;
 
+/** the character encoding of input (and output) text */
+extern const char *encoding;
 
+/** ucs4_t character '\t' (tab)  */
+extern const ucs4_t char_tab;
+
+/** ucs4_t character ' '  (space) */
+extern const ucs4_t char_space;
+
+/** ucs4_t character '\r' (carriage return) */
+extern const ucs4_t char_cr;
+
+/** ucs4_t character '\n' (newline) */
+extern const ucs4_t char_newline;
+
+/** ucs4_t character 0x1b (escape)  */
+extern const ucs4_t char_esc;
+
+/** ucs4_t character '\0' (zero) */
+extern const ucs4_t char_nul;
 
 int is_char_at(const uint32_t *text, const size_t idx, const ucs4_t expected_char);
 
@@ -74,6 +89,55 @@ uint32_t *advance_next32(const uint32_t *s, size_t *invis);
  * @return a pointer to the new position in s, or 0 if the end of the string was reached
  */
 uint32_t *advance32(uint32_t *s, const size_t offset);
+
+/**
+ * Convert a string from the input/output encoding (`encoding` in this .h file) to UTF-32 internal representation.
+ * Memory will be allocated for the converted string.
+ *
+ * @param <src> string to convert, zero-terminated
+ * @return UTF-32 string, or NULL in case of error (then an error message was already printed on stderr)
+ */
+uint32_t *u32_strconv_from_input(const char *src);
+
+/**
+ * Convert a string from the given source encoding to UTF-32 internal representation.
+ * Memory will be allocated for the converted string.
+ *
+ * @param <src> string to convert, zero-terminated
+ * @param <sourceEncoding> the character encoding of <src>
+ * @return UTF-32 string, or NULL in case of error (then an error message was already printed on stderr)
+ */
+uint32_t *u32_strconv_from_arg(const char *src, const char *sourceEncoding);
+
+/**
+ * Convert a string from UTF-32 internal representation to input/output encoding (`encoding` in this .h file).
+ * Memory will be allocated for the converted string.
+ *
+ * @param <src> UTF-32 string to convert, zero-terminated
+ * @return string in input/output encoding, or NULL on error (then an error message was already printed on stderr)
+ */
+char *u32_strconv_to_output(const uint32_t *src);
+
+/**
+ * Convert a string from UTF-32 internal representation to the given target encoding.
+ * Memory will be allocated for the converted string.
+ *
+ * @param <src> UTF-32 string to convert, zero-terminated
+ * @param <targetEncoding> the character encoding of the result
+ * @return string in target encoding, or NULL in case of error (then an error message was already printed on stderr)
+ */
+char *u32_strconv_to_arg(const uint32_t *src, const char *targetEncoding);
+
+/**
+ * Check if the given <manual_encoding> can be used to covert anything. This should reveal invalid encoding names that
+ * have been specified on the command line. If no <manual_encoding> was specified, or if an invalid encoding is
+ * detected, we fall back to the system encoding. No new memory is allocated.
+ *
+ * @param <manual_encoding> the encoding set on the command line, may be NULL
+ * @param <system_encoding> the system encoding
+ * @return <manual_encoding> if it is set to a valid value, <system_encoding> otherwise
+ */
+const char *check_encoding(const char *manual_encoding, const char *system_encoding);
 
 
 #endif

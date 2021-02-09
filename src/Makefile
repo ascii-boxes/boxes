@@ -79,7 +79,7 @@ lex.yy.c: lexer.l boxes.h
 	cat lexer.tmp.c >> lex.yy.c
 	rm lexer.tmp.c
 
-
+# TODO In the end, check declared dependencies again
 boxes.o: boxes.c boxes.h regulex.h shape.h tools.h unicode.h generate.h remove.h config.h
 tools.o: tools.c tools.h boxes.h shape.h config.h
 unicode.o: unicode.c unicode.h config.h

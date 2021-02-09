@@ -28,7 +28,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <uniconv.h>
 #include <unistr.h>
 
 #include "shape.h"
@@ -729,7 +728,7 @@ static int justify_line(line_t *line, int skew)
 
     #if defined(DEBUG) || 0
         fprintf (stderr, "justify_line(%c):  Input: real: (%02d) \"%s\", text: (%02d) \"%s\", invisible=%d, skew=%d",
-             opt.justify ? opt.justify : '0', (int) line->num_chars, u32_strconv_to_locale(line->mbtext),
+             opt.justify ? opt.justify : '0', (int) line->num_chars, u32_strconv_to_output(line->mbtext),
              (int) line->len, line->text, (int) line->invis, skew);
     #endif
 
@@ -998,7 +997,7 @@ int output_box(const sentry_t *thebox)
                 concat_strings(obuf, LINE_MAX_BYTES + 1, 8, restored_indent,
                                skip_left ? "" : thebox[BLEF].chars[j], hfill1,
                                ti >= 0 && shift > 0 ? nspaces(shift) : "",
-                               ti >= 0 ? u32_strconv_to_locale(mbtext_shifted) : "",
+                               ti >= 0 ? u32_strconv_to_output(mbtext_shifted) : "",
                                hfill2, nspaces(input.maxline - input.lines[ti].len - shift),
                                thebox[BRIG].chars[j]);
             }

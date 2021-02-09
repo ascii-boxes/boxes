@@ -24,22 +24,42 @@
 
 #include "config.h"
 #include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include <uniconv.h>
 #include <unictype.h>
 #include <unistr.h>
 
+#include "boxes.h"
+#include "tools.h"
 #include "unicode.h"
 
 
-const char *encoding;                          /* the character encoding that we use */
 
-const ucs4_t char_tab     = 0x00000009;        /* ucs4_t character '\t' (tab)  */
-const ucs4_t char_space   = 0x00000020;        /* ucs4_t character ' '  (space) */
-const ucs4_t char_cr      = 0x0000000d;        /* ucs4_t character '\r' (carriage return) */
-const ucs4_t char_newline = 0x0000000a;        /* ucs4_t character '\n' (newline) */
-const ucs4_t char_esc     = 0x0000001b;        /* ucs4_t character 0x1b (escape)  */
-const ucs4_t char_nul     = 0x00000000;        /* ucs4_t character '\0' (zero) */
+const char *config_encoding = "ISO_8859-15";
+
+/* effective character encoding of input and output text */
+const char *encoding;
+
+/* ucs4_t character '\t' (tab)  */
+const ucs4_t char_tab = 0x00000009;
+
+/* ucs4_t character ' '  (space) */
+const ucs4_t char_space = 0x00000020;
+
+/* ucs4_t character '\r' (carriage return) */
+const ucs4_t char_cr = 0x0000000d;
+
+/* ucs4_t character '\n' (newline) */
+const ucs4_t char_newline = 0x0000000a;
+
+/* ucs4_t character 0x1b (escape)  */
+const ucs4_t char_esc = 0x0000001b;
+
+/* ucs4_t character '\0' (zero) */
+const ucs4_t char_nul = 0x00000000;
 
 
 
@@ -173,6 +193,80 @@ uint32_t *advance32(uint32_t *s, const size_t offset)
         rest = advance_next32(rest, &step_invis);
     }
     return (uint32_t *) rest;         /* may point to zero terminator when offset too large */
+}
+
+
+
+uint32_t *u32_strconv_from_input(const char *src)
+{
+    return u32_strconv_from_arg(src, encoding);
+}
+
+
+
+uint32_t *u32_strconv_from_arg(const char *src, const char *sourceEncoding)
+{
+    if (src == NULL) {
+        return NULL;
+    }
+    if (src[0] == '\0') {
+        return new_empty_string32();
+    }
+
+    uint32_t *result = u32_strconv_from_encoding(
+            src,                    /* the source string to convert */
+            sourceEncoding,         /* the character encoding from which to convert */
+            iconveh_question_mark); /* produce one question mark '?' per unconvertible character */
+
+    if (result == NULL) {
+        fprintf(stderr, "%s: failed to convert from '%s' to UTF-32: %s\n", PROJECT, sourceEncoding, strerror(errno));
+    }
+    return result;
+}
+
+
+
+char *u32_strconv_to_output(const uint32_t *src)
+{
+    return u32_strconv_to_arg(src, encoding);
+}
+
+
+
+char *u32_strconv_to_arg(const uint32_t *src, const char *targetEncoding)
+{
+    if (src == NULL) {
+        return NULL;
+    }
+    if (is_empty(src)) {
+        return strdup("");
+    }
+
+    char *result = u32_strconv_to_encoding(
+            src,                    /* the source string to convert */
+            targetEncoding,         /* the character encoding to which to convert */
+            iconveh_question_mark); /* produce one question mark '?' per unconvertible character */
+
+    if (result == NULL) {
+        fprintf(stderr, "%s: failed to convert from UTF-32 to '%s': %s\n", PROJECT, targetEncoding, strerror(errno));
+    }
+    return result;
+}
+
+
+
+const char *check_encoding(const char *manual_encoding, const char *system_encoding)
+{
+    if (manual_encoding != NULL) {
+        uint32_t *unicode = u32_strconv_from_encoding(" ", manual_encoding, iconveh_error);
+        if (unicode != NULL) {
+            BFREE(unicode);
+            return manual_encoding;
+        }
+        fprintf(stderr, "%s: Invalid character encoding: %s - falling back to %s\n",
+                PROJECT, manual_encoding, system_encoding);
+    }
+    return system_encoding;
 }
 
 

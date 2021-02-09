@@ -29,7 +29,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <uniconv.h>
 #include <unictype.h>
 #include <unistdio.h>
 #include <unistr.h>
@@ -107,6 +106,7 @@ static void usage(FILE *st)
     fprintf(st, "        -k bool  leading/trailing blank line retention on removal\n");
     fprintf(st, "        -l       list available box designs w/ samples\n");
     fprintf(st, "        -m       mend box, i.e. remove it and redraw it afterwards\n");
+    fprintf(st, "        -n enc   Character encoding of input and output\n");
     fprintf(st, "        -p fmt   padding [default: none]\n");
     /* fprintf(st, "        -q       modify command for needs of the web UI (undocumented)\n"); */
     fprintf(st, "        -r       remove box\n");
@@ -370,6 +370,7 @@ static int process_commandline(int argc, char *argv[])
     opt.tabstop = DEF_TABSTOP;
     opt.tabexp = 'e';
     opt.killblank = -1;
+    opt.encoding = NULL;
     for (idummy = 0; idummy < ANZ_SIDES; ++idummy) {
         opt.padding[idummy] = -1;
     }
@@ -388,7 +389,7 @@ static int process_commandline(int argc, char *argv[])
      *  Parse Command Line
      */
     do {
-        oc = getopt(argc, argv, "a:c:d:f:hi:k:lmp:qrs:t:v");
+        oc = getopt(argc, argv, "a:c:d:f:hi:k:lmn:p:qrs:t:v");
 
         switch (oc) {
 
@@ -578,6 +579,17 @@ static int process_commandline(int argc, char *argv[])
                 opt.mend = 2;
                 opt.r = 1;
                 opt.killblank = 0;
+                break;
+
+            case 'n':
+                /*
+                 *  Character encoding
+                 */
+                opt.encoding = (char *) strdup(optarg);
+                if (opt.encoding == NULL) {
+                    perror(PROJECT);
+                    return 1;
+                }
                 break;
 
             case 'p':
@@ -1257,6 +1269,9 @@ static int apply_substitutions(const int mode)
     /*
      *  Compile regular expressions
      */
+    #ifdef REGEXP_DEBUG
+        fprintf(stderr, "Compiling %d %s rule patterns\n", (int) anz_rules, mode ? "reversion" : "replacement");
+    #endif
     errno = 0;
     opt.design->current_rule = rules;
     for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
@@ -1278,13 +1293,13 @@ static int apply_substitutions(const int mode)
         for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
             #ifdef REGEXP_DEBUG
             fprintf (stderr, "regex_replace(0x%p, \"%s\", \"%s\", %d, \'%c\') == ",
-                    rules[j].prog, rules[j].repstr, u32_strconv_to_locale(input.lines[k].mbtext),
+                    rules[j].prog, rules[j].repstr, u32_strconv_to_output(input.lines[k].mbtext),
                     (int) input.lines[k].num_chars, rules[j].mode);
             #endif
             uint32_t *newtext = regex_replace(rules[j].prog, rules[j].repstr,
                                               input.lines[k].mbtext, input.lines[k].num_chars, rules[j].mode == 'g');
             #ifdef REGEXP_DEBUG
-                fprintf (stderr, "\"%s\"\n", newtext ? u32_strconv_to_locale(newtext) : "NULL");
+                fprintf (stderr, "\"%s\"\n", newtext ? u32_strconv_to_output(newtext) : "NULL");
             #endif
             if (newtext == NULL) {
                 return 1;
@@ -1298,7 +1313,7 @@ static int apply_substitutions(const int mode)
 
             #ifdef REGEXP_DEBUG
                 fprintf (stderr, "input.lines[%d] == {%d, \"%s\"}\n", (int) k,
-                    (int) input.lines[k].num_chars, u32_strconv_to_locale(input.lines[k].mbtext));
+                    (int) input.lines[k].num_chars, u32_strconv_to_output(input.lines[k].mbtext));
             #endif
         }
         opt.design->current_rule = NULL;
@@ -1393,7 +1408,7 @@ static int read_all_input(const int use_stdin)
                 input.lines = tmp;
             }
 
-            mbtemp = u32_strconv_from_locale(buf);
+            mbtemp = u32_strconv_from_input(buf);
             len_chars = u32_strlen(mbtemp);
             input.final_newline = has_linebreak(mbtemp, len_chars);
             input.lines[input.anz_lines].posmap = NULL;
@@ -1484,7 +1499,7 @@ static int read_all_input(const int use_stdin)
         for (i = 0; i < input.anz_lines; ++i) {
             #ifdef DEBUG
                 fprintf(stderr, "%2d: mbtext = \"%s\" (%d chars)\n", (int) i,
-                    u32_strconv_to_locale(input.lines[i].mbtext), (int) input.lines[i].num_chars);
+                    u32_strconv_to_output(input.lines[i].mbtext), (int) input.lines[i].num_chars);
             #endif
             if (input.lines[i].num_chars >= input.indent) {
                 memmove(input.lines[i].text, input.lines[i].text + input.indent,
@@ -1496,7 +1511,7 @@ static int read_all_input(const int use_stdin)
             }
             #ifdef DEBUG
                 fprintf(stderr, "%2d: mbtext = \"%s\" (%d chars)\n", (int) i,
-                    u32_strconv_to_locale(input.lines[i].mbtext), (int) input.lines[i].num_chars);
+                    u32_strconv_to_output(input.lines[i].mbtext), (int) input.lines[i].num_chars);
             #endif
         }
         input.maxline -= input.indent;
@@ -1557,7 +1572,7 @@ int main(int argc, char *argv[])
      * Store system character encoding
      */
     setlocale(LC_ALL, "");    /* switch from default "C" encoding to system encoding */
-    encoding = locale_charset();
+    encoding = check_encoding(opt.encoding, locale_charset());
     #ifdef DEBUG
         fprintf (stderr, "Character Encoding = %s\n", encoding);
     #endif

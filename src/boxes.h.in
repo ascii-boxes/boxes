@@ -139,6 +139,7 @@ typedef struct {                         /* Command line options: */
     char      indentmode;                /* 'b', 't', 'n', or '\0' */
     char      justify;                   /* 'l', 'c', 'r', or '\0' */
     int       killblank;                 /* -1 if not set */
+    char     *encoding;                  /* character encoding override for input and output text */
     FILE     *infile;                    /* where we get our input */
     FILE     *outfile;                   /* where we put our output */
 } opt_t;

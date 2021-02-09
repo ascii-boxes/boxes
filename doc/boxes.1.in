@@ -10,7 +10,7 @@ boxes \- text mode box and comment drawing filter
 .SH SYNOPSIS
 .B boxes
 [\-hlmrv] [\-a\ format] [\-d\ design] [\-f\ file] [\-i\ indent] [\-k\ bool]
-[\-p\ pad] [\-s\ size] [\-t\ tabopts] [infile [outfile]]
+[\-n\ encoding] [\-p\ pad] [\-s\ size] [\-t\ tabopts] [infile [outfile]]
 .SH DESCRIPTION
 .I Boxes
 is a text filter which can draw any kind of box around its input text. Box
@@ -185,6 +185,14 @@ padding, indentation, etc. for the mended box. Implies
 false.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
+.B \-n \fIencoding\fP
+Character encoding. Overrides the character encoding of the input and output
+text. Choose from the list shown by \fIiconv -l\fP. If an invalid character
+encoding is specified here, \fIUTF-8\fP is used as a fallback. The default
+is to use the system encoding, which is normally the best course of action.
+So don't specify this option unless you have to.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
 .B \-p \fIstring\fP
 Padding. Specify padding in spaces around the input text block for all
 sides of the box. The argument string may not contain whitespace and must
@@ -357,4 +365,5 @@ configuration file (takes precedence over system-wide configuration file)
 system\-wide configuration file
 .\" =======================================================================
 .SH "SEE ALSO"
-.I figlet(6)
+.BR figlet (6),
+.BR iconv (1)

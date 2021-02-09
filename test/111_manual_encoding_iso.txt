@@ -1,0 +1,24 @@
+:ARGS
+-ac -n ISO_8859-15
+:INPUT
+             ä
+      äb
+      äbç
+    äbçd
+    äbçdé
+    äbçdéf
+     äbçdéfg
+    äbçdéfgh
+:OUTPUT-FILTER
+:EXPECTED
+    /**************/
+    /*     ä      */
+    /*     äb     */
+    /*    äbç     */
+    /*    äbçd    */
+    /*   äbçdé    */
+    /*   äbçdéf   */
+    /*  äbçdéfg   */
+    /*  äbçdéfgh  */
+    /**************/
+:EOF

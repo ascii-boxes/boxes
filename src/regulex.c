@@ -26,9 +26,10 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <uniconv.h>
+#include <string.h>
 
 #include "tools.h"
+#include "unicode.h"
 #include "regulex.h"
 
 
@@ -37,7 +38,10 @@ pcre2_code *compile_pattern(char *pattern)
 {
     int errornumber;
     PCRE2_SIZE erroroffset;
-    PCRE2_SPTR pattern32 = u32_strconv_from_locale(pattern);
+    PCRE2_SPTR pattern32 = u32_strconv_from_arg(pattern, config_encoding);
+    if (pattern32 == NULL) {
+        return NULL;
+    }
 
     pcre2_code *re = pcre2_compile(
             pattern32,               /* the pattern */
@@ -51,7 +55,7 @@ pcre2_code *compile_pattern(char *pattern)
         PCRE2_UCHAR buffer[256];
         pcre2_get_error_message(errornumber, buffer, sizeof(buffer));
         fprintf(stderr, "Regular expression pattern \"%s\" failed to compile at offset %d: %s\n",
-                pattern, (int) erroroffset, u32_strconv_to_locale(buffer));
+                pattern, (int) erroroffset, u32_strconv_to_output(buffer));
     }
     return re;
 }
@@ -60,7 +64,10 @@ pcre2_code *compile_pattern(char *pattern)
 
 uint32_t *regex_replace(pcre2_code *search, char *replace, uint32_t *input, const size_t input_len, const int global)
 {
-    PCRE2_SPTR replacement = u32_strconv_from_locale(replace);
+    PCRE2_SPTR replacement = u32_strconv_from_arg(replace, config_encoding);
+    if (replacement == NULL) {
+        return NULL;
+    }
     uint32_t options = PCRE2_SUBSTITUTE_OVERFLOW_LENGTH | PCRE2_SUBSTITUTE_EXTENDED
             | (global ? PCRE2_SUBSTITUTE_GLOBAL : 0);
     PCRE2_SIZE outlen = input_len * 2;     /* estimated length of output buffer in characters, fine if too small */
@@ -101,7 +108,7 @@ uint32_t *regex_replace(pcre2_code *search, char *replace, uint32_t *input, cons
         PCRE2_UCHAR buffer[256];
         pcre2_get_error_message(pcre2_rc, buffer, sizeof(buffer));
         /* buffer will normally contain "invalid replacement string" */
-        fprintf(stderr, "Error substituting \"%s\": %s\n", replace, u32_strconv_to_locale(buffer));
+        fprintf(stderr, "Error substituting \"%s\": %s\n", replace, u32_strconv_to_output(buffer));
         BFREE(output);
         return NULL;
     }

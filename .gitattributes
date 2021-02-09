@@ -1,0 +1,13 @@
+* text=auto
+
+# shell scripts
+*.sh text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf
+
+# the test cases
+/test/*.txt text eol=lf
+
+# special test case for testing ISO encoding
+/test/111_manual_encoding_iso.txt text working-tree-encoding=ISO_8859-15

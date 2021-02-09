@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <uniconv.h>
 #include <unistr.h>
 
 #include "shape.h"
@@ -1098,7 +1097,7 @@ void output_input(const int trim_only)
             indent = 0;
         }
 
-        fprintf(opt.outfile, "%s%s%s", indentspc, u32_strconv_to_locale(advance32(input.lines[j].mbtext, indent)),
+        fprintf(opt.outfile, "%s%s%s", indentspc, u32_strconv_to_output(advance32(input.lines[j].mbtext, indent)),
                 (input.final_newline || j < input.anz_lines - 1 ? "\n" : ""));
         BFREE (indentspc);
     }
