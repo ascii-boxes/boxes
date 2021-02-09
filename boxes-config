@@ -2954,4 +2954,37 @@ END vim-box
 # ============================================================================
 
 
+BOX square
+
+author "Jens Brimfors <jens.brimfors@gmail.com>"
+designer "(public domain)"
+revision "1.0"
+created "2021-02-09"
+tags "box"
+
+sample
+    ┏━━━━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃ I'm square.             ┃
+    ┃ And I'm fine with that. ┃
+    ┗━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ends
+
+shapes {
+    nw ("┏") n ("━") ne ("┓")
+     w ("┃")          e ("┃")
+    sw ("┗") s ("━") se ("┛")
+}
+
+padding {
+    horiz 1
+}
+
+elastic (n,e,s,w)
+
+END square
+
+
+# ============================================================================
+
+
 #EOF                                               vim: set ai sw=4 syn=boxes:
