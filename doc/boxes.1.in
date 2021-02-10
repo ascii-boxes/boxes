@@ -313,6 +313,22 @@ The syntax of
 .I boxes
 config files is described on the website.
 .\" =======================================================================
+.SH EXAMPLES
+Examples on how to invoke
+.I boxes
+may be found on the website at
+<URL:https://boxes.thomasjensen.com/examples.html>. Try
+.br
+
+\fIecho "Good Bye World!" | boxes -d nuke\fP
+.br
+
+.I Boxes
+also combines nicely with other tools. Try
+.br
+
+\fIfiglet "boxes . . . !" | lolcat -f | boxes -d unicornthink\fP
+.\" =======================================================================
 .SH AVAILABILITY
 The
 .I boxes
@@ -366,4 +382,6 @@ system\-wide configuration file
 .\" =======================================================================
 .SH "SEE ALSO"
 .BR figlet (6),
-.BR iconv (1)
+.BR iconv (1),
+.BR lolcat (6)
+
