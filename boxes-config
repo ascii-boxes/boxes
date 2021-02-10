@@ -1883,8 +1883,7 @@ reverse "^  " to "    "
 reverse "((?:\x1b\[[0-9;]*m)*(?!\x1b).) " to "$1"
 
 padding {
-    left 2
-    right 1
+    horizontal 2
 }
 
 elastic (n,e,s,w)
