@@ -1,13 +1,25 @@
-#   Copyright (C)  boxes (c)1999 by Thomas Jensen
-#      <boxes(at)thomasjensen.com>  All rights reserved.
 #
-# This is free software, licensed under the GNU General Public License 
-# See /LICENSE for more information.
+# boxes - Command line filter to draw/remove ASCII boxes around text
+# Copyright (c) 1999-2021 Thomas Jensen and the boxes contributors
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License, version 2, as published
+# by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#____________________________________________________________________________
 #
 #   File:           $(TOPDIR)/feeds/packages/utils/boxes/Makefile
 #   Date created:   2014-09-12 23:28
 #   Author:         Lu Weifeng <lyredsoft@gmail.com>
-#   usage:                 
+#   Usage:
 # +-------------------------------------------------------------------------+
 # |$cd $(TOPDIR)                                                            |
 # |$./scripts/feeds update -i                                               |
@@ -17,7 +29,6 @@
 # |$scp  $(TOPDIR)/bin/ar71xx/packages/boxes_1.1-1_ar71xx.ipk  openwrt:/tmp/|
 # |$opkg install --force-depends /tmp/boxes_1.1-1_ar71xx.ipk                |
 # +-------------------------------------------------------------------------+
-#____________________________________________________________________________
 #============================================================================
 
 
@@ -38,7 +49,7 @@ define Package/boxes
 	TITLE:=HW
 endef
 define Package/boxes/description
-boxes 
+boxes
 endef
 define Package/boxes/Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) boxes
