@@ -1,8 +1,8 @@
 :ARGS
 -s 15x7 -a l
 :INPUT
-aaa
-bbbb
+  aaa
+     bbbb
 ccccc
 :OUTPUT-FILTER
 :EXPECTED

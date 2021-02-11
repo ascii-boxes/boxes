@@ -1,0 +1,15 @@
+:DESC
+A non-existent encoding is specified. Boxes falls back to the system encoding and logs a warning.
+
+:ARGS
+-n NON-EXISTENT
+:INPUT
+foo
+:OUTPUT-FILTER
+s/( falling back to) .*$/\1 [system encoding]/
+:EXPECTED
+boxes: Invalid character encoding: NON-EXISTENT - falling back to [system encoding]
+/*******/
+/* foo */
+/*******/
+:EOF

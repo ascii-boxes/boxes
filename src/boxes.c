@@ -1380,7 +1380,7 @@ static int read_all_input(const int use_stdin)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    char buf[LINE_MAX_BYTES + 2];    /* input buffer */
+    char buf[LINE_MAX_BYTES + 3];    /* input buffer incl. newline + zero terminator */
     size_t len_chars;
     size_t input_size = 0;           /* number of elements allocated */
     uint32_t *mbtemp = NULL;         /* temp string for preparing the multi-byte input */
@@ -1396,7 +1396,7 @@ static int read_all_input(const int use_stdin)
         /*
          *  Start reading
          */
-        while (fgets(buf, LINE_MAX_BYTES + 1, opt.infile)) {
+        while (fgets(buf, LINE_MAX_BYTES + 2, opt.infile)) {
             if (input.anz_lines % 100 == 0) {
                 input_size += 100;
                 line_t *tmp = (line_t *) realloc(input.lines, input_size * sizeof(line_t));

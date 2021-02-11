@@ -263,7 +263,7 @@ size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    static uint32_t temp[LINE_MAX_BYTES * MAX_TABSTOP + 1];  /* work string */
+    static uint32_t temp[LINE_MAX_BYTES + 100];  /* work string */
     size_t io;         /* character position in work string */
     size_t tabnum = 0; /* index of the current tab */
 
@@ -294,7 +294,7 @@ size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_
     ucs4_t puc;
     const uint32_t *rest = input_buffer;
     io = 0;
-    while ((rest = u32_next(&puc, rest))) {
+    while ((rest = u32_next(&puc, rest)) && io < (LINE_MAX_BYTES - 12)) {
         if (puc == char_tab) {
             if (*tabpos_len > 0) {
                 (*tabpos)[tabnum++] = io;
@@ -314,7 +314,6 @@ size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_
     if (*text == NULL) {
         return 0;
     }
-
     return io;
 }
 
