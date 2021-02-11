@@ -355,46 +355,6 @@ END c-cmt2
 # ============================================================================
 
 
-BOX c-cmt3
-
-author   "AlpT (@freaknet.org)"
-designer "AlpT (@freaknet.org)"
-revision "1.0"
-revdate  "Fri Jun  9 11:04:42 CEST 2006"
-created  "Fri Jun  9 11:04:42 CEST 2006"
-tags "programming, comment"
-
-sample
-    /**
-     *
-     */
-    code(here); a++;
-    /**/
-ends
-
-shapes {
-    nnw ("/** ",
-         " *  ",
-         " */ ")
-      n (" ",
-         " ",
-         " ")
-    ssw ("/**/")
-      s (" ")
-}
-
-delimiter ?"
-replace "\*/" with "*\/"                 # quote closing comment tags
-reverse "\*\\/" to "*/"
-
-elastic (n,s)
-
-END c-cmt3
-
-
-# ============================================================================
-
-
 BOX javadoc
 
 author   "Ted Berg <tedberg@spiritone.com>"
@@ -417,7 +377,7 @@ shapes {
     sw (" *") ssw ("/") s (" ")
 }
 
-padding { left 2 }
+padding { left 1 }
 
 delimiter ?"
 replace "\*/" with "*\/"                 # quote closing comment tags
@@ -874,99 +834,6 @@ shapes {
 elastic (nne,nnw, sse,ssw, e, w)
 
 END girl
-
-
-# ============================================================================
-
-
-BOX tjc
-
-author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
-designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
-revision "1.1"
-revdate  "July 16, 1999 (Friday, 18:55h)"
-created  "April 02, 1999 (Friday, 19:26h)"
-tags "programming, comment, deprecated"
-
-SAmple
-    static char *foo (const int a, const int b)
-    /*
-     *  Do the foo on the bar and around again.
-     *
-     *      a     number of doodlefrobs
-     *      b     barfoo mode (0 == off)
-     *
-     *  Memory will be allocated for the result.
-     *
-     *  RETURNS:  Success: Pointer to result line
-     *            Error:   0       (e.g. out of memory)
-     *
-    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     */
-    {
-        static char temp ....
-        int ii;          ....
-ends
-
-indent "none"                 # alternatives: "box", "text"
-
-replace "\\*/" with "*\\/"    # quote closing comment tags
-reverse "\\*\\\\/" to "*/"
-
-shapes {
-    wnw ("/*")
-    w   (" *")
-    sw  ("* ", " *")
-    ssw ("*", "/")
-    s   (" *", "  ")
-}
-
-elastic (n, s, w)
-
-padding {
-    left 2
-    vertical 1
-}
-
-END tjc
-
-
-# ============================================================================
-
-
-BOX netdata
-
-author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
-designer "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
-revision "1.0"
-revdate  "April 09, 1999 (Friday, 19:06h)"
-created  "April 09, 1999 (Friday, 19:06h)"
-tags "programming, comment, deprecated"
-
-sample
-    %{-----------------------------------------------------------------+
-     | IBM Net.Data Macro Comment                                      |
-     | Created February 17, 1998 (Tuesday, 16:40h)                     |
-     +-----------------------------------------------------------------%}
-ends
-
-shapes {
-    nw ("%{") ne ("+ ")
-    sw (" +") se ("%}")
-    e  ("| ")  w (" |")
-    n  ("-")   s ("-")
-}
-
-replace "%}" with "%\\}"
-reverse "%\\\\}" to "%}"
-
-padding {
-    horizontal 1
-}
-
-elastic (n, e, s, w)
-
-END netdata
 
 
 # ============================================================================
@@ -1923,38 +1790,6 @@ END lisp-cmt
 #============================================================================
 
 
-BOX ccel
-
-author   "Elmar Loos <elInfo@gmx.net>"
-designer "Elmar Loos <elInfo@gmx.net>"
-revision "1.0"
-tags "artwork"
-
-sample
-    ///////////////
-    text         //
-    here         //
-    ///////////////
-ends
-
-shapes {
-    nnw ("/") n ("/")  ne ("//")
-                        e ("//")
-    ssw ("//") s ("/") se ("//")
-}
-
-padding {
-    right 1
-}
-
-elastic (n,e,s)
-
-END ccel
-
-
-#============================================================================
-
-
 BOX underline
 
 author   "Elmar Loos <elInfo@gmx.net>"
@@ -2864,7 +2699,9 @@ padding { horiz 1 }
 
 END bear
 
+
 # ============================================================================
+
 
 BOX jstone
 author "Ed Schaller"
@@ -2898,7 +2735,9 @@ padding {
 
 END jstone
 
+
 # ============================================================================
+
 
 BOX vim-box
 
@@ -2932,6 +2771,7 @@ padding {
 elastic (n, e, s, w)
 
 END vim-box
+
 
 # ============================================================================
 
