@@ -84,7 +84,7 @@ export BOXES=../boxes-config
 
 cat $testInputFile | $boxesBinary $boxesArgs >$testOutputFile 2>&1
 declare -ir actualReturnCode=$?
-cat $testOutputFile | tr -d '\r' | sed -f $testFilterFile | diff - $testExpectationFile
+cat $testOutputFile | tr -d '\r' | sed -E -f $testFilterFile | diff - $testExpectationFile
 if [ $? -ne 0 ]; then
     >&2 echo "Error in test case: $testCaseFile (top: actual; bottom: expected)"
     exit 5
