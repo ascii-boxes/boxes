@@ -20,12 +20,16 @@
 
 # The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/share/boxes
+# TODO update git call
 GIT_STATUS = ($(shell git rev-parse --short HEAD)$(shell if [ $$(git status -s -uall | wc -l) -ge 1 ] ; then echo ", dirty" ; fi))
 BVERSION   = 1.3.1-SNAPSHOT
 
 ALL_FILES  = LICENSE README.md README.Win32.md boxes-config
 DOC_FILES  = doc/boxes.1 doc/boxes.el
 PKG_NAME   = boxes-$(BVERSION)
+
+WIN_PCRE2_VERSION = 10.36
+WIN_PCRE2_DIR     = pcre2-$(WIN_PCRE2_VERSION)
 
 .PHONY: clean build win32 debug win32.debug infomsg replaceinfos test package win32.package package_common
 
@@ -35,10 +39,18 @@ build debug: infomsg replaceinfos
 	$(MAKE) -C src BOXES_PLATFORM=unix $@
 
 win32: infomsg replaceinfos
-	$(MAKE) -C src BOXES_PLATFORM=win32 build
+	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(WIN_PCRE2_DIR)/src LDFLAGS=-L../$(WIN_PCRE2_DIR)/.libs build
 
 win32.debug: infomsg replaceinfos
-	$(MAKE) -C src BOXES_PLATFORM=win32 debug
+	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(WIN_PCRE2_DIR)/src LDFLAGS=-L../$(WIN_PCRE2_DIR)/.libs debug
+
+win32.pcre:
+	# build the pcre2 dependency (only needed on Windows MinGW)
+	curl -LO https://ftp.pcre.org/pub/pcre/$(WIN_PCRE2_DIR).tar.gz
+	tar xfz $(WIN_PCRE2_DIR).tar.gz
+	cd $(WIN_PCRE2_DIR)
+	./configure --disable-pcre2-8 --disable-pcre2-16 --enable-pcre2-32 --disable-shared --enable-never-backslash-C --enable-newline-is-anycrlf
+	$(MAKE)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -50,7 +50,7 @@ boxes: $(ALL_OBJ)
 	if [ "$(STRIP)" = "true" ] ; then strip $(BOXES_EXECUTABLE_NAME) ; fi
 
 boxes.exe: $(ALL_OBJ)
-	$(CC) $(LDFLAGS) $(ALL_OBJ) -o $(BOXES_EXECUTABLE_NAME) -lkernel32
+	$(CC) $(LDFLAGS) $(ALL_OBJ) -o $(BOXES_EXECUTABLE_NAME) -lkernel32 -l:libunistring.a -l:libpcre2-32.a -l:libiconv.a
 	if [ "$(STRIP)" = "true" ] ; then strip $(BOXES_EXECUTABLE_NAME) ; fi
 
 

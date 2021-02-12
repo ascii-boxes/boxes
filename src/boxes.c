@@ -106,7 +106,7 @@ static void usage(FILE *st)
     fprintf(st, "        -k bool  leading/trailing blank line retention on removal\n");
     fprintf(st, "        -l       list available box designs w/ samples\n");
     fprintf(st, "        -m       mend box, i.e. remove it and redraw it afterwards\n");
-    fprintf(st, "        -n enc   Character encoding of input and output\n");
+    fprintf(st, "        -n enc   Character encoding of input and output [default: %s]\n", locale_charset());
     fprintf(st, "        -p fmt   padding [default: none]\n");
     /* fprintf(st, "        -q       modify command for needs of the web UI (undocumented)\n"); */
     fprintf(st, "        -r       remove box\n");

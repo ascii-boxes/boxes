@@ -19,6 +19,7 @@
 /src/parser.h
 /src/parser.c
 /doc/boxes.1
+/pcre2-*/
 
 # Linux Packaging
 doc/*.tar.gz
