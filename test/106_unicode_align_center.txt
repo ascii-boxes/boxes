@@ -1,5 +1,8 @@
+:DESC
+Test center alignment of unicode text without escape sequences mixed in, but with some chars in double-width
+(chinese). We always set the charset manually because else the build would fail on systems which have it set wrong.
 :ARGS
--ac
+-n UTF-8 -ac
 :INPUT
          a
      ab

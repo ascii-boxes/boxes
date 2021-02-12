@@ -265,6 +265,7 @@ const char *check_encoding(const char *manual_encoding, const char *system_encod
         }
         fprintf(stderr, "%s: Invalid character encoding: %s - falling back to %s\n",
                 PROJECT, manual_encoding, system_encoding);
+        fflush(stderr);
     }
     return system_encoding;
 }

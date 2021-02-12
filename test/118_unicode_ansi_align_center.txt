@@ -1,7 +1,7 @@
 :DESC
 Center align colored unicode text.
 :ARGS
--d unicornsay -ac
+-n UTF-8 -d unicornsay -ac
 :INPUT
 [38;5;39m [0m[38;5;44m [0m[38;5;44m [0m[38;5;44m [0m[38;5;49m [0m[38;5;49m [0m[38;5;48m [0m[38;5;84m [0m[38;5;83m [0m[38;5;83m試[0m
 [38;5;44m [0m[38;5;49m [0m[38;5;49m [0m[38;5;48m [0m[38;5;84m [0m[38;5;83m常[0m[38;5;83m盤[0m

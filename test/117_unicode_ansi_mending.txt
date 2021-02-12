@@ -1,7 +1,7 @@
 :DESC
 This test case checks that a broken box with unicode and ansi sequences can be properly mended.
 :ARGS
--d diamonds -ac -m
+-n UTF-8 -d diamonds -ac -m
 :INPUT
        /\          /\          /\          /\
     /\//\\/\    /\//\\/\    /\//\\/\    /\//\\/\
