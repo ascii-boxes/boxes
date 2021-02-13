@@ -26,9 +26,9 @@ GEN_HDR    = parser.h boxes.h
 GEN_SRC    = parser.c lex.yy.c
 GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
 ORIG_HDRCL = boxes.h.in config.h
-ORIG_HDR   = $(ORIG_HDRCL) lexer.h tools.h shape.h generate.h remove.h unicode.h regulex.h
+ORIG_HDR   = $(ORIG_HDRCL) generate.h lexer.h regulex.h remove.h shape.h tools.h unicode.h
 ORIG_GEN   = lexer.l parser.y
-ORIG_NORM  = boxes.c tools.c shape.c generate.c remove.c unicode.c regulex.c
+ORIG_NORM  = boxes.c generate.c regulex.c remove.c shape.c tools.c unicode.c
 ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
 ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 OTH_FILES  = Makefile
@@ -79,14 +79,13 @@ lex.yy.c: lexer.l boxes.h
 	cat lexer.tmp.c >> lex.yy.c
 	rm lexer.tmp.c
 
-# TODO In the end, check declared dependencies again
 boxes.o: boxes.c boxes.h regulex.h shape.h tools.h unicode.h generate.h remove.h config.h
-tools.o: tools.c tools.h boxes.h shape.h config.h
-unicode.o: unicode.c unicode.h config.h
-shape.o: shape.c shape.h boxes.h config.h tools.h
-generate.o: generate.c generate.h boxes.h shape.h tools.h config.h
-remove.o: remove.c remove.h boxes.h shape.h tools.h config.h
-regulex.o: regulex.c regulex.h config.h
+tools.o: tools.c tools.h boxes.h shape.h unicode.h config.h
+unicode.o: unicode.c unicode.h boxes.h tools.h config.h
+shape.o: shape.c shape.h boxes.h tools.h config.h
+generate.o: generate.c generate.h boxes.h shape.h tools.h unicode.h config.h
+remove.o: remove.c remove.h boxes.h shape.h tools.h unicode.h config.h
+regulex.o: regulex.c regulex.h tools.h unicode.h config.h
 lex.yy.o: lex.yy.c parser.h tools.h shape.h lexer.h config.h
 parser.o: parser.c parser.h tools.h shape.h lexer.h config.h
 misc/getopt.o: misc/getopt.c
