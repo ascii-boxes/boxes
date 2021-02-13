@@ -20,8 +20,7 @@
 
 # The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/share/boxes
-# TODO update git call
-GIT_STATUS = ($(shell git rev-parse --short HEAD)$(shell if [ $$(git status -s -uall | wc -l) -ge 1 ] ; then echo ", dirty" ; fi))
+GIT_STATUS = ($(shell git describe --dirty --always))
 BVERSION   = 1.3.1-SNAPSHOT
 
 ALL_FILES  = LICENSE README.md README.Win32.md boxes-config
