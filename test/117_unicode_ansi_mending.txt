@@ -18,7 +18,7 @@ This test case checks that a broken box with unicode and ansi sequences can be p
 \\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\//
  \/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/
     \/\\//\/    \/\\//\/    \/\\//\/    \/\\//\/
-       \/          \/          \/          \/
+       \/          \/          \/     jgs  \/
 :OUTPUT-FILTER
 :EXPECTED
          /\          /\          /\          /\
@@ -36,5 +36,5 @@ This test case checks that a broken box with unicode and ansi sequences can be p
   \\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\//
    \/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/
       \/\\//\/    \/\\//\/    \/\\//\/    \/\\//\/
-         \/          \/          \/          \/
+         \/          \/          \/     jgs  \/
 :EOF

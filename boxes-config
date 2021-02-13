@@ -511,8 +511,8 @@ BOX diamonds
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.1"
-revdate  "August 18, 1999 (Wednesday, 17:02h)"
+revision "1.2"
+revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "March 30, 1999 (Tuesday, 15:59h)"
 tags "artwork, box"
 
@@ -532,7 +532,7 @@ Sample
     \\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\//
      \/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/
         \/\\//\/    \/\\//\/    \/\\//\/    \/\\//\/
-           \/          \/          \/          \/
+           \/          \/          \/     jgs  \/
 Ends
 
 delimiter ?"
@@ -571,7 +571,7 @@ shapes {
     sse ("///\\/\/",
          "/\\///\\",
          "  \/\\//",
-         "     \/ ")
+         "jgs  \/ ")
 
     se  ("/\\\//",
          "\//\/ ",
@@ -591,8 +591,8 @@ BOX mouse
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.1"
-revdate  "August 22, 1999 (Sunday, 12:57h)"
+revision "1.2"
+revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "March 18, 1999 (Thursday, 15:27h)"
 tags "artwork, box, sign"
 
@@ -609,7 +609,7 @@ sample
     \          ascii art gallery           /
     / http://www.geocities.com/SoHo/7373/  \
     \______________________________________/
-                  ___)( )(___
+                  ___)( )(___  jgs
                  (((__) (__)))
 ends
 
@@ -632,9 +632,9 @@ shapes {
        "     >  -  <     ",
        "_.\"\"`-------`\"\"._")
 
-    s ("_____________",
-       " ___)( )(___ ",
-       "(((__) (__)))")
+    s ("_____________________",
+       "     ___)( )(___  jgs",
+       "    (((__) (__)))    ")
 
     ssw ("_"," "," ")
     sse ("_"," "," ")
@@ -657,8 +657,8 @@ BOX sunset
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.0"
-revdate  "March 30, 1999 (Tuesday, 17:10h)"
+revision "1.1"
+revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "March 30, 1999 (Tuesday, 17:10h)"
 tags "artwork, box"
 
@@ -672,20 +672,18 @@ sample
      <>:   ., .., . . .  . .  .  .  .  .  . joan stark    :<>
      <>:  :,  :.' : : :`.: :.'  `: `: `: `:  spunk1111    :<>
      <>:  ,.; :   `.' : `: : `.  :  :  :  :   @juno.com   :<>
-     <>:..................................................:<>
+     <>:..................................................:<> jgs
      <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-   ~you can't hurt your eyesight by looking on the bright side~
-       ~but you can hurt them by looking at bad ascii art!~
 ends
 
 shapes {
-    e (":<>")
+    e (":<>    ")
     w ("<>:")
     sw ("<>:", "<><")
-    se (":<>", "><>")
+    se (":<> jgs", "><>    ")
     s ("..", "><")
     nw ("   ", "   ", "   ", "   ", "   ", "<>.")
-    ne ("   ", "   ", "   ", "   ", "   ", ".<>")
+    ne ("       ", "       ", "       ", "       ", "       ", ".<>    ")
     nnw (" ", " ", " ", " ", " ", ".")
     nne (" ", " ", " ", " ", " ", ".")
     n ("           .           ",
@@ -708,8 +706,8 @@ BOX boy
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.1"
-revdate  "August 22, 1999 (Sunday, 13:02h)"
+revision "1.2"
+revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 02, 1999 (Friday, 15:02h)"
 tags "artwork, box, sign"
 
@@ -723,11 +721,11 @@ sample
     |   joan stark   spunk1111@juno.com   |
     |     VISIT MY ASCII ART GALLERY:     |
     | http://www.geocities.com/SoHo/7373/ |
-     \_______________________ooo_________/  jgs
+     \_______________________ooo_________/
                     |  |  |
                     |_ | _|
                     |  |  |
-                    |__|__|
+                    |__|__|  jgs
                     /-'Y'-\
                    (__/ \__)
 ends
@@ -754,7 +752,7 @@ shapes {
        "     |  |  |     ",
        "     |_ | _|     ",
        "     |  |  |     ",
-       "     |__|__|     ",
+       "     |__|__|  jgs",
        "     /-'Y'-\\     ",
        "    (__/ \\__)    ")
 }
@@ -774,8 +772,8 @@ BOX girl
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.0"
-revdate  "April 02, 1999 (Friday, 19:13h)"
+revision "1.1"
+revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 02, 1999 (Friday, 19:13h)"
 tags "artwork, box, sign"
 
@@ -789,11 +787,11 @@ sample
     |   joan stark   spunk1111@juno.com   |
     |     VISIT MY ASCII ART GALLERY:     |
     | http://www.geocities.com/SoHo/7373/ |
-     \________________________ooo________/  jgs
+     \________________________ooo________/
                  /           \
                 /:.:.:.:.:.:.:\
                     |  |  |
-                    \==|==/
+                    \==|==/  jgs
                     /-'Y'-\
                    (__/ \__)
 ends
@@ -809,7 +807,7 @@ shapes {
          "   /           \\   ",
          "  /:.:.:.:.:.:.:\\  ",
          "      |  |  |      ",
-         "      \\==|==/      ",
+         "      \\==|==/  jgs ",
          "      /-'Y'-\\      ",
          "     (__/ \\__)     ")
     e   (" |")
@@ -836,8 +834,8 @@ BOX xes
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.1"
-revdate  "August 18, 1999 (Wednesday, 17:04h)"
+revision "1.2"
+revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 09, 1999 (Friday, 20:05h)"
 tags "artwork, box"
 
@@ -867,7 +865,7 @@ shapes {
     wnw (" <\/>", " </\>")
     w   ("<\/> ", "</\> ")
     wsw (" <\/>", " </\>")
-    sw  ("    <", "    <", "     ")
+    sw  ("    <", "    <", "jgs  ")
     ssw ("\/>", "/\>", "   ")
     s   ("    ", "<\/>", "</\>")
     sse ("<\/", "</\", "   ")
@@ -889,8 +887,8 @@ BOX dog
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.0"
-revdate  "April 09, 1999 (Friday, 19:45h)"
+revision "1.1"
+revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 09, 1999 (Friday, 19:45h)"
 tags "artwork, box, sign"
 
@@ -900,8 +898,8 @@ sample
               /  ,/  _   : :   _  \/` \
               \  `| /o\  :_:  /o\ |\__/
                `-'| :="~` _ `~"=: |
-                  \`     (_)     `/
-       jgs .-"-.   \      |      /   .-"-.
+                  \`     (_)     `/ jgs
+           .-"-.   \      |      /   .-"-.
     .-----{     }--|  /,.-'-.,\  |--{     }-----.
      )    (_)_)_)  \_/`~-===-~`\_/  (_(_(_)    (
     (                joan  stark                )
@@ -926,7 +924,7 @@ shapes {
          "    /  ,/  _   : :   _  \\/` \\    ",
          "    \\  `| /o\\  :_:  /o\\ |\\__/    ",
          "     `-'| :=\"~` _ `~\"=: |        ",
-         "        \\`     (_)     `/        ",
+         "        \\`     (_)     `/ jgs    ",
          " .-\"-.   \\      |      /   .-\"-. ",
          "{     }--|  /,.-'-.,\\  |--{     }",
          "(_)_)_)  \\_/`~-===-~`\\_/  (_(_(_)")
@@ -944,8 +942,8 @@ BOX cat
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.0"
-revdate  "April 09, 1999 (Friday, 19:45h)"
+revision "1.1"
+revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 09, 1999 (Friday, 19:45h)"
 tags "artwork, box, sign"
 
@@ -955,9 +953,9 @@ sample
                  \ ."  :'. .':  ". /
                 ==)  _ :  '  : _  (==
                   |>/O\   _   /O\<|
-                  | \-"~` _ `~"-/ |
+                  | \-"~` _ `~"-/ |   jgs
                  >|`===. \_/ .===`|<
-       jgs .-"-.   \==='  |  '===/   .-"-.
+           .-"-.   \==='  |  '===/   .-"-.
     .-----{'. '`}---\,  .-'-.  ,/---{.'. '}-----.
      )    `"---"`     `~-===-~`     `"---"`    (
     (                 joan  stark               )
@@ -982,7 +980,7 @@ shapes {
         "       \\ .\"  :'. .':  \". /       ",
         "      ==)  _ :  '  : _  (==      ",
         "        |>/O\\   _   /O\\<|        ",
-        "        | \\-\"~` _ `~\"-/ |        ",
+        "        | \\-\"~` _ `~\"-/ |   jgs  ",
         "       >|`===. \\_/ .===`|<       ",
         " .-\"-.   \\==='  |  '===/   .-\"-. ",
         "{'. '`}---\\,  .-'-.  ,/---{.'. '}",
@@ -1001,8 +999,8 @@ BOX capgirl
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.0"
-revdate  "April 09, 1999 (Friday, 19:24h)"
+revision "1.1"
+revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 09, 1999 (Friday, 19:24h)"
 tags "artwork, box, sign"
 
@@ -1018,10 +1016,10 @@ sample
     |     VISIT MY ASCII ART GALLERY:     |
     |      http://www.ascii-art.com       |
      \________________________ooo________/
-                 /           \   jgs
+                 /           \
                 /:.:.:.:.:.:.:\
                     |  |  |
-                    \==|==/
+                    \==|==/  jgs
                     /-'Y'-\
                    (__/ \__)
 ends
@@ -1038,7 +1036,7 @@ shapes {
          "   /           \\   ",
          "  /:.:.:.:.:.:.:\\  ",
          "      |  |  |      ",
-         "      \\==|==/      ",
+         "      \\==|==/  jgs ",
          "      /-'Y'-\\      ",
          "     (__/ \\__)     ")
     e   (" |")
@@ -1201,8 +1199,8 @@ BOX stark2
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.0"
-revdate  "April 05, 1999 (Monday, 21:55h)"
+revision "1.1"
+revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 05, 1999 (Monday, 21:55h)"
 tags "artwork, box"
 
@@ -1218,7 +1216,7 @@ sample
     .:-@                  _  |(_)(_|| |   ____) | (_||  | \_,          @-:.
     .:-@                 (__/            (      |_,                    @-:.
     .:-@                                                               @-:.
-    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:. jgs
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
 ends
 
@@ -1226,13 +1224,13 @@ shapes {
     nw  (".:-@", ".:-@")
     n   (".:-@", ".:-@")
     nne (".:-",  ".:-")
-    ne  ("@-:.", "@-:.")
-    e   ("@-:.")
+    ne  ("@-:.    ", "@-:.    ")
+    e   ("@-:.    ")
     w   (".:-@")
     sw  (".:-@", ".:-@")
     s   (".:-@", ".:-@")
     sse (".:-",  ".:-")
-    se  ("@-:.", "@-:.")
+    se  ("@-:. jgs", "@-:.    ")
 }
 
 elastic (n,s,e, w)
@@ -1247,8 +1245,8 @@ BOX stark1
 
 author   "Thomas Jensen <boxes(at)thomasjensen(dot)com>"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.0"
-revdate  "April 05, 1999 (Monday, 21:55h)"
+revision "1.1"
+revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 05, 1999 (Monday, 21:55h)"
 tags "artwork, box"
 
@@ -1264,13 +1262,13 @@ sample
     ^      , ; | | | | | | |`. | | | |        ^
     ^      `-' |-' `-^ ' ^ ` ` ` ` ` `        ^
     ^          `                              ^
-    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= jgs
 ends
 
 shapes {
-    nw ("=") ne ("=") nne ("-") N ("-=")
-    e  ("^")                     w ("^")
-    sw ("=") ssw ("-") s ("=-") se ("=")
+    nw ("=") N ("-=") nne ("-") ne ("=    ")
+    w  ("^")                     e ("^    ")
+    sw ("=") ssw ("-") s ("=-") se ("= jgs")
 }
 
 padding {h 1}
