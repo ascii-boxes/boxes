@@ -135,7 +135,7 @@ uint32_t *advance_next32(const uint32_t *s, size_t *invis)
             /* Found an ESC char, count it as invisible and move 1 forward in the detection of CSI sequences */
             (*invis)++;
             ansipos++;
-        } else if (ansipos == 1 && c == '[') {
+        } else if (ansipos == 1 && (c == '[' || c == '(')) {
             /* Found '[' char after ESC. A CSI sequence has started. */
             (*invis)++;
             ansipos++;
