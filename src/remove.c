@@ -976,7 +976,7 @@ int remove_box()
                     break;
                 }
             }
-            #ifdef DEBUG
+            #if defined(DEBUG)
                 fprintf(stderr, "memmove(\"%s\", \"%s\", %d);\n",
                         input.lines[j].text, input.lines[j].text + c, (int) (input.lines[j].len - c + 1));
             #endif
@@ -984,7 +984,12 @@ int remove_box()
                     input.lines[j].len - c + 1);         /* +1 for zero byte */
             input.lines[j].len -= c;
 
-            /* TODO the next line may kill an escape code to color the next char */
+            #if defined(DEBUG)
+                fprintf(stderr, "u32_move(\"%s\", \"%s\", %d); // posmap[c]=%d\n",
+                        u32_strconv_to_output(input.lines[j].mbtext),
+                        u32_strconv_to_output(input.lines[j].mbtext + input.lines[j].posmap[c]),
+                        (int) (input.lines[j].num_chars - c + 1), (int) input.lines[j].posmap[c]);
+            #endif
             u32_move(input.lines[j].mbtext, input.lines[j].mbtext + input.lines[j].posmap[c],
                      input.lines[j].num_chars - c + 1);  /* +1 for zero byte */
             input.lines[j].num_chars -= c;

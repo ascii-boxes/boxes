@@ -197,7 +197,7 @@ void concat_strings(char *dst, int max_len, int count, ...)
         /*
          * Concatenate 'src' onto 'dst', as long as we have room.
          */
-        while (*src && max_len > 1) {    // TODO Can this be improved via strcpy
+        while (*src && max_len > 1) {
             *dst++ = *src++;
             max_len--;
         }
