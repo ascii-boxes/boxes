@@ -1,9 +1,6 @@
-.\" @(#)boxes.1 1.3 04/04/2019
+.\" @(#)boxes.1 2.0.0 02/14/2021
 .\"
-.\" boxes.1.in
-.\" Thomas Jensen
-.\"
-.TH boxes 1 "April 04 2019"
+.TH boxes 1 "February 14 2021"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter
@@ -355,9 +352,11 @@ This is
 .I boxes
 version --BVERSION--.
 .\" =======================================================================
-.SH BUGS
-Any currently known bugs, and also any current feature requests are tracked
-on GitHub: <URL:https://github.com/ascii-boxes/boxes/issues>
+.SH LICENSE
+.I boxes
+is free software under the terms of the GNU General Public License,
+version 2. Details in the LICENSE file:
+<URL:https://raw.githubusercontent.com/ascii-boxes/boxes/v--BVERSION--/LICENSE>
 .\" =======================================================================
 .SH ENVIRONMENT
 .I Boxes
@@ -384,4 +383,3 @@ system\-wide configuration file
 .BR figlet (6),
 .BR iconv (1),
 .BR lolcat (6)
-
