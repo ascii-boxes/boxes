@@ -1,0 +1,11 @@
+:ARGS
+-f 120_parser_unterminated_string.cfg
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: 120_parser_unterminated_string.cfg: line 4: Unterminated String -- "           # unterminated!
+boxes: 120_parser_unterminated_string.cfg: line 4: syntax error
+boxes: 120_parser_unterminated_string.cfg: line 4: skipping to next design
+boxes: 120_parser_unterminated_string.cfg: line 25: no valid designs found
+:EOF
