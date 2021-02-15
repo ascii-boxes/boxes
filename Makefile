@@ -65,6 +65,11 @@ src/boxes.h: src/boxes.h.in src/regulex.h src/shape.h Makefile
 doc/boxes.1: doc/boxes.1.in Makefile
 	sed -e 's/--BVERSION--/$(BVERSION)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' doc/boxes.1.in > doc/boxes.1
 
+doc/boxes.1.html: doc/boxes.1
+	cat doc/boxes.1 | groff -mandoc -Thtml > doc/boxes.1.raw.html
+	sed -E -e 's/&lt;URL:([^&]+)&gt;/<a href=\1>\1<\/a>/g' < doc/boxes.1.raw.html > doc/boxes.1.html
+	rm -f doc/boxes.1.raw.html
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 $(PKG_NAME).tar.gz:
@@ -101,7 +106,8 @@ src/boxes.exe: win32
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 clean:
-	rm -f doc/boxes.1 src/boxes.h tools/boxes.cfg tools/LICENSE.txt tools/boxes.exe tools/README*.md boxes.portable.*.nupkg
+	rm -f src/boxes.h tools/boxes.cfg tools/LICENSE.txt tools/boxes.exe tools/README*.md boxes.portable.*.nupkg
+	rm -f doc/boxes.1 doc/boxes.1.raw.html doc/boxes.1.html
 	$(MAKE) -C src clean
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

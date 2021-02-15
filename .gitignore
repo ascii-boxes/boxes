@@ -19,10 +19,11 @@
 /src/parser.h
 /src/parser.c
 /doc/boxes.1
+/doc/boxes.1.raw.html
+/doc/boxes.1.html
 /pcre2-*/
 
 # Linux Packaging
-doc/*.tar.gz
 *.tar.gz
 
 # Chocolatey Packaging
