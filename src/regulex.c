@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "boxes.h"
 #include "tools.h"
 #include "unicode.h"
 #include "regulex.h"
@@ -66,13 +67,15 @@ uint32_t *regex_replace(pcre2_code *search, char *replace, uint32_t *input, cons
 {
     PCRE2_SPTR replacement = u32_strconv_from_arg(replace, config_encoding);
     if (replacement == NULL) {
+        fprintf(stderr, "Failed to convert replacement string to UTF-32 - \"%s\"\n", replace);
         return NULL;
     }
+
     uint32_t options = PCRE2_SUBSTITUTE_OVERFLOW_LENGTH | PCRE2_SUBSTITUTE_EXTENDED
             | (global ? PCRE2_SUBSTITUTE_GLOBAL : 0);
     PCRE2_SIZE outlen = input_len * 2;     /* estimated length of output buffer in characters, fine if too small */
 
-    PCRE2_SIZE bufsize = (input_len == 0) ? 16 : outlen;
+    PCRE2_SIZE bufsize = (input_len < 8) ? 16 : outlen;
     uint32_t *output = (uint32_t *) malloc(sizeof(uint32_t) * bufsize);   /* output buffer */
     int pcre2_rc;
 
@@ -84,7 +87,8 @@ uint32_t *regex_replace(pcre2_code *search, char *replace, uint32_t *input, cons
         }
         PCRE2_SIZE outlen = bufsize;
 
-        pcre2_rc = pcre2_substitute(search, (PCRE2_SPTR) input, input_len,
+        pcre2_rc = pcre2_substitute(search,
+                                    (PCRE2_SPTR) input, PCRE2_ZERO_TERMINATED,
                                     0,         /* start offset */
                                     options,
                                     NULL,      /* ptr to a match data block */

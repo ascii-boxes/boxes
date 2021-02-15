@@ -85,7 +85,7 @@ unicode.o: unicode.c unicode.h boxes.h tools.h config.h
 shape.o: shape.c shape.h boxes.h tools.h config.h
 generate.o: generate.c generate.h boxes.h shape.h tools.h unicode.h config.h
 remove.o: remove.c remove.h boxes.h shape.h tools.h unicode.h config.h
-regulex.o: regulex.c regulex.h tools.h unicode.h config.h
+regulex.o: regulex.c regulex.h boxes.h tools.h unicode.h config.h
 lex.yy.o: lex.yy.c parser.h tools.h shape.h lexer.h config.h
 parser.o: parser.c parser.h tools.h shape.h lexer.h config.h
 misc/getopt.o: misc/getopt.c
