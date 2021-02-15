@@ -17,72 +17,70 @@ So far, there were these stable releases:
       <th class="visible-xs">Src</th>
       <th class="hidden-xs">Binaries</th>
       <th class="visible-xs">Bin</th>
+      <th class="hidden-xs">Remark</th>
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td><a href="{{ site.baseurl}}{% post_url 2021-02-15-boxes-v2.0.0-released %}">2.0.0</a></td>
+      <td>February&nbsp;15, 2021</td>
+      <td><a href="https://github.com/{{ site.github }}/tree/v2.0.0">link</a></td>
+      <td><a href="https://github.com/{{ site.github }}/releases/tag/v2.0.0">link</a></td>
+	  <td class="hidden-xs">major update</td>
+    </tr>
     <tr>
       <td><a href="{{ site.baseurl}}{% post_url 2019-02-21-boxes-v1.3-released %}">1.3</a></td>
       <td>February&nbsp;21, 2019</td>
       <td><a href="https://github.com/{{ site.github }}/tree/v1.3">link</a></td>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v1.3">link</a></td>
+	  <td class="hidden-xs">minor update</td>
     </tr>
     <tr>
       <td><a href="{{ site.baseurl}}{% post_url 2017-03-16-boxes-v1.2-released %}">1.2</a></td>
       <td>March&nbsp;16, 2017</td>
       <td><a href="https://github.com/{{ site.github }}/tree/v1.2">link</a></td>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v1.2">link</a></td>
+	  <td class="hidden-xs">&nbsp;</td>
     </tr>
     <tr>
       <td><a href="{{ site.baseurl}}{% post_url 2015-01-16-boxes-v1.1.2-released %}">1.1.2</a></td>
       <td>January&nbsp;16, 2015</td>
       <td><a href="https://github.com/{{ site.github }}/tree/v1.1.2">link</a></td>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v1.1.2">link</a></td>
+	  <td class="hidden-xs">&nbsp;</td>
     </tr>
     <tr>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v1.1.1">1.1.1</a></td>
       <td>October&nbsp;19, 2012</td>
       <td><a href="https://github.com/{{ site.github }}/tree/release_1.1.1">link</a></td>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v1.1.1">link</a></td>
+	  <td class="hidden-xs">&nbsp;</td>
     </tr>
     <tr>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v1.1">1.1</a></td>
       <td>July&nbsp;23, 2006</td>
       <td><a href="https://github.com/{{ site.github }}/tree/release_1.1">link</a></td>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v1.1">link</a></td>
+	  <td class="hidden-xs">new features</td>
     </tr>
     <tr>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v1.0.1">1.0.1</a></td>
       <td>March&nbsp;18, 2000</td>
       <td><a href="https://github.com/{{ site.github }}/tree/release_1.0.1">link</a></td>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v1.0.1">link</a></td>
+	  <td class="hidden-xs">important maintenance</td>
     </tr>
     <tr>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v1.0">1.0</a></td>
       <td>August&nbsp;22, 1999</td>
       <td><a href="https://github.com/{{ site.github }}/tree/release_1.0">link</a></td>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v1.0">link</a></td>
+	  <td class="hidden-xs">&nbsp;</td>
     </tr>
   </tbody>
 </table>
 
 Sources and binaries for these releases are available from the above table.
-
-## When to upgrade
-
-Boxes has been around a long time, and it has been very stable. Sometimes, new releases are still
-required to ensure that *boxes* continues to compile smoothly on a large number of platforms.
-Whether or not you should upgrade to a new version depends on what you've got, and what you want
-to do:
-
-- **Building from Source:** If you want to [build from source]({{ site.baseurl}}/build.html), you
-  should always use the latest sources from the above table. You may also clone the repo and build
-  the bleeding edge. Since we have a stable master branch, this will also get you a good build, but
-  it will be a snapshot version.
-
-- **Using a binary:** The last major functional enhancements were in version 1.1 (of 2006). So if
-  you've got a working 1.1 binary on your system, you're good and you don't really need to upgrade.
-  Staying on the even older 1.0.1 will mean that you're missing features (such as better tab
-  handling and the 'mend' option). Anything prior to 1.0.1 should definitely be upgraded.
 
 Note that you can always copy the [latest box designs](https://github.com/{{ site.github }}/blob/master/boxes-config)
 from GitHub to replace your older *boxes-config* (Unix) or *boxes.cfg* (Windows) - the designs
