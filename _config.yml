@@ -40,7 +40,7 @@ kramdown:
 
 exclude: ['README.md', 'LICENSE', 'src/', 'doc/']
 
-currentVersion: 1.3
+currentVersion: 2.0.0
 
 # boxes custom variables
 defaults:

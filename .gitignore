@@ -18,3 +18,4 @@ src/parser.c
 bin/
 _site/
 _cache/
+/pcre2-*/
