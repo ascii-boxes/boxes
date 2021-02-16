@@ -1161,19 +1161,19 @@ static int list_styles()
             }
             else {
                 if (list[i]->author && list[i]->designer && strcmp(list[i]->author, list[i]->designer) != 0) {
-                    fprintf(opt.outfile, "%s\n%s, coded by %s:\n\n%s\n\n", list[i]->name,
+                    fprintf(opt.outfile, "%s\n%s, coded by %s:\n%s\n\n", list[i]->name,
                             list[i]->designer, list[i]->author, list[i]->sample);
                 }
                 else if (list[i]->designer) {
-                    fprintf(opt.outfile, "%s\n%s:\n\n%s\n\n", list[i]->name,
+                    fprintf(opt.outfile, "%s\n%s:\n%s\n\n", list[i]->name,
                             list[i]->designer, list[i]->sample);
                 }
                 else if (list[i]->author) {
-                    fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n\n%s\n\n", list[i]->name,
+                    fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n%s\n\n", list[i]->name,
                             list[i]->author, list[i]->sample);
                 }
                 else {
-                    fprintf(opt.outfile, "%s:\n\n%s\n\n", list[i]->name, list[i]->sample);
+                    fprintf(opt.outfile, "%s:\n%s\n\n", list[i]->name, list[i]->sample);
                 }
             }
         }
