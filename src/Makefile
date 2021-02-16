@@ -96,7 +96,7 @@ package: $(BOXES_EXECUTABLE_NAME)
 	cp $(BOXES_EXECUTABLE_NAME) ../$(PKG_NAME)
 
 clean: flags_unix
-	rm -f $(ALL_OBJ)
+	rm -f $(ALL_OBJ) misc/getopt.o
 	rm -f $(GEN_FILES)
 	rm -f core boxes boxes.exe
 
