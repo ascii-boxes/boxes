@@ -27,6 +27,21 @@ Unless stated otherwise, the input used for these examples is the following:
 Draws a standard box of the first valid design found in your config file. If you have the config file as it comes with the *boxes* distribution, you get a &quot;C&quot; box, as you can see above.
 
 
+<a class="bxOffsetAnchor" name="with-tools"></a>
+
+## Combining with other tools
+
+As a text filter, *boxes* can be combined easily with other tools, for example *figlet* and *lolcat*:
+
+`figlet "boxes . . . !" | lolcat -f | boxes -d unicornthink`
+
+<div class="bxLargeImageWrapper">
+<img src="{{ site.baseurl}}/images/example-with-tools.png" alt="boxes with figlet and lolcat" width="457" height="304" />
+</div>
+
+Note: *lolcat* is supported since *boxes* v2.0.0.
+
+
 <a class="bxOffsetAnchor" name="design"></a>
 
 ## Choosing a different design
@@ -303,7 +318,9 @@ Finally, it is also possible to throw away any indentation altogether by specify
     /*  G l o b a l   V a r i a b l e s  */
     /*************************************/
 
-The `replace` and `reverse` statements may contain regular expressions and backreferences, which can be used for more elaborate text modifications. The example shown here, where spaces are inserted between the individual characters, is configured [like this](https://github.com/{{ site.github }}/blob/9eb1472f9c54d88f574017ad4b4912a94bd5a2f0/boxes-config#L1942-L1945).
+The `replace` and `reverse` statements may contain regular expressions and backreferences, which can be used for more
+elaborate text modifications. The example shown here, where spaces are inserted between the individual characters, is
+configured [like this](https://github.com/{{ site.github }}/blob/ac8617b3839d372e108b6eea3a5e7743232281da/boxes-config#L1734-L1739).  
 
 `boxes -d headline -r`
 

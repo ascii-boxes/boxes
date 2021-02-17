@@ -103,19 +103,28 @@ The `REPLACE` statement in the above example may be used to quote closing commen
 
 The search pattern may be a regular expression, and the replacement string may include backreferences. This gives you quite a powerful means for text modification. The following example is used to insert a space between all characters of the input text:
 
-    replace "(.)" with "\\1 "
-    reverse "(.) " to "\\1"
+    replace "(.)" with "$1 "
+    reverse "(.) " to "$1"
 
-There may be many `REPLACE`/`REVERSE` statements in one design definition. They will be executed one after the other, starting from the top.
+There may be many `REPLACE`/`REVERSE` statements in one design definition. They will be executed one after the other,
+starting from the top.
 
-Note that as in all strings, backslashes must be doubled, i.e. *boxes* "consumes one layer of backslashes". This is why in the first example, there are two backslashes at the beginning of the search pattern, when only one would have been needed to escape the star operator. Alternately, you may use the [`delimiter` statement](#delim) to change the string delimiting and escape character.
+Note that as in all strings, backslashes must be doubled, i.e. *boxes* "consumes one layer of backslashes". This is
+why in the first example, there are two backslashes at the beginning of the search pattern, when only one would have
+been needed to escape the star operator.
 
-You may choose if the replacement is performed *once* per line or as many times as necessary to replace all occurrences
-of the sarch pattern (*global*). Put this indication in front of the search pattern (the default is `global`):
+The [`delimiter` statement](#delim) should not be used to change the string delimiting and escape character in
+regular expressions. While this is possible, it only affects *boxes*' processing, not the regular expression engine's.
+This will most likely cause confusion.
+
+You may choose if the replacement is performed `once` per line or as many times as necessary to replace all occurrences
+of the sarch pattern (`global`). Put this indication in front of the search pattern (the default is `global`):
 
     replace once "foo" with "bar"
 
-For more information on how to use regular expressions, please see `man 5 regexp`, under "Basic Regular Expressions" or any other source.
+We use [PCRE2](https://www.pcre.org/current/doc/html/) regular expression syntax. In order to craft the proper
+regular expressions, online tools such as [Regex101](https://regex101.com/) or [Regexper](https://regexper.com/) might
+come in handy.
 
 
 ### Indentation Mode
