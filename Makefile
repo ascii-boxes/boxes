@@ -93,10 +93,10 @@ choco: tools/LICENSE.txt tools/boxes.cfg tools/boxes.exe
 	choco pack --version=$(BVERSION)
 
 tools/LICENSE.txt: LICENSE
-	cp LICENSE tools/LICENSE.txt
+	unix2dos -n LICENSE tools/LICENSE.txt
 
 tools/boxes.cfg: boxes-config
-	cp boxes-config tools/boxes.cfg
+	unix2dos -n boxes-config tools/boxes.cfg
 
 tools/boxes.exe: src/boxes.exe
 	cp src/boxes.exe tools/

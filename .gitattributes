@@ -3,8 +3,9 @@
 # shell scripts
 *.sh text eol=lf
 
-# Windows batch files
+# Windows files
 *.bat text eol=crlf
+tools/VERIFICATION.txt text eol=crlf
 
 # the test cases
 /test/*.txt text eol=lf
