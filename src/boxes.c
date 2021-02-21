@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include <errno.h>
+#include <dirent.h>
 #include <limits.h>
 #include <locale.h>
 #include <stdlib.h>
@@ -45,20 +46,14 @@
 #include "remove.h"
 #include "unicode.h"
 
-
-
 #ifdef __MINGW32__
     #include <windows.h>
 #endif
 
+
 extern char *optarg;                     /* for getopt() */
 extern int optind, opterr, optopt;       /* for getopt() */
 
-#ifdef __MINGW32__
-    #define BOXES_CONFIG "boxes.cfg"     /* filename of config file in $HOME */
-#else
-    #define BOXES_CONFIG ".boxes"
-#endif
 
 
 /*       _\|/_
@@ -82,11 +77,308 @@ opt_t opt;                           /* command line options */
 input_t input = INPUT_INITIALIZER;   /* input lines */
 
 
+
 /*       _\|/_
          (o o)
  +----oOO-{_}-OOo------------------------------------------------------------+
  |                           F u n c t i o n s                               |
  +--------------------------------------------------------------------------*/
+
+
+static int can_read_file(const char *filename)
+{
+    struct stat statbuf;
+    int result = 1;
+    if (filename == NULL || filename[0] == '\0') {
+        #ifdef DEBUG
+        fprintf(stderr, "%s: can_read_file(): argument was NULL\n", PROJECT);
+        #endif
+        result = 0;
+    }
+    else {
+        FILE *f = fopen(filename, "r");
+        if (f == NULL) {
+            #ifdef DEBUG
+            fprintf(stderr, "%s: can_read_file(): File \"%s\" could not be opened for reading - %s\n",
+                    PROJECT, filename, strerror(errno));
+            #endif
+            result = 0;
+        }
+        else {
+            fclose(f);
+
+            if (stat(filename, &statbuf) != 0) {
+                #ifdef DEBUG
+                fprintf(stderr, "%s: can_read_file(): File \"%s\" not statable - %s\n",
+                        PROJECT, filename, strerror(errno));
+                #endif
+                result = 0;
+            }
+            else if (S_ISDIR(statbuf.st_mode)) {
+                #ifdef DEBUG
+                fprintf(stderr, "%s: can_read_file(): File \"%s\" is in fact a directory\n", PROJECT, filename);
+                #endif
+                result = 0;
+            }
+        }
+    }
+    return result;
+}
+
+
+
+static int can_read_dir(const char *dirname)
+{
+    int result = 1;
+    if (dirname == NULL || dirname[0] == '\0') {
+        #ifdef DEBUG
+        fprintf(stderr, "%s: can_read_dir(): argument was NULL\n", PROJECT);
+        #endif
+        result = 0;
+    }
+    else {
+        DIR *dir = opendir(dirname);
+        if (dir == NULL) {
+            #ifdef DEBUG
+            fprintf(stderr, "%s: can_read_dir(): Directory \"%s\" could not be opened for reading - %s\n",
+                    PROJECT, dirname, strerror(errno));
+            #endif
+            result = 0;
+        }
+        else {
+            closedir(dir);
+        }
+    }
+    return result;
+}
+
+
+
+static char *combine(const char *dirname, const char *filename)
+{
+    const size_t dirname_len = strlen(dirname);
+    const size_t filename_len = strlen(filename);
+
+    char *result = (char *) malloc(dirname_len + filename_len + 2);
+    char *p = result;
+
+    strcpy(result, dirname);   // TODO leverage concat_strings
+    p += dirname_len;
+    if (dirname[dirname_len - 1] != '/') {
+        result[dirname_len] = '/';
+        p++;
+    }
+    strcpy(p, filename);
+    p += filename_len;
+    *p = '\0';
+
+    return result;
+}
+
+
+
+static char *locate_config_in_dir(const char *dirname)
+{
+    #ifdef __MINGW32__
+    static const char *filenames[] = {"boxes.cfg", "box-designs.cfg", "boxes-config"};
+    #else
+    static const char *filenames[] = {".boxes", "box-designs", "boxes-config", "boxes"};
+    #endif
+    for (size_t i = 0; i < (sizeof(filenames) / sizeof(const char *)); i++) {
+        char *f = combine(dirname, filenames[i]);
+        if (can_read_file(f)) {
+            return f;
+        }
+        BFREE(f);
+    }
+    return NULL;
+}
+
+
+
+static char *locate_config_file_or_dir(const char *path, const char *ext_msg)
+{
+    char *result = NULL;
+    if (can_read_file(path)) {
+        result = strdup(path);
+    }
+    else if (can_read_dir(path)) {
+        result = locate_config_in_dir(path);
+        if (result == NULL) {
+            fprintf(stderr, "%s: Couldn\'t find config file in directory \'%s\'%s\n", PROJECT, path, ext_msg);
+        }
+    }
+    else {
+        fprintf(stderr, "%s: Couldn\'t find config file at \'%s\'%s\n", PROJECT, path, ext_msg);
+    }
+    return result;
+}
+
+
+
+static char *from_env_var(const char *env_var, const char *postfix)
+{
+    char *result = getenv(env_var);
+    #ifdef DEBUG
+        fprintf(stderr, "%s: from_env_var(): getenv(\"%s\") --> %s\n", PROJECT, env_var, result);
+    #endif
+    if (result != NULL) {
+        size_t result_len = strlen(result) + strlen(postfix) + 1;
+        char *combined = (char *) malloc(result_len);
+        concat_strings(combined, result_len, 2, result, postfix);
+        result = combined;
+    }
+    return result;
+}
+
+
+
+static char *locate_config_common(int *error_printed)
+{
+    char *result = NULL;
+    if (opt.f) {
+        result = locate_config_file_or_dir(opt.f, "");
+        if (result == NULL) {
+            *error_printed = 1;
+        }
+    }
+    else if (getenv("BOXES")) {
+        result = locate_config_file_or_dir(getenv("BOXES"), " from BOXES environment variable");
+        if (result == NULL) {
+            *error_printed = 1;
+        }
+    }
+    return result;
+}
+
+
+#ifdef __MINGW32__
+
+static char *exe_to_cfg()
+{
+    const char *fallback = "C:\\boxes.cfg";
+    char *exepath = (char *) malloc(256);   /* for constructing config file path */
+    if (GetModuleFileName(NULL, exepath, 255) != 0) {
+        char *p = strrchr(exepath, '.') + 1;
+        if (p) {
+            /* p is always != NULL, because we get the full path */
+            *p = '\0';
+            if (strlen(exepath) < 253) {
+                strcat(exepath, "cfg");       /* c:\blah\boxes.cfg */
+            }
+            else {
+                fprintf(stderr, "%s: path too long. Using %s.\n", PROJECT, fallback);
+                strcpy(exepath, fallback);
+            }
+        }
+    }
+    else {
+        strcpy(exepath, fallback);
+    }
+    return exepath;
+}
+
+
+
+static char *determine_config_file()
+{
+    int error_printed = 0;
+    char *result = locate_config_common(&error_printed);
+
+    if (result == NULL && !error_printed) {
+        const char *dirs[] = {
+            ".",
+            from_env_var("HOME", "")
+        };
+        for (size_t i = 0; i < (sizeof(dirs) / sizeof(const char *)); i++) {
+            const char *dir = dirs[i];
+            if (can_read_dir(dir)) {
+                result = locate_config_in_dir(dir);
+                if (result != NULL) {
+                    break;
+                }
+            }
+        }
+
+        if (result == NULL) {    // TODO same determine_config_file(), but globalconf_marker triggers different things
+            char *exepath = exe_to_cfg();
+            if (can_read_file(exepath)) {
+                result = exepath;
+            } else {
+                fprintf(stderr, "%s: Couldn\'t find config file at \'%s\'\n", PROJECT, exepath);
+                error_printed = 1;
+            }
+        }
+    }
+
+    if (result == NULL && !error_printed) {
+        fprintf(stderr, "%s: Can't find config file.\n", PROJECT);
+    }
+    return result;
+}
+
+#else
+
+static char *determine_config_file()
+{
+    int error_printed = 0;
+    char *result = locate_config_common(&error_printed);
+
+    if (result == NULL && !error_printed) {
+        const char *globalconf_marker = "::GLOBALCONF::";
+        const char *dirs[] = {
+                from_env_var("HOME", ""),
+                from_env_var("XDG_CONFIG_HOME", "/boxes"),
+                from_env_var("HOME", "/.config/boxes"),
+                globalconf_marker,
+                "/etc/xdg/boxes",
+                "/usr/local/share/boxes",
+                "/usr/share/boxes"
+        };
+        for (size_t i = 0; i < (sizeof(dirs) / sizeof(const char *)); i++) {
+            const char *dir = dirs[i];
+            if (dir == globalconf_marker && can_read_file(GLOBALCONF)) {
+                result = strdup(GLOBALCONF);
+            }
+            else if (can_read_dir(dir)) {
+                result = locate_config_in_dir(dir);
+            }
+            if (result != NULL) {
+                break;
+            }
+        }
+    }
+
+    if (result == NULL && !error_printed) {
+        fprintf(stderr, "%s: Can't find config file.\n", PROJECT);
+    }
+    return result;
+}
+
+#endif
+
+
+
+static int open_yy_config_file(const char *config_file_name)
+/*
+ *  Set yyin and yyfilename to the config file to be used.
+ *
+ *  RETURNS:    == 0    success  (yyin and yyfilename are set)
+ *              != 0    error    (yyin is unmodified)
+ *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
+{
+    FILE *new_yyin = fopen(config_file_name, "r");
+    if (new_yyin == NULL) {
+        fprintf(stderr, "%s: Couldn't open config file '%s' for input\n", PROJECT, config_file_name);
+        return 1;
+    }
+    yyfilename = config_file_name;
+    yyin = new_yyin;
+    return 0;
+}
+
 
 
 static void usage(FILE *st)
@@ -96,11 +388,13 @@ static void usage(FILE *st)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
+    char *config_file = determine_config_file();
+
     fprintf(st, "Usage:  %s [options] [infile [outfile]]\n", PROJECT);
     fprintf(st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
     fprintf(st, "        -c str   use single shape box design where str is the W shape\n");
     fprintf(st, "        -d name  box design [default: first one in file]\n");
-    fprintf(st, "        -f file  configuration file\n");
+    fprintf(st, "        -f file  configuration file [default: %s]\n", config_file != NULL ? config_file : "none");
     fprintf(st, "        -h       print usage information\n");
     fprintf(st, "        -i mode  indentation mode [default: box]\n");
     fprintf(st, "        -k bool  leading/trailing blank line retention on removal\n");
@@ -113,6 +407,8 @@ static void usage(FILE *st)
     fprintf(st, "        -s wxh   box size (width w and/or height h)\n");
     fprintf(st, "        -t str   tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
     fprintf(st, "        -v       print version information\n");
+
+    BFREE(config_file);
 }
 
 
@@ -144,203 +440,6 @@ static void usage_long(FILE *st)
 
 
 
-static int is_dir(const char *path)
-/*
- *  Return true if file specified by path is a directory
- *
- *      path    file name to check
- *
- *  On Windows, this check seems unnecessary, because fopen() seems to fail
- *  when applied to a directory.
- *
- *  RETURNS:    ==  0   path is not a directory
- *               >  0   path is a directory
- *              == -1   error in stat() call
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    struct stat sinf;
-    int rc;
-
-    rc = stat(path, &sinf);
-    if (rc) {
-        perror(PROJECT);
-        return -1;
-    }
-
-    return S_ISDIR(sinf.st_mode);
-}
-
-
-
-static int get_config_file()
-/*
- *  Set yyin and yyfilename to the config file to be used.
- *
- *  If no config file was specified on the command line (yyin == stdin),
- *  try getting it from other locations:
- *      (1) contents of BOXES environment variable
- *      (2) file ~/.boxes
- *      (3) system-wide config file from GLOBALCONF macro.
- *  If neither file exists, return complainingly.
- *
- *  May change current working directory to $HOME.
- *
- *  RETURNS:    == 0    success  (yyin and yyfilename are set)
- *              != 0    error    (yyin is unmodified)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    FILE *new_yyin = NULL;
-    char *s;                             /* points to data from environment */
-    int rc;
-    #ifdef __MINGW32__
-    char exepath[256];                   /* for constructing config file path */
-    #endif
-
-    if (yyin != stdin) {
-        return 0;                        /* we're already ok */
-    }
-
-    /*
-     *  Try getting it from the BOXES environment variable
-     */
-    s = getenv("BOXES");
-    if (s) {
-        new_yyin = fopen(s, "r");
-        if (new_yyin == NULL) {
-            fprintf(stderr, "%s: Couldn't open config file '%s' "
-                    "for input (taken from $BOXES).\n", PROJECT, s);
-            return 1;
-        }
-        rc = is_dir(s);
-        if (rc == -1) {
-            fclose(new_yyin);
-            return 1;
-        }
-        else if (rc) {
-            fprintf(stderr, "%s: Alleged config file '%s' is a directory "
-                    "(taken from $BOXES)\n", PROJECT, s);
-            fclose(new_yyin);
-            return 1;
-        }
-        yyfilename = (char *) strdup(s);
-        if (yyfilename == NULL) {
-            perror(PROJECT);
-            fclose(new_yyin);
-            return 1;
-        }
-        yyin = new_yyin;
-        return 0;
-    }
-
-    /*
-     *  Try getting it from ~/.boxes
-     */
-    s = getenv("HOME");
-    if (s) {
-        rc = chdir(s);
-        if (rc) {
-            perror(PROJECT);
-            return 1;
-        }
-        new_yyin = fopen(BOXES_CONFIG, "r");
-        if (new_yyin) {
-            rc = is_dir(BOXES_CONFIG);
-            if (rc == -1) {
-                fclose(new_yyin);
-                return 1;
-            }
-            else {
-                if (rc == 0) {
-                    yyfilename = (char *) strdup(BOXES_CONFIG);
-                    if (yyfilename == NULL) {
-                        perror(PROJECT);
-                        fclose(new_yyin);
-                        return 1;
-                    }
-                    yyin = new_yyin;
-                    return 0;
-                }
-                else {
-                    fclose(new_yyin);
-                    new_yyin = NULL;
-                }
-            }
-        }
-    }
-    else {
-        #ifndef __MINGW32__
-            /* Do not print this warning on windows. */
-            fprintf(stderr, "%s: warning: Environment variable HOME not set!\n", PROJECT);
-        #endif
-    }
-
-    /*
-     *  Try reading the system-wide config file
-     *  On UNIX, the global config file must be given by the GLOBALCONF macro.
-     *  On Win32, it is expected to reside in the same directory as the binary
-     *  used, and its name is assumed to be execfilename+".cfg".
-     */
-    #ifdef __MINGW32__
-        if (GetModuleFileName (NULL, exepath, 255) != 0) {
-            char *p = strrchr (exepath, '.') + 1;
-            if (p) {
-                /* p is always != NULL, because we get the full path */
-                *p = '\0';
-                if (strlen(exepath) < 253) {
-                    strcat (exepath, "cfg");       /* c:\blah\boxes.cfg */
-                }
-                else {
-                    fprintf (stderr, "%s: path too long. Using C:\\boxes.cfg.\n", PROJECT);
-                    strcpy (exepath, "C:\\boxes.cfg");
-                }
-            }
-        }
-        else {
-            strcpy (exepath, "C:\\boxes.cfg");
-        }
-        new_yyin = fopen (exepath, "r");
-    #else
-        new_yyin = fopen(GLOBALCONF, "r");
-    #endif
-    if (new_yyin) {
-        #ifdef __MINGW32__
-            yyfilename = (char *) strdup (exepath);
-        #else
-            rc = is_dir(GLOBALCONF);
-            if (rc == -1) {
-                fclose(new_yyin);
-                return 1;
-            }
-            else if (rc) {
-                fprintf(stderr, "%s: Alleged system-wide config file '%s' "
-                        "is a directory\n", PROJECT, GLOBALCONF);
-                fclose(new_yyin);
-                return 1;
-            }
-            yyfilename = (char *) strdup(GLOBALCONF);
-        #endif
-        if (yyfilename == NULL) {
-            perror(PROJECT);
-            fclose(new_yyin);
-            return 1;
-        }
-        yyin = new_yyin;
-        return 0;
-    }
-
-    /*
-     *  Darn. No luck today.
-     */
-    fprintf(stderr, "%s: Can't find config file.\n", PROJECT);
-    return 2;
-}
-
-
-
 static int process_commandline(int argc, char *argv[])
 /*
  *  Process command line options.
@@ -355,26 +454,24 @@ static int process_commandline(int argc, char *argv[])
  */
 {
     int oc;                           /* option character */
-    FILE *f;                          /* potential input file */
     int idummy;
     char *pdummy;
     char c;
     int errfl = 0;                    /* true on error */
     size_t optlen;
-    int rc;
 
     /*
      *  Set default values
      */
     memset(&opt, 0, sizeof(opt_t));
     opt.tabstop = DEF_TABSTOP;
+    opt.f = NULL;
     opt.tabexp = 'e';
     opt.killblank = -1;
     opt.encoding = NULL;
     for (idummy = 0; idummy < ANZ_SIDES; ++idummy) {
         opt.padding[idummy] = -1;
     }
-    yyin = stdin;
 
     /*
      *  Intercept '--help' and '-?' cases first, as they are not supported by getopt()
@@ -488,7 +585,7 @@ static int process_commandline(int argc, char *argv[])
                 /*
                  *  Box design selection
                  */
-            BFREE (opt.design);
+                BFREE (opt.design);
                 opt.design = (design_t *) ((char *) strdup(optarg));
                 if (opt.design == NULL) {
                     perror(PROJECT);
@@ -501,28 +598,7 @@ static int process_commandline(int argc, char *argv[])
                 /*
                  *  Input File
                  */
-                f = fopen(optarg, "r");
-                if (f == NULL) {
-                    fprintf(stderr, "%s: Couldn\'t open config file \'%s\' for input.\n", PROJECT, optarg);
-                    return 1;
-                }
-                rc = is_dir(optarg);
-                if (rc == -1) {
-                    fclose(f);
-                    return 1;
-                }
-                else if (rc) {
-                    fprintf(stderr, "%s: Alleged config file '%s' is a directory\n", PROJECT, optarg);
-                    fclose(f);
-                    return 1;
-                }
-                yyfilename = (char *) strdup(optarg);
-                if (yyfilename == NULL) {
-                    perror(PROJECT);
-                    fclose(f);
-                    return 1;
-                }
-                yyin = f;
+                opt.f = optarg;
                 break;
 
             case 'h':
@@ -808,31 +884,22 @@ static int process_commandline(int argc, char *argv[])
         }
     }
 
-    /*
-     *  If no config file has been specified yet, try getting it elsewhere.
-     */
-    if (opt.cld == NULL) {
-        rc = get_config_file();          /* sets yyin and yyfilename     */
-        if (rc) {                        /* may change working directory */
-            return rc;
-        }
-    }
-
     #if defined(DEBUG) || 0
-    fprintf (stderr, "Command line option settings (excerpt):\n");
-    fprintf (stderr, "- Padding: l:%d t:%d r:%d b:%d\n", opt.padding[BLEF],
-            opt.padding[BTOP], opt.padding[BRIG], opt.padding[BBOT]);
-    fprintf (stderr, "- Requested box size: %ldx%ld\n", opt.reqwidth, opt.reqheight);
-    fprintf (stderr, "- Tabstop distance: %d\n", opt.tabstop);
-    fprintf (stderr, "- Tab handling: \'%c\'\n", opt.tabexp);
-    fprintf (stderr, "- Alignment: horiz %c, vert %c\n", opt.halign?opt.halign:'?', opt.valign?opt.valign:'?');
-    fprintf (stderr, "- Indentmode: \'%c\'\n", opt.indentmode? opt.indentmode: '?');
-    fprintf (stderr, "- Line justification: \'%c\'\n", opt.justify? opt.justify: '?');
-    fprintf (stderr, "- Kill blank lines: %d\n", opt.killblank);
-    fprintf (stderr, "- Remove box: %d\n", opt.r);
-    fprintf (stderr, "- Special handling for Web UI: %d\n", opt.q);
-    fprintf (stderr, "- Mend box: %d\n", opt.mend);
-    fprintf (stderr, "- Design Definition W shape: %s\n", opt.cld? opt.cld: "n/a");
+        fprintf (stderr, "Command line option settings (excerpt):\n");
+        fprintf (stderr, "- Explicit config file: %s\n", opt.f ? opt.f : "no");
+        fprintf (stderr, "- Padding: l:%d t:%d r:%d b:%d\n", opt.padding[BLEF],
+                opt.padding[BTOP], opt.padding[BRIG], opt.padding[BBOT]);
+        fprintf (stderr, "- Requested box size: %ldx%ld\n", opt.reqwidth, opt.reqheight);
+        fprintf (stderr, "- Tabstop distance: %d\n", opt.tabstop);
+        fprintf (stderr, "- Tab handling: \'%c\'\n", opt.tabexp);
+        fprintf (stderr, "- Alignment: horiz %c, vert %c\n", opt.halign?opt.halign:'?', opt.valign?opt.valign:'?');
+        fprintf (stderr, "- Indentmode: \'%c\'\n", opt.indentmode? opt.indentmode: '?');
+        fprintf (stderr, "- Line justification: \'%c\'\n", opt.justify? opt.justify: '?');
+        fprintf (stderr, "- Kill blank lines: %d\n", opt.killblank);
+        fprintf (stderr, "- Remove box: %d\n", opt.r);
+        fprintf (stderr, "- Special handling for Web UI: %d\n", opt.q);
+        fprintf (stderr, "- Mend box: %d\n", opt.mend);
+        fprintf (stderr, "- Design Definition W shape: %s\n", opt.cld? opt.cld: "n/a");
     #endif
 
     return 0;
@@ -1582,8 +1649,19 @@ int main(int argc, char *argv[])
     /*
      *  Parse config file, then reset design pointer
      */
+    char *config_file = determine_config_file();
+    if (config_file == NULL) {
+        exit(EXIT_FAILURE);
+    }
+    if (opt.cld == NULL) {
+        yyin = stdin;
+        rc = open_yy_config_file(config_file);
+        if (rc) {
+            exit(EXIT_FAILURE);
+        }
+    }
     #ifdef DEBUG
-        fprintf (stderr, "Parsing Config File ...\n");
+        fprintf (stderr, "Parsing Config File %s ...\n", config_file);
     #endif
     if (opt.cld == NULL) {
         rc = yyparse();

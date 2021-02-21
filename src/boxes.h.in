@@ -123,6 +123,7 @@ extern char *yyfilename;                 /* name of config file */
 
 typedef struct {                         /* Command line options: */
     int       l;                         /* list available designs */
+    char     *f;                         /* the string specified as argument to -f ; config file path */
     int       mend;                      /* 1 if -m is given, 2 in 2nd loop */
     int       q;                         /* special handling of web UI needs */
     int       r;                         /* remove box from input */
