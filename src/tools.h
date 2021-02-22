@@ -30,6 +30,7 @@
 #include "boxes.h"
 
 
+
 #define BMAX(a, b) ({                    /* return the larger value */ \
     __typeof__ (a) _a = (a); \
     __typeof__ (b) _b = (b); \
@@ -63,6 +64,15 @@ char *my_strnrstr(const char *s1, const char *s2, const size_t s2_len,
 int strisyes(const char *s);
 
 int strisno(const char *s);
+
+/**
+ * Concatenate variable number of strings into one. This would normally be achieved via snprintf(), but that's not
+ * available on all platforms where boxes is compiled.
+ * @param <count> number of strings given in the following
+ * @param <...> the strings
+ * @returns a new string, for which new memory was allocated
+ */
+char *concat_strings_alloc(size_t count, ...);
 
 void concat_strings(char *dst, int max_len, int count, ...);
 

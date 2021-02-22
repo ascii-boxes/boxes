@@ -157,22 +157,11 @@ static int can_read_dir(const char *dirname)
 static char *combine(const char *dirname, const char *filename)
 {
     const size_t dirname_len = strlen(dirname);
-    const size_t filename_len = strlen(filename);
 
-    char *result = (char *) malloc(dirname_len + filename_len + 2);
-    char *p = result;
-
-    strcpy(result, dirname);   // TODO leverage concat_strings
-    p += dirname_len;
-    if (dirname[dirname_len - 1] != '/') {
-        result[dirname_len] = '/';
-        p++;
+    if (dirname[dirname_len - 1] == '/') {
+        return concat_strings_alloc(2, dirname, filename);
     }
-    strcpy(p, filename);
-    p += filename_len;
-    *p = '\0';
-
-    return result;
+    return concat_strings_alloc(3, dirname, "/", filename);
 }
 
 
@@ -223,10 +212,7 @@ static char *from_env_var(const char *env_var, const char *postfix)
         fprintf(stderr, "%s: from_env_var(): getenv(\"%s\") --> %s\n", PROJECT, env_var, result);
     #endif
     if (result != NULL) {
-        size_t result_len = strlen(result) + strlen(postfix) + 1;
-        char *combined = (char *) malloc(result_len);
-        concat_strings(combined, result_len, 2, result, postfix);
-        result = combined;
+        result = concat_strings_alloc(2, result, postfix);
     }
     return result;
 }
@@ -374,7 +360,7 @@ static int open_yy_config_file(const char *config_file_name)
         fprintf(stderr, "%s: Couldn't open config file '%s' for input\n", PROJECT, config_file_name);
         return 1;
     }
-    yyfilename = config_file_name;
+    yyfilename = (char *) config_file_name;
     yyin = new_yyin;
     return 0;
 }

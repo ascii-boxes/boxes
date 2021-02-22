@@ -213,6 +213,44 @@ void concat_strings(char *dst, int max_len, int count, ...)
 
 
 
+char *concat_strings_alloc(size_t count, ...)
+{
+    if (count < 1) {
+        return strdup("");
+    }
+
+    size_t total_len = 0;
+    const char *src;
+    va_list va;
+
+    va_start (va, count);
+    for (size_t i = 0; i < count; i++) {
+        src = va_arg (va, const char *);
+        if (src != NULL) {
+            total_len += strlen(src);
+        }
+    }
+    va_end (va);
+
+    char *result = malloc(total_len + 1);
+    char *p = result;
+
+    va_start (va, count);
+    for (size_t i = 0; i < count; i++) {
+        src = va_arg (va, const char *);
+        if (src != NULL && src[0] != '\0') {
+            strcpy(p, src);
+            p += strlen(src);
+        }
+    }
+    va_end (va);
+
+    *p = '\0';
+    return result;
+}
+
+
+
 int empty_line(const line_t *line)
 /*
  *  Return true if line is empty.
