@@ -1,0 +1,17 @@
+:DESC
+Tests that the config file is found by looking in $HOME/.config/boxes.
+Also tests a shape length problem, where the least common multiple must be found (here: 3 x 5 = 15).
+
+:SKIP-IF
+Msys
+:ENV
+export HOME="`pwd`/123_data"
+:ARGS
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+#123123123123123#
+#foo            #
+#123451234512345#
+:EOF

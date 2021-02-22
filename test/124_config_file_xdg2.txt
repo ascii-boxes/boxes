@@ -1,0 +1,18 @@
+:DESC
+Tests that the config file is found by looking in $XDG_CONFIG_HOME/boxes with higher precedence
+than $HOME/.config/boxes. Also tests a particular shape length problem.
+
+:SKIP-IF
+Msys
+:ENV
+export HOME="`pwd`/124_data/home"
+export XDG_CONFIG_HOME="`pwd`/124_data/xdg"
+:ARGS
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+#--123123#
+#foo     #
+#12345---#
+:EOF

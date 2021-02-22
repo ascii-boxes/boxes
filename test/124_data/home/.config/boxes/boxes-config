@@ -1,0 +1,23 @@
+# This file should NOT be used!
+
+BOX wrong
+
+author "Thomas Jensen"
+designer "Thomas Jensen"
+
+sample
+    #-WRONG-#
+    #sample #
+    #-WRONG-#
+ends
+
+shapes {
+    nw ("#")
+    n ("-WRONG-")
+    s ("-WRONG-")
+    se ("#") e ("#") sw ("#") ne ("#") w ("#")
+}
+
+elastic (n, s, e, w)
+
+END wrong

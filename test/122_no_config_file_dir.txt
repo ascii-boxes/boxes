@@ -1,0 +1,10 @@
+:DESC
+Like 003, but the argument to -f exists and is a directory, but does not contain the config.
+
+:ARGS
+-f .
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: Couldn't find config file in directory '.'
+:EOF
