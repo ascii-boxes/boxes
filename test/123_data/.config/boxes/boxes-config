@@ -1,0 +1,27 @@
+# Config file with a design that requires the least common multiple of shape lengths (3 and 5 cols).
+
+BOX test1
+
+author "Thomas Jensen"
+designer "Thomas Jensen"
+
+sample
+    #123123123123123#
+    #sample         #
+    #123451234512345#
+ends
+
+shapes {
+    nw ("#")
+    n ("123")
+    s ("12345")
+
+    se ("#") e ("#") sw ("#") ne ("#") w ("#")
+}
+
+elastic (n,s,e, w)
+
+END test1
+
+
+#EOF                                                  vim: set ai sw=4:

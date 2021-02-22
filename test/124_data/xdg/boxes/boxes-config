@@ -1,0 +1,24 @@
+# A design that offsets the least common multiple effect by nnw/sse shapes.
+
+BOX test2
+
+author "Thomas Jensen"
+designer "Thomas Jensen"
+
+sample          #--123123#
+          #sample  #
+          #12345---#
+ends
+
+shapes {
+    nw ("#")
+    nnw ("--") sse ("---")
+    n ("123")
+    s ("12345")
+
+    se ("#") e ("#") sw ("#") ne ("#") w ("#")
+}
+
+elastic (n,s,e, w)
+
+END test2

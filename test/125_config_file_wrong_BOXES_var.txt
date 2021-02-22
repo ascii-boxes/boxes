@@ -1,0 +1,11 @@
+:DESC
+When $BOXES points to the wrong place, that's always an error.
+
+:ENV
+export BOXES=non-existent
+:ARGS
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: Couldn't find config file at 'non-existent' from BOXES environment variable
+:EOF

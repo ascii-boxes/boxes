@@ -1,0 +1,27 @@
+# A design with particular shape lengths.
+
+BOX test3
+
+author "Thomas Jensen"
+designer "Thomas Jensen"
+
+sample
+	#123123---456#
+	#sample      #
+	#12345<>67890#
+ends
+
+shapes {
+    nnw ("123")
+    nne ("456")
+    n ("---")
+    s ("<>")
+    ssw ("12345")
+    sse ("67890")
+
+    nw ("#") se ("#") e ("#") sw ("#") ne ("#") w ("#")
+}
+
+elastic (nne, nnw, ssw, sse, e, w)
+
+END test3

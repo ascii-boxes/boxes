@@ -1,0 +1,15 @@
+:DESC
+Because of historic boxes behavior, a config file in $HOME has precedence over one in $XDG_CONFIG_HOME/boxes.
+
+:ENV
+export HOME="`pwd`/126_data/home"
+export XDG_CONFIG_HOME="`pwd`/126_data/xdg"
+:ARGS
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+#123123---456#
+#foo         #
+#12345<>67890#
+:EOF
