@@ -264,46 +264,8 @@ static char *exe_to_cfg()
     return exepath;
 }
 
+#endif
 
-
-static char *determine_config_file()
-{
-    int error_printed = 0;
-    char *result = locate_config_common(&error_printed);
-
-    if (result == NULL && !error_printed) {
-        const char *dirs[] = {
-            ".",
-            from_env_var("HOME", "")
-        };
-        for (size_t i = 0; i < (sizeof(dirs) / sizeof(const char *)); i++) {
-            const char *dir = dirs[i];
-            if (can_read_dir(dir)) {
-                result = locate_config_in_dir(dir);
-                if (result != NULL) {
-                    break;
-                }
-            }
-        }
-
-        if (result == NULL) {    // TODO same determine_config_file(), but globalconf_marker triggers different things
-            char *exepath = exe_to_cfg();
-            if (can_read_file(exepath)) {
-                result = exepath;
-            } else {
-                fprintf(stderr, "%s: Couldn\'t find config file at \'%s\'\n", PROJECT, exepath);
-                error_printed = 1;
-            }
-        }
-    }
-
-    if (result == NULL && !error_printed) {
-        fprintf(stderr, "%s: Can't find config file.\n", PROJECT);
-    }
-    return result;
-}
-
-#else
 
 static char *determine_config_file()
 {
@@ -323,8 +285,20 @@ static char *determine_config_file()
         };
         for (size_t i = 0; i < (sizeof(dirs) / sizeof(const char *)); i++) {
             const char *dir = dirs[i];
-            if (dir == globalconf_marker && can_read_file(GLOBALCONF)) {
-                result = strdup(GLOBALCONF);
+            if (dir == globalconf_marker) {
+                #ifdef __MINGW32__
+                    char *exepath = exe_to_cfg();
+                    if (can_read_file(exepath)) {
+                        result = exepath;
+                    } else {
+                        fprintf(stderr, "%s: Couldn\'t find config file at \'%s\'\n", PROJECT, exepath);
+                        error_printed = 1;
+                    }
+                #else
+                    if (can_read_file(GLOBALCONF)) {
+                        result = strdup(GLOBALCONF);
+                    }
+                #endif
             }
             else if (can_read_dir(dir)) {
                 result = locate_config_in_dir(dir);
@@ -340,8 +314,6 @@ static char *determine_config_file()
     }
     return result;
 }
-
-#endif
 
 
 

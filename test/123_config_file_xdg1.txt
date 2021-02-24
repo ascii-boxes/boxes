@@ -2,8 +2,6 @@
 Tests that the config file is found by looking in $HOME/.config/boxes.
 Also tests a shape length problem, where the least common multiple must be found (here: 3 x 5 = 15).
 
-:SKIP-IF
-Msys
 :ENV
 export HOME="`pwd`/123_data"
 :ARGS
