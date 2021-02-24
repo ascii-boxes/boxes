@@ -59,19 +59,6 @@ for sectionName in :ARGS :INPUT :OUTPUT-FILTER :EXPECTED :EOF; do
     fi
 done
 
-declare boxesSkipIf=""
-declare -r boxesCurrentOs=`uname -o`
-if [ $(grep -c "^:SKIP-IF" $testCaseFile) -eq 1 ]; then
-    boxesSkipIf=$(cat $testCaseFile | sed -n '/^:SKIP-IF/,/^:ARGS/p;' | sed '1d;$d' | tr -d '\r')
-    if [[ $boxesSkipIf == *":ENV"* ]]; then
-        boxesSkipIf=$(echo ${boxesSkipIf%:ENV*} | head -c -1 | tr -d '\r')
-    fi
-fi
-if [ $(echo $boxesSkipIf | xargs -n1 echo | grep -e "^$boxesCurrentOs$" | wc -l) -eq 1 ]; then
-    echo "    Skipping test because operating system is \"$boxesCurrentOs\"."
-    exit 0
-fi
-
 declare boxesEnv=""
 if [ $(grep -c "^:ENV" $testCaseFile) -eq 1 ]; then
     boxesEnv=$(cat $testCaseFile | sed -n '/^:ENV/,/^:ARGS/p;' | sed '1d;$d' | tr -d '\r')
