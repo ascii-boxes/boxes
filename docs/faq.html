@@ -58,7 +58,7 @@ Detailed information on how to build *boxes* from source is collected on the
 
 In addition to that, the following issues have occurred:
 
-- Warnings from flex or bison:
+- Warnings from flex or bison:\\
   If you get warnings from flex or bison, do a `make clean ; make` from the top level directory. The following warning
   is harmless:
 
@@ -75,6 +75,11 @@ In addition to that, the following issues have occurred:
   In order to do this, use the following command line (works with current sources):
 
       make CFLAGS_ADDTL=-m32 LDFLAGS_ADDTL=-m32
+
+- Compilation on SLES:\\
+  On SLES, you might need to add `-std=c99` as observed by
+  <span class="atmention">[@mathomp4](https://github.com/mathomp4)</span> in
+  [#74](https://github.com/ascii-boxes/boxes/issues/74#issuecomment-784371446).
 
 
 <a class="bxOffsetAnchor" name="q6"></a>
