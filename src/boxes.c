@@ -20,15 +20,13 @@
 
 #include "config.h"
 #include <errno.h>
-#include <dirent.h>
 #include <limits.h>
 #include <locale.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <unistd.h>
 
 #include <unictype.h>
 #include <unistdio.h>
@@ -36,19 +34,14 @@
 #include <unitypes.h>
 #include <uniwidth.h>
 
-#include <unistd.h>
-
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
+#include "discovery.h"
 #include "generate.h"
 #include "regulex.h"
 #include "remove.h"
 #include "unicode.h"
-
-#ifdef __MINGW32__
-    #include <windows.h>
-#endif
 
 
 extern char *optarg;                     /* for getopt() */
@@ -85,238 +78,6 @@ input_t input = INPUT_INITIALIZER;   /* input lines */
  +--------------------------------------------------------------------------*/
 
 
-static int can_read_file(const char *filename)
-{
-    struct stat statbuf;
-    int result = 1;
-    if (filename == NULL || filename[0] == '\0') {
-        #ifdef DEBUG
-        fprintf(stderr, "%s: can_read_file(): argument was NULL\n", PROJECT);
-        #endif
-        result = 0;
-    }
-    else {
-        FILE *f = fopen(filename, "r");
-        if (f == NULL) {
-            #ifdef DEBUG
-            fprintf(stderr, "%s: can_read_file(): File \"%s\" could not be opened for reading - %s\n",
-                    PROJECT, filename, strerror(errno));
-            #endif
-            result = 0;
-        }
-        else {
-            fclose(f);
-
-            if (stat(filename, &statbuf) != 0) {
-                #ifdef DEBUG
-                fprintf(stderr, "%s: can_read_file(): File \"%s\" not statable - %s\n",
-                        PROJECT, filename, strerror(errno));
-                #endif
-                result = 0;
-            }
-            else if (S_ISDIR(statbuf.st_mode)) {
-                #ifdef DEBUG
-                fprintf(stderr, "%s: can_read_file(): File \"%s\" is in fact a directory\n", PROJECT, filename);
-                #endif
-                result = 0;
-            }
-        }
-    }
-    return result;
-}
-
-
-
-static int can_read_dir(const char *dirname)
-{
-    int result = 1;
-    if (dirname == NULL || dirname[0] == '\0') {
-        #ifdef DEBUG
-        fprintf(stderr, "%s: can_read_dir(): argument was NULL\n", PROJECT);
-        #endif
-        result = 0;
-    }
-    else {
-        DIR *dir = opendir(dirname);
-        if (dir == NULL) {
-            #ifdef DEBUG
-            fprintf(stderr, "%s: can_read_dir(): Directory \"%s\" could not be opened for reading - %s\n",
-                    PROJECT, dirname, strerror(errno));
-            #endif
-            result = 0;
-        }
-        else {
-            closedir(dir);
-        }
-    }
-    return result;
-}
-
-
-
-static char *combine(const char *dirname, const char *filename)
-{
-    const size_t dirname_len = strlen(dirname);
-
-    if (dirname[dirname_len - 1] == '/') {
-        return concat_strings_alloc(2, dirname, filename);
-    }
-    return concat_strings_alloc(3, dirname, "/", filename);
-}
-
-
-
-static char *locate_config_in_dir(const char *dirname)
-{
-    #ifdef __MINGW32__
-    static const char *filenames[] = {"boxes.cfg", "box-designs.cfg", "boxes-config"};
-    #else
-    static const char *filenames[] = {".boxes", "box-designs", "boxes-config", "boxes"};
-    #endif
-    for (size_t i = 0; i < (sizeof(filenames) / sizeof(const char *)); i++) {
-        char *f = combine(dirname, filenames[i]);
-        if (can_read_file(f)) {
-            return f;
-        }
-        BFREE(f);
-    }
-    return NULL;
-}
-
-
-
-static char *locate_config_file_or_dir(const char *path, const char *ext_msg)
-{
-    char *result = NULL;
-    if (can_read_file(path)) {
-        result = strdup(path);
-    }
-    else if (can_read_dir(path)) {
-        result = locate_config_in_dir(path);
-        if (result == NULL) {
-            fprintf(stderr, "%s: Couldn\'t find config file in directory \'%s\'%s\n", PROJECT, path, ext_msg);
-        }
-    }
-    else {
-        fprintf(stderr, "%s: Couldn\'t find config file at \'%s\'%s\n", PROJECT, path, ext_msg);
-    }
-    return result;
-}
-
-
-
-static char *from_env_var(const char *env_var, const char *postfix)
-{
-    char *result = getenv(env_var);
-    #ifdef DEBUG
-        fprintf(stderr, "%s: from_env_var(): getenv(\"%s\") --> %s\n", PROJECT, env_var, result);
-    #endif
-    if (result != NULL) {
-        result = concat_strings_alloc(2, result, postfix);
-    }
-    return result;
-}
-
-
-
-static char *locate_config_common(int *error_printed)
-{
-    char *result = NULL;
-    if (opt.f) {
-        result = locate_config_file_or_dir(opt.f, "");
-        if (result == NULL) {
-            *error_printed = 1;
-        }
-    }
-    else if (getenv("BOXES")) {
-        result = locate_config_file_or_dir(getenv("BOXES"), " from BOXES environment variable");
-        if (result == NULL) {
-            *error_printed = 1;
-        }
-    }
-    return result;
-}
-
-
-#ifdef __MINGW32__
-
-static char *exe_to_cfg()
-{
-    const char *fallback = "C:\\boxes.cfg";
-    char *exepath = (char *) malloc(256);   /* for constructing config file path */
-    if (GetModuleFileName(NULL, exepath, 255) != 0) {
-        char *p = strrchr(exepath, '.') + 1;
-        if (p) {
-            /* p is always != NULL, because we get the full path */
-            *p = '\0';
-            if (strlen(exepath) < 253) {
-                strcat(exepath, "cfg");       /* c:\blah\boxes.cfg */
-            }
-            else {
-                fprintf(stderr, "%s: path too long. Using %s.\n", PROJECT, fallback);
-                strcpy(exepath, fallback);
-            }
-        }
-    }
-    else {
-        strcpy(exepath, fallback);
-    }
-    return exepath;
-}
-
-#endif
-
-
-static char *determine_config_file()
-{
-    int error_printed = 0;
-    char *result = locate_config_common(&error_printed);
-
-    if (result == NULL && !error_printed) {
-        const char *globalconf_marker = "::GLOBALCONF::";
-        const char *dirs[] = {
-                from_env_var("HOME", ""),
-                from_env_var("XDG_CONFIG_HOME", "/boxes"),
-                from_env_var("HOME", "/.config/boxes"),
-                globalconf_marker,
-                "/etc/xdg/boxes",
-                "/usr/local/share/boxes",
-                "/usr/share/boxes"
-        };
-        for (size_t i = 0; i < (sizeof(dirs) / sizeof(const char *)); i++) {
-            const char *dir = dirs[i];
-            if (dir == globalconf_marker) {
-                #ifdef __MINGW32__
-                    char *exepath = exe_to_cfg();
-                    if (can_read_file(exepath)) {
-                        result = exepath;
-                    } else {
-                        fprintf(stderr, "%s: Couldn\'t find config file at \'%s\'\n", PROJECT, exepath);
-                        error_printed = 1;
-                    }
-                #else
-                    if (can_read_file(GLOBALCONF)) {
-                        result = strdup(GLOBALCONF);
-                    }
-                #endif
-            }
-            else if (can_read_dir(dir)) {
-                result = locate_config_in_dir(dir);
-            }
-            if (result != NULL) {
-                break;
-            }
-        }
-    }
-
-    if (result == NULL && !error_printed) {
-        fprintf(stderr, "%s: Can't find config file.\n", PROJECT);
-    }
-    return result;
-}
-
-
-
 static int open_yy_config_file(const char *config_file_name)
 /*
  *  Set yyin and yyfilename to the config file to be used.
@@ -346,7 +107,7 @@ static void usage(FILE *st)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    char *config_file = determine_config_file();
+    char *config_file = discover_config_file();
 
     fprintf(st, "Usage:  %s [options] [infile [outfile]]\n", PROJECT);
     fprintf(st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
@@ -1607,7 +1368,7 @@ int main(int argc, char *argv[])
     /*
      *  Parse config file, then reset design pointer
      */
-    char *config_file = determine_config_file();
+    char *config_file = discover_config_file();
     if (config_file == NULL) {
         exit(EXIT_FAILURE);
     }

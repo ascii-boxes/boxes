@@ -26,9 +26,9 @@ GEN_HDR    = parser.h boxes.h
 GEN_SRC    = parser.c lex.yy.c
 GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
 ORIG_HDRCL = boxes.h.in config.h
-ORIG_HDR   = $(ORIG_HDRCL) generate.h lexer.h regulex.h remove.h shape.h tools.h unicode.h
+ORIG_HDR   = $(ORIG_HDRCL) discovery.h generate.h lexer.h regulex.h remove.h shape.h tools.h unicode.h
 ORIG_GEN   = lexer.l parser.y
-ORIG_NORM  = boxes.c generate.c regulex.c remove.c shape.c tools.c unicode.c
+ORIG_NORM  = boxes.c discovery.c generate.c regulex.c remove.c shape.c tools.c unicode.c
 ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
 ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 OTH_FILES  = Makefile
@@ -79,7 +79,8 @@ lex.yy.c: lexer.l boxes.h
 	cat lexer.tmp.c >> lex.yy.c
 	rm lexer.tmp.c
 
-boxes.o: boxes.c boxes.h regulex.h shape.h tools.h unicode.h generate.h remove.h config.h
+boxes.o: boxes.c boxes.h discovery.h regulex.h shape.h tools.h unicode.h generate.h remove.h config.h
+discovery.o: discovery.c discovery.h boxes.h tools.h config.h
 tools.o: tools.c tools.h boxes.h shape.h unicode.h config.h
 unicode.o: unicode.c unicode.h boxes.h tools.h config.h
 shape.o: shape.c shape.h boxes.h tools.h config.h
