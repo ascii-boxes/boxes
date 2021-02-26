@@ -16,8 +16,7 @@ be removed and repaired, even if it has been badly damaged by editing of the
 text inside. Since boxes may be open on any side,
 .I boxes
 can also be used to create regional comments in any programming language.
-New box designs of all sorts can easily be added and shared by appending to
-a configuration file.
+New box designs can be added and shared by appending to a configuration file.
 .LP
 .I boxes
 is a command line tool, but also integrates with any text editor that
@@ -136,7 +135,10 @@ use.
 Use alternate config file. The one argument of this option is the name of a
 valid
 .I boxes
-config file, containing new and exciting designs!
+config file. The argument of
+.B \-f
+can also be a directory which contains a configuration file. More information
+on this topic below in the CONFIGURATION FILE section.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-h
@@ -293,37 +295,84 @@ always converted into spaces. The tab distance in this example is 4.
 .B \-v
 Print out current version number.
 .\" =======================================================================
-.SH CONFIGURATION FILES
+.SH CONFIGURATION FILE
 .I Boxes
-will use the configuration file specified on the command line (using
-.B \-f\fP).
+will look for the configuration file in several places, some of which are
+given by the XDG specification.
+.TP 0.6i
+\fB1.\fP \fI\-f\fP option [file or dir]
+When a configuration file is specified on the command line, we will use that. The
+.B \-f
+option can also specify a directory. Any location specified via
+.B \-f
+must exist, or
+.I boxes
+will terminate with an error.
+.TP 0.6i
+\fB2.\fP \fIBOXES\fP environment variable [file or dir]
 If no config file is specified on the command line,
 .I boxes
-will check for the BOXES environment variable, which may contain a filename
-to use. If BOXES is not set,
+will check for the BOXES environment variable, which may contain a filename or
+directory to use. Any location specified via the BOXES environment variable
+must exist, or
 .I boxes
-will try to read $HOME/.boxes and use it as a config file. Failing that,
-.I boxes
-will try to read the system\-wide config file (see FILES).
-.PP
+will terminate with an error.
+.TP 0.6i
+\fB3.\fP \fI$HOME\fP [dir]
+.TQ
+\fB4.\fP \fI$XDG_CONFIG_HOME/boxes\fP [dir]
+.TQ
+\fB5.\fP \fI$HOME/.config/boxes\fP [dir]
+.TQ
+\fB6.\fP \fI--GLOBALCONF--\fP [file]
+.TQ
+\fB7.\fP \fI/etc/xdg/boxes\fP [dir]
+.TQ
+\fB8.\fP \fI/usr/local/share/boxes\fP [dir]
+.TQ
+\fB9.\fP \fI/usr/share/boxes\fP [dir]
+Either one of these last two directory locations might have the same name as the
+global config file from \fB6\fP. That's fine. It just means that we first
+look for a file of that name, and then for a directory containing the file.
+.P
+The XDG environment variable \fIXDG_CONFIG_DIRS\fP is not supported. However,
+its default value is supported via steps \fB8\fP and \fB9\fP above.
+.TP 0.6i
+In the above list, whenever a step is designated with [dir], the following file names will be found, in this order:
+.br
+\fB1.\fP .boxes
+.br
+\fB2.\fP box-designs
+.br
+\fB3.\fP boxes-config
+.br
+\fB4.\fP boxes
+.LP
+As soon as the first valid file is found, we use that and stop the search.
+.P
+The recommended location for a user-specific configuration file is
+\fI$HOME/.boxes\fP or \fI$HOME/.config/boxes/.boxes\fP. A global
+configuration file should be located at \fI--GLOBALCONF--\fP. But all of the
+other locations are fully supported, too.
+.P
 The syntax of
 .I boxes
-config files is described on the website.
+config files is described on the website at
+<URL:https://boxes.thomasjensen.com/docs/config-syntax.html>.
 .\" =======================================================================
 .SH EXAMPLES
 Examples on how to invoke
 .I boxes
 may be found on the website at
-<URL:https://boxes.thomasjensen.com/examples.html>. Try
+<URL:https://boxes.thomasjensen.com/examples.html>.
 .br
-
+Try
+.P
 \fIecho "Good Bye World!" | boxes -d nuke\fP
-.br
-
+.P
 .I Boxes
 also combines nicely with other tools. Try
-.br
-
+.P
 \fIfiglet "boxes . . . !" | lolcat -f | boxes -d unicornthink\fP
 .\" =======================================================================
 .SH AVAILABILITY
@@ -335,9 +384,9 @@ documentation.
 .\" =======================================================================
 .SH AUTHOR
 .I Boxes
-was made by Thomas Jensen and many great contributors.
+was made by Thomas Jensen and the \fIboxes\fP contributors.
 .br
-For a full list, see
+For a full list of contributors, see
 .br
 <URL:https://boxes.thomasjensen.com/contributing.html#contributors>
 .br
@@ -361,23 +410,20 @@ version 2. Details in the LICENSE file:
 .SH ENVIRONMENT
 .I Boxes
 recognizes the following environment variables:
-.TP 1.0i
-HOME
-The user's home directory.
-.TP 1.0i
+.HP 0.6i
 BOXES
-Name of
+.br
+Absolute path of the
 .I boxes
-configuration file, if different from ~/.boxes.
-.\" =======================================================================
-.SH FILES
-.TP 1.0i
-$HOME/.boxes
-.I boxes
-configuration file (takes precedence over system-wide configuration file)
-.TP 1.0i
---GLOBALCONF--
-system\-wide configuration file
+configuration file. If this is specified, it must refer to an existing file
+or directory.
+.HP 0.6i
+HOME
+.br
+The user's home directory.
+.TP 0.6i
+XDG_CONFIG_HOME
+The root of the configuration file location as per the XDG specification.
 .\" =======================================================================
 .SH "SEE ALSO"
 .BR figlet (6),
