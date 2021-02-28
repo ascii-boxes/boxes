@@ -23,14 +23,15 @@ GLOBALCONF = /usr/share/boxes
 GIT_STATUS = ($(shell git describe --dirty --always))
 BVERSION   = 2.0.0
 
-ALL_FILES  = LICENSE README.md README.Win32.md boxes-config
+ALL_FILES  = LICENSE README.md boxes-config
 DOC_FILES  = doc/boxes.1 doc/boxes.el
 PKG_NAME   = boxes-$(BVERSION)
+OUT_DIR    = out
 
 WIN_PCRE2_VERSION = 10.36
 WIN_PCRE2_DIR     = pcre2-$(WIN_PCRE2_VERSION)
 
-.PHONY: clean build win32 debug win32.debug infomsg replaceinfos test package win32.package package_common
+.PHONY: clean build win32 debug win32.debug win32.pcre infomsg replaceinfos test package win32.package package_common
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -59,7 +60,7 @@ infomsg:
 
 replaceinfos: src/boxes.h doc/boxes.1
 
-src/boxes.h: src/boxes.h.in src/regulex.h src/shape.h Makefile
+src/boxes.h: src/boxes.h.in Makefile
 	sed -e 's/--BVERSION--/$(BVERSION) $(GIT_STATUS)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' src/boxes.h.in > src/boxes.h
 
 doc/boxes.1: doc/boxes.1.in Makefile
@@ -69,23 +70,35 @@ doc/boxes.1.html: doc/boxes.1
 	cat doc/boxes.1 | groff -mandoc -Thtml > doc/boxes.1.raw.html
 	sed -E -e 's/&lt;URL:([^&]+)&gt;/<a href=\1>\1<\/a>/g' < doc/boxes.1.raw.html > doc/boxes.1.html
 	rm -f doc/boxes.1.raw.html
+	@echo "Conversion complete. Excessive manual work remains."
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-$(PKG_NAME).tar.gz:
-	mkdir -p $(PKG_NAME)/doc
-	cp $(ALL_FILES) $(PKG_NAME)
-	cp $(DOC_FILES) $(PKG_NAME)/doc
-	$(MAKE) -C src PKG_NAME=$(PKG_NAME) BOXES_PLATFORM=$(BOXES_PLATFORM) flags_$(BOXES_PLATFORM) package
-	if which gtar >/dev/null 2>&1 ; then gtar cfvz $(PKG_NAME).tar.gz $(PKG_NAME)/* ; \
-	    else tar cfvz $(PKG_NAME).tar.gz $(PKG_NAME)/* ; fi
-	rm -rf $(PKG_NAME)/
+$(OUT_DIR)/$(PKG_NAME).tar.gz:
+	mkdir -p $(OUT_DIR)/$(PKG_NAME)/doc
+	cp $(ALL_FILES) $(OUT_DIR)/$(PKG_NAME)/
+	cp $(DOC_FILES) $(OUT_DIR)/$(PKG_NAME)/doc/
+	$(MAKE) -C $(OUT_DIR) -f ../src/Makefile PKG_NAME=$(PKG_NAME) BOXES_PLATFORM=$(BOXES_PLATFORM) flags_$(BOXES_PLATFORM) package
+	if which gtar >/dev/null 2>&1 ; then cd $(OUT_DIR) ; gtar cfvz $(PKG_NAME).tar.gz $(PKG_NAME)/* ; \
+	    else cd $(OUT_DIR) ; tar cfvz $(PKG_NAME).tar.gz $(PKG_NAME)/* ; fi
+	rm -rf $(OUT_DIR)/$(PKG_NAME)/
+
+$(OUT_DIR)/zip/$(PKG_NAME).zip:
+	mkdir -p $(OUT_DIR)/zip/$(PKG_NAME)
+	unix2dos -n LICENSE $(OUT_DIR)/zip/$(PKG_NAME)/LICENSE.txt
+	unix2dos -n boxes-config $(OUT_DIR)/zip/$(PKG_NAME)/boxes.cfg
+	unix2dos -n README.md $(OUT_DIR)/zip/$(PKG_NAME)/README.md
+	unix2dos -n README.Win32.md $(OUT_DIR)/zip/$(PKG_NAME)/README.Win32.md
+	unix2dos -n doc/boxes.1 $(OUT_DIR)/zip/$(PKG_NAME)/boxes.1
+	unix2dos -n doc/boxes.1.html $(OUT_DIR)/zip/$(PKG_NAME)/boxes-man-1.html
+	cp -a $(OUT_DIR)/boxes.exe $(OUT_DIR)/zip/$(PKG_NAME)/
+	cd $(OUT_DIR)/zip ; zip $(PKG_NAME).zip $(PKG_NAME)/*
+	@echo Windows ZIP file created at $(OUT_DIR)/zip/$(PKG_NAME).zip
 
 package: build
 	$(MAKE) BOXES_PLATFORM=unix $(PKG_NAME).tar.gz
 
-win32.package: win32
-	$(MAKE) BOXES_PLATFORM=win32 $(PKG_NAME).tar.gz
+win32.package: win32 $(OUT_DIR)/zip/$(PKG_NAME).zip
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -98,10 +111,10 @@ tools/LICENSE.txt: LICENSE
 tools/boxes.cfg: boxes-config
 	unix2dos -n boxes-config tools/boxes.cfg
 
-tools/boxes.exe: src/boxes.exe
-	cp src/boxes.exe tools/
+tools/boxes.exe: out/boxes.exe
+	cp out/boxes.exe tools/
 
-src/boxes.exe: win32
+out/boxes.exe: win32
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

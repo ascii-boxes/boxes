@@ -2,6 +2,7 @@
 .cproject
 .project
 /.idea/
+/coverage/
 
 # Jekyll generated (website) artifacts
 /.jekyll-metadata
@@ -10,18 +11,21 @@
 /_support/
 
 # Build artifacts
-*.o
-*.a
-/src/boxes
-/src/boxes.exe
-/src/boxes.h
-/src/lex.yy.c
-/src/parser.h
-/src/parser.c
 /doc/boxes.1
 /doc/boxes.1.raw.html
 /doc/boxes.1.html
 /pcre2-*/
+/out/
+*.o
+*.a
+/src/boxes.h
+
+# Legacy locations of generated files (no longer in use)
+/src/boxes
+/src/boxes.exe
+/src/lex.yy.c
+/src/parser.h
+/src/parser.c
 
 # Linux Packaging
 *.tar.gz
