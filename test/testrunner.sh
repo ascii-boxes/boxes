@@ -79,9 +79,9 @@ cat $testCaseFile | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d
 cat $testCaseFile | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > $testFilterFile
 cat $testCaseFile | sed -n '/^:EXPECTED/,/^:EOF/p;' | sed '1d;$d' | tr -d '\r' > $testExpectationFile
 
-declare boxesBinary=../src/boxes.exe
+declare boxesBinary=../out/boxes.exe
 if [ ! -x $boxesBinary ]; then
-    boxesBinary=../src/boxes
+    boxesBinary=../out/boxes
 fi
 
 if [ ! -z "$boxesEnv" ]; then
