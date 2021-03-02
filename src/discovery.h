@@ -26,7 +26,7 @@
 #define BOXES_DISCOVERY_H
 
 
-char *discover_config_file();
+char *discover_config_file(const int global_only);
 
 
 #endif /* BOXES_DISCOVERY_H */

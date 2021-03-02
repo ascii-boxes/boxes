@@ -224,22 +224,31 @@ static char *exe_to_cfg()
 #endif
 
 
-char *discover_config_file()
+char *discover_config_file(const int global_only)
 {
     int error_printed = 0;
     char *result = locate_config_common(&error_printed);
 
     if (result == NULL && !error_printed) {
         const char *globalconf_marker = "::GLOBALCONF::";
-        const char *dirs[] = {
+        const char *user_dirs[] = {
                 from_env_var("HOME", ""),
                 from_env_var("XDG_CONFIG_HOME", "/boxes"),
-                from_env_var("HOME", "/.config/boxes"),
+                from_env_var("HOME", "/.config/boxes")
+        };
+        const char *global_dirs[] = {
                 globalconf_marker,
                 "/etc/xdg/boxes",
                 "/usr/local/share/boxes",
                 "/usr/share/boxes"
         };
+        const char *dirs[global_only ? 4 : 7];
+        if (global_only) {
+            memcpy(dirs, global_dirs, 4);
+        } else {
+            memcpy(dirs, user_dirs, 3);
+            memcpy(dirs + 3, global_dirs, 4);
+        }
         for (size_t i = 0; i < (sizeof(dirs) / sizeof(const char *)); i++) {
             const char *dir = dirs[i];
             if (dir == globalconf_marker) {
