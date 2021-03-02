@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include "discovery.h"
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
@@ -310,7 +311,7 @@ static int design_needed (const char *name, const int design_idx)
     int num;
 }
 
-%token YSHAPES YELASTIC YPADDING YSAMPLE YENDSAMPLE YBOX YEND YUNREC
+%token YPARENT YSHAPES YELASTIC YPADDING YSAMPLE YENDSAMPLE YBOX YEND YUNREC
 %token YREPLACE YREVERSE YTO YWITH YCHGDEL
 %token <s> KEYWORD
 %token <s> WORD
@@ -373,8 +374,25 @@ config_file
     }
 ;
 
+parent_def: YPARENT STRING
+    {
+        char *filepath = $2;
+        if (strcasecmp(filepath, ":global:") == 0) {    /* special token */
+            filepath = discover_config_file(1);
+            if (filepath == NULL) {
+                // TODO duplicate error msg
+                yyerror ("parent reference to global config which cannot be found");
+                YYERROR;
+            }
+        }
+        #ifdef PARSER_DEBUG
+            fprintf (stderr, "parent config file specified: [%s]\n", filepath);
+        #endif
+        // TODO HERE
+        // TODO it "skips to next design" on broken parent
+    }
 
-config_file: config_file design_or_error | design_or_error ;
+config_file: config_file design_or_error | design_or_error | config_file parent_def | parent_def ;
 
 
 design_or_error: design | error
@@ -725,9 +743,9 @@ block: YSAMPLE STRING YENDSAMPLE
         }
         #ifdef PARSER_DEBUG
             fprintf (stderr, "Minimum box dimensions: width %d height %d\n",
-                    designs[design_idx].minwidth, designs[design_idx].minheight);
+                    (int) designs[design_idx].minwidth, (int) designs[design_idx].minheight);
             fprintf (stderr, "Maximum shape height: %d\n",
-                    designs[design_idx].maxshapeheight);
+                    (int) designs[design_idx].maxshapeheight);
         #endif
     }
 
@@ -847,7 +865,7 @@ slist_entry: SHAPE shape_def
     {
         #ifdef PARSER_DEBUG
             fprintf (stderr, "Adding shape spec for \'%s\' (width %d "
-                    "height %d)\n", shape_name[$1], $2.width, $2.height);
+                    "height %d)\n", shape_name[$1], (int) $2.width, (int) $2.height);
         #endif
 
         if (isempty (designs[design_idx].shape + $1)) {

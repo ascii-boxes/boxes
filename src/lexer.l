@@ -68,14 +68,17 @@ static void inflate_inbuf();
 %x SAMPLE
 %x SPEEDMODE
 %x DELWORD
+%x PARENT
 %s SHAPES
 %s ELASTIC
 
 
-PWORD  [a-zA-ZהצüִײÜ][a-zA-Z0-9\-_üהצÜִײß]*
-PWHITE [\n \r\t]
-PBOX   Box
-SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
+PWORD     [a-zA-ZהצüִײÜ][a-zA-Z0-9\-_üהצÜִײß]*
+PWHITE    [\n \r\t]
+PBOX      Box
+SDELIM    [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
+PPARENT   parent
+PFILENAME [^\r\n]+
 
 
 %%
@@ -149,6 +152,35 @@ SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
     return YUNREC;
 }
 
+
+{PPARENT} {
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "\nYPARENT: %s", yytext);
+    #endif
+    BEGIN PARENT;
+    return YPARENT;
+}
+
+<PARENT>{PFILENAME} {
+    char *p = yytext;
+    while (*p == ' ' || *p == '\t') {
+        ++p;
+    }
+    yylval.s = (char *) strdup (p);
+    p = yylval.s + strlen(yylval.s) - 1;
+    while ((*p == ' ' || *p == '\t') && p >= yylval.s) {
+        *p-- = '\0';
+    }
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "\n STRING: \"%s\"", yylval.s);
+    #endif
+    BEGIN INITIAL;
+    return STRING;
+}
+
+<PARENT>\n {
+    BEGIN INITIAL;
+}
 
 
 Sample {
