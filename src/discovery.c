@@ -227,7 +227,10 @@ static char *exe_to_cfg()
 char *discover_config_file(const int global_only)
 {
     int error_printed = 0;
-    char *result = locate_config_common(&error_printed);
+    char *result = NULL;
+    if (!global_only) {
+        result = locate_config_common(&error_printed);
+    }
 
     if (result == NULL && !error_printed) {
         const char *globalconf_marker = "::GLOBALCONF::";
@@ -244,10 +247,10 @@ char *discover_config_file(const int global_only)
         };
         const char *dirs[global_only ? 4 : 7];
         if (global_only) {
-            memcpy(dirs, global_dirs, 4);
+            memcpy(dirs, global_dirs, 4 * sizeof(char *));
         } else {
-            memcpy(dirs, user_dirs, 3);
-            memcpy(dirs + 3, global_dirs, 4);
+            memcpy(dirs, user_dirs, 3 * sizeof(char *));
+            memcpy(dirs + 3, global_dirs, 4 * sizeof(char *));
         }
         for (size_t i = 0; i < (sizeof(dirs) / sizeof(const char *)); i++) {
             const char *dir = dirs[i];
