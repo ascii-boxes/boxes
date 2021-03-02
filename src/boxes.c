@@ -107,7 +107,7 @@ static void usage(FILE *st)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    char *config_file = discover_config_file();
+    char *config_file = discover_config_file(0);
 
     fprintf(st, "Usage:  %s [options] [infile [outfile]]\n", PROJECT);
     fprintf(st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
@@ -1368,7 +1368,7 @@ int main(int argc, char *argv[])
     /*
      *  Parse config file, then reset design pointer
      */
-    char *config_file = discover_config_file();
+    char *config_file = discover_config_file(0);
     if (config_file == NULL) {
         exit(EXIT_FAILURE);
     }
