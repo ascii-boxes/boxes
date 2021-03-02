@@ -115,35 +115,30 @@ typedef struct {
 
 extern design_t *designs;
 extern int anz_designs;
-extern int design_idx;
-
-
-extern int tjlineno;                     /* config file line counter */
-extern char *yyfilename;                 /* name of config file */
 
 
 typedef struct {                         /* Command line options: */
-    int       l;                         /* list available designs */
-    char     *f;                         /* the string specified as argument to -f ; config file path */
-    int       mend;                      /* 1 if -m is given, 2 in 2nd loop */
-    int       q;                         /* special handling of web UI needs */
-    int       r;                         /* remove box from input */
-    int       tabstop;                   /* tab stop distance */
-    char      tabexp;                    /* tab expansion mode (for leading tabs) */
-    int       padding[ANZ_SIDES];        /* in spaces or lines resp. */
-    design_t *design;                    /* currently used box design */
-    int       design_choice_by_user;     /* true if design was chosen by user */
-    char     *cld;                       /* commandline design definition, -c */
-    long      reqwidth;                  /* requested box width (-s) */
-    long      reqheight;                 /* requested box height (-s) */
-    char      valign;                    /* text position inside box */
-    char      halign;                    /* ( h[lcr]v[tcb] )         */
-    char      indentmode;                /* 'b', 't', 'n', or '\0' */
-    char      justify;                   /* 'l', 'c', 'r', or '\0' */
-    int       killblank;                 /* -1 if not set */
-    char     *encoding;                  /* character encoding override for input and output text */
-    FILE     *infile;                    /* where we get our input */
-    FILE     *outfile;                   /* where we put our output */
+    int       l;                         /** list available designs */
+    char     *f;                         /** the string specified as argument to -f ; config file path */
+    int       mend;                      /** 1 if -m is given, 2 in 2nd loop */
+    int       q;                         /** special handling of web UI needs */
+    int       r;                         /** remove box from input */
+    int       tabstop;                   /** tab stop distance */
+    char      tabexp;                    /** tab expansion mode (for leading tabs) */
+    int       padding[ANZ_SIDES];        /** in spaces or lines resp. */
+    design_t *design;                    /** currently used box design */
+    int       design_choice_by_user;     /** true if design was chosen by user */
+    char     *cld;                       /** commandline design definition, -c */
+    long      reqwidth;                  /** requested box width (-s) */
+    long      reqheight;                 /** requested box height (-s) */
+    char      valign;                    /** text position inside box */
+    char      halign;                    /** ( h[lcr]v[tcb] )         */
+    char      indentmode;                /** 'b', 't', 'n', or '\0' */
+    char      justify;                   /** 'l', 'c', 'r', or '\0' */
+    int       killblank;                 /** -1 if not set */
+    char     *encoding;                  /** character encoding override for input and output text */
+    FILE     *infile;                    /** where we get our input */
+    FILE     *outfile;                   /** where we put our output */
 } opt_t;
 
 extern opt_t opt;

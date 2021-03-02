@@ -39,14 +39,10 @@
 #include "tools.h"
 #include "discovery.h"
 #include "generate.h"
+#include "parsing.h"
 #include "regulex.h"
 #include "remove.h"
 #include "unicode.h"
-
-
-extern char *optarg;                     /* for getopt() */
-extern int optind, opterr, optopt;       /* for getopt() */
-
 
 
 /*       _\|/_
@@ -55,14 +51,10 @@ extern int optind, opterr, optopt;       /* for getopt() */
  |                    G l o b a l   V a r i a b l e s                        |
  +--------------------------------------------------------------------------*/
 
-extern int yyparse();
-extern FILE *yyin;                   /* lex input file */
-
-char *yyfilename = NULL;             /* file name of config file used */
+extern char *optarg;                 /* for getopt() */
+extern int optind, opterr, optopt;   /* for getopt() */
 
 design_t *designs = NULL;            /* available box designs */
-
-int design_idx = 0;                  /* anz_designs-1 */
 int anz_designs = 0;                 /* no of designs after parsing */
 
 opt_t opt;                           /* command line options */
@@ -76,29 +68,6 @@ input_t input = INPUT_INITIALIZER;   /* input lines */
  +----oOO-{_}-OOo------------------------------------------------------------+
  |                           F u n c t i o n s                               |
  +--------------------------------------------------------------------------*/
-
-
-static int open_yy_config_file(const char *config_file_name)
-/*
- *  Set yyin and yyfilename to the config file to be used.
- *
- *  RETURNS:    == 0    success  (yyin and yyfilename are set)
- *              != 0    error    (yyin is unmodified)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    FILE *new_yyin = fopen(config_file_name, "r");
-    if (new_yyin == NULL) {
-        fprintf(stderr, "%s: Couldn't open config file '%s' for input\n", PROJECT, config_file_name);
-        return 1;
-    }
-    yyfilename = (char *) config_file_name;
-    yyin = new_yyin;
-    return 0;
-}
-
-
 
 static void usage(FILE *st)
 /*
@@ -916,9 +885,8 @@ static int list_styles()
 
     else {
         design_t **list;                 /* temp list for sorting */
-        char buf[42];
 
-        list = (design_t **) calloc(design_idx + 1, sizeof(design_t *));
+        list = (design_t **) calloc(anz_designs, sizeof(design_t *));
         if (list == NULL) {
             perror(PROJECT);
             return 1;
@@ -927,19 +895,10 @@ static int list_styles()
         for (i = 0; i < anz_designs; ++i) {
             list[i] = &(designs[i]);
         }
-        qsort(list, design_idx + 1, sizeof(design_t *), style_sort);
-
-        sprintf(buf, "%d", anz_designs);
+        qsort(list, anz_designs, sizeof(design_t *), style_sort);
 
         if (!opt.q) {
-            fprintf(opt.outfile, "%d Available Style%s in \"%s\":\n",
-                    anz_designs, anz_designs == 1 ? "" : "s", yyfilename);
-            fprintf(opt.outfile, "-----------------------%s",
-                    anz_designs == 1 ? "" : "-");
-            for (i = strlen(yyfilename) + strlen(buf); i > 0; --i) {
-                fprintf(opt.outfile, "-");
-            }
-            fprintf(opt.outfile, "\n\n");
+            print_design_list_header();
         }
         for (i = 0; i < anz_designs; ++i) {
             if (opt.q) {
@@ -1366,27 +1325,19 @@ int main(int argc, char *argv[])
     #endif
 
     /*
-     *  Parse config file, then reset design pointer
+     *  Parse config file(s), then reset design pointer
      */
     char *config_file = discover_config_file(0);
     if (config_file == NULL) {
         exit(EXIT_FAILURE);
     }
     if (opt.cld == NULL) {
-        yyin = stdin;
-        rc = open_yy_config_file(config_file);
-        if (rc) {
+        size_t r_num_designs = 0;
+        designs = parse_config_files(config_file, &r_num_designs);
+        if (designs == NULL) {
             exit(EXIT_FAILURE);
         }
-    }
-    #ifdef DEBUG
-        fprintf (stderr, "Parsing Config File %s ...\n", config_file);
-    #endif
-    if (opt.cld == NULL) {
-        rc = yyparse();
-        if (rc) {
-            exit(EXIT_FAILURE);
-        }
+        anz_designs = (int) r_num_designs;
     }
     else {
         rc = build_design(&designs, opt.cld);

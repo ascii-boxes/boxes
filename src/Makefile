@@ -26,13 +26,13 @@ OUT_DIR    = ../out
 SRC_DIR    = ../src
 VPATH      = $(SRC_DIR):$(SRC_DIR)/misc
 
-GEN_HDR    = parser.h boxes.h
+GEN_HDR    = parser.h boxes.h lex.yy.h
 GEN_SRC    = parser.c lex.yy.c
 GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
 ORIG_HDRCL = boxes.in.h config.h
-ORIG_HDR   = $(ORIG_HDRCL) discovery.h generate.h lexer.h regulex.h remove.h shape.h tools.h unicode.h
+ORIG_HDR   = $(ORIG_HDRCL) discovery.h generate.h lexer.h parsing.h regulex.h remove.h shape.h tools.h unicode.h
 ORIG_GEN   = lexer.l parser.y
-ORIG_NORM  = boxes.c discovery.c generate.c regulex.c remove.c shape.c tools.c unicode.c
+ORIG_NORM  = boxes.c discovery.c generate.c parsing.c regulex.c remove.c shape.c tools.c unicode.c
 ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
 ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 
@@ -81,14 +81,12 @@ flags_:
 	@echo Please call make from the top level directory.
 	exit 1
 
-parser.c parser.h: parser.y boxes.h | check_dir
-	$(YACC) -o parser.c -d $<
+parser.c parser.h: parser.y lex.yy.h | check_dir
+	$(YACC) --warnings=all --verbose --defines=parser.h --output=parser.c $<
+	cpp -I. -I$(SRC_DIR) -P parser.c parser.p
 
-lex.yy.c: lexer.l boxes.h | check_dir
-	$(LEX) -t $< > lexer.tmp.c
-	echo '#include "config.h"' > lex.yy.c
-	cat lexer.tmp.c >> lex.yy.c
-	rm lexer.tmp.c
+lex.yy.c lex.yy.h: lexer.l | check_dir
+	$(LEX) --header-file=lex.yy.h $<
 
 boxes.o:     boxes.c boxes.h discovery.h regulex.h shape.h tools.h unicode.h generate.h remove.h config.h | check_dir
 discovery.o: discovery.c discovery.h boxes.h tools.h config.h | check_dir
@@ -96,11 +94,12 @@ tools.o:     tools.c tools.h boxes.h shape.h unicode.h config.h | check_dir
 unicode.o:   unicode.c unicode.h boxes.h tools.h config.h | check_dir
 shape.o:     shape.c shape.h boxes.h tools.h config.h | check_dir
 generate.o:  generate.c generate.h boxes.h shape.h tools.h unicode.h config.h | check_dir
+parsing.o:   parsing.c parsing.h boxes.h config.h | check_dir
 remove.o:    remove.c remove.h boxes.h shape.h tools.h unicode.h config.h | check_dir
 regulex.o:   regulex.c regulex.h boxes.h tools.h unicode.h config.h | check_dir
 getopt.o:    misc/getopt.c misc/getopt.h | check_dir
-parser.o:    parser.c parser.h tools.h shape.h lexer.h config.h | check_dir
-lex.yy.o:    lex.yy.c parser.h tools.h shape.h lexer.h config.h | check_dir
+parser.o:    parser.c boxes.h lex.yy.h parser.h parsing.h tools.h shape.h discovery.h config.h | check_dir
+lex.yy.o:    lex.yy.c parser.h boxes.h parsing.h tools.h shape.h config.h | check_dir
 
 package: $(BOXES_EXECUTABLE_NAME)
 	if [ -z "$(PKG_NAME)" ] ; then exit 1 ; fi

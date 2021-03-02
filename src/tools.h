@@ -45,10 +45,6 @@
 }
 
 
-int yyerror(const char *fmt, ...);
-
-void regerror(char *msg);
-
 int empty_line(const line_t *line);
 
 size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_t **text,

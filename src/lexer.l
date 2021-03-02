@@ -1,4 +1,4 @@
-%{
+%top{
 /*
  * boxes - Command line filter to draw/remove ASCII boxes around text
  * Copyright (c) 1999-2021 Thomas Jensen and the boxes contributors
@@ -24,6 +24,28 @@
  */
 
 #include "config.h"
+
+void begin_speedmode();
+
+
+void chg_strdelims (const char asdel, const char asesc);
+
+
+/**
+ * User-defined initializations for the lexer.
+ *
+ * Since this scanner must use REJECT in order to be able to process the string delimiter commands, it cannot
+ * dynamically enlarge its input buffer to accomodate larger tokens. Thus, we simply set the buffer size to the
+ * input file size plus 10 bytes margin-of-error.
+ *
+ * @param scanner pointer to the scanner data block
+ * @param configfile the path to the config file we are reading
+ */
+void inflate_inbuf(void *scanner, const char *configfile);
+
+}
+
+%{
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -32,59 +54,59 @@
 #include "boxes.h"
 #undef FILE_LEXER_L
 #include "tools.h"
+#include "parsing.h"
 #include "parser.h"
-#include "lexer.h"
-
 
 
 #define LEX_MAX_WARN 3                   /* number of lex errors per design */
 
-
-int tjlineno = 1;
-
 static int yyerrcnt = 0;
 
+/* the currently active string delimiter character */
 static char sdel = '\"';
+
+/* the currently active string escape character */
 static char sesc = '\\';
 
 
-/*
- *  User-defined initializations for the lexer
- */
-static void inflate_inbuf();
-#define YY_USER_INIT  inflate_inbuf()
-
 %}
 
-
+%option 8bit
+%option bison-bridge
+%option case-insensitive
+%option ecs
+%option never-interactive
+%option nodefault
+%option noinput
 %option nounput
 %option noyywrap
-%option never-interactive
-%option caseless
-%option noinput
-%option noyylineno
+%option reentrant
+%option warn
+%option yylineno
 
 
 %x SAMPLE
 %x SPEEDMODE
 %x DELWORD
+%x PARENT
 %s SHAPES
 %s ELASTIC
 
 
-PWORD  [a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*
-PWHITE [\n \r\t]
-PBOX   Box
-SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
+PWORD     [a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*
+PWHITE    [\n \r\t]
+PBOX      Box
+SDELIM    [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
+PPARENT   parent
+PFILENAME [^\r\n]+
 
 
 %%
 
 
-
 <DELWORD,SHAPES,ELASTIC,INITIAL>[ \r\t] /* ignore whitespace */
 
-<DELWORD,SHAPES,ELASTIC,INITIAL>\n ++tjlineno;
+<DELWORD,SHAPES,ELASTIC,INITIAL>\n {}
 
 
 <DELWORD>[^ \t\r\n]+ {
@@ -94,8 +116,8 @@ SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
     #ifdef LEXER_DEBUG
         fprintf (stderr, "\nYDELWOR: %s -- STATE INITIAL", yytext);
     #endif
-    yylval.s = (char *) strdup (yytext);
-    if (yylval.s == NULL) {
+    yylval->s = (char *) strdup (yytext);
+    if (yylval->s == NULL) {
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
@@ -118,12 +140,12 @@ SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
         REJECT;                          /* that was not our delimiter */
     }
 
-    yylval.s = (char *) strdup (yytext + 1);
-    if (yylval.s == NULL) {
+    yylval->s = (char *) strdup (yytext + 1);
+    if (yylval->s == NULL) {
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
-    p = yylval.s;
+    p = yylval->s;
 
     while (*p) {
         if (*p == sesc) {
@@ -135,9 +157,9 @@ SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
         }
         else if (*p == sdel) {
             *p = '\0';
-            yyless ((p-yylval.s)+2+qcnt);   /* string plus quotes */
+            yyless ((p-yylval->s)+2+qcnt);   /* string plus quotes */
             #ifdef LEXER_DEBUG
-                fprintf (stderr, "\n STRING: \"%s\"", yylval.s);
+                fprintf (stderr, "\n STRING: \"%s\"", yylval->s);
             #endif
             return STRING;
         }
@@ -145,10 +167,39 @@ SDELIM [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
         ++p;
     }
     if (yyerrcnt++ < 5)
-        yyerror ("Unterminated String -- %s", yytext);
+        yyerror(NULL, "Unterminated String -- %s", yytext);
     return YUNREC;
 }
 
+
+{PPARENT} {
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "\nYPARENT: %s", yytext);
+    #endif
+    BEGIN PARENT;
+    return YPARENT;
+}
+
+<PARENT>{PFILENAME} {
+    char *p = yytext;
+    while (*p == ' ' || *p == '\t') {
+        ++p;
+    }
+    yylval->s = (char *) strdup (p);
+    p = yylval->s + strlen(yylval->s) - 1;
+    while ((*p == ' ' || *p == '\t') && p >= yylval->s) {
+        *p-- = '\0';
+    }
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "\n STRING: \"%s\"", yylval->s);
+    #endif
+    BEGIN INITIAL;
+    return STRING;
+}
+
+<PARENT>\n {
+    BEGIN INITIAL;
+}
 
 
 Sample {
@@ -161,7 +212,6 @@ Sample {
 
 
 <SAMPLE>\n {
-    ++tjlineno;
     if (yyleng > 1)
         yymore();
 }
@@ -175,8 +225,8 @@ Sample {
         --p;                             /* skip trailing whitespace */
     p -= 2;                              /* almost skip "ends" statement */
     *p = '\0';                           /* p now points to 'n' */
-    yylval.s = (char *) strdup (yytext);
-    if (yylval.s == NULL) {
+    yylval->s = (char *) strdup (yytext);
+    if (yylval->s == NULL) {
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
@@ -185,20 +235,20 @@ Sample {
     len = p - yytext;                    /* yyless(n): push back all but the first n */
     yyless (len);                        /* allow him to return YENDSAMPLE */
 
-    yylval.s[len] = '\n';                /* replace 'e' with newline */
-    btrim (yylval.s, &len);
+    yylval->s[len] = '\n';                /* replace 'e' with newline */
+    btrim (yylval->s, &len);
     if (len > 0) {
-        strcat (yylval.s, "\n");         /* memory was allocated with strdup */
+        strcat (yylval->s, "\n");         /* memory was allocated with strdup */
         #ifdef LEXER_DEBUG
-            fprintf (stderr, "\n STRING: \"%s\" -- STATE INITIAL", yylval.s);
+            fprintf (stderr, "\n STRING: \"%s\" -- STATE INITIAL", yylval->s);
         #endif
         BEGIN INITIAL;
         return STRING;
     }
     else {
         if (yyerrcnt++ < 5)
-            yyerror ("SAMPLE block must not be empty");
-        BFREE (yylval.s);
+            yyerror(NULL, "SAMPLE block must not be empty");
+        BFREE (yylval->s);
         return YUNREC;
     }
 }
@@ -246,26 +296,26 @@ Padding { return YPADDING; }
 End     { return YEND;     }
 To      { return YTO;      }
 With    { return YWITH;    }
-Global  { yylval.c = 'g'; return YRXPFLAG; }
-Once    { yylval.c = 'o'; return YRXPFLAG; }
+Global  { yylval->c = 'g'; return YRXPFLAG; }
+Once    { yylval->c = 'o'; return YRXPFLAG; }
 
 
-<SHAPES,ELASTIC>nw  { yylval.shape = NW;  return SHAPE; }
-<SHAPES,ELASTIC>nnw { yylval.shape = NNW; return SHAPE; }
-<SHAPES,ELASTIC>n   { yylval.shape = N;   return SHAPE; }
-<SHAPES,ELASTIC>nne { yylval.shape = NNE; return SHAPE; }
-<SHAPES,ELASTIC>ne  { yylval.shape = NE;  return SHAPE; }
-<SHAPES,ELASTIC>ene { yylval.shape = ENE; return SHAPE; }
-<SHAPES,ELASTIC>e   { yylval.shape = E;   return SHAPE; }
-<SHAPES,ELASTIC>ese { yylval.shape = ESE; return SHAPE; }
-<SHAPES,ELASTIC>se  { yylval.shape = SE;  return SHAPE; }
-<SHAPES,ELASTIC>sse { yylval.shape = SSE; return SHAPE; }
-<SHAPES,ELASTIC>s   { yylval.shape = S;   return SHAPE; }
-<SHAPES,ELASTIC>ssw { yylval.shape = SSW; return SHAPE; }
-<SHAPES,ELASTIC>sw  { yylval.shape = SW;  return SHAPE; }
-<SHAPES,ELASTIC>wsw { yylval.shape = WSW; return SHAPE; }
-<SHAPES,ELASTIC>w   { yylval.shape = W;   return SHAPE; }
-<SHAPES,ELASTIC>wnw { yylval.shape = WNW; return SHAPE; }
+<SHAPES,ELASTIC>nw  { yylval->shape = NW;  return SHAPE; }
+<SHAPES,ELASTIC>nnw { yylval->shape = NNW; return SHAPE; }
+<SHAPES,ELASTIC>n   { yylval->shape = N;   return SHAPE; }
+<SHAPES,ELASTIC>nne { yylval->shape = NNE; return SHAPE; }
+<SHAPES,ELASTIC>ne  { yylval->shape = NE;  return SHAPE; }
+<SHAPES,ELASTIC>ene { yylval->shape = ENE; return SHAPE; }
+<SHAPES,ELASTIC>e   { yylval->shape = E;   return SHAPE; }
+<SHAPES,ELASTIC>ese { yylval->shape = ESE; return SHAPE; }
+<SHAPES,ELASTIC>se  { yylval->shape = SE;  return SHAPE; }
+<SHAPES,ELASTIC>sse { yylval->shape = SSE; return SHAPE; }
+<SHAPES,ELASTIC>s   { yylval->shape = S;   return SHAPE; }
+<SHAPES,ELASTIC>ssw { yylval->shape = SSW; return SHAPE; }
+<SHAPES,ELASTIC>sw  { yylval->shape = SW;  return SHAPE; }
+<SHAPES,ELASTIC>wsw { yylval->shape = WSW; return SHAPE; }
+<SHAPES,ELASTIC>w   { yylval->shape = W;   return SHAPE; }
+<SHAPES,ELASTIC>wnw { yylval->shape = WNW; return SHAPE; }
 
 <ELASTIC>\) {
     #ifdef LEXER_DEBUG
@@ -291,8 +341,8 @@ author|designer|tags|created|revision|revdate|indent {
     #ifdef LEXER_DEBUG
         fprintf (stderr, "\nKEYWORD: %s", yytext);
     #endif
-    yylval.s = (char *) strdup (yytext);
-    if (yylval.s == NULL) {
+    yylval->s = (char *) strdup (yytext);
+    if (yylval->s == NULL) {
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
@@ -316,8 +366,8 @@ Delimiter|Delim {
     #ifdef LEXER_DEBUG
         fprintf (stderr, "\n   WORD: %s", yytext);
     #endif
-    yylval.s = (char *) strdup (yytext);
-    if (yylval.s == NULL) {
+    yylval->s = (char *) strdup (yytext);
+    if (yylval->s == NULL) {
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
@@ -329,7 +379,7 @@ Delimiter|Delim {
     #ifdef LEXER_DEBUG
         fprintf (stderr, "\nYNUMBER: %s", yytext);
     #endif
-    yylval.num = atoi (yytext);
+    yylval->num = atoi (yytext);
     return YNUMBER;
 }
 
@@ -352,7 +402,7 @@ Delimiter|Delim {
 
 . {
     if (yyerrcnt++ < LEX_MAX_WARN)
-        yyerror ("Unrecognized input char \'%s\'", yytext);
+        yyerror(NULL, "Unrecognized input char \'%s\'", yytext);
     return YUNREC;
 }
 
@@ -366,7 +416,7 @@ Delimiter|Delim {
     BEGIN INITIAL;
 }
 
-<SPEEDMODE>\n ++tjlineno;
+<SPEEDMODE>\n {}
 
 <SPEEDMODE>. /* ignore anything else */
 
@@ -374,35 +424,31 @@ Delimiter|Delim {
 %%
 
 
-static void inflate_inbuf()
-/*
- *  User-defined initializations for the lexer.
- *
- *  Since this scanner must use REJECT in order to be able to process the
- *  string delimiter commands, it cannot dynamically enlarge its input
- *  buffer to accomodate larger tokens. Thus, we simply set the buffer size
- *  to the input file size plus 10 bytes margin-of-error.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
+/* TODO These functions should go away. The cast to (struct yyguts_t *) is a hack.
+ *      And they use global variables which is not reentrant at all. Use extra data instead.
+ *      Maybe inflate_inbuf() can be moved to parsing.c? */
+
+void inflate_inbuf(void *scanner, const char *configfile)
 {
     struct stat sinf;
 
-    if (stat(yyfilename, &sinf)) {
+    if (stat(configfile, &sinf)) {
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
-    yy_delete_buffer (YY_CURRENT_BUFFER);
-    yy_switch_to_buffer (yy_create_buffer (yyin, sinf.st_size+10));
+    struct yyguts_t *yyg = (struct yyguts_t *) scanner;
+    yy_delete_buffer(YY_CURRENT_BUFFER, scanner);
+    yy_switch_to_buffer (yy_create_buffer(yyin, sinf.st_size+10, scanner), scanner);
 }
 
 
 
-void begin_speedmode()
+void begin_speedmode(void *scanner)
 {
     #ifdef LEXER_DEBUG
         fprintf (stderr, "\n STATUS: begin_speedmode() -- STATE SPEEDMODE");
     #endif
+    struct yyguts_t *yyg = (struct yyguts_t *) scanner;
     BEGIN SPEEDMODE;
 }
 
@@ -416,7 +462,6 @@ void chg_strdelims (const char asesc, const char asdel)
     sesc = asesc;
     sdel = asdel;
 }
-
 
 
 /*EOF*/                                         /* vim: set cindent sw=4: */
