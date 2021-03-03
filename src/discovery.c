@@ -226,7 +226,7 @@ static char *exe_to_cfg()
 
 char *discover_config_file(const int global_only)
 {
-    int error_printed = 0;
+    int error_printed = global_only;
     char *result = NULL;
     if (!global_only) {
         result = locate_config_common(&error_printed);
