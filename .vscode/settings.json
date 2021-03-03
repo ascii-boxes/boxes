@@ -1,0 +1,53 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.idea": true,
+        "**/_site": true,
+        "**/_support": true,
+        "**/cmake-build-debug": true,
+        "**/coverage": true,
+        "**/out": true
+    },
+    "editor.autoClosingBrackets": "never",
+    "editor.dragAndDrop": false,
+    "editor.formatOnSave": false,
+    "editor.renderWhitespace": "selection",
+    "editor.rulers": [120],
+    "editor.wordWrapColumn": 120,
+    "files.associations": {
+        "*.h.in": "c",
+        "*.1.in": "troff"
+    },
+    "files.encoding": "utf8",
+
+    "todo-tree.highlights.defaultHighlight": {
+        "foreground": "red",
+        "rulerLane": "full"
+    },
+    "todo-tree.filtering.excludeGlobs": [
+        "**/out/**",
+        "**/build/**",
+        "**/.vscode/**",
+        "**/.github/**",
+        "**/_site/**",
+        "**/_support/**",
+        "**/pcre2-*/**"
+    ],
+    "todo-tree.general.statusBar": "total",
+    "todo-tree.general.tags": ["TODO", "FIXME", "CHECK"],
+    "todo-tree.regex.regex": "(//|#|<!--|\"|/\\*|^\\s*\\*)\\s*($TAGS)",
+    "todo-tree.tree.expanded": true,
+    "todo-tree.tree.showCountsInTree": true,
+
+    "[lex]": {
+        "files.encoding": "iso885915"
+    },
+    "[makefile]": {
+        "editor.insertSpaces": false,
+        "editor.detectIndentation": false,
+        "editor.renderWhitespace": "boundary"
+    },
+    "[viml]": {
+        "files.encoding": "iso885915"
+    }
+}

@@ -19,6 +19,8 @@
 *.o
 *.a
 /src/boxes.h
+/cmake-build-debug/
+/test/*.tmp
 
 # Legacy locations of generated files (no longer in use)
 /src/boxes

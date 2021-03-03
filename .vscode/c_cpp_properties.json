@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/src/misc",
+                "${workspaceFolder}/out",
+                "${workspaceFolder}/pcre2-10.36/src"
+            ],
+            "defines": [
+                "_DEBUG",
+                "DEBUG",
+                "REGEXP_DEBUG",
+                "PARSER_DEBUG",
+                "LEXER_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:\\MinGW\\bin\\gcc.exe",
+            "cStandard": "c99",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "windows-gcc-x86"
+        }
+    ],
+    "version": 4
+}
