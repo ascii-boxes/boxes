@@ -1,0 +1,33 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.idea": true,
+        "**/_site": true,
+        "**/_support": true,
+        "**/cmake-build-debug": true,
+        "**/coverage": true,
+        "**/out": true
+    },
+    "editor.autoClosingBrackets": "never",
+    "editor.dragAndDrop": false,
+    "editor.formatOnSave": false,
+    "editor.renderWhitespace": "selection",
+    "editor.rulers": [120],
+    "editor.wordWrapColumn": 120,
+    "files.associations": {
+        "*.h.in": "c",
+        "*.1.in": "troff"
+    },
+    "files.encoding": "utf8",
+    "[lex]": {
+        "files.encoding": "iso885915"
+    },
+    "[makefile]": {
+        "editor.insertSpaces": false,
+        "editor.detectIndentation": false,
+        "editor.renderWhitespace": "boundary"
+    },
+    "[viml]": {
+        "files.encoding": "iso885915"
+    }
+}
