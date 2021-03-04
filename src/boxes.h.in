@@ -116,6 +116,9 @@ extern design_t *designs;
 extern int anz_designs;
 extern int design_idx;
 
+extern char **parent_configs;
+extern size_t num_parent_configs;
+
 
 extern int tjlineno;                     /* config file line counter */
 extern char *yyfilename;                 /* name of config file */

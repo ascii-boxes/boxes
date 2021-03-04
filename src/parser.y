@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+
 #include "discovery.h"
 #include "shape.h"
 #include "boxes.h"
@@ -35,12 +36,11 @@
 #include "lexer.h"
 
 
-static int pflicht = 0;
+static int num_mandatory = 0;
 static int time_for_se_check = 0;
-static int anz_shapespec = 0;            /* number of user-specified shapes */
+static int num_shapespec = 0;            /* number of user-specified shapes */
 
-int speeding = 0;                        /* true if we're skipping designs, */
-                                         /* but no error                    */
+int speeding = 0;                        /* true if we're skipping designs, but no error */
 static int skipping = 0;                 /* used to limit "skipping" msgs */
 
 
@@ -257,9 +257,9 @@ static void recover()
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-     pflicht = 0;
+     num_mandatory = 0;
      time_for_se_check = 0;
-     anz_shapespec = 0;
+     num_shapespec = 0;
      chg_strdelims ('\\', '\"');
 
      /*
@@ -377,19 +377,51 @@ config_file
 parent_def: YPARENT STRING
     {
         char *filepath = $2;
-        if (strcasecmp(filepath, ":global:") == 0) {    /* special token */
+        #ifdef PARSER_DEBUG
+            fprintf (stderr, "parent config file specified: [%s]\n", filepath);
+        #endif
+        if (filepath == NULL || filepath[0] == '\0') {
+            skipping = 1;
+            yyerror ("parent reference is empty");
+            YYERROR;
+        }
+        else if (strcasecmp(filepath, ":global:") == 0) {    /* special token */
             filepath = discover_config_file(1);
             if (filepath == NULL) {
-                // TODO duplicate error msg
+                skipping = 1;   /* prevent redundant "skipping to next design" message */
                 yyerror ("parent reference to global config which cannot be found");
                 YYERROR;
             }
         }
+        else {
+            FILE *f = fopen(filepath, "r");
+            if (f == NULL) {
+                skipping = 1;
+                yyerror ("parent config file not found: %s", filepath);
+                YYERROR;
+            }
+            else {
+                fclose(f);
+            }
+        }
         #ifdef PARSER_DEBUG
-            fprintf (stderr, "parent config file specified: [%s]\n", filepath);
+            fprintf (stderr, "parent config file path resolved: [%s]\n", filepath);
         #endif
+        
+        int is_new = !array_contains(parent_configs, num_parent_configs, filepath);
+        if (!is_new) {
+            #ifdef PARSER_DEBUG
+                fprintf (stderr, "duplicate parent / cycle: [%s]\n", filepath);
+            #endif
+        }
+        else {
+            parent_configs = realloc(parent_configs, (num_parent_configs + 1) * sizeof(char *));
+            parent_configs[num_parent_configs] = filepath;
+            ++num_parent_configs;
+        }
+
         // TODO HERE
-        // TODO it "skips to next design" on broken parent
+        // TODO each design should know where it was defined
     }
 
 config_file: config_file design_or_error | design_or_error | config_file parent_def | parent_def ;
@@ -430,7 +462,7 @@ layout YEND WORD
             yyerror ("box design name differs at BOX and END");
             YYERROR;
         }
-        if (pflicht < 3) {
+        if (num_mandatory < 3) {
             yyerror ("entries SAMPLE, SHAPES, and ELASTIC are mandatory");
             YYERROR;
         }
@@ -457,9 +489,9 @@ layout YEND WORD
             perror (PROJECT);
             YYABORT;
         }
-        pflicht = 0;
+        num_mandatory = 0;
         time_for_se_check = 0;
-        anz_shapespec = 0;
+        num_shapespec = 0;
 
         /*
          *  Check if we need to continue parsing. If not, return.
@@ -604,7 +636,7 @@ block: YSAMPLE STRING YENDSAMPLE
         }
 
         designs[design_idx].sample = line;
-        ++pflicht;
+        ++num_mandatory;
     }
 
 | YSHAPES  '{' slist  '}'
@@ -619,7 +651,7 @@ block: YSAMPLE STRING YENDSAMPLE
         /*
          *  At least one shape must be specified
          */
-        if (anz_shapespec < 1) {
+        if (num_shapespec < 1) {
             yyerror ("must specify at least one non-empty shape per design");
             YYERROR;
         }
@@ -703,7 +735,7 @@ block: YSAMPLE STRING YENDSAMPLE
         if (check_sizes())
             YYERROR;
 
-        ++pflicht;
+        ++num_mandatory;
         if (++time_for_se_check > 1) {
             if (perform_se_check() != 0)
                 YYERROR;
@@ -751,7 +783,7 @@ block: YSAMPLE STRING YENDSAMPLE
 
 | YELASTIC '(' elist ')'
     {
-        ++pflicht;
+        ++num_mandatory;
         if (++time_for_se_check > 1) {
             if (perform_se_check() != 0)
                 YYERROR;
@@ -871,7 +903,7 @@ slist_entry: SHAPE shape_def
         if (isempty (designs[design_idx].shape + $1)) {
             designs[design_idx].shape[$1] = $2;
             if (!isdeepempty(&($2)))
-                ++anz_shapespec;
+                ++num_shapespec;
         }
         else {
             yyerror ("duplicate specification for %s shape", shape_name[$1]);

@@ -65,6 +65,9 @@ design_t *designs = NULL;            /* available box designs */
 int design_idx = 0;                  /* anz_designs-1 */
 int anz_designs = 0;                 /* no of designs after parsing */
 
+char **parent_configs = NULL;        /* names of config files specified via "parent" */
+size_t num_parent_configs = 0;       /* number of parent config files (size of parent_configs array) */
+
 opt_t opt;                           /* command line options */
 
 input_t input = INPUT_INITIALIZER;   /* input lines */
