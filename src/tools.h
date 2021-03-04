@@ -84,6 +84,8 @@ void print_input_lines(const char *heading);
 
 void analyze_line_ascii(line_t *line);
 
+int array_contains(char **array, const size_t array_len, const char *s);
+
 
 #endif
 
