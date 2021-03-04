@@ -63,7 +63,7 @@
 #undef LINE_MAX_BYTES
 #endif
 #ifndef LINE_MAX_BYTES
-#define LINE_MAX_BYTES        4096
+#define LINE_MAX_BYTES        16382
 #endif
 
 
