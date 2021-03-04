@@ -8,6 +8,10 @@
             ],
             "defines": [
                 "_DEBUG",
+                "DEBUG",
+                "REGEXP_DEBUG",
+                "PARSER_DEBUG",
+                "LEXER_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
