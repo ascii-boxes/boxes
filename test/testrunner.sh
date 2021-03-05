@@ -86,6 +86,7 @@ fi
 
 if [ ! -z "$boxesEnv" ]; then
     echo $boxesEnv | sed -e 's/export/\n    export/g' | sed '1d'
+    unset BOXES
     eval $boxesEnv
 else
     export BOXES=../boxes-config
