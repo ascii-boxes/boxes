@@ -15,7 +15,6 @@
     "editor.rulers": [120],
     "editor.wordWrapColumn": 120,
     "files.associations": {
-        "*.h.in": "c",
         "*.1.in": "troff"
     },
     "files.encoding": "utf8",

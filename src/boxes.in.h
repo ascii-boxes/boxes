@@ -30,6 +30,7 @@
 /* #define PARSER_DEBUG 1 */
 /* #define LEXER_DEBUG 1 */
 
+#include <stdio.h>
 #include <unitypes.h>
 #include "regulex.h"
 #include "shape.h"
@@ -181,4 +182,4 @@ extern input_t input;
 
 #endif /* BOXES_H */
 
-/*EOF*/                                  /* vim: set cindent sw=4 syntax=c: */
+/*EOF*/                                  /* vim: set cindent sw=4: */

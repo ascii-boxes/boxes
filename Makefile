@@ -58,10 +58,13 @@ infomsg:
 	@echo "| For compilation info please refer to the boxes compilation FAQ"
 	@echo "| at https://boxes.thomasjensen.com/docs/faq.html#q5"
 
-replaceinfos: src/boxes.h doc/boxes.1
+$(OUT_DIR):
+	mkdir $(OUT_DIR)
 
-src/boxes.h: src/boxes.h.in Makefile
-	sed -e 's/--BVERSION--/$(BVERSION) $(GIT_STATUS)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' src/boxes.h.in > src/boxes.h
+replaceinfos: $(OUT_DIR)/boxes.h doc/boxes.1
+
+$(OUT_DIR)/boxes.h: src/boxes.in.h Makefile | $(OUT_DIR)
+	sed -e 's/--BVERSION--/$(BVERSION) $(GIT_STATUS)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' src/boxes.in.h > $(OUT_DIR)/boxes.h
 
 doc/boxes.1: doc/boxes.1.in Makefile
 	sed -e 's/--BVERSION--/$(BVERSION)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' doc/boxes.1.in > doc/boxes.1
@@ -111,15 +114,15 @@ tools/LICENSE.txt: LICENSE
 tools/boxes.cfg: boxes-config
 	unix2dos -n boxes-config tools/boxes.cfg
 
-tools/boxes.exe: out/boxes.exe
-	cp out/boxes.exe tools/
+tools/boxes.exe: $(OUT_DIR)/boxes.exe
+	cp $(OUT_DIR)/boxes.exe tools/
 
-out/boxes.exe: win32
+$(OUT_DIR)/boxes.exe: win32
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 clean:
-	rm -f src/boxes.h tools/boxes.cfg tools/LICENSE.txt tools/boxes.exe tools/README*.md boxes.portable.*.nupkg
+	rm -f $(OUT_DIR)/boxes.h tools/boxes.cfg tools/LICENSE.txt tools/boxes.exe tools/README*.md boxes.portable.*.nupkg
 	rm -f doc/boxes.1 doc/boxes.1.raw.html doc/boxes.1.html
 	$(MAKE) -C src clean
 
