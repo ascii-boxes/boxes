@@ -3,7 +3,9 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/src/misc",
+                "${workspaceFolder}/out",
                 "${workspaceFolder}/pcre2-10.36/src"
             ],
             "defines": [
