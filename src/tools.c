@@ -42,45 +42,6 @@
 
 
 
-int yyerror(const char *fmt, ...)
-/*
- *  Print configuration file parser errors.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    va_list ap;
-
-    va_start (ap, fmt);
-
-    fprintf(stderr, "%s: %s: line %d: ", PROJECT,
-            yyfilename ? yyfilename : "(null)", tjlineno);
-    vfprintf(stderr, fmt, ap);
-    fputc('\n', stderr);
-
-    va_end (ap);
-
-    return 0;
-}
-
-
-
-void regerror(char *msg)
-/*
- *  Print regular expression andling error messages
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    fprintf(stderr, "%s: %s: line %d: %s\n",
-            PROJECT, yyfilename ? yyfilename : "(null)",
-            opt.design->current_rule ? opt.design->current_rule->line : 0,
-            msg);
-    errno = EINVAL;
-}
-
-
-
 int strisyes(const char *s)
 /*
  *  Determine if the string s has a contents indicating "yes".
