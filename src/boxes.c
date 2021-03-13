@@ -55,8 +55,6 @@ extern char *optarg;                 /* for getopt() */
 extern int optind, opterr, optopt;   /* for getopt() */
 
 design_t *designs = NULL;            /* available box designs */
-
-int design_idx = 0;                  /* anz_designs-1 */
 int anz_designs = 0;                 /* no of designs after parsing */
 
 opt_t opt;                           /* command line options */
@@ -888,7 +886,7 @@ static int list_styles()
     else {
         design_t **list;                 /* temp list for sorting */
 
-        list = (design_t **) calloc(design_idx + 1, sizeof(design_t *));
+        list = (design_t **) calloc(anz_designs, sizeof(design_t *));
         if (list == NULL) {
             perror(PROJECT);
             return 1;
@@ -897,7 +895,7 @@ static int list_styles()
         for (i = 0; i < anz_designs; ++i) {
             list[i] = &(designs[i]);
         }
-        qsort(list, design_idx + 1, sizeof(design_t *), style_sort);
+        qsort(list, anz_designs, sizeof(design_t *), style_sort);
 
         if (!opt.q) {
             print_design_list_header();

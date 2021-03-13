@@ -115,7 +115,6 @@ typedef struct {
 
 extern design_t *designs;
 extern int anz_designs;
-extern int design_idx;
 
 
 typedef struct {                         /* Command line options: */
