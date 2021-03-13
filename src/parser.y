@@ -69,7 +69,9 @@ typedef struct {
 /** required for bison-flex bridge */
 #define scanner bison_args->lexer_state
 
-/* TODO a #deinfe for bison_args->designs[bison_args->design_idx] */
+/** the current design being parsed */
+#define curdes (bison_args->designs[bison_args->design_idx])
+
 
 static int num_mandatory = 0;
 static int time_for_se_check = 0;
@@ -103,19 +105,18 @@ static int check_sizes(pass_to_bison *bison_args)
              *  horizontal
              */
             for (j=0; j<SHAPES_PER_SIDE-1; ++j) {
-                if (bison_args->designs[bison_args->design_idx].shape[sides[i][j]].height == 0)
+                if (curdes.shape[sides[i][j]].height == 0) {
                     continue;
+                }
                 for (k=j+1; k<SHAPES_PER_SIDE; ++k) {
-                    if (bison_args->designs[bison_args->design_idx].shape[sides[i][k]].height == 0)
+                    if (curdes.shape[sides[i][k]].height == 0) {
                         continue;
-                    if (bison_args->designs[bison_args->design_idx].shape[sides[i][j]].height
-                            != bison_args->designs[bison_args->design_idx].shape[sides[i][k]].height) {
+                    }
+                    if (curdes.shape[sides[i][j]].height != curdes.shape[sides[i][k]].height) {
                         yyerror(bison_args, "All shapes on horizontal sides must be of "
                                 "equal height (%s: %d, %s: %d)\n",
-                                shape_name[sides[i][j]],
-                                bison_args->designs[bison_args->design_idx].shape[sides[i][j]].height,
-                                shape_name[sides[i][k]],
-                                bison_args->designs[bison_args->design_idx].shape[sides[i][k]].height);
+                                shape_name[sides[i][j]], curdes.shape[sides[i][j]].height,
+                                shape_name[sides[i][k]], curdes.shape[sides[i][k]].height);
                         return 1;
                     }
                 }
@@ -126,19 +127,18 @@ static int check_sizes(pass_to_bison *bison_args)
              *  vertical
              */
             for (j=0; j<SHAPES_PER_SIDE-1; ++j) {
-                if (bison_args->designs[bison_args->design_idx].shape[sides[i][j]].width == 0)
+                if (curdes.shape[sides[i][j]].width == 0) {
                     continue;
+                }
                 for (k=j+1; k<SHAPES_PER_SIDE; ++k) {
-                    if (bison_args->designs[bison_args->design_idx].shape[sides[i][k]].width == 0)
+                    if (curdes.shape[sides[i][k]].width == 0) {
                         continue;
-                    if (bison_args->designs[bison_args->design_idx].shape[sides[i][j]].width
-                            != bison_args->designs[bison_args->design_idx].shape[sides[i][k]].width) {
+                    }
+                    if (curdes.shape[sides[i][j]].width != curdes.shape[sides[i][k]].width) {
                         yyerror(bison_args, "All shapes on vertical sides must be of "
                                 "equal width (%s: %d, %s: %d)\n",
-                                shape_name[sides[i][j]],
-                                bison_args->designs[bison_args->design_idx].shape[sides[i][j]].width,
-                                shape_name[sides[i][k]],
-                                bison_args->designs[bison_args->design_idx].shape[sides[i][k]].width);
+                                shape_name[sides[i][j]], curdes.shape[sides[i][j]].width,
+                                shape_name[sides[i][k]], curdes.shape[sides[i][k]].width);
                         return 1;
                     }
                 }
@@ -168,7 +168,7 @@ static int corner_check(pass_to_bison *bison_args)
     #endif
 
     for (c=0; c<ANZ_CORNERS; ++c) {
-        if (bison_args->designs[bison_args->design_idx].shape[corners[c]].elastic) {
+        if (curdes.shape[corners[c]].elastic) {
             yyerror(bison_args, "Corners may not be elastic (%s)", shape_name[corners[c]]);
             return 1;
         }
@@ -188,9 +188,9 @@ static shape_t non_existent_elastics(pass_to_bison *bison_args)
     #endif
 
     for (i=0; i<ANZ_SHAPES; ++i) {
-        if (bison_args->designs[bison_args->design_idx].shape[i].elastic
-         && isempty(bison_args->designs[bison_args->design_idx].shape+i))
+        if (curdes.shape[i].elastic && isempty(curdes.shape+i)) {
             return i;
+        }
     }
 
     return (shape_t) ANZ_SHAPES;         /* all elastic shapes exist */
@@ -207,11 +207,14 @@ static int insufficient_elasticity(pass_to_bison *bison_args)
     #endif
 
     for (i=0; i<ANZ_SIDES; ++i) {
-        for (j=1,ef=0; j<4; ++j)
-            if (bison_args->designs[bison_args->design_idx].shape[sides[i][j]].elastic)
+        for (j=1,ef=0; j<4; ++j) {
+            if (curdes.shape[sides[i][j]].elastic) {
                 ++ef;
-        if (ef != 1 && ef != 2)
+            }
+        }
+        if (ef != 1 && ef != 2) {
             return 1;                    /* error */
+        }
     }
 
     return 0;                            /* all clear */
@@ -230,13 +233,15 @@ static int adjoining_elastics(pass_to_bison *bison_args)
     for (i=0; i<ANZ_SIDES; ++i) {
         ef = 0;
         for (j=1; j<4; ++j) {
-            if (isempty(bison_args->designs[bison_args->design_idx].shape+sides[i][j]))
+            if (isempty(curdes.shape+sides[i][j])) {
                 continue;
-            if (bison_args->designs[bison_args->design_idx].shape[sides[i][j]].elastic) {
-                if (ef)
+            }
+            if (curdes.shape[sides[i][j]].elastic) {
+                if (ef) {
                     return 1;            /* error detected */
-                else
+                } else {
                     ef = 1;
+                }
             }
             else {
                 ef = 0;
@@ -300,16 +305,16 @@ static void recover(pass_to_bison *bison_args)
      /*
       *  Clear current design
       */
-     BFREE (bison_args->designs[bison_args->design_idx].name);
-     BFREE (bison_args->designs[bison_args->design_idx].author);
-     BFREE (bison_args->designs[bison_args->design_idx].designer);
-     BFREE (bison_args->designs[bison_args->design_idx].created);
-     BFREE (bison_args->designs[bison_args->design_idx].revision);
-     BFREE (bison_args->designs[bison_args->design_idx].revdate);
-     BFREE (bison_args->designs[bison_args->design_idx].sample);
-     BFREE (bison_args->designs[bison_args->design_idx].tags);
+     BFREE (curdes.name);
+     BFREE (curdes.author);
+     BFREE (curdes.designer);
+     BFREE (curdes.created);
+     BFREE (curdes.revision);
+     BFREE (curdes.revdate);
+     BFREE (curdes.sample);
+     BFREE (curdes.tags);
      memset (bison_args->designs + bison_args->design_idx, 0, sizeof(design_t));
-     bison_args->designs[bison_args->design_idx].indentmode = DEF_INDENTMODE;
+     curdes.indentmode = DEF_INDENTMODE;
 }
 
 
@@ -325,10 +330,12 @@ static int design_needed (const char *name, const int design_idx)
         return !strcasecmp (name, (char *) opt.design);
     }
     else {
-        if (opt.r || opt.l)
+        if (opt.r || opt.l) {
             return 1;
-        if (design_idx == 0)
+        }
+        if (design_idx == 0) {
             return 1;
+        }
     }
 
     return 0;
@@ -505,6 +512,7 @@ design: YBOX WORD
             YYERROR;
         }
     }
+
 layout YEND WORD
     {
         design_t *tmp;
@@ -541,8 +549,8 @@ layout YEND WORD
             ++p;
         }
 
-        bison_args->designs[bison_args->design_idx].name = (char *) strdup ($2);
-        if (bison_args->designs[bison_args->design_idx].name == NULL) {
+        curdes.name = (char *) strdup ($2);
+        if (curdes.name == NULL) {
             perror (PROJECT);
             YYABORT;
         }
@@ -569,8 +577,8 @@ layout YEND WORD
             YYABORT;
         }
         bison_args->designs = tmp;
-        memset (&(bison_args->designs[bison_args->design_idx]), 0, sizeof(design_t));
-        bison_args->designs[bison_args->design_idx].indentmode = DEF_INDENTMODE;
+        memset (&curdes, 0, sizeof(design_t));
+        curdes.indentmode = DEF_INDENTMODE;
     }
 ;
 
@@ -584,43 +592,43 @@ entry: KEYWORD STRING
             fprintf (stderr, "entry rule fulfilled [%s = %s]\n", $1, $2);
         #endif
         if (strcasecmp ($1, "author") == 0) {
-            bison_args->designs[bison_args->design_idx].author = (char *) strdup ($2);
-            if (bison_args->designs[bison_args->design_idx].author == NULL) {
+            curdes.author = (char *) strdup ($2);
+            if (curdes.author == NULL) {
                 perror (PROJECT);
                 YYABORT;
             }
         }
         else if (strcasecmp ($1, "designer") == 0) {
-            bison_args->designs[bison_args->design_idx].designer = (char *) strdup ($2);
-            if (bison_args->designs[bison_args->design_idx].designer == NULL) {
+            curdes.designer = (char *) strdup ($2);
+            if (curdes.designer == NULL) {
                 perror (PROJECT);
                 YYABORT;
             }
         }
         else if (strcasecmp ($1, "revision") == 0) {
-            bison_args->designs[bison_args->design_idx].revision = (char *) strdup ($2);
-            if (bison_args->designs[bison_args->design_idx].revision == NULL) {
+            curdes.revision = (char *) strdup ($2);
+            if (curdes.revision == NULL) {
                 perror (PROJECT);
                 YYABORT;
             }
         }
         else if (strcasecmp ($1, "created") == 0) {
-            bison_args->designs[bison_args->design_idx].created = (char *) strdup ($2);
-            if (bison_args->designs[bison_args->design_idx].created == NULL) {
+            curdes.created = (char *) strdup ($2);
+            if (curdes.created == NULL) {
                 perror (PROJECT);
                 YYABORT;
             }
         }
         else if (strcasecmp ($1, "revdate") == 0) {
-            bison_args->designs[bison_args->design_idx].revdate = (char *) strdup ($2);
-            if (bison_args->designs[bison_args->design_idx].revdate == NULL) {
+            curdes.revdate = (char *) strdup ($2);
+            if (curdes.revdate == NULL) {
                 perror (PROJECT);
                 YYABORT;
             }
         }
         else if (strcasecmp ($1, "tags") == 0) {
-            bison_args->designs[bison_args->design_idx].tags = (char *) strdup ($2);
-            if (bison_args->designs[bison_args->design_idx].tags == NULL) {
+            curdes.tags = (char *) strdup ($2);
+            if (curdes.tags == NULL) {
                 perror (PROJECT);
                 YYABORT;
             }
@@ -629,7 +637,7 @@ entry: KEYWORD STRING
             if (strcasecmp ($2, "text") == 0 ||
                 strcasecmp ($2, "box") == 0 ||
                 strcasecmp ($2, "none") == 0) {
-                bison_args->designs[bison_args->design_idx].indentmode = $2[0];
+                curdes.indentmode = $2[0];
             }
             else {
                 yyerror(bison_args, "indent keyword must be followed by \"text\", "
@@ -682,7 +690,7 @@ block: YSAMPLE STRING YENDSAMPLE
             fprintf (stderr, "SAMPLE block rule satisfied\n");
         #endif
 
-        if (bison_args->designs[bison_args->design_idx].sample) {
+        if (curdes.sample) {
             yyerror(bison_args, "duplicate SAMPLE block");
             YYERROR;
         }
@@ -692,7 +700,7 @@ block: YSAMPLE STRING YENDSAMPLE
             YYABORT;
         }
 
-        bison_args->designs[bison_args->design_idx].sample = line;
+        curdes.sample = line;
         ++num_mandatory;
     }
 
@@ -718,7 +726,7 @@ block: YSAMPLE STRING YENDSAMPLE
          *  as necessary, starting at any side which already includes at
          *  least one shape in order to ensure correct measurements.
          */
-        fshape = findshape (bison_args->designs[bison_args->design_idx].shape, ANZ_SHAPES);
+        fshape = findshape (curdes.shape, ANZ_SHAPES);
         if (fshape == ANZ_SHAPES) {
             yyerror(bison_args, "internal error");
             YYABORT;                        /* never happens ;-) */
@@ -732,28 +740,31 @@ block: YSAMPLE STRING YENDSAMPLE
         for (sc=0,side=fside; sc<ANZ_SIDES; ++sc,side=(side+1)%ANZ_SIDES) {
             shape_t   nshape;               /* next shape */
             sentry_t *c;                    /* corner to be processed */
-            c = bison_args->designs[bison_args->design_idx].shape + sides[side][SHAPES_PER_SIDE-1];
+            c = curdes.shape + sides[side][SHAPES_PER_SIDE-1];
 
             if (isempty(c)) {
                 nshape = findshape (c, SHAPES_PER_SIDE);
                 if (side == BLEF || side == BRIG) {
-                    if (nshape == SHAPES_PER_SIDE)
+                    if (nshape == SHAPES_PER_SIDE) {
                         c->height = 1;
-                    else
+                    } else {
                         c->height = c[nshape].height;
-                    c->width = bison_args->designs[bison_args->design_idx].shape[fshape].width;
+                    }
+                    c->width = curdes.shape[fshape].width;
                 }
                 else {
-                    if (nshape == SHAPES_PER_SIDE)
+                    if (nshape == SHAPES_PER_SIDE) {
                         c->width = 1;
-                    else
+                    } else {
                         c->width = c[nshape].width;
-                    c->height = bison_args->designs[bison_args->design_idx].shape[fshape].height;
+                    }
+                    c->height = curdes.shape[fshape].height;
                 }
                 c->elastic = 0;
                 rc = genshape (c->width, c->height, &(c->chars));
-                if (rc)
+                if (rc) {
                     YYABORT;
+                }
             }
 
             fshape = sides[side][SHAPES_PER_SIDE-1];
@@ -766,36 +777,39 @@ block: YSAMPLE STRING YENDSAMPLE
         for (side=0; side<ANZ_SIDES; ++side) {
             int found = 0;
             for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
-                if (isempty (bison_args->designs[bison_args->design_idx].shape + sides[side][i]))
+                if (isempty (curdes.shape + sides[side][i])) {
                     continue;
-                else
+                } else {
                     found = 1;
+                }
             }
             if (!found) {
-                sentry_t *c = bison_args->designs[bison_args->design_idx].shape
-                    + sides[side][SHAPES_PER_SIDE/2];
+                sentry_t *c = curdes.shape + sides[side][SHAPES_PER_SIDE/2];
                 if (side == BLEF || side == BRIG) {
-                    c->width = bison_args->designs[bison_args->design_idx].shape[sides[side][0]].width;
+                    c->width = curdes.shape[sides[side][0]].width;
                     c->height = 1;
                 }
                 else {
                     c->width = 1;
-                    c->height = bison_args->designs[bison_args->design_idx].shape[sides[side][0]].height;
+                    c->height = curdes.shape[sides[side][0]].height;
                 }
                 c->elastic = 1;
                 rc = genshape (c->width, c->height, &(c->chars));
-                if (rc)
+                if (rc) {
                     YYABORT;
+                }
             }
         }
 
-        if (check_sizes(bison_args))
+        if (check_sizes(bison_args)) {
             YYERROR;
+        }
 
         ++num_mandatory;
         if (++time_for_se_check > 1) {
-            if (perform_se_check(bison_args) != 0)
+            if (perform_se_check(bison_args) != 0) {
                 YYERROR;
+            }
         }
 
         /*
@@ -805,19 +819,23 @@ block: YSAMPLE STRING YENDSAMPLE
             size_t c = 0;
             if (i % 2) {                 /* vertical sides */
                 for (j=0; j<SHAPES_PER_SIDE; ++j) {
-                    if (!isempty(bison_args->designs[bison_args->design_idx].shape + sides[i][j]))
-                        c += bison_args->designs[bison_args->design_idx].shape[sides[i][j]].height;
+                    if (!isempty(curdes.shape + sides[i][j])) {
+                        c += curdes.shape[sides[i][j]].height;
+                    }
                 }
-                if (c > bison_args->designs[bison_args->design_idx].minheight)
-                    bison_args->designs[bison_args->design_idx].minheight = c;
+                if (c > curdes.minheight) {
+                    curdes.minheight = c;
+                }
             }
             else {                       /* horizontal sides */
                 for (j=0; j<SHAPES_PER_SIDE; ++j) {
-                    if (!isempty(bison_args->designs[bison_args->design_idx].shape + sides[i][j]))
-                        c += bison_args->designs[bison_args->design_idx].shape[sides[i][j]].width;
+                    if (!isempty(curdes.shape + sides[i][j])) {
+                        c += curdes.shape[sides[i][j]].width;
+                    }
                 }
-                if (c > bison_args->designs[bison_args->design_idx].minwidth)
-                    bison_args->designs[bison_args->design_idx].minwidth = c;
+                if (c > curdes.minwidth) {
+                    curdes.minwidth = c;
+                }
             }
         }
 
@@ -825,16 +843,18 @@ block: YSAMPLE STRING YENDSAMPLE
          *  Compute height of highest shape in design
          */
         for (i=0; i<ANZ_SHAPES; ++i) {
-            if (isempty(bison_args->designs[bison_args->design_idx].shape + i))
+            if (isempty(curdes.shape + i)) {
                 continue;
-            if (bison_args->designs[bison_args->design_idx].shape[i].height > bison_args->designs[bison_args->design_idx].maxshapeheight)
-                bison_args->designs[bison_args->design_idx].maxshapeheight = bison_args->designs[bison_args->design_idx].shape[i].height;
+            }
+            if (curdes.shape[i].height > curdes.maxshapeheight) {
+                curdes.maxshapeheight = curdes.shape[i].height;
+            }
         }
         #ifdef PARSER_DEBUG
             fprintf (stderr, "Minimum box dimensions: width %d height %d\n",
-                    (int) bison_args->designs[bison_args->design_idx].minwidth, (int) bison_args->designs[bison_args->design_idx].minheight);
+                    (int) curdes.minwidth, (int) curdes.minheight);
             fprintf (stderr, "Maximum shape height: %d\n",
-                    (int) bison_args->designs[bison_args->design_idx].maxshapeheight);
+                    (int) curdes.maxshapeheight);
         #endif
     }
 
@@ -842,81 +862,68 @@ block: YSAMPLE STRING YENDSAMPLE
     {
         ++num_mandatory;
         if (++time_for_se_check > 1) {
-            if (perform_se_check(bison_args) != 0)
+            if (perform_se_check(bison_args) != 0) {
                 YYERROR;
+            }
         }
     }
 
 | YREPLACE rflag STRING YWITH STRING
     {
-        int a = bison_args->designs[bison_args->design_idx].anz_reprules;
+        int a = curdes.anz_reprules;
 
         #ifdef PARSER_DEBUG
             fprintf (stderr, "Adding replacement rule: \"%s\" with \"%s\" (%c)\n",
                     $3, $5, $2);
         #endif
 
-        bison_args->designs[bison_args->design_idx].reprules = (reprule_t *) realloc
-            (bison_args->designs[bison_args->design_idx].reprules, (a+1) * sizeof(reprule_t));
-        if (bison_args->designs[bison_args->design_idx].reprules == NULL) {
+        curdes.reprules = (reprule_t *) realloc (curdes.reprules, (a+1) * sizeof(reprule_t));
+        if (curdes.reprules == NULL) {
             perror (PROJECT);
             YYABORT;
         }
-        memset (&(bison_args->designs[bison_args->design_idx].reprules[a]), 0, sizeof(reprule_t));
-        bison_args->designs[bison_args->design_idx].reprules[a].search =
-            (char *) strdup ($3);
-        bison_args->designs[bison_args->design_idx].reprules[a].repstr =
-            (char *) strdup ($5);
-        if (bison_args->designs[bison_args->design_idx].reprules[a].search == NULL
-         || bison_args->designs[bison_args->design_idx].reprules[a].repstr == NULL)
-        {
+        memset (&(curdes.reprules[a]), 0, sizeof(reprule_t));
+        curdes.reprules[a].search = (char *) strdup ($3);
+        curdes.reprules[a].repstr = (char *) strdup ($5);
+        if (curdes.reprules[a].search == NULL || curdes.reprules[a].repstr == NULL) {
             perror (PROJECT);
             YYABORT;
         }
-        bison_args->designs[bison_args->design_idx].reprules[a].line = yyget_lineno(scanner);
-        bison_args->designs[bison_args->design_idx].reprules[a].mode = $2;
-        bison_args->designs[bison_args->design_idx].anz_reprules = a + 1;
+        curdes.reprules[a].line = yyget_lineno(scanner);
+        curdes.reprules[a].mode = $2;
+        curdes.anz_reprules = a + 1;
     }
 
 | YREVERSE rflag STRING YTO STRING
     {
-        int a = bison_args->designs[bison_args->design_idx].anz_revrules;
+        int a = curdes.anz_revrules;
 
         #ifdef PARSER_DEBUG
-            fprintf (stderr, "Adding reversion rule: \"%s\" to \"%s\" (%c)\n",
-                    $3, $5, $2);
+            fprintf (stderr, "Adding reversion rule: \"%s\" to \"%s\" (%c)\n", $3, $5, $2);
         #endif
 
-        bison_args->designs[bison_args->design_idx].revrules = (reprule_t *) realloc
-            (bison_args->designs[bison_args->design_idx].revrules, (a+1) * sizeof(reprule_t));
-        if (bison_args->designs[bison_args->design_idx].revrules == NULL) {
+        curdes.revrules = (reprule_t *) realloc (curdes.revrules, (a+1) * sizeof(reprule_t));
+        if (curdes.revrules == NULL) {
             perror (PROJECT);
             YYABORT;
         }
-        memset (&(bison_args->designs[bison_args->design_idx].revrules[a]), 0, sizeof(reprule_t));
-        bison_args->designs[bison_args->design_idx].revrules[a].search =
-            (char *) strdup ($3);
-        bison_args->designs[bison_args->design_idx].revrules[a].repstr =
-            (char *) strdup ($5);
-        if (bison_args->designs[bison_args->design_idx].revrules[a].search == NULL
-         || bison_args->designs[bison_args->design_idx].revrules[a].repstr == NULL)
-        {
+        memset (&(curdes.revrules[a]), 0, sizeof(reprule_t));
+        curdes.revrules[a].search = (char *) strdup ($3);
+        curdes.revrules[a].repstr = (char *) strdup ($5);
+        if (curdes.revrules[a].search == NULL || curdes.revrules[a].repstr == NULL) {
             perror (PROJECT);
             YYABORT;
         }
-        bison_args->designs[bison_args->design_idx].revrules[a].line = yyget_lineno(scanner);
-        bison_args->designs[bison_args->design_idx].revrules[a].mode = $2;
-        bison_args->designs[bison_args->design_idx].anz_revrules = a + 1;
+        curdes.revrules[a].line = yyget_lineno(scanner);
+        curdes.revrules[a].mode = $2;
+        curdes.anz_revrules = a + 1;
     }
 
 | YPADDING '{' wlist '}'
     {
         #ifdef PARSER_DEBUG
             fprintf (stderr, "Padding set to (l%d o%d r%d u%d)\n",
-                    bison_args->designs[bison_args->design_idx].padding[BLEF],
-                    bison_args->designs[bison_args->design_idx].padding[BTOP],
-                    bison_args->designs[bison_args->design_idx].padding[BRIG],
-                    bison_args->designs[bison_args->design_idx].padding[BBOT]);
+                curdes.padding[BLEF], curdes.padding[BTOP], curdes.padding[BRIG], curdes.padding[BBOT]);
         #endif
     }
 ;
@@ -942,7 +949,7 @@ elist_entry: SHAPE
             fprintf (stderr, "Marked \'%s\' shape as elastic\n",
                     shape_name[(int)$1]);
         #endif
-        bison_args->designs[bison_args->design_idx].shape[$1].elastic = 1;
+        curdes.shape[$1].elastic = 1;
     }
 ;
 
@@ -957,10 +964,11 @@ slist_entry: SHAPE shape_def
                     "height %d)\n", shape_name[$1], (int) $2.width, (int) $2.height);
         #endif
 
-        if (isempty (bison_args->designs[bison_args->design_idx].shape + $1)) {
-            bison_args->designs[bison_args->design_idx].shape[$1] = $2;
-            if (!isdeepempty(&($2)))
+        if (isempty (curdes.shape + $1)) {
+            curdes.shape[$1] = $2;
+            if (!isdeepempty(&($2))) {
                 ++num_shapespec;
+            }
         }
         else {
             yyerror(bison_args, "duplicate specification for %s shape", shape_name[$1]);
@@ -1047,36 +1055,35 @@ wlist: wlist wlist_entry | wlist_entry;
 wlist_entry: WORD YNUMBER
     {
         if ($2 < 0) {
-            yyerror(bison_args, "padding must be a positive integer (%s %d) (ignored)",
-                    $1, $2);
+            yyerror(bison_args, "padding must be a positive integer (%s %d) (ignored)", $1, $2);
         }
         else {
             size_t len1 = strlen ($1);
             if (len1 <= 3 && !strncasecmp ("all", $1, len1)) {
-                bison_args->designs[bison_args->design_idx].padding[BTOP] = $2;
-                bison_args->designs[bison_args->design_idx].padding[BBOT] = $2;
-                bison_args->designs[bison_args->design_idx].padding[BLEF] = $2;
-                bison_args->designs[bison_args->design_idx].padding[BRIG] = $2;
+                curdes.padding[BTOP] = $2;
+                curdes.padding[BBOT] = $2;
+                curdes.padding[BLEF] = $2;
+                curdes.padding[BRIG] = $2;
             }
             else if (len1 <= 10 && !strncasecmp ("horizontal", $1, len1)) {
-                bison_args->designs[bison_args->design_idx].padding[BRIG] = $2;
-                bison_args->designs[bison_args->design_idx].padding[BLEF] = $2;
+                curdes.padding[BRIG] = $2;
+                curdes.padding[BLEF] = $2;
             }
             else if (len1 <= 8 && !strncasecmp ("vertical", $1, len1)) {
-                bison_args->designs[bison_args->design_idx].padding[BTOP] = $2;
-                bison_args->designs[bison_args->design_idx].padding[BBOT] = $2;
+                curdes.padding[BTOP] = $2;
+                curdes.padding[BBOT] = $2;
             }
             else if (len1 <= 3 && !strncasecmp ("top", $1, len1)) {
-                bison_args->designs[bison_args->design_idx].padding[BTOP] = $2;
+                curdes.padding[BTOP] = $2;
             }
             else if (len1 <= 5 && !strncasecmp ("right", $1, len1)) {
-                bison_args->designs[bison_args->design_idx].padding[BRIG] = $2;
+                curdes.padding[BRIG] = $2;
             }
             else if (len1 <= 4 && !strncasecmp ("left", $1, len1)) {
-                bison_args->designs[bison_args->design_idx].padding[BLEF] = $2;
+                curdes.padding[BLEF] = $2;
             }
             else if (len1 <= 6 && !strncasecmp ("bottom", $1, len1)) {
-                bison_args->designs[bison_args->design_idx].padding[BBOT] = $2;
+                curdes.padding[BBOT] = $2;
             }
             else {
                 yyerror(bison_args, "invalid padding area %s (ignored)", $1);
