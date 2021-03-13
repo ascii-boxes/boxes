@@ -32,8 +32,11 @@
 #include "lex.yy.h"
 
 
-/* file name of config file used */
-char *config_file_name = NULL;
+/* file name of the config file currently being parsed */
+char *current_config_file_name = NULL;
+
+/** file handle of the config file currently being parsed */
+static FILE *current_config_handle = NULL;
 
 /** names of config files specified via "parent" */
 char **parent_configs = NULL;
@@ -48,22 +51,22 @@ static pass_to_bison *current_bison_args = NULL;
 
 
 /**
- *  Set yyin and config_file_name to the config file to be used.
+ *  Set yyin and current_config_file_name to the config file to be used.
  *
  *  @param bison_args the bison args that we set up in the calling function
  *  @param config_file_path the new file name to set
- *  @return 0 if successful (yyin and config_file_name are set)  
+ *  @return 0 if successful (yyin and current_config_file_name are set)  
  *          != 0 on error (yyin is unmodified)
  */
 static int open_yy_config_file(pass_to_bison *bison_args, const char *config_file_path)
 {
-    FILE *new_yyin = fopen(config_file_path, "r");
-    if (new_yyin == NULL) {
+    current_config_handle = fopen(config_file_path, "r");
+    if (current_config_handle == NULL) {
         fprintf(stderr, "%s: Couldn't open config file '%s' for input\n", PROJECT, config_file_path);
         return 1;
     }
-    config_file_name = (char *) config_file_path;
-    yyset_in(new_yyin, bison_args->lexer_state);
+    current_config_file_name = (char *) config_file_path;
+    yyset_in(current_config_handle, bison_args->lexer_state);
     // TODO to reset parser, ‘YY_FLUSH_BUFFER’ and BEGIN INITIAL after each change to yyin.
     // --> should be ok, because we delete the whole buffer at the beginning, but BEGIN INITIAL may make sense
     return 0;
@@ -76,10 +79,10 @@ void print_design_list_header()
     sprintf(buf, "%d", anz_designs);
 
     fprintf(opt.outfile, "%d Available Style%s in \"%s\":\n",
-            anz_designs, anz_designs == 1 ? "" : "s", config_file_name);
+            anz_designs, anz_designs == 1 ? "" : "s", current_config_file_name);
     fprintf(opt.outfile, "-----------------------%s",
             anz_designs == 1 ? "" : "-");
-    for (int i = strlen(config_file_name) + strlen(buf); i > 0; --i) {
+    for (int i = strlen(current_config_file_name) + strlen(buf); i > 0; --i) {
         fprintf(opt.outfile, "-");
     }
     fprintf(opt.outfile, "\n\n");
@@ -102,7 +105,7 @@ int yyerror(pass_to_bison *bison_args, const char *fmt, ...)
 
     pass_to_bison *bargs = bison_args ? bison_args : current_bison_args;
     fprintf(stderr, "%s: %s: line %d: ", PROJECT,
-            config_file_name ? config_file_name : "(null)",
+            current_config_file_name ? current_config_file_name : "(null)",
             yyget_lineno(bargs->lexer_state));
     vfprintf(stderr, fmt, ap);
     fputc('\n', stderr);
@@ -125,7 +128,9 @@ static design_t *parse_config_file(const char *config_file, size_t *r_num_design
     pass_to_bison bison_args;
     bison_args.designs = NULL;
     bison_args.num_designs = 0;
+    bison_args.design_idx = 0;
     bison_args.lexer_state = NULL;
+    current_bison_args = &bison_args;
 
     yylex_init (&(bison_args.lexer_state));
     int rc = open_yy_config_file(&bison_args, config_file);
@@ -133,11 +138,17 @@ static design_t *parse_config_file(const char *config_file, size_t *r_num_design
         return NULL;
     }
     inflate_inbuf(bison_args.lexer_state, config_file);
-    rc = yyparse (&bison_args);
+    rc = yyparse(&bison_args);
     yylex_destroy(bison_args.lexer_state);
 
-    // TODO error handling
+    if (current_config_handle != NULL) {
+        fclose(current_config_handle);
+        current_config_handle = NULL;
+    }
 
+    if (rc) {
+        return NULL;
+    }
     *r_num_designs = bison_args.num_designs;
     return bison_args.designs;
 }
@@ -146,10 +157,7 @@ static design_t *parse_config_file(const char *config_file, size_t *r_num_design
 
 design_t *parse_config_files(const char *first_config_file, size_t *r_num_designs)
 {
-    // TODO HERE much code
-
-    // TODO Call fclose() on yyin when we're done parsing!
-
+    // TODO much code
 
     return parse_config_file(first_config_file, r_num_designs);
 }
