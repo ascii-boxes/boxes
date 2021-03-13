@@ -81,7 +81,7 @@ flags_:
 	@echo Please call make from the top level directory.
 	exit 1
 
-parser.c parser.h: parser.y | check_dir
+parser.c parser.h: parser.y lex.yy.h | check_dir
 	$(YACC) --warnings=all --verbose --defines=parser.h --output=parser.c $<
 	cpp -I. -I$(SRC_DIR) -P parser.c parser.p
 
