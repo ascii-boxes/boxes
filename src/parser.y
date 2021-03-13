@@ -25,7 +25,6 @@
 
 #include "boxes.h"
 
-extern int speeding;
 
 /** all the arguments which we pass to the bison parser */
 typedef struct {
@@ -40,6 +39,31 @@ typedef struct {
 
     /** the path to the config file we are parsing */
     char *config_file;
+
+    /** the currently active string delimiter character */
+    char sdel;
+
+    /** the currently active string escape character */
+    char sesc;
+
+    int num_mandatory;
+
+    int time_for_se_check;
+
+    /** number of user-specified shapes */
+    int num_shapespec;
+
+    /** used to limit "skipping" msgs */
+    int skipping;
+
+    /** true if we're skipping designs, but no error */
+    int speeding;
+
+    /** names of config files specified via "parent" */
+    char **parent_configs;
+
+    /** number of parent config files (size of parent_configs array) */
+    size_t num_parent_configs;
 
     /** the flex scanner, which is explicitly passed to reentrant bison */
     void *lexer_state;
@@ -62,26 +86,18 @@ typedef struct {
 #include "parser.h"
 #include "lex.yy.h"
 
+
 /*
  *  Valid characters to be used as string delimiters. Note that the
  *  following list must correspond to the DELIM definition in lexer.l.
  */
 #define LEX_SDELIM  "\"~'`!@%&*=:;<>?/|.\\"
 
-
 /** required for bison-flex bridge */
 #define scanner bison_args->lexer_state
 
 /** the current design being parsed */
 #define curdes (bison_args->designs[bison_args->design_idx])
-
-
-static int num_mandatory = 0;
-static int time_for_se_check = 0;
-static int num_shapespec = 0;            /* number of user-specified shapes */
-
-int speeding = 0;                        /* true if we're skipping designs, but no error */
-static int skipping = 0;                 /* used to limit "skipping" msgs */
 
 
 
@@ -293,6 +309,17 @@ static int perform_se_check(pass_to_bison *bison_args)
 
 
 
+static void chg_strdelims (pass_to_bison *bison_args, const char asesc, const char asdel)
+{
+    #ifdef PARSER_DEBUG
+        fprintf (stderr, " STATUS: chg_strdelims ('%c', '%c') - This changes lexer behavior!\n", asesc, asdel);
+    #endif
+    bison_args->sesc = asesc;
+    bison_args->sdel = asdel;
+}
+
+
+
 static void recover(pass_to_bison *bison_args)
 /*
  *  Reset parser to neutral state, so a new design can be parsed.
@@ -300,10 +327,10 @@ static void recover(pass_to_bison *bison_args)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-     num_mandatory = 0;
-     time_for_se_check = 0;
-     num_shapespec = 0;
-     chg_strdelims ('\\', '\"');
+     bison_args->num_mandatory = 0;
+     bison_args->time_for_se_check = 0;
+     bison_args->num_shapespec = 0;
+     chg_strdelims(bison_args, '\\', '\"');
 
      /*
       *  Clear current design
@@ -358,7 +385,6 @@ static int design_needed (const char *name, const int design_idx)
 |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|_*/
 
 %define api.pure true
-%pure-parser
 %lex-param {void *scanner}
 %parse-param {pass_to_bison *bison_args}
 
@@ -375,6 +401,7 @@ static int design_needed (const char *name, const int design_idx)
 %token <s> KEYWORD
 %token <s> WORD
 %token <s> STRING
+%token <s> FILENAME
 %token <shape> SHAPE
 %token <num> YNUMBER
 %token <c> YRXPFLAG
@@ -410,6 +437,7 @@ first_rule:
             YYABORT;
         }
         bison_args->num_designs = 1;
+
         bison_args->designs->indentmode = DEF_INDENTMODE;
         bison_args->designs->defined_in = bison_args->config_file;
     }
@@ -424,14 +452,11 @@ config_file
         if (bison_args->design_idx == 0) {
             BFREE (bison_args->designs);
             bison_args->num_designs = 0;
-            if (opt.design_choice_by_user) {
-                fprintf (stderr, "%s: unknown box design -- %s\n",
-                        PROJECT, (char *) opt.design);
+            if (!opt.design_choice_by_user && bison_args->num_parent_configs == 0) {
+                fprintf (stderr, "%s: no valid data in config file -- %s\n", PROJECT, bison_args->config_file);
+                YYABORT;
             }
-            else {
-                yyerror(bison_args, "no valid designs found");
-            }
-            YYABORT;
+            YYACCEPT;
         }
 
         --(bison_args->design_idx);
@@ -444,21 +469,21 @@ config_file
         bison_args->designs = tmp;
     }
 
-parent_def: YPARENT STRING
+parent_def: YPARENT FILENAME
     {
         char *filepath = $2;
         #ifdef PARSER_DEBUG
             fprintf (stderr, "parent config file specified: [%s]\n", filepath);
         #endif
         if (filepath == NULL || filepath[0] == '\0') {
-            skipping = 1;
+            bison_args->skipping = 1;
             yyerror(bison_args, "parent reference is empty");
             YYERROR;
         }
         else if (strcasecmp(filepath, ":global:") == 0) {    /* special token */
             filepath = discover_config_file(1);
             if (filepath == NULL) {
-                skipping = 1;   /* prevent redundant "skipping to next design" message */
+                bison_args->skipping = 1;   /* prevent redundant "skipping to next design" message */
                 yyerror(bison_args, "parent reference to global config which cannot be found");
                 YYERROR;
             }
@@ -466,7 +491,7 @@ parent_def: YPARENT STRING
         else {
             FILE *f = fopen(filepath, "r");
             if (f == NULL) {
-                skipping = 1;
+                bison_args->skipping = 1;
                 yyerror(bison_args, "parent config file not found: %s", filepath);
                 YYERROR;
             }
@@ -478,16 +503,17 @@ parent_def: YPARENT STRING
             fprintf (stderr, "parent config file path resolved: [%s]\n", filepath);
         #endif
         
-        int is_new = !array_contains(parent_configs, num_parent_configs, filepath);
+        int is_new = !array_contains(bison_args->parent_configs, bison_args->num_parent_configs, filepath);
         if (!is_new) {
             #ifdef PARSER_DEBUG
                 fprintf (stderr, "duplicate parent / cycle: [%s]\n", filepath);
             #endif
         }
         else {
-            parent_configs = realloc(parent_configs, (num_parent_configs + 1) * sizeof(char *));
-            parent_configs[num_parent_configs] = filepath;
-            ++num_parent_configs;
+            bison_args->parent_configs = realloc(bison_args->parent_configs,
+                    (bison_args->num_parent_configs + 1) * sizeof(char *));
+            bison_args->parent_configs[bison_args->num_parent_configs] = filepath;
+            ++(bison_args->num_parent_configs);
         }
     }
 
@@ -496,20 +522,21 @@ config_file: config_file design_or_error | design_or_error | config_file parent_
 
 design_or_error: design | error
     {
-        if (!speeding && !skipping) {
+        if (!(bison_args->speeding) && !(bison_args->skipping)) {
             recover(bison_args);
             yyerror(bison_args, "skipping to next design");
-            skipping = 1;
+            bison_args->skipping = 1;
         }
     }
 
 
 design: YBOX WORD
     {
-        chg_strdelims ('\\', '\"');
-        skipping = 0;
+        chg_strdelims(bison_args, '\\', '\"');
+        bison_args->speeding = 0;
+        bison_args->skipping = 0;
         if (!design_needed ($2, bison_args->design_idx)) {
-            speeding = 1;
+            bison_args->speeding = 1;
             begin_speedmode(scanner);
             YYERROR;
         }
@@ -529,7 +556,7 @@ layout YEND WORD
             yyerror(bison_args, "box design name differs at BOX and END");
             YYERROR;
         }
-        if (num_mandatory < 3) {
+        if (bison_args->num_mandatory < 3) {
             yyerror(bison_args, "entries SAMPLE, SHAPES, and ELASTIC are mandatory");
             YYERROR;
         }
@@ -556,9 +583,9 @@ layout YEND WORD
             perror (PROJECT);
             YYABORT;
         }
-        num_mandatory = 0;
-        time_for_se_check = 0;
-        num_shapespec = 0;
+        bison_args->num_mandatory = 0;
+        bison_args->time_for_se_check = 0;
+        bison_args->num_shapespec = 0;
 
         /*
          *  Check if we need to continue parsing. If not, return.
@@ -655,6 +682,24 @@ entry: KEYWORD STRING
         }
     }
 
+| YPARENT FILENAME
+    {
+        char *filename = $2;
+        if (filename[0] != filename[strlen(filename) - 1]
+            || (filename[0] >= 'a' && filename[0] <= 'z')
+            || (filename[0] >= 'A' && filename[0] <= 'Z')
+            || (filename[0] >= '0' && filename[0] <= '9'))
+        {
+            yyerror(bison_args, "string expected", filename);
+            YYERROR;
+        }
+        else {
+            #ifdef PARSER_DEBUG
+                fprintf (stderr, "%s: Discarding entry [%s = %s].\n", PROJECT, "parent", filename);
+            #endif
+        }
+    }
+
 | YCHGDEL YDELWORD
     {
         if (strlen($2) != 2) {
@@ -670,7 +715,7 @@ entry: KEYWORD STRING
                     ($2)[1], LEX_SDELIM);
             YYERROR;
         }
-        chg_strdelims ($2[0], $2[1]);
+        chg_strdelims(bison_args, $2[0], $2[1]);
     }
 
 | WORD STRING
@@ -704,7 +749,7 @@ block: YSAMPLE STRING YENDSAMPLE
         }
 
         curdes.sample = line;
-        ++num_mandatory;
+        ++(bison_args->num_mandatory);
     }
 
 | YSHAPES  '{' slist  '}'
@@ -719,7 +764,7 @@ block: YSAMPLE STRING YENDSAMPLE
         /*
          *  At least one shape must be specified
          */
-        if (num_shapespec < 1) {
+        if (bison_args->num_shapespec < 1) {
             yyerror(bison_args, "must specify at least one non-empty shape per design");
             YYERROR;
         }
@@ -808,8 +853,8 @@ block: YSAMPLE STRING YENDSAMPLE
             YYERROR;
         }
 
-        ++num_mandatory;
-        if (++time_for_se_check > 1) {
+        ++(bison_args->num_mandatory);
+        if (++(bison_args->time_for_se_check) > 1) {
             if (perform_se_check(bison_args) != 0) {
                 YYERROR;
             }
@@ -863,8 +908,8 @@ block: YSAMPLE STRING YENDSAMPLE
 
 | YELASTIC '(' elist ')'
     {
-        ++num_mandatory;
-        if (++time_for_se_check > 1) {
+        ++(bison_args->num_mandatory);
+        if (++(bison_args->time_for_se_check) > 1) {
             if (perform_se_check(bison_args) != 0) {
                 YYERROR;
             }
@@ -970,7 +1015,7 @@ slist_entry: SHAPE shape_def
         if (isempty (curdes.shape + $1)) {
             curdes.shape[$1] = $2;
             if (!isdeepempty(&($2))) {
-                ++num_shapespec;
+                ++(bison_args->num_shapespec);
             }
         }
         else {

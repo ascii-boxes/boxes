@@ -28,20 +28,8 @@
 #include "parser.h"
 
 
-/** file name of config file used */
-extern char *config_file_name;
-
-/** names of config files specified via "parent" */
-extern char **parent_configs;
-
-/** number of parent config files (size of parent_configs array) */
-extern size_t num_parent_configs;
-
-
-
 /**
- * Print the header for the design list output, which includes the file name.
- * TODO what if more file names used?
+ * Print the header for the design list output, which includes the file name(s).
  */
 void print_design_list_header();
 

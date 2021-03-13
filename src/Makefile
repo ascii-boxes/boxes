@@ -94,7 +94,7 @@ tools.o:     tools.c tools.h boxes.h shape.h unicode.h config.h | check_dir
 unicode.o:   unicode.c unicode.h boxes.h tools.h config.h | check_dir
 shape.o:     shape.c shape.h boxes.h tools.h config.h | check_dir
 generate.o:  generate.c generate.h boxes.h shape.h tools.h unicode.h config.h | check_dir
-parsing.o:   parsing.c parsing.h boxes.h config.h | check_dir
+parsing.o:   parsing.c parsing.h parser.h lex.yy.h boxes.h tools.h config.h | check_dir
 remove.o:    remove.c remove.h boxes.h shape.h tools.h unicode.h config.h | check_dir
 regulex.o:   regulex.c regulex.h boxes.h tools.h unicode.h config.h | check_dir
 getopt.o:    misc/getopt.c misc/getopt.h | check_dir
