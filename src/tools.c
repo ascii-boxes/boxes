@@ -268,13 +268,13 @@ size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_
     size_t tabnum = 0; /* index of the current tab */
 
     *text = NULL;
+    *tabpos = NULL;
+    *tabpos_len = 0;
 
-    if (opt.tabexp != 'k') {
+    if (opt.tabexp == 'k') {
         /* We need to know the exact tab positions only if expansion type 'k' is requested (keep tabs as much as they
          * were as possible). Else we'll just convert spaces and tabs without having to know where exactly the tabs
          * were in the first place. */
-        *tabpos_len = 0;
-    } else {
         ucs4_t puc;
         const uint32_t *rest = input_buffer;
         while ((rest = u32_next(&puc, rest))) {
