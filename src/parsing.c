@@ -67,8 +67,6 @@ static int open_yy_config_file(pass_to_bison *bison_args, const char *config_fil
     }
     current_config_file_name = (char *) config_file_path;
     yyset_in(current_config_handle, bison_args->lexer_state);
-    // TODO to reset parser, ‘YY_FLUSH_BUFFER’ and BEGIN INITIAL after each change to yyin.
-    // --> should be ok, because we delete the whole buffer at the beginning, but BEGIN INITIAL may make sense
     return 0;
 }
 

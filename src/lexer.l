@@ -439,6 +439,7 @@ void inflate_inbuf(void *scanner, const char *configfile)
     struct yyguts_t *yyg = (struct yyguts_t *) scanner;
     yy_delete_buffer(YY_CURRENT_BUFFER, scanner);
     yy_switch_to_buffer (yy_create_buffer(yyin, sinf.st_size+10, scanner), scanner);
+    BEGIN INITIAL;
 }
 
 
