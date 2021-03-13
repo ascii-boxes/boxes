@@ -123,12 +123,11 @@ static design_t *parse_config_file(const char *config_file, size_t *r_num_design
         fprintf (stderr, "Parsing Config File %s ...\n", config_file);
     #endif
 
-    // TODO the parser reallocs the global designs array, do this with module-local vars
-
     pass_to_bison bison_args;
     bison_args.designs = NULL;
     bison_args.num_designs = 0;
     bison_args.design_idx = 0;
+    bison_args.config_file = (char *) config_file;
     bison_args.lexer_state = NULL;
     current_bison_args = &bison_args;
 

@@ -629,6 +629,7 @@ static int build_design(design_t **adesigns, const char *cld)
     dp->sample = "n/a";
     dp->indentmode = DEF_INDENTMODE;
     dp->padding[BLEF] = 1;
+    dp->defined_in = "(command line)";
 
     dp->tags = (char *) calloc(10, sizeof(char));
     strcpy(dp->tags, "transient");
@@ -759,6 +760,8 @@ static int list_styles()
                 d->revision ? d->revision : "",
                 d->revision && d->revdate ? " as of " : "",
                 d->revdate ? d->revdate : (d->revision ? "" : "(unknown)"));
+
+        fprintf(opt.outfile, "Configuration File:     %s\n", d->defined_in);
 
         fprintf(opt.outfile, "Indentation Mode:       ");
         switch (d->indentmode) {
