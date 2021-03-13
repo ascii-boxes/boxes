@@ -38,6 +38,9 @@ typedef struct {
     /** index into `*designs` */
     int design_idx;
 
+    /** the path to the config file we are parsing */
+    char *config_file;
+
     /** the flex scanner, which is explicitly passed to reentrant bison */
     void *lexer_state;
 } pass_to_bison;
@@ -315,6 +318,7 @@ static void recover(pass_to_bison *bison_args)
      BFREE (curdes.tags);
      memset (bison_args->designs + bison_args->design_idx, 0, sizeof(design_t));
      curdes.indentmode = DEF_INDENTMODE;
+     curdes.defined_in = bison_args->config_file;
 }
 
 
@@ -407,6 +411,7 @@ first_rule:
         }
         bison_args->num_designs = 1;
         bison_args->designs->indentmode = DEF_INDENTMODE;
+        bison_args->designs->defined_in = bison_args->config_file;
     }
 
 config_file
@@ -484,9 +489,6 @@ parent_def: YPARENT STRING
             parent_configs[num_parent_configs] = filepath;
             ++num_parent_configs;
         }
-
-        // TODO HERE
-        // TODO each design should know where it was defined
     }
 
 config_file: config_file design_or_error | design_or_error | config_file parent_def | parent_def ;
@@ -579,6 +581,7 @@ layout YEND WORD
         bison_args->designs = tmp;
         memset (&curdes, 0, sizeof(design_t));
         curdes.indentmode = DEF_INDENTMODE;
+        curdes.defined_in = bison_args->config_file;
     }
 ;
 

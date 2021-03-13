@@ -9,6 +9,7 @@ Author:                 (unknown author)
 Original Designer:      (unknown artist)
 Creation Date:          now
 Current Revision:       1.0
+Configuration File:     (command line)
 Indentation Mode:       box (indent box)
 Replacement Rules:      none
 Reversion Rules:        none

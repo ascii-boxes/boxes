@@ -105,6 +105,7 @@ typedef struct {
     size_t     minheight;
     int        padding[ANZ_SIDES];
     char      *tags;
+    char      *defined_in;               /* path to config file where this was defined */
 
     reprule_t *current_rule;
     reprule_t *reprules;                 /* applied when drawing a box */
