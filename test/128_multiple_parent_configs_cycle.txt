@@ -1,0 +1,33 @@
+:DESC
+Tests our cycle detection, when parents reference each other.
+
+:ARGS
+-f 128_data/C.cfg -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+3 Available Styles:
+-------------------
+
+Configuration Files:
+    - 128_data/C.cfg
+    - 128_data/B.cfg (parent)
+    - 128_data/A.cfg (parent)
+
+
+designA:
+
+    A from config file B
+
+
+designB:
+
+    B from config file B
+
+
+designC:
+
+    C from config file C
+
+
+:EOF

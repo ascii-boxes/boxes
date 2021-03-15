@@ -1,0 +1,13 @@
+:DESC
+The parent ref is found even while skipping over designs to find the specified one.
+
+:ARGS
+-f 132_data/B.cfg -avc -d designD
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+DDD
+DDD foo
+DDD
+:EOF

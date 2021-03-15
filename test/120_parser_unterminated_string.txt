@@ -7,5 +7,6 @@ foo
 boxes: 120_parser_unterminated_string.cfg: line 4: Unterminated String -- "           # unterminated!
 boxes: 120_parser_unterminated_string.cfg: line 4: syntax error
 boxes: 120_parser_unterminated_string.cfg: line 4: skipping to next design
-boxes: 120_parser_unterminated_string.cfg: line 25: no valid designs found
+boxes: no valid data in config file -- 120_parser_unterminated_string.cfg
+boxes: no valid designs found
 :EOF

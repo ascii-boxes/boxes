@@ -1,0 +1,34 @@
+:DESC
+A config file that has a "parent" and a "grand-parent".
+Also test overwriting a design, which leads to designA being from config file 'B.cfg'
+
+:ARGS
+-f 127_data/C.cfg -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+3 Available Styles:
+-------------------
+
+Configuration Files:
+    - 127_data/C.cfg
+    - 127_data/B.cfg (parent)
+    - 127_data/A.cfg (parent)
+
+
+designA:
+
+    A from config file B
+
+
+designB:
+
+    B from config file B
+
+
+designC:
+
+    C from config file C
+
+
+:EOF

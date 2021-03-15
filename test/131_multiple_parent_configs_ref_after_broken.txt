@@ -1,0 +1,40 @@
+:DESC
+Check that a parent reference works when it is not at the top of a file, but further down.
+Also check that a parent reference is not evaluated when encountered inside a BOX definition.
+Also check that a valid parent reference is properly found even when the design right before it is broken. (This means
+that speedmode is properly terminated.)
+
+:ARGS
+-f 131_data/B.cfg -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+boxes: 131_data/B.cfg: line 32: entries SAMPLE, SHAPES, and ELASTIC are mandatory
+boxes: 131_data/B.cfg: line 32: skipping to next design
+boxes: 131_data/A.cfg: line 29: string expected
+boxes: 131_data/A.cfg: line 29: skipping to next design
+3 Available Styles:
+-------------------
+
+Configuration Files:
+    - 131_data/B.cfg
+    - 131_data/A.cfg (parent)
+
+
+designA:
+
+    A from config file B
+    parent 131_data/C.cfg
+
+
+designB:
+
+    B from config file A
+
+
+designC:
+
+    C from config file B
+
+
+:EOF

@@ -1,0 +1,35 @@
+:DESC
+Config file D has 3 parents, but no design definitions of its own.
+The order in which parents are evaluated matters! Also, design names are case insensitive.
+
+:ARGS
+-f 129_data/D.cfg -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+3 Available Styles:
+-------------------
+
+Configuration Files:
+    - 129_data/D.cfg
+    - 129_data/C.cfg (parent)
+    - 129_data/B.cfg (parent)
+    - 129_data/A.cfg (parent)
+
+
+Designa:
+
+    A from config file B
+
+
+designB:
+
+    B from config file B
+
+
+designC:
+
+    C from config file C
+
+
+:EOF

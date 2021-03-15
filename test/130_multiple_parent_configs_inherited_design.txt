@@ -1,0 +1,13 @@
+:DESC
+Reference a design defined in a parent file, so that no match is found after parsing the first file.
+
+:ARGS
+-f 130_data/B.cfg -d designA -p l1 -a vc
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+AAA
+AAA foo
+AAA
+:EOF

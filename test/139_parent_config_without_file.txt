@@ -1,0 +1,28 @@
+:DESC
+Test that the parser handles gracefully when a broken config file contains just "parent" with no file.
+
+:ARGS
+-f 139_parent_config_without_file.cfg -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+boxes: 139_parent_config_without_file.cfg: line 30: syntax error
+boxes: 139_parent_config_without_file.cfg: line 30: skipping to next design
+2 Available Styles in "139_parent_config_without_file.cfg":
+-----------------------------------------------------------
+
+designA:
+
+    AAA
+    AAA foo
+    AAA
+
+
+designB:
+
+    BBB
+    BBB foo
+    BBB
+
+
+:EOF

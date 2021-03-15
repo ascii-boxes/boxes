@@ -1,0 +1,12 @@
+:DESC
+Strings or sample content which looks like a comment must be treated as a string instead (not a comment).
+
+:ARGS
+-f 133_comments_in_strings.cfg
+:INPUT
+- your text here
+:OUTPUT-FILTER
+:EXPECTED
+# looks like a comment - your text here
+fooooooooooooooooooooo
+:EOF
