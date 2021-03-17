@@ -21,6 +21,11 @@
 " _____________________________________________________________________________________________________________________
 
 
+if exists("b:current_syntax")
+    finish
+endif
+
+
 " Removes any old syntax stuff hanging around
 syntax clear
 
@@ -37,6 +42,7 @@ setlocal iskeyword=a-z,A-Z
 syntax keyword boxesClassicKeywords contained author designer revision created revdate tags indent skipwhite skipempty nextgroup=boxesString
 syntax keyword boxesBlocks   contained elastic replace reverse padding shapes
 syntax keyword boxesRegStuff contained with to once global
+syntax keyword boxesParent   parent skipwhite nextgroup=boxesParentPath,boxesParentGlobal
 
 " Shape Names
 syntax keyword boxesShapes   contained nw nnw n nne ne ene e ese
@@ -79,6 +85,10 @@ syntax cluster boxesInside add=boxesClassicKeywords,boxesShapeBlk,boxesPadBlock
 syntax cluster boxesInside add=boxesRegStuff,boxesShapes,boxesList
 syntax cluster boxesInside add=boxesString,boxesPads,boxesNumber,boxesBraces
 
+" File path of a 'parent' definition
+syntax match   boxesParentGlobal "\s:global:\s*$"
+syntax match   boxesParentPath contained "[^:]\{-}$"
+
 " The main box design blocks BOX..END
 syntax region  boxesDesign matchgroup=boxesBoxStmt start="box" skip="ends" end="end" keepend contains=@boxesInside skipwhite skipempty nextgroup=boxesWord
 
@@ -95,6 +105,8 @@ syntax match   boxesComment /#.*$/
 "
 syntax sync clear
 syntax sync match boxesSync grouphere boxesDesign "box"
+syntax sync match boxesSync "parent"
+syntax sync minlines=5 maxlines=100
 
 
 "
@@ -103,13 +115,16 @@ syntax sync match boxesSync grouphere boxesDesign "box"
 if !exists("did_boxes_syntax_inits")
     let did_boxes_syntax_inits = 1
 
-    hi link boxesBoxStmt Define
+    hi link boxesBoxStmt PreProc
     hi link boxesNumber Number
     hi link boxesString String
     hi link boxesDelSpec boxesString
     hi link boxesComment Comment
     hi link boxesError Error
     hi link boxesClassicKeywords Keyword
+    hi link boxesParent PreProc
+    hi link boxesParentGlobal PreProc
+    hi link boxesParentPath String
     hi link boxesBlocks Statement
     hi link boxesDelim boxesBlocks
     hi link boxesRegStuff Label
