@@ -1412,6 +1412,8 @@ static int read_all_input(const int use_stdin)
             len_chars = u32_strlen(mbtemp);
             input.final_newline = has_linebreak(mbtemp, len_chars);
             input.lines[input.anz_lines].posmap = NULL;
+            input.lines[input.anz_lines].tabpos = NULL;
+            input.lines[input.anz_lines].tabpos_len = 0;
 
             if (opt.r) {
                 if (is_char_at(mbtemp, len_chars - 1, char_newline)) {
