@@ -92,6 +92,7 @@ typedef struct {
 
 typedef struct {
     char      *name;
+    char     **aliases;                  /* zero-terminated array of alias names of the design */
     char      *author;                   /* creator of the configuration file entry */
     char      *designer;                 /* creator of the original ASCII artwork */
     char      *created;                  /* date created, free format */

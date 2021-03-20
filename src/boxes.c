@@ -624,6 +624,7 @@ static int build_design(design_t **adesigns, const char *cld)
     dp = *adesigns;                      /* for readability */
 
     dp->name = "<Command Line Definition>";
+    dp->aliases = (char **) calloc(1, sizeof(char *));
     dp->created = "now";
     dp->revision = "1.0";
     dp->sample = "n/a";
@@ -718,6 +719,53 @@ static int style_sort(const void *p1, const void *p2)
 
 
 
+/**
+ * Create a string listing all the names of a design, for example `"ada-cmt alias lua-cmt, sql-cmt"`.
+ * @param design pointer to the design
+ * @return the string of names, for which memory was allocated
+ */
+static char *names(design_t *design)
+{
+    size_t siz = strlen(design->name);
+    size_t num_aliases = 0;
+    while(design->aliases[num_aliases] != NULL) {
+        siz += strlen(design->aliases[num_aliases]);
+        if (num_aliases > 0) {
+            siz += 2;   // ", "
+        }
+        ++num_aliases;
+    }
+    if (num_aliases > 0) {
+        siz += 7;   // " alias "
+    }
+
+    char *result = (char *) malloc (siz + 1);
+    if (result == NULL) {
+        perror(PROJECT);
+        return NULL;
+    }
+    strcpy(result, design->name);
+
+    if (num_aliases > 0) {
+        char *p = result + strlen(design->name);
+        strcpy(p, " alias ");
+        p += 7;
+
+        for (size_t aidx = 0; design->aliases[aidx] != NULL; ++aidx) {
+            strcpy(p, design->aliases[aidx]);
+            p += strlen(design->aliases[aidx]);
+
+            if (aidx < num_aliases - 1) {
+                strcpy(p, ", ");
+                p += 2;
+            }
+        }
+    }
+    return result;
+}
+
+
+
 static int list_styles()
 /*
  *  Generate sorted listing of available box styles.
@@ -746,6 +794,17 @@ static int list_styles()
         fprintf(opt.outfile, "-----------------------------------");
         for (i = strlen(d->name); i > 0; --i) {
             fprintf(opt.outfile, "-");
+        }
+        fprintf(opt.outfile, "\n");
+
+        fprintf(opt.outfile, "Alias Names:            ");
+        size_t aidx = 0;
+        while(d->aliases[aidx] != NULL) {
+            fprintf(opt.outfile, "%s%s", aidx > 0 ? ", " : "", d->aliases[aidx]);
+            ++aidx;
+        }
+        if (aidx == 0) {
+            fprintf(opt.outfile, "none");
         }
         fprintf(opt.outfile, "\n");
 
@@ -906,23 +965,27 @@ static int list_styles()
         for (i = 0; i < anz_designs; ++i) {
             if (opt.q) {
                 fprintf(opt.outfile, "%s\n", list[i]->name);
+                for (size_t aidx = 0; list[i]->aliases[aidx] != NULL; ++aidx) {
+                    fprintf(opt.outfile, "%s (alias)\n", list[i]->aliases[aidx]);
+                }
             }
             else {
+                char *all_names = names(list[i]);
                 if (list[i]->author && list[i]->designer && strcmp(list[i]->author, list[i]->designer) != 0) {
-                    fprintf(opt.outfile, "%s\n%s, coded by %s:\n%s\n\n", list[i]->name,
+                    fprintf(opt.outfile, "%s\n%s, coded by %s:\n%s\n\n", all_names,
                             list[i]->designer, list[i]->author, list[i]->sample);
                 }
                 else if (list[i]->designer) {
-                    fprintf(opt.outfile, "%s\n%s:\n%s\n\n", list[i]->name,
-                            list[i]->designer, list[i]->sample);
+                    fprintf(opt.outfile, "%s\n%s:\n%s\n\n", all_names, list[i]->designer, list[i]->sample);
                 }
                 else if (list[i]->author) {
-                    fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n%s\n\n", list[i]->name,
+                    fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n%s\n\n", all_names,
                             list[i]->author, list[i]->sample);
                 }
                 else {
-                    fprintf(opt.outfile, "%s:\n%s\n\n", list[i]->name, list[i]->sample);
+                    fprintf(opt.outfile, "%s:\n%s\n\n", all_names, list[i]->sample);
                 }
+                BFREE(all_names);
             }
         }
         BFREE (list);

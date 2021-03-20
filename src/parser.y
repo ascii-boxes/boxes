@@ -320,6 +320,16 @@ static void chg_strdelims (pass_to_bison *bison_args, const char asesc, const ch
 
 
 
+static void init_design(pass_to_bison *bison_args, design_t *design)
+{
+    memset (design, 0, sizeof(design_t));
+    design->aliases = (char **) calloc(1, sizeof(char *));
+    design->indentmode = DEF_INDENTMODE;
+    design->defined_in = bison_args->config_file;
+}
+
+
+
 static void recover(pass_to_bison *bison_args)
 /*
  *  Reset parser to neutral state, so a new design can be parsed.
@@ -337,39 +347,70 @@ static void recover(pass_to_bison *bison_args)
       */
      BFREE (curdes.name);
      BFREE (curdes.author);
+     BFREE (curdes.aliases);
      BFREE (curdes.designer);
      BFREE (curdes.created);
      BFREE (curdes.revision);
      BFREE (curdes.revdate);
      BFREE (curdes.sample);
      BFREE (curdes.tags);
-     memset (bison_args->designs + bison_args->design_idx, 0, sizeof(design_t));
-     curdes.indentmode = DEF_INDENTMODE;
-     curdes.defined_in = bison_args->config_file;
+     init_design(bison_args, &(curdes));
 }
 
 
 
-static int design_needed (const char *name, const int design_idx)
-/*
- *  Return true if design of name name will be needed later on
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+static int design_has_name(design_t *design, char *name)
+{
+    int result = 0;
+    if (strcasecmp(name, design->name) == 0) {
+        result = 1;
+    }
+    else {
+        for (size_t aidx = 0; design->aliases[aidx] != NULL; ++aidx) {
+            if (strcasecmp(name, design->aliases[aidx]) == 0) {
+                result = 1;
+                break;
+            }
+        }
+    }
+    return result;
+}
+
+
+
+/**
+ * Determine if the design currently being parsed is one that we will need.
+ * @param bison_args the bison state
+ * @return flag
  */
+static int design_needed(pass_to_bison *bison_args)
 {
     if (opt.design_choice_by_user) {
-        return !strcasecmp (name, (char *) opt.design);
+        return design_has_name(&(curdes), (char *) opt.design);
     }
     else {
         if (opt.r || opt.l) {
             return 1;
         }
-        if (design_idx == 0) {
+        if (bison_args->design_idx == 0) {
             return 1;
         }
     }
-
     return 0;
+}
+
+
+
+static int design_name_exists(pass_to_bison *bison_args, char *name)
+{
+    int result = 0;
+    for (int i = 0; i < bison_args->design_idx; ++i) {
+        if (design_has_name(bison_args->designs + i, name)) {
+            result = 1;
+            break;
+        }
+    }
+    return result;
 }
 
 }
@@ -437,9 +478,7 @@ first_rule:
             YYABORT;
         }
         bison_args->num_designs = 1;
-
-        bison_args->designs->indentmode = DEF_INDENTMODE;
-        bison_args->designs->defined_in = bison_args->config_file;
+        init_design(bison_args, bison_args->designs);
     }
 
 config_file
@@ -530,29 +569,55 @@ design_or_error: design | error
     }
 
 
-design: YBOX WORD
+alias: WORD
+    {
+        if (design_name_exists(bison_args, $1)) {
+            yyerror(bison_args, "alias already in use -- %s", $1);
+            YYERROR;
+        }
+        size_t num_aliases = 0;
+        while (curdes.aliases[num_aliases] != NULL) {
+            ++num_aliases;
+        }
+        curdes.aliases = (char **) realloc(curdes.aliases, (num_aliases + 2) * sizeof(char *));
+        curdes.aliases[num_aliases] = strdup($1);
+        curdes.aliases[num_aliases + 1] = NULL;
+    }
+
+alias_list: alias | alias_list ',' alias;
+
+design_id: WORD | WORD ',' alias_list
+
+design: YBOX design_id
     {
         chg_strdelims(bison_args, '\\', '\"');
         bison_args->speeding = 0;
         bison_args->skipping = 0;
-        if (!design_needed ($2, bison_args->design_idx)) {
+
+        curdes.name = (char *) strdup($<s>2);
+        if (curdes.name == NULL) {
+            perror (PROJECT);
+            YYABORT;
+        }
+
+        if (!design_needed(bison_args)) {
             bison_args->speeding = 1;
             begin_speedmode(scanner);
+            init_design(bison_args, &(curdes));
             YYERROR;
         }
     }
-
 layout YEND WORD
     {
+        char *design_primary_name = $<s>2;
         design_t *tmp;
-        int i;
         char *p;
 
         #ifdef PARSER_DEBUG
-            fprintf (stderr, "--------- ADDING DESIGN \"%s\".\n", $2);
+            fprintf (stderr, "--------- ADDING DESIGN \"%s\".\n", design_primary_name);
         #endif
 
-        if (strcasecmp ($2, $6)) {
+        if (strcasecmp (design_primary_name, $6)) {
             yyerror(bison_args, "box design name differs at BOX and END");
             YYERROR;
         }
@@ -560,29 +625,20 @@ layout YEND WORD
             yyerror(bison_args, "entries SAMPLE, SHAPES, and ELASTIC are mandatory");
             YYERROR;
         }
-
-        for (i=0; i<bison_args->design_idx; ++i) {
-            if (strcasecmp ($2, bison_args->designs[i].name) == 0) {
-                yyerror(bison_args, "duplicate box design name -- %s", $2);
-                YYERROR;
-            }
+        if (design_name_exists(bison_args, design_primary_name)) {
+            yyerror(bison_args, "duplicate box design name -- %s", design_primary_name);
+            YYERROR;
         }
 
-        p = $2;
+        p = design_primary_name;
         while (*p) {
             if (*p < 32 || *p > 126) {
-                yyerror(bison_args, "box design name must consist of printable standard "
-                         "ASCII characters.");
+                yyerror(bison_args, "box design name must consist of printable standard ASCII characters.");
                 YYERROR;
             }
             ++p;
         }
 
-        curdes.name = (char *) strdup ($2);
-        if (curdes.name == NULL) {
-            perror (PROJECT);
-            YYABORT;
-        }
         bison_args->num_mandatory = 0;
         bison_args->time_for_se_check = 0;
         bison_args->num_shapespec = 0;
@@ -600,15 +656,13 @@ layout YEND WORD
          *  Allocate space for next design
          */
         ++(bison_args->design_idx);
-        tmp = (design_t *) realloc (bison_args->designs, (bison_args->design_idx+1)*sizeof(design_t));
+        tmp = (design_t *) realloc(bison_args->designs, (bison_args->design_idx + 1) * sizeof(design_t));
         if (tmp == NULL) {
             perror (PROJECT);
             YYABORT;
         }
         bison_args->designs = tmp;
-        memset (&curdes, 0, sizeof(design_t));
-        curdes.indentmode = DEF_INDENTMODE;
-        curdes.defined_in = bison_args->config_file;
+        init_design(bison_args, &(curdes));
     }
 ;
 
