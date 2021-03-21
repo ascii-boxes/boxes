@@ -1,0 +1,27 @@
+:DESC
+Test that the alias names of a design are properly listed in the design information sheet.
+
+:ARGS
+-f 135_design_alias_by_design.cfg -l -d design
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+Complete Design Information for "design":
+-----------------------------------------
+Alias Names:            alias1, alias2
+Author:                 (unknown author)
+Original Designer:      (unknown artist)
+Creation Date:          (unknown)
+Current Revision:       (unknown)
+Configuration File:     135_design_alias_by_design.cfg
+Indentation Mode:       box (indent box)
+Replacement Rules:      none
+Reversion Rules:        none
+Minimum Box Dimensions: 3 x 3  (width x height)
+Default Padding:        left 1, right 1
+Default Killblank:      no
+Tags:                   (none)
+Elastic Shapes:         N, E, S, W
+Defined Shapes:           E: "X" 
+                          W: "X" 
+:EOF

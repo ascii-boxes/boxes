@@ -1,0 +1,24 @@
+:DESC
+Test that we get an error if an alias already exists.
+
+:ARGS
+-f 138_design_alias_duplicate_name.cfg -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+boxes: 138_design_alias_duplicate_name.cfg: line 49: alias already in use -- alias2
+boxes: 138_design_alias_duplicate_name.cfg: line 49: skipping to next design
+2 Available Styles in "138_design_alias_duplicate_name.cfg":
+------------------------------------------------------------
+
+design1:
+
+    X1 your text X1
+
+
+design2 alias alias2:
+
+    X2 your text X2
+
+
+:EOF

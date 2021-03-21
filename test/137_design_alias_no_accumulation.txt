@@ -1,0 +1,27 @@
+:DESC
+Test that the list of aliases is properly reset when lexer is in speedmode.
+
+:ARGS
+-f 137_design_alias_no_accumulation.cfg -d alias3b -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+Complete Design Information for "design3":
+------------------------------------------
+Alias Names:            alias3a, alias3b
+Author:                 (unknown author)
+Original Designer:      (unknown artist)
+Creation Date:          (unknown)
+Current Revision:       (unknown)
+Configuration File:     137_design_alias_no_accumulation.cfg
+Indentation Mode:       box (indent box)
+Replacement Rules:      none
+Reversion Rules:        none
+Minimum Box Dimensions: 5 x 3  (width x height)
+Default Padding:        left 1, right 1
+Default Killblank:      no
+Tags:                   (none)
+Elastic Shapes:         N, E, S, W
+Defined Shapes:           E: "X3" 
+                          W: "X3" 
+:EOF

@@ -5,6 +5,7 @@
 :EXPECTED
 Complete Design Information for "c":
 ------------------------------------
+Alias Names:            none
 Author:                 Thomas Jensen
 Original Designer:      (public domain)
 Creation Date:          March 18, 1999 (Thursday, 15:25h)
