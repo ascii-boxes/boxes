@@ -28,6 +28,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef __MINGW32__
+    #include <windows.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -35,10 +38,6 @@
 #include "boxes.h"
 #include "tools.h"
 #include "discovery.h"
-
-#ifdef __MINGW32__
-    #include <windows.h>
-#endif
 
 
 
