@@ -24,6 +24,7 @@
 
 #include "config.h"
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
@@ -305,6 +306,8 @@ design_t *parse_config_files(const char *p_first_config_file, size_t *r_num_desi
         }
         return NULL;
     }
+
+    fflush(stderr);      /* ensure order of error msgs and normal output for test cases */
     return result;
 }
 
