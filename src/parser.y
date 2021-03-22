@@ -796,7 +796,12 @@ block: YSAMPLE STRING YENDSAMPLE
             yyerror(bison_args, "duplicate SAMPLE block");
             YYERROR;
         }
-        line = (char *) strdup ($2);
+
+        char *p = $2;
+        while ((*p == '\r' || *p == '\n') && *p != '\0') {
+            p++;
+        }
+        line = (char *) strdup (p);
         if (line == NULL) {
             perror (PROJECT);
             YYABORT;

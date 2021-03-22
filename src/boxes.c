@@ -972,18 +972,18 @@ static int list_styles()
             else {
                 char *all_names = names(list[i]);
                 if (list[i]->author && list[i]->designer && strcmp(list[i]->author, list[i]->designer) != 0) {
-                    fprintf(opt.outfile, "%s\n%s, coded by %s:\n%s\n\n", all_names,
+                    fprintf(opt.outfile, "%s\n%s, coded by %s:\n\n%s\n\n", all_names,
                             list[i]->designer, list[i]->author, list[i]->sample);
                 }
                 else if (list[i]->designer) {
-                    fprintf(opt.outfile, "%s\n%s:\n%s\n\n", all_names, list[i]->designer, list[i]->sample);
+                    fprintf(opt.outfile, "%s\n%s:\n\n%s\n\n", all_names, list[i]->designer, list[i]->sample);
                 }
                 else if (list[i]->author) {
-                    fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n%s\n\n", all_names,
+                    fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n\n%s\n\n", all_names,
                             list[i]->author, list[i]->sample);
                 }
                 else {
-                    fprintf(opt.outfile, "%s:\n%s\n\n", all_names, list[i]->sample);
+                    fprintf(opt.outfile, "%s:\n\n%s\n\n", all_names, list[i]->sample);
                 }
                 BFREE(all_names);
             }
