@@ -37,9 +37,20 @@
 
 #elif defined(__FreeBSD__)
     /* do nothing */
+
+#elif defined(__MINGW32__)
+
+#define __MISC_VISIBLE 1
+
+#ifndef _POSIX_SOURCE
+#define _POSIX_SOURCE
+#endif
+
 #else
 
+#ifndef _POSIX_SOURCE
 #define _POSIX_SOURCE
+#endif
 
 #endif
 
