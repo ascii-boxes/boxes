@@ -12,10 +12,8 @@
 " ---------------
 " Latest version available from:
 "         https://github.com/ascii-boxes/boxes/blob/master/boxes.vim
-" Status: This syntax file is still under development (you could say "beta") and has a few known issues (below).
-"         We think it's good enough to be used in the wild.
-"         Even though it is not officially part of a boxes release, and simply intended to be downloaded via the link
-"         above, we think it's great when it gets packaged and installed with boxes!
+" Status: This syntax file is not officially part of a boxes release, and simply intended to be downloaded via the link
+"         above, but we think it's great when it gets packaged and installed with boxes!
 " Known Issues:
 "         https://github.com/ascii-boxes/boxes/issues?q=is%3Aissue+is%3Aopen+Vim+Syntax
 " _____________________________________________________________________________________________________________________
@@ -33,27 +31,31 @@ syntax clear
 syntax case ignore
 
 " Set the keyword characters
-setlocal iskeyword=a-z,A-Z
+syntax iskeyword a-z,A-Z
+
+" TODO foldlevel - It should be possible to fold box designs
+" TODO spell checking - In a boxes config file, only comments should be spell checked.
 
 
 "
 "  Key Words
 "
-syntax keyword boxesClassicKeywords contained author designer revision created revdate tags indent skipwhite skipempty nextgroup=boxesString
-syntax keyword boxesBlocks   contained elastic replace reverse padding shapes
-syntax keyword boxesRegStuff contained with to once global
-syntax keyword boxesParent   parent skipwhite nextgroup=boxesParentPath,boxesParentGlobal
+syntax keyword boxesClassicKeywords author designer revision created revdate tags indent skipwhite skipempty nextgroup=boxesString
+syntax keyword boxesBlocks          elastic replace reverse padding shapes skipwhite skipempty
+syntax keyword boxesRegStuff        with to once global skipwhite skipempty
+syntax keyword boxesParent          parent skipwhite nextgroup=boxesParentPath,boxesParentGlobal
+syntax keyword boxesEnd             end skipwhite skipempty nextgroup=boxesNameAtEnd
 
 " Shape Names
-syntax keyword boxesShapes   contained nw nnw n nne ne ene e ese
-syntax keyword boxesShapes   contained se sse s ssw sw wsw w wnw
+syntax keyword boxesShapes nw nnw n nne ne ene e ese
+syntax keyword boxesShapes se sse s ssw sw wsw w wnw
 
 " Padding Areas
-syntax keyword boxesPads     contained a[ll] l[eft] r[ight] t top
-syntax keyword boxesPads     contained b[ottom] h[orizontal] v[ertical]
+syntax keyword boxesPads   a[ll] l[eft] r[ight] t top
+syntax keyword boxesPads   b[ottom] h[orizontal] v[ertical]
 
 " Delimiter statement
-syntax keyword boxesDelim    contained delim delimiter skipwhite skipempty nextgroup=boxesDelSpec
+syntax keyword boxesDelim  delim delimiter skipwhite skipempty nextgroup=boxesDelSpec
 
 
 "
@@ -65,38 +67,33 @@ syntax match   boxesError /\S/
 "
 "  Main syntax definition part
 "
-syntax match   boxesComma   contained /,/
-syntax match   boxesBraces  contained /[{}]/
-syntax match   boxesDelSpec contained /[^ \t\r]\+/
-syntax match   boxesWord    contained /[a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*/
-syntax match   boxesNumber  contained /[-+]\=\d\+/
+syntax match   boxesComma     contained display /,/
+syntax match   boxesBraces    display /[{}]/
+" TODO Introduce region between delim and delim|end which exists 361 times to cover all combinations
+syntax match   boxesDelSpec   contained display /[^ \t\r]\+/
+syntax match   boxesNameAtEnd display /[a-zA-ZäöüÄÖÜ][a-zA-Z0-9_\-üäöÜÄÖß]*/ skipwhite skipempty
+syntax match   boxesWord      display /[a-zA-ZäöüÄÖÜ][a-zA-Z0-9_\-üäöÜÄÖß]*/
+syntax match   boxesNumber    display /[-+]\=\d\+/
 
 " a list, used inside shape blocks and for the elastic list
-syntax region  boxesList    contained matchgroup=Normal start="(" end=")" contains=boxesString,boxesShapes,boxesComma,boxesError,boxesComment
+syntax region  boxesList matchgroup=Normal start="(" end=")" contains=boxesString,boxesShapes,boxesComma,boxesError,boxesComment
 
 " Strings
-syntax region  boxesString contained start=/"/ skip=/\\\\\|\\"/ end=/"/ oneline
-
-
-" These items may appear inside a BOX..END block
-syntax cluster boxesInside contains=boxesComment,boxesWord,boxesElasticList
-syntax cluster boxesInside add=boxesError,boxesBlocks,boxesSample,boxesDelim
-syntax cluster boxesInside add=boxesClassicKeywords,boxesShapeBlk,boxesPadBlock
-syntax cluster boxesInside add=boxesRegStuff,boxesShapes,boxesList
-syntax cluster boxesInside add=boxesString,boxesPads,boxesNumber,boxesBraces
+" TODO the uncontained is normal, and contained ones belong to a delim region
+syntax region  boxesString display start=/"/ skip=/\\\\\|\\"/ end=/"/ oneline
 
 " File path of a 'parent' definition
-syntax match   boxesParentGlobal "\s:global:\s*$"
-syntax match   boxesParentPath contained "[^:]\{-}$"
-
-" The main box design blocks BOX..END
-syntax region  boxesDesign matchgroup=boxesBoxStmt start="box" skip="ends" end="end" keepend contains=@boxesInside skipwhite skipempty nextgroup=boxesWord
+syntax match   boxesParentGlobal display "\s:global:\s*$"
+syntax match   boxesParentPath contained display "[^:]\{-}$"
 
 " The SAMPLE block
-syntax region  boxesSample contained matchgroup=boxesBlocks start="sample" end=+^[ \t]*ends[ \t\r]*$+ keepend contains=NONE
+syntax region  boxesSample matchgroup=boxesBlocks start="sample" end=+^[ \t]*ends[ \t\r]*$+ keepend
+
+" a BOX definition with aliases
+syntax region boxesNames matchgroup=boxesBoxStmt start=/\<box\s\+/ end=/\>[ \t\r\n]\+\</re=s,he=s keepend contains=boxesComma
 
 " Comments may appear anywhere in the file
-syntax match   boxesComment /#.*$/
+syntax match   boxesComment display /#.*$/
 
 
 
@@ -104,9 +101,9 @@ syntax match   boxesComment /#.*$/
 "  Synchronisation
 "
 syntax sync clear
-syntax sync match boxesSync grouphere boxesDesign "box"
+syntax sync match boxesSync grouphere boxesNames "box"
 syntax sync match boxesSync "parent"
-syntax sync minlines=5 maxlines=100
+syntax sync minlines=40 maxlines=200
 
 
 "
@@ -115,7 +112,10 @@ syntax sync minlines=5 maxlines=100
 if !exists("did_boxes_syntax_inits")
     let did_boxes_syntax_inits = 1
 
+    hi link boxesNames Special
+    hi link boxesNameAtEnd Special
     hi link boxesBoxStmt PreProc
+    hi link boxesEnd PreProc
     hi link boxesNumber Number
     hi link boxesString String
     hi link boxesDelSpec boxesString
