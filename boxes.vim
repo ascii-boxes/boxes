@@ -33,7 +33,6 @@ syntax case ignore
 " Set the keyword characters
 syntax iskeyword a-z,A-Z
 
-" TODO foldlevel - It should be possible to fold box designs
 " TODO spell checking - In a boxes config file, only comments should be spell checked.
 
 
@@ -69,31 +68,32 @@ syntax match   boxesError /\S/
 "
 syntax match   boxesComma     contained display /,/
 syntax match   boxesBraces    display /[{}]/
-" TODO Introduce region between delim and delim|end which exists 361 times to cover all combinations
 syntax match   boxesDelSpec   contained display /[^ \t\r]\+/
 syntax match   boxesNameAtEnd display /[a-zA-ZäöüÄÖÜ][a-zA-Z0-9_\-üäöÜÄÖß]*/ skipwhite skipempty
 syntax match   boxesWord      display /[a-zA-ZäöüÄÖÜ][a-zA-Z0-9_\-üäöÜÄÖß]*/
 syntax match   boxesNumber    display /[-+]\=\d\+/
 
+" TODO Introduce a region between delim and delim|end which exists multiple times to cover all escape characters
+"      with specialized string definitions
+
 " a list, used inside shape blocks and for the elastic list
 syntax region  boxesList matchgroup=Normal start="(" end=")" contains=boxesString,boxesShapes,boxesComma,boxesError,boxesComment
 
 " Strings
-" TODO the uncontained is normal, and contained ones belong to a delim region
-syntax region  boxesString display start=/"/ skip=/\\\\\|\\"/ end=/"/ oneline
+syntax region  boxesString display start=/\z\(["~'`!@%&*=:;<>?/|.\\]\)/ skip=/\\\\\|\\\z1/ end=/\z1/ oneline
 
 " File path of a 'parent' definition
 syntax match   boxesParentGlobal display "\s:global:\s*$"
 syntax match   boxesParentPath contained display "[^:]\{-}$"
-
-" The SAMPLE block
-syntax region  boxesSample matchgroup=boxesBlocks start="sample" end=+^[ \t]*ends[ \t\r]*$+ keepend
 
 " a BOX definition with aliases
 syntax region boxesNames matchgroup=boxesBoxStmt start=/\<box\s\+/ end=/\>[ \t\r\n]\+\</re=s,he=s keepend contains=boxesComma
 
 " Comments may appear anywhere in the file
 syntax match   boxesComment display /#.*$/
+
+" The SAMPLE block
+syntax region  boxesSample matchgroup=boxesBlocks start="sample" end=+^[ \t]*ends[ \t\r]*$+ keepend
 
 
 
@@ -126,7 +126,7 @@ if !exists("did_boxes_syntax_inits")
     hi link boxesParentGlobal PreProc
     hi link boxesParentPath String
     hi link boxesBlocks Statement
-    hi link boxesDelim boxesBlocks
+    hi link boxesDelim Keyword
     hi link boxesRegStuff Label
     hi link boxesShapes Type
     hi link boxesPads Type
@@ -144,4 +144,4 @@ let b:current_syntax = "boxes"
 
 
 
-"EOF                                      vim: sw=4
+"EOF                                      vim: sw=4 nowrap :
