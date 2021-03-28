@@ -28,7 +28,7 @@ designer "(public domain)"
 revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:25h)"
 created "March 18, 1999 (Thursday, 15:25h)"
-tags "programming, box"
+tags    "programming, box"
 
 sample
     /*************/
@@ -65,7 +65,7 @@ author   "Thomas Jensen"
 created  "March 12, 1999 (Friday, 17:05h)"
 revision "1.0"
 revdate  "March 12, 1999 (Friday, 17:05h)"
-tags "artwork, box, scroll"
+tags     "artwork, box, scroll"
 
 sample
      ________________________
@@ -109,7 +109,7 @@ author   "Thomas Jensen"
 revision "1.1"
 revdate  "July 20, 1999 (Tuesday, 21:06h)"
 created  "March 17, 1999 (Wednesday, 15:27h)"
-tags "artwork, box"
+tags     "artwork, box"
 
 sample
      __^__                 __^__
@@ -150,10 +150,10 @@ END columns
 BOX whirly
 
 author   "Thomas Jensen"
-created "March 17, 1999 (Wednesday, 15:40h)"
-revdate "March 17, 1999 (Wednesday, 15:40h)"
+created  "March 17, 1999 (Wednesday, 15:40h)"
+revdate  "March 17, 1999 (Wednesday, 15:40h)"
 revision "1.0"
-tags "artwork, box"
+tags     "artwork, box"
 
 sample
      .+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.
@@ -192,7 +192,7 @@ author   "Thomas Jensen"
 revision "1.2"
 revdate  "August 18, 1999 (Wednesday, 17:00h)"
 created  "March 17, 1999 (Wednesday, 17:04h)"
-tags "artwork, box, scroll"
+tags     "artwork, box, scroll"
 
 SAMPLE
      / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \
@@ -253,7 +253,7 @@ designer "(public domain)"
 revision "1.1"
 revdate  "August 22, 1999 (Sunday, 12:44h)"
 created  "March 18, 1999 (Thursday, 15:24h)"
-tags "simple, box"
+tags     "simple, box"
 
 sample
     *************
@@ -283,7 +283,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags "programming, comment"
+tags     "programming, comment"
 
 sample
     /*                               */
@@ -317,7 +317,7 @@ designer "(public domain)"
 revision "1.1"
 revdate  "August 18, 1999 (Wednesday, 17:01h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags "programming, comment"
+tags     "programming, comment"
 
 sample
     /*
@@ -353,7 +353,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "October 25, 1999 (Monday 10:16h)"
 created  "October 25, 1999 (Monday 10:16h)"
-tags "programming, comment"
+tags     "programming, comment"
 
 sample
     /**
@@ -389,7 +389,7 @@ designer "(public domain)"
 revision "1.2"
 revdate  "October 19, 2012 (Friday, 17:32h)"
 created  "March 18, 1999 (Thursday, 15:26h)"
-tags "programming, box"
+tags     "programming, box"
 
 sample
     <!-- - - - - - - - - - - -->
@@ -426,7 +426,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "March 18, 1999 (Thursday, 15:27h)"
 created  "March 18, 1999 (Thursday, 15:27h)"
-tags "programming, box"
+tags     "programming, box"
 
 sample
     #############
@@ -459,7 +459,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "August 22, 1999 (Sunday, 12:51h)"
 created  "March 30, 1999 (Tuesday, 15:55h)"
-tags "artwork, box"
+tags     "artwork, box"
 
 sample
                             _ ._  _ , _ ._
@@ -512,7 +512,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.2"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "March 30, 1999 (Tuesday, 15:59h)"
-tags "artwork, box"
+tags     "artwork, box"
 
 Sample
            /\          /\          /\          /\
@@ -592,7 +592,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.2"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "March 18, 1999 (Thursday, 15:27h)"
-tags "artwork, box, sign"
+tags     "artwork, box, sign"
 
 sample
                 .--,       .--,
@@ -658,7 +658,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "March 30, 1999 (Tuesday, 17:10h)"
-tags "artwork, box"
+tags     "artwork, box"
 
 sample
                                .
@@ -707,7 +707,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.2"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 02, 1999 (Friday, 15:02h)"
-tags "artwork, box, sign"
+tags     "artwork, box, sign"
 
 sample
                     .-"""-.
@@ -773,7 +773,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 02, 1999 (Friday, 19:13h)"
-tags "artwork, box, sign"
+tags     "artwork, box, sign"
 
 sample
                     .-"""-.
@@ -835,7 +835,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.2"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 09, 1999 (Friday, 20:05h)"
-tags "artwork, box"
+tags     "artwork, box"
 
 sample
             <\/><\/><\/>
@@ -1287,14 +1287,14 @@ created  "April 12, 1999 (Monday, 12:52h)"
 tags     "programming, box"
 
 sample
-   /*       _\|/_
-            (o o)
-    +----oOO-{_}-OOo---------------------+
-    |                                    |
-    | C function headers?                |
-    |                                    |
-    |                                    |
-    +-----------------------------------*/
+    /*       _\|/_
+             (o o)
+     +----oOO-{_}-OOo---------------------+
+     |                                    |
+     | C function headers?                |
+     |                                    |
+     |                                    |
+     +-----------------------------------*/
 ends
 
 shapes {
@@ -1730,7 +1730,7 @@ shapes {
     sw ("/*") s ("*") se ("*/")
 }
 
-delim _"
+delim ~"
 replace "((?:\x1b\[[0-9;]*m)+(?!\x1b).(?!$))|((?:\x1b\[[0-9;]*m)+$)|([^\x1b](?!$))" with "$0 "
 reverse "^        " to "          "
 reverse "^      " to "        "
@@ -1812,21 +1812,21 @@ revision "0.1"
 tags     "artwork, box, sign"
 
 sample
-                            \\\///
-                           / _  _ \
-                         (| (.)(.) |)
-.----------------------.OOOo--()--oOOO.-----------------.
-|                                                       |
-| Your Text Here Your Text Here Your Text Here Your Tex |
-| Your Text Here Your Text Here Your Text Here Your Tex |
-| Your Text Here Your Text Here Your Text Here Your Tex |
-| Your Text Here Your Text Here Your Text Here Your Tex |
-|                                                       |
-'--------------------.oooO------------------------------'
-                      (   )   Oooo.
-                       \ (    (   )
-                        \_)    ) /
-                              (_/
+                                \\\///
+                               / _  _ \
+                             (| (.)(.) |)
+    .----------------------.OOOo--()--oOOO.-----------------.
+    |                                                       |
+    | Your Text Here Your Text Here Your Text Here Your Tex |
+    | Your Text Here Your Text Here Your Text Here Your Tex |
+    | Your Text Here Your Text Here Your Text Here Your Tex |
+    | Your Text Here Your Text Here Your Text Here Your Tex |
+    |                                                       |
+    '--------------------.oooO------------------------------'
+                          (   )   Oooo.
+                           \ (    (   )
+                            \_)    ) /
+                                  (_/
 ends
 
 shapes {
@@ -1901,20 +1901,18 @@ created  "September 02, 2013 (Monday, 14:43h)"
 tags     "artwork, speech"
 
 sample
-
-   _________________________________
-  /                                 \
-  |     E L E C T R O L Y T E S     |
-  \______________________________ '\
-                             ()    \\
-                               O    \\  .
-                                 o  |\\/|
-                                    / " '\
-                                    . .   .
-                                   /    ) |
-                                  '  _.'  |
-                                  '-'/    \
-
+     _________________________________
+    /                                 \
+    |     E L E C T R O L Y T E S     |
+    \______________________________ '\
+                               ()    \\
+                                 O    \\  .
+                                   o  |\\/|
+                                      / " '\
+                                      . .   .
+                                     /    ) |
+                                    '  _.'  |
+                                    '-'/    \
 ends
 
 shapes {
@@ -1989,20 +1987,18 @@ created  "September 02, 2013 (Monday, 14:43h)"
 tags     "artwork, speech"
 
 sample
-
-   _________________________________
-  /                                 \
-  |     E L E C T R O L Y T E S     |
-  \___________________________  __'\
-                              |/   \\
-                               \    \\  .
-                                    |\\/|
-                                    / " '\
-                                    . .   .
-                                   /    ) |
-                                  '  _.'  |
-                                  '-'/    \
-
+     _________________________________
+    /                                 \
+    |     E L E C T R O L Y T E S     |
+    \___________________________  __'\
+                                |/   \\
+                                 \    \\  .
+                                      |\\/|
+                                      / " '\
+                                      . .   .
+                                     /    ) |
+                                    '  _.'  |
+                                    '-'/    \
 ends
 
 shapes {
@@ -2118,28 +2114,28 @@ revdate  "Saturday, 02-Jan-16 12:42:31 UTC+1"
 tags     "artwork, box"
 
 sample
-._____. ._____. .________________________________________. ._____. ._____.
-| ._. | | ._. | | .____________________________________. | | ._. | | ._. |
-| !_| |_|_|_! | | !____________________________________! | | !_| |_|_|_! |
-!___| |_______! !________________________________________! !___| |_______!
-.___|_|_| |____________________________________________________|_|_| |___.
-| ._____| |________________________________________________________| |_. |
-| !_! | | |                                                    | | ! !_! |
-!_____! | | * * * * * * * * * * * TWISTED * * * * * * * * * *  | | !_____!
-._____. | | -----------------------|-------------------------  | | ._____.
-| ._. | | | Just another cool ascii frame, brought to you by:  | | | ._. |
-| | | | | |                                                    | | | | | |
-| | | | | |              -~{ Tristano Ajmone }~-               | | | | | |
-| !_! | | | -----------------------|-------------------------  | | ! !_! |
-!_____! | | Derived from an ascii frame originally created by: | | !_____!
-._____. | |                                                    | | ._____.
-| ._. | | |               -~{ Michael Naylor }~                | | | ._. |
-| !_| |_|_|____________________________________________________| |_|_|_! |
-!___| |________________________________________________________| |_______!
-.___|_|_| |___. .________________________________________. .___|_|_| |___.
-| ._____| |_. | | .____________________________________. | | ._____| |_. |
-| !_! | | !_! | | !____________________________________! | | !_! | | !_! |
-!_____! !_____! !________________________________________! !_____! !_____!
+    ._____. ._____. .________________________________________. ._____. ._____.
+    | ._. | | ._. | | .____________________________________. | | ._. | | ._. |
+    | !_| |_|_|_! | | !____________________________________! | | !_| |_|_|_! |
+    !___| |_______! !________________________________________! !___| |_______!
+    .___|_|_| |____________________________________________________|_|_| |___.
+    | ._____| |________________________________________________________| |_. |
+    | !_! | | |                                                    | | ! !_! |
+    !_____! | | * * * * * * * * * * * TWISTED * * * * * * * * * *  | | !_____!
+    ._____. | | -----------------------|-------------------------  | | ._____.
+    | ._. | | | Just another cool ascii frame, brought to you by:  | | | ._. |
+    | | | | | |                                                    | | | | | |
+    | | | | | |              -~{ Tristano Ajmone }~-               | | | | | |
+    | !_! | | | -----------------------|-------------------------  | | ! !_! |
+    !_____! | | Derived from an ascii frame originally created by: | | !_____!
+    ._____. | |                                                    | | ._____.
+    | ._. | | |               -~{ Michael Naylor }~                | | | ._. |
+    | !_| |_|_|____________________________________________________| |_|_|_! |
+    !___| |________________________________________________________| |_______!
+    .___|_|_| |___. .________________________________________. .___|_|_| |___.
+    | ._____| |_. | | .____________________________________. | | ._____| |_. |
+    | !_! | | !_! | | !____________________________________! | | !_! | | !_! |
+    !_____! !_____! !________________________________________! !_____! !_____!
 ends
 
 shapes {
@@ -2175,7 +2171,7 @@ NNW ("___. .___",
      "_! | | !_",
      "___! !___",
      "_________",
-	 "_________")
+     "_________")
 
   N ("_",
      "_",
@@ -2229,20 +2225,19 @@ SSE ("________",
      "__. .___",
      ". | | ._",
      "! | | !_",
-	 "__! !___")
+     "__! !___")
 
 SSW ("_________",
      "_________",
      "___. .___",
      "_. | | ._",
      "_! | | !_",
-	 "___! !___")
-
+     "___! !___")
 }
 
 padding {
     all 1
-	bottom 0
+    bottom 0
 }
 
 elastic (n,e,s,w)
@@ -2262,15 +2257,15 @@ revision "1.0"
 tags     "artwork, box, scroll"
 
 sample
- /"\/\_..---------------------------------._/\/"\
-(     _|| ||| Scroll-AKN...          ||| ||_     )
- \_/\/ || ------------------------------ || \/\_/
-       || Original Design by "akn" (???) ||
-       || Implemented in boxes by:       ||
-       ||     -~{ Tristano Ajmone }~-    ||
- /"\/\_|----------------------------------|_/\/"\
-(     _|                                  |_     )
- \_/\/ `----------------------------------' \/\_/
+     /"\/\_..---------------------------------._/\/"\
+    (     _|| ||| Scroll-AKN...          ||| ||_     )
+     \_/\/ || ------------------------------ || \/\_/
+           || Original Design by "akn" (???) ||
+           || Implemented in boxes by:       ||
+           ||     -~{ Tristano Ajmone }~-    ||
+     /"\/\_|----------------------------------|_/\/"\
+    (     _|                                  |_     )
+     \_/\/ `----------------------------------' \/\_/
 ends
 
 shapes {
@@ -2292,7 +2287,7 @@ elastic (W,E,N,S)
 
 padding {
     horizontal 1
-	vertical 0
+    vertical 0
 }
 
 END scroll-akn
@@ -2415,18 +2410,18 @@ ends
 delim @"
 
 shapes {
-  nw (" /\ ")
-  w  ("|! |")
-  sw ("|__|",
-      "(__)")
+    nw (" /\ ")
+    w  ("|! |")
+    sw ("|__|",
+        "(__)")
 
-  ne (" /\ ")
-  e  ("|! |")
-  se ("|__|",
-      "(__)")
+    ne (" /\ ")
+    e  ("|! |")
+    se ("|__|",
+        "(__)")
 
-  n ("!")
-  s (" ", "!")
+    n ("!")
+    s (" ", "!")
 }
 
 padding { left 1 top 1 right 1 }
@@ -2460,20 +2455,20 @@ ends
 delim @"
 
 shapes {
-  nw (" /\  /\ ",
-      "|! ||! |")
-  w  ("|! ||! |")
-  sw ("|__||__|",
-      "(__)(__)")
+    nw (" /\  /\ ",
+        "|! ||! |")
+    w  ("|! ||! |")
+    sw ("|__||__|",
+        "(__)(__)")
 
-  ne (" /\  /\ ",
-      "|! ||! |")
-  e  ("|! ||! |")
-  se ("|__||__|",
-      "(__)(__)")
+    ne (" /\  /\ ",
+        "|! ||! |")
+    e  ("|! ||! |")
+    se ("|__||__|",
+        "(__)(__)")
 
-  n ("!", "!")
-  s ("!", "!")
+    n ("!", "!")
+    s ("!", "!")
 }
 
 padding { all 1 }
@@ -2509,24 +2504,24 @@ ends
 delim @"
 
 shapes {
-  nw (" /\  /\  /\ ",
-      "|! ||! ||! |",
-      "|! ||! ||! |")
-  w  ("|! ||! ||! |")
-  sw ("|! ||! ||! |",
-      "|__||__||__|",
-      "(__)(__)(__)")
+    nw (" /\  /\  /\ ",
+        "|! ||! ||! |",
+        "|! ||! ||! |")
+    w  ("|! ||! ||! |")
+    sw ("|! ||! ||! |",
+        "|__||__||__|",
+        "(__)(__)(__)")
 
-  ne (" /\  /\  /\ ",
-      "|! ||! ||! |",
-      "|! ||! ||! |")
-  e  ("|! ||! ||! |")
-  se ("|! ||! ||! |",
-      "|__||__||__|",
-      "(__)(__)(__)")
+    ne (" /\  /\  /\ ",
+        "|! ||! ||! |",
+        "|! ||! ||! |")
+    e  ("|! ||! ||! |")
+    se ("|! ||! ||! |",
+        "|__||__||__|",
+        "(__)(__)(__)")
 
-  n ("!", "!", "!")
-  s ("!", "!", "!")
+    n ("!", "!", "!")
+    s ("!", "!", "!")
 }
 
 padding { all 1 }
@@ -2693,6 +2688,7 @@ END bear
 
 
 BOX jstone
+
 author   "Ed Schaller"
 designer "schallee_@_darkmist.net"
 revision "1.0"
@@ -2701,25 +2697,25 @@ created  "3 Oct 2019"
 tags     "programming, box"
 
 sample
-	/*----------------+
-	 | toast is yummy |
-	 +----------------*/
+    /*----------------+
+     | toast is yummy |
+     +----------------*/
 ends
 
 shapes {
-	nw ("/*")	n  ("-")	ne ("+ ")
-	w  (" |")			e  ("| ")
-	sw (" +")	s  ("-")	se ("*/")
+    nw ("/*")  n ("-")  ne ("+ ")
+    w  (" |")            e ("| ")
+    sw (" +")  s ("-")  se ("*/")
 }
 
-elastic (n,e,s,w)
+elastic (n, e, s, w)
 
 delim ?"
 replace "\*/" with "*\/"
 reverse "\*\\/" to "*/"
 
 padding {
-	horiz 1
+    horiz 1
 }
 
 END jstone
