@@ -3,6 +3,7 @@
 .project
 /.idea/
 /coverage/
+/cmake-build-debug/
 
 # Jekyll generated (website) artifacts
 /.jekyll-metadata
@@ -18,13 +19,12 @@
 /out/
 *.o
 *.a
-/src/boxes.h
-/cmake-build-debug/
 /test/*.tmp
 
 # Legacy locations of generated files (no longer in use)
 /src/boxes
 /src/boxes.exe
+/src/boxes.h
 /src/lex.yy.c
 /src/parser.h
 /src/parser.c
@@ -37,3 +37,6 @@
 /tools/README*.md
 /tools/LICENSE.txt
 /boxes.portable.*.nupkg
+
+# Misc
+/vs
