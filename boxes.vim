@@ -34,8 +34,6 @@ syntax case ignore
 " Set the keyword characters
 syntax iskeyword a-z,A-Z
 
-" TODO spell checking - In a boxes config file, only comments should be spell checked.
-
 
 "
 "  Key Words
@@ -149,10 +147,11 @@ syntax region  boxesNames matchgroup=boxesBoxStmt start=/\<box\s\+/ end=/\>[ \t\
 syntax match   boxesDelim display /\<delim\%(iter\)\?\>/ nextgroup=delimRegion15,delimRegion06,delimRegion03,delimRegion04,delimRegion05,delimRegion02,delimRegion07,delimRegion08,delimRegion09,delimRegion10,delimRegion11,delimRegion12,delimRegion13,delimRegion14,delimRegion01,delimRegion16,delimRegion17,delimRegion18,delimRegion
 
 " Comments may appear anywhere in the file
-syntax match   boxesComment display /#.*$/
+syntax match   boxesComment display /#.*$/ contains=@Spell
 
 " The SAMPLE block
 syntax region  boxesSample matchgroup=boxesBlocks start="sample" end=+^[ \t]*ends[ \t\r]*$+ keepend
+
 
 "
 "  Synchronisation
