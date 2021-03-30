@@ -1473,6 +1473,8 @@ END right
 # ============================================================================
 
 
+# As soon as boxes v2.1.0 is available everywhere, aliases will be activated:
+#BOX ada-cmt, lua-cmt, sql-cmt
 BOX ada-cmt
 
 author   "Neil Bird <neil.bird@rdel.co.uk>"
@@ -1503,6 +1505,8 @@ END ada-cmt
 # ============================================================================
 
 
+# As soon as boxes v2.1.0 is available everywhere, aliases will be activated:
+#BOX ada-box, lua-box, sql-box
 BOX ada-box
 
 author   "Neil Bird <neil.bird@rdel.co.uk>"
