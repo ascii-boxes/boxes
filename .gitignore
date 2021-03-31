@@ -16,6 +16,7 @@
 /doc/boxes.1.raw.html
 /doc/boxes.1.html
 /pcre2-*/
+/flex_bison_*/
 /out/
 *.o
 *.a

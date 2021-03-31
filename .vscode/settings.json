@@ -30,6 +30,7 @@
         "**/.github/**",
         "**/_site/**",
         "**/_support/**",
+        "**/flex_bison_*/**",
         "**/pcre2-*/**"
     ],
     "todo-tree.general.statusBar": "total",

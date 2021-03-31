@@ -28,29 +28,41 @@ DOC_FILES  = doc/boxes.1 doc/boxes.el
 PKG_NAME   = boxes-$(BVERSION)
 OUT_DIR    = out
 
-WIN_PCRE2_VERSION = 10.36
-WIN_PCRE2_DIR     = pcre2-$(WIN_PCRE2_VERSION)
+WIN_PCRE2_VERSION      = 10.36
+WIN_PCRE2_DIR          = pcre2-$(WIN_PCRE2_VERSION)
+WIN_FLEX_BISON_VERSION = 2.5.24
+WIN_FLEX_BISON_DIR     = flex_bison_$(WIN_FLEX_BISON_VERSION)
 
 .PHONY: clean build win32 debug win32.debug win32.pcre infomsg replaceinfos test package win32.package package_common
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 build debug: infomsg replaceinfos
-	$(MAKE) -C src BOXES_PLATFORM=unix $@
+	$(MAKE) -C src BOXES_PLATFORM=unix LEX=flex YACC=bison $@
 
 win32: infomsg replaceinfos
-	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(WIN_PCRE2_DIR)/src LDFLAGS=-L../$(WIN_PCRE2_DIR)/.libs build
+	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(WIN_PCRE2_DIR)/src LDFLAGS=-L../$(WIN_PCRE2_DIR)/.libs \
+	    LEX=../$(WIN_FLEX_BISON_DIR)/win_flex.exe YACC=../$(WIN_FLEX_BISON_DIR)/win_bison.exe build
 
 win32.debug: infomsg replaceinfos
-	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(WIN_PCRE2_DIR)/src LDFLAGS=-L../$(WIN_PCRE2_DIR)/.libs debug
+	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(WIN_PCRE2_DIR)/src LDFLAGS=-L../$(WIN_PCRE2_DIR)/.libs \
+	    LEX=../$(WIN_FLEX_BISON_DIR)/win_flex.exe YACC=../$(WIN_FLEX_BISON_DIR)/win_bison.exe debug
 
-win32.pcre:
-	# build the pcre2 dependency (only needed on Windows MinGW)
-	curl -LO https://ftp.pcre.org/pub/pcre/$(WIN_PCRE2_DIR).tar.gz
+win32.prereq:
+	# download components
+	curl -LO https://ftp.pcre.org/pub/pcre/pcre2-$(WIN_PCRE2_VERSION).tar.gz
+	curl -LO https://downloads.sourceforge.net/project/winflexbison/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip
+	# unpack components
 	tar xfz $(WIN_PCRE2_DIR).tar.gz
-	cd $(WIN_PCRE2_DIR)
-	./configure --disable-pcre2-8 --disable-pcre2-16 --enable-pcre2-32 --disable-shared --enable-never-backslash-C --enable-newline-is-anycrlf
+	unzip win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip -d $(WIN_FLEX_BISON_DIR)
+	# build the pcre2 dependency (only needed on Windows MinGW)
+	cd $(WIN_PCRE2_DIR) ; \
+	./configure --disable-pcre2-8 --disable-pcre2-16 --enable-pcre2-32 --disable-shared \
+				--enable-never-backslash-C --enable-newline-is-anycrlf ; \
 	$(MAKE)
+	# remove downloaded archives
+	rm pcre2-$(WIN_PCRE2_VERSION).tar.gz
+	rm win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
