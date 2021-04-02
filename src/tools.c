@@ -682,4 +682,37 @@ size_t array_count0(char **array)
 }
 
 
+
+char *trimdup(char *s, char *e)
+{
+    if (s > e || (s == e && *s == '\0')) {
+        return strdup("");
+    }
+    while (s <= e && (*s == ' ' || *s == '\t')) {
+        ++s;
+    }
+    while (e > s && (*e == ' ' || *e == '\t')) {
+        --e;
+    }
+    return strndup(s, e - s + 1);
+}
+
+
+
+
+int tag_is_valid(char *tag)
+{
+    if (tag == NULL) {
+        return 0;
+    }
+
+    const size_t len = strlen(tag);
+    return len > 0
+        && strspn(tag, "abcdefghijklmnopqrstuvwxyz-0123456789") == len
+        && strchr("abcdefghijklmnopqrstuvwxyz", tag[0]) != NULL
+        && tag[len - 1] != '-'
+        && strstr(tag, "--") == NULL;
+}
+
+
 /*EOF*/                                                  /* vim: set sw=4: */

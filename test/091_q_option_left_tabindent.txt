@@ -1,5 +1,5 @@
 :ARGS
--q -t 8k
+-q (undoc) -t 8k
 :INPUT
 	foo
 	barf

@@ -1,5 +1,5 @@
 :ARGS
--ac -q -p a3 -d diamonds -i text
+-ac -q (undoc) -p a3 -d diamonds -i text
 :INPUT
     foo
     barf

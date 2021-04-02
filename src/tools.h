@@ -97,6 +97,24 @@ int array_contains0(char **array, const char *s);
  */
 size_t array_count0(char **array);
 
+/**
+ * Trim leading and trailing whitespace from a string and return the result in a new string, for which memory is
+ * allocated. `s` and `e` may point into some other string, which will not be modified. `e` should be greater than `s`.
+ * @param s pointer to the first character of the string
+ * @param e pointer to the last character of the string (NOT the character AFTER the last)
+ * @returns a new string, which may be the empty string if the input was invalid or consisted only of whitespace
+ */
+char *trimdup(char *s, char *e);
+
+/**
+ * Determine if the given string is a valid tag. Valid tags are lower-case alphanumeric strings which may have
+ * intermixed, single hyphens. A valid tag starts with a letter. Hyphens may also not appear as last character.
+ * @param tag a potential tag
+ * @return flag indicating validity
+ */
+int tag_is_valid(char *tag);
+
+
 #endif
 
 /*EOF*/                                          /* vim: set cindent sw=4: */

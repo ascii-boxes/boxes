@@ -90,7 +90,7 @@ static void usage(FILE *st)
     fprintf(st, "        -m       mend box, i.e. remove it and redraw it afterwards\n");
     fprintf(st, "        -n enc   Character encoding of input and output [default: %s]\n", locale_charset());
     fprintf(st, "        -p fmt   padding [default: none]\n");
-    /* fprintf(st, "        -q       modify command for needs of the web UI (undocumented)\n"); */
+    fprintf(st, "        -q qry   in combination with -l, query design list by tag\n"); /* with (undoc) arg, trigger undocumented webui stuff */
     fprintf(st, "        -r       remove box\n");
     fprintf(st, "        -s wxh   box size (width w and/or height h)\n");
     fprintf(st, "        -t str   tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
@@ -128,6 +128,55 @@ static void usage_long(FILE *st)
 
 
 
+static int validate_tag(char *tag)
+{
+    if (strcmp(tag, "(all)") == 0 || strcmp(tag, "(undoc)") == 0) {
+        return 1;
+    }
+    return tag_is_valid(tag);
+}
+
+
+
+static char **parse_tag_query(char *optarg)
+{
+    char **result = NULL;
+    char *dup = strdup(optarg);   /* required because strtok() modifies its input */
+
+    size_t num_expr = 0;
+    for (char *q = strtok(dup, ","); q != NULL; q = strtok(NULL, ","))
+    {
+        char *trimmed = trimdup(q, q + strlen(q) - 1);
+        if (strlen(trimmed) == 0) {
+            BFREE(trimmed);
+            continue;
+        }
+
+        if (trimmed[0] == '+' || trimmed[0] == '-') {
+            if (!validate_tag(trimmed + 1)) {
+                fprintf(stderr, "%s: not a tag -- %s\n", PROJECT, trimmed + 1);
+                return NULL;
+            }
+        } else if (!validate_tag(trimmed)) {
+            fprintf(stderr, "%s: not a tag -- %s\n", PROJECT, trimmed);
+            return NULL;
+        }
+
+        ++num_expr;
+        result = (char **) realloc(result, (num_expr + 1) * sizeof(char *));
+        if (result == NULL) {
+            perror(PROJECT);
+            break;
+        }
+        result[num_expr - 1] = trimmed;
+        result[num_expr] = NULL;
+    }
+    BFREE(dup);
+    return result;
+}
+
+
+
 static int process_commandline(int argc, char *argv[])
 /*
  *  Process command line options.
@@ -157,6 +206,7 @@ static int process_commandline(int argc, char *argv[])
     opt.tabexp = 'e';
     opt.killblank = -1;
     opt.encoding = NULL;
+    opt.query = NULL;
     for (idummy = 0; idummy < ANZ_SIDES; ++idummy) {
         opt.padding[idummy] = -1;
     }
@@ -173,7 +223,7 @@ static int process_commandline(int argc, char *argv[])
      *  Parse Command Line
      */
     do {
-        oc = getopt(argc, argv, "a:c:d:f:hi:k:lmn:p:qrs:t:v");
+        oc = getopt(argc, argv, "a:c:d:f:hi:k:lmn:p:q:rs:t:v");
 
         switch (oc) {
 
@@ -416,9 +466,13 @@ static int process_commandline(int argc, char *argv[])
 
             case 'q':
                 /*
-                 *  Activate special behavior for web UI (undocumented)
+                 *  Record the argument of the '-q' option. Combined with '-l', this is a tag query,
+                 *  else it activates undocumented special behavior used by the web UI.
                  */
-                opt.q = 1;
+                opt.query = parse_tag_query(optarg);
+                if (opt.query == NULL) {
+                    return 1;
+                }
                 break;
 
             case 'r':
@@ -584,7 +638,15 @@ static int process_commandline(int argc, char *argv[])
         fprintf (stderr, "- Line justification: \'%c\'\n", opt.justify? opt.justify: '?');
         fprintf (stderr, "- Kill blank lines: %d\n", opt.killblank);
         fprintf (stderr, "- Remove box: %d\n", opt.r);
-        fprintf (stderr, "- Special handling for Web UI: %d\n", opt.q);
+        fprintf (stderr, "- Tag Query / Special handling for Web UI: ");
+        if (opt.query != NULL) {
+            for (size_t qidx = 0; opt.query[qidx] != NULL; ++qidx) {
+                fprintf(stderr, "%s%s", qidx > 0 ? ", " : "", opt.query[qidx]);
+            }
+        } else {
+            fprintf (stderr, "(none)");
+        }
+        fprintf (stderr, "\n");
         fprintf (stderr, "- Mend box: %d\n", opt.mend);
         fprintf (stderr, "- Design Definition W shape: %s\n", opt.cld? opt.cld: "n/a");
     #endif
@@ -765,6 +827,14 @@ static char *names(design_t *design)
 
 
 
+static int filter_by_tag(char **tags)
+{
+    // TODO
+    return 1;  // TODO or 0 if the tags don't match
+}
+
+
+
 static int list_styles()
 /*
  *  Generate sorted listing of available box styles.
@@ -927,7 +997,7 @@ static int list_styles()
         /*
          *  Display all shapes
          */
-        if (opt.q) {
+        if (opt.query != NULL) {
             fprintf(opt.outfile, "Sample:\n%s\n", d->sample);
         }
         else {
@@ -966,14 +1036,16 @@ static int list_styles()
         }
         qsort(list, anz_designs, sizeof(design_t *), style_sort);
 
-        if (!opt.q) {
+        if (opt.query == NULL) {
             print_design_list_header();
         }
         for (i = 0; i < anz_designs; ++i) {
-            if (opt.q) {
-                fprintf(opt.outfile, "%s\n", list[i]->name);
-                for (size_t aidx = 0; list[i]->aliases[aidx] != NULL; ++aidx) {
-                    fprintf(opt.outfile, "%s (alias)\n", list[i]->aliases[aidx]);
+            if (opt.query != NULL) {
+                if (filter_by_tag(list[i]->tags)) {
+                    fprintf(opt.outfile, "%s\n", list[i]->name);
+                    for (size_t aidx = 0; list[i]->aliases[aidx] != NULL; ++aidx) {
+                        fprintf(opt.outfile, "%s (alias)\n", list[i]->aliases[aidx]);
+                    }
                 }
             }
             else {

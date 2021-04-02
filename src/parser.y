@@ -416,18 +416,6 @@ static int design_name_exists(pass_to_bison *bison_args, char *name)
 
 
 
-static int tag_is_valid(char *tag)
-{
-    const size_t len = strlen(tag);
-    return len > 0
-        && strspn(tag, "abcdefghijklmnopqrstuvwxyz-0123456789") == len
-        && strchr("abcdefghijklmnopqrstuvwxyz", tag[0]) != NULL
-        && tag[len - 1] != '-'
-        && strstr(tag, "--") == NULL;
-}
-
-
-
 static int tag_add(pass_to_bison *bison_args, char *tag)
 {
     int rc = 0;
@@ -463,22 +451,6 @@ static char *tag_next_comma(char *s)
 
 
 
-static char *tag_trim(char *s, char *e)
-{
-    if (s > e || (s == e && *s == '\0')) {
-        return strdup("");
-    }
-    while (s <= e && (*s == ' ' || *s == '\t')) {
-        ++s;
-    }
-    while (e > s && (*e == ' ' || *e == '\t')) {
-        --e;
-    }
-    return strndup(s, e - s + 1);
-}
-
-
-
 static int tag_split_add(pass_to_bison *bison_args, char *tag)
 {
     int rc = 0;
@@ -486,7 +458,7 @@ static int tag_split_add(pass_to_bison *bison_args, char *tag)
     char *c = NULL;
     do {
         c = tag_next_comma(s);
-        char *single_tag = tag_trim(s, c - 1);
+        char *single_tag = trimdup(s, c - 1);
         int rc_add = tag_add(bison_args, single_tag);
         if (rc_add != 0) {
             rc = rc_add;
@@ -511,7 +483,7 @@ static int tag_record(pass_to_bison *bison_args, char *tag)
         rc = tag_split_add(bison_args, tag);
     }
     else {
-        char *trimmed = tag_trim(tag, tag + strlen(tag) - 1);
+        char *trimmed = trimdup(tag, tag + strlen(tag) - 1);
         rc = tag_add(bison_args, trimmed);
     }
     return rc;

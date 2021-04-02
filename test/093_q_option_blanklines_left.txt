@@ -1,5 +1,5 @@
 :ARGS
--q -s 12 -al
+-q (undoc) -s 12 -al
 :INPUT
 f
 fo

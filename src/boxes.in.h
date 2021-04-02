@@ -123,7 +123,7 @@ typedef struct {                         /* Command line options: */
     int       l;                         /** list available designs */
     char     *f;                         /** the string specified as argument to -f ; config file path */
     int       mend;                      /** 1 if -m is given, 2 in 2nd loop */
-    int       q;                         /** special handling of web UI needs */
+    char    **query;                     /** parsed tag query expression passed in via -q; also, special handling of web UI needs */
     int       r;                         /** remove box from input */
     int       tabstop;                   /** tab stop distance */
     char      tabexp;                    /** tab expansion mode (for leading tabs) */

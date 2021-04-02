@@ -1,5 +1,5 @@
 :ARGS
--ac -q -s 18x5 -p h3
+-ac -q (undoc) -s 18x5 -p h3
 :INPUT
 foo
 barf

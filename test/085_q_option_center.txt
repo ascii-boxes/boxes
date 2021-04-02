@@ -1,5 +1,5 @@
 :ARGS
--ac -q -s 12
+-ac -q (undoc) -s 12
 :INPUT
 foo
 barf

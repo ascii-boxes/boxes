@@ -1,5 +1,5 @@
 :ARGS
--q -d right
+-q (undoc) -d right
 :INPUT
 foo
 

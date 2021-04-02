@@ -1,5 +1,5 @@
 :ARGS
--ac -q -s 18 -p a3 -i box
+-ac -q (undoc) -s 18 -p a3 -i box
 :INPUT
   foo
   barf
