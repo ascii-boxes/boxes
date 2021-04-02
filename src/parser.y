@@ -326,6 +326,7 @@ static void init_design(pass_to_bison *bison_args, design_t *design)
     design->aliases = (char **) calloc(1, sizeof(char *));
     design->indentmode = DEF_INDENTMODE;
     design->defined_in = bison_args->config_file;
+    design->tags = (char **) calloc(1, sizeof(char *));
 }
 
 
@@ -413,6 +414,109 @@ static int design_name_exists(pass_to_bison *bison_args, char *name)
     return result;
 }
 
+
+
+static int tag_is_valid(char *tag)
+{
+    const size_t len = strlen(tag);
+    return len > 0
+        && strspn(tag, "abcdefghijklmnopqrstuvwxyz-0123456789") == len
+        && strchr("abcdefghijklmnopqrstuvwxyz", tag[0]) != NULL
+        && tag[len - 1] != '-'
+        && strstr(tag, "--") == NULL;
+}
+
+
+
+static int tag_add(pass_to_bison *bison_args, char *tag)
+{
+    int rc = 0;
+    if (tag_is_valid(tag)) {
+        if (!array_contains0(curdes.tags, tag)) {
+            size_t num_tags = array_count0(curdes.tags);
+            curdes.tags = (char **) realloc(curdes.tags, (num_tags + 2) * sizeof(char *));
+            curdes.tags[num_tags] = tag;
+            curdes.tags[num_tags + 1] = NULL;
+        }
+        else {
+            yyerror(bison_args, "duplicate tag -- %s", tag);
+            rc = 1;
+        }
+    }
+    else {
+        yyerror(bison_args, "invalid tag -- %s", tag);
+        rc = 2;
+    }
+    return rc;
+}
+
+
+
+static char *tag_next_comma(char *s)
+{
+    char *comma = strchr(s, ',');
+    if (comma == NULL) {
+        comma = s + strlen(s);
+    }
+    return comma;
+}
+
+
+
+static char *tag_trim(char *s, char *e)
+{
+    if (s > e || (s == e && *s == '\0')) {
+        return strdup("");
+    }
+    while (s <= e && (*s == ' ' || *s == '\t')) {
+        ++s;
+    }
+    while (e > s && (*e == ' ' || *e == '\t')) {
+        --e;
+    }
+    return strndup(s, e - s + 1);
+}
+
+
+
+static int tag_split_add(pass_to_bison *bison_args, char *tag)
+{
+    int rc = 0;
+    char *s = tag;
+    char *c = NULL;
+    do {
+        c = tag_next_comma(s);
+        char *single_tag = tag_trim(s, c - 1);
+        int rc_add = tag_add(bison_args, single_tag);
+        if (rc_add != 0) {
+            rc = rc_add;
+        }
+        s = c + 1;
+    } while (*c != '\0');
+    return rc;
+}
+
+
+
+/**
+ * Add tag to list of current design's tag after validity checking.
+ * @param bison_args the parser state
+ * @param tag a single tag, or a comma-separated list of tags
+ * @return error code, 0 on success, anything else on failure
+ */
+static int tag_record(pass_to_bison *bison_args, char *tag)
+{
+    int rc = 0;
+    if (strchr(tag, ',') != NULL) {
+        rc = tag_split_add(bison_args, tag);
+    }
+    else {
+        char *trimmed = tag_trim(tag, tag + strlen(tag) - 1);
+        rc = tag_add(bison_args, trimmed);
+    }
+    return rc;
+}
+
 }
 
 
@@ -438,7 +542,7 @@ static int design_name_exists(pass_to_bison *bison_args, char *name)
 }
 
 %token YPARENT YSHAPES YELASTIC YPADDING YSAMPLE YENDSAMPLE YBOX YEND YUNREC
-%token YREPLACE YREVERSE YTO YWITH YCHGDEL
+%token YREPLACE YREVERSE YTO YWITH YCHGDEL YTAGS
 %token <s> KEYWORD
 %token <s> WORD
 %token <s> STRING
@@ -575,10 +679,7 @@ alias: WORD
             yyerror(bison_args, "alias already in use -- %s", $1);
             YYERROR;
         }
-        size_t num_aliases = 0;
-        while (curdes.aliases[num_aliases] != NULL) {
-            ++num_aliases;
-        }
+        size_t num_aliases = array_count0(curdes.aliases);
         curdes.aliases = (char **) realloc(curdes.aliases, (num_aliases + 2) * sizeof(char *));
         curdes.aliases[num_aliases] = strdup($1);
         curdes.aliases[num_aliases + 1] = NULL;
@@ -670,6 +771,16 @@ layout YEND WORD
 layout: layout entry | layout block | entry | block ;
 
 
+tag_entry: STRING
+    {
+        if (tag_record(bison_args, $1) != 0) {
+            YYABORT;
+        }
+    }
+
+tag_list: tag_entry | tag_list ',' tag_entry;
+
+
 entry: KEYWORD STRING
     {
         #ifdef PARSER_DEBUG
@@ -711,9 +822,7 @@ entry: KEYWORD STRING
             }
         }
         else if (strcasecmp ($1, "tags") == 0) {
-            curdes.tags = (char *) strdup ($2);
-            if (curdes.tags == NULL) {
-                perror (PROJECT);
+            if (tag_record(bison_args, $2) != 0) {
                 YYABORT;
             }
         }
@@ -771,6 +880,8 @@ entry: KEYWORD STRING
         }
         chg_strdelims(bison_args, $2[0], $2[1]);
     }
+
+| YTAGS '(' tag_list ')' | YTAGS tag_entry
 
 | WORD STRING
     {

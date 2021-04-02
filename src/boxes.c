@@ -164,8 +164,7 @@ static int process_commandline(int argc, char *argv[])
     /*
      *  Intercept '--help' and '-?' cases first, as they are not supported by getopt()
      */
-    if (argc >= 2 && argv[1] != NULL
-            && (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-?") == 0)) {
+    if (argc >= 2 && argv[1] != NULL && (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-?") == 0)) {
         usage_long(stdout);
         return 42;
     }
@@ -632,8 +631,8 @@ static int build_design(design_t **adesigns, const char *cld)
     dp->padding[BLEF] = 1;
     dp->defined_in = "(command line)";
 
-    dp->tags = (char *) calloc(10, sizeof(char));
-    strcpy(dp->tags, "transient");
+    dp->tags = (char **) calloc(2, sizeof(char *));
+    dp->tags[0] = "transient";
 
     dp->shape[W].height = 1;
     dp->shape[W].width = strlen(cld);
@@ -901,8 +900,16 @@ static int list_styles()
                 empty_side(opt.design->shape, BTOP) &&
                         empty_side(opt.design->shape, BBOT) ? "no" : "yes");
 
-        fprintf(opt.outfile, "Tags:                   %s\n",
-                d->tags ? d->tags : "(none)");
+        fprintf(opt.outfile, "Tags:                   ");
+        size_t tidx = 0;
+        while(d->tags[tidx] != NULL) {
+            fprintf(opt.outfile, "%s%s", tidx > 0 ? ", " : "", d->tags[tidx]);
+            ++tidx;
+        }
+        if (tidx == 0) {
+            fprintf(opt.outfile, "none");
+        }
+        fprintf(opt.outfile, "\n");
 
         fprintf(opt.outfile, "Elastic Shapes:         ");
         sstart = 0;

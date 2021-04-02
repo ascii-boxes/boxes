@@ -266,6 +266,12 @@ ends[ \t\r]*$ {
 }
 
 
+Tags {
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "  YTAGS: %s\n", yytext);
+    #endif
+    return YTAGS;
+}
 
 Elastic {
     BEGIN(ELASTIC);
@@ -327,7 +333,7 @@ Once    { yylval->c = 'o'; return YRXPFLAG; }
 }
 
 
-author|designer|tags|created|revision|revdate|indent {
+author|designer|created|revision|revdate|indent {
     /*
      *  general key words
      */
