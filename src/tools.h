@@ -82,6 +82,20 @@ void analyze_line_ascii(line_t *line);
 
 int array_contains(char **array, const size_t array_len, const char *s);
 
+/**
+ * Determine if the given `array` contains the given string (case-insensitive!).
+ * @param array an array of strings to search
+ * @param s the string to search
+ * @returns != 0 if found, 0 if not found
+ */
+int array_contains0(char **array, const char *s);
+
+/**
+ * Count the number of elements in a zero-terminated array.
+ * @param array a zero-terminated array of strings (can be NULL)
+ * @returns the number of elements, excluding the zero terminator
+ */
+size_t array_count0(char **array);
 
 #endif
 

@@ -653,4 +653,33 @@ int array_contains(char **array, const size_t array_len, const char *s)
 }
 
 
+
+int array_contains0(char **array, const char *s)
+{
+    int result = 0;
+    if (array != NULL) {
+        for (size_t i = 0; array[i] != NULL; ++i) {
+            if (strcasecmp(array[i], s) == 0) {
+                result = 1;
+                break;
+            }
+        }
+    }
+    return result;
+}
+
+
+
+size_t array_count0(char **array)
+{
+    size_t num_elems = 0;
+    if (array != NULL) {
+        while (array[num_elems] != NULL) {
+            ++num_elems;
+        }
+    }
+    return num_elems;
+}
+
+
 /*EOF*/                                                  /* vim: set sw=4: */
