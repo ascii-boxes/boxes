@@ -1,0 +1,7 @@
+:ARGS
+-q ,,
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: empty tag query -- ,,
+:EOF

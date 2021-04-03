@@ -745,9 +745,7 @@ layout: layout entry | layout block | entry | block ;
 
 tag_entry: STRING
     {
-        if (tag_record(bison_args, $1) != 0) {
-            YYABORT;
-        }
+        tag_record(bison_args, $1);    /* discard return code (we print warnings, but tolerate the problem) */
     }
 
 tag_list: tag_entry | tag_list ',' tag_entry;
@@ -794,9 +792,7 @@ entry: KEYWORD STRING
             }
         }
         else if (strcasecmp ($1, "tags") == 0) {
-            if (tag_record(bison_args, $2) != 0) {
-                YYABORT;
-            }
+            tag_record(bison_args, $2);    /* discard return code (we print warnings, but tolerate the problem) */
         }
         else if (strcasecmp ($1, "indent") == 0) {
             if (strcasecmp ($2, "text") == 0 ||

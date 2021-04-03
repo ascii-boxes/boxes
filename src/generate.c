@@ -1034,7 +1034,7 @@ int output_box(const sentry_t *thebox)
     }
 
     /* add info line for web ui if requested with -q */
-    if (opt.query != NULL) {
+    if (query_is_undoc()) {
         fprintf(opt.outfile, "%d ", (int) (thebox[BTOP].height + vfill1_save - skip_start));
         for (j = 0; j < input.anz_lines; j++) {
             fprintf(opt.outfile, "%d%s",

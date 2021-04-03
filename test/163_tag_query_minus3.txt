@@ -1,0 +1,9 @@
+:ARGS
+-f 14x_tag_query.cfg -q -tag1,tag2
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+designB
+aliasB1 (alias)
+aliasB2 (alias)
+:EOF

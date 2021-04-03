@@ -45,6 +45,13 @@
 #include "unicode.h"
 
 
+
+typedef struct {
+    char  *tag;
+    size_t count;
+} tagstats_t;
+
+
 /*       _\|/_
          (o o)
  +----oOO-{_}-OOo------------------------------------------------------------+
@@ -130,7 +137,7 @@ static void usage_long(FILE *st)
 
 static int validate_tag(char *tag)
 {
-    if (strcmp(tag, "(all)") == 0 || strcmp(tag, "(undoc)") == 0) {
+    if (strcmp(tag, QUERY_ALL) == 0 || strcmp(tag, QUERY_UNDOC) == 0) {
         return 1;
     }
     return tag_is_valid(tag);
@@ -143,6 +150,7 @@ static char **parse_tag_query(char *optarg)
     char **result = NULL;
     char *dup = strdup(optarg);   /* required because strtok() modifies its input */
 
+    int contains_positive_element = 0;
     size_t num_expr = 0;
     for (char *q = strtok(dup, ","); q != NULL; q = strtok(NULL, ","))
     {
@@ -152,14 +160,23 @@ static char **parse_tag_query(char *optarg)
             continue;
         }
 
-        if (trimmed[0] == '+' || trimmed[0] == '-') {
-            if (!validate_tag(trimmed + 1)) {
-                fprintf(stderr, "%s: not a tag -- %s\n", PROJECT, trimmed + 1);
-                return NULL;
-            }
-        } else if (!validate_tag(trimmed)) {
-            fprintf(stderr, "%s: not a tag -- %s\n", PROJECT, trimmed);
+        if (trimmed[0] != '-') {
+            contains_positive_element = 1;
+        }
+
+        char *raw_tag = (trimmed[0] == '+' || trimmed[0] == '-') ? (trimmed + 1) : trimmed;
+        if (!validate_tag(raw_tag)) {
+            fprintf(stderr, "%s: not a tag -- %s\n", PROJECT, raw_tag);
             return NULL;
+        }
+        if (result != NULL) {
+            for (size_t i = 0; result[i] != NULL; ++i) {
+                char *restag = (result[i][0] == '+' || result[i][0] == '-') ? (result[i] + 1) : result[i];
+                if (strcasecmp(restag, raw_tag) == 0) {
+                    fprintf(stderr, "%s: duplicate query expression -- %s\n", PROJECT, trimmed);
+                    return NULL;
+                }
+            }
         }
 
         ++num_expr;
@@ -172,6 +189,23 @@ static char **parse_tag_query(char *optarg)
         result[num_expr] = NULL;
     }
     BFREE(dup);
+
+    if (num_expr == 0) {
+        fprintf(stderr, "%s: empty tag query -- %s\n", PROJECT, optarg);
+        return NULL;
+    }
+
+    if (!contains_positive_element) {
+        ++num_expr;
+        result = (char **) realloc(result, (num_expr + 1) * sizeof(char *));
+        if (result == NULL) {
+            perror(PROJECT);
+        }
+        else {
+            result[num_expr - 1] = QUERY_ALL;
+            result[num_expr] = NULL;
+        }
+    }
     return result;
 }
 
@@ -827,10 +861,89 @@ static char *names(design_t *design)
 
 
 
+int query_is_undoc()
+{
+    return opt.query != NULL && strcmp(opt.query[0], QUERY_UNDOC) == 0 && opt.query[1] == NULL;
+}
+
+
+
 static int filter_by_tag(char **tags)
 {
-    // TODO
-    return 1;  // TODO or 0 if the tags don't match
+    #ifdef DEBUG
+        fprintf(stderr, "filter_by_tag(");
+        for (size_t tidx = 0; tags[tidx] != NULL; ++tidx) {
+            fprintf(stderr, "%s%s", tidx > 0 ? ", " : "", tags[tidx]);
+        }
+    #endif
+
+    int result = array_contains0(opt.query, QUERY_ALL);
+    if (opt.query != NULL) {
+        for (size_t qidx = 0; opt.query[qidx] != NULL; ++qidx) {
+            if (opt.query[qidx][0] == '+') {
+                result = array_contains0(tags, opt.query[qidx] + 1);
+                if (!result) {
+                    break;
+                }
+            }
+            else if (opt.query[qidx][0] == '-') {
+                if (array_contains0(tags, opt.query[qidx] + 1)) {
+                    result = 0;
+                    break;
+                }
+            }
+            else if (array_contains0(tags, opt.query[qidx])) {
+                result = 1;
+            }
+        }
+    }
+
+    #ifdef DEBUG
+        fprintf(stderr, ") -> %d\n", result);
+    #endif
+    return result;
+}
+
+
+
+static void count_tag(char *tag, tagstats_t **tagstats, size_t *num_tags)
+{
+    if (*tagstats != NULL) {
+        for (size_t i = 0; i < (*num_tags); ++i) {
+            if (strcasecmp((*tagstats)[i].tag, tag) == 0) {
+                ++((*tagstats)[i].count);
+                return;
+            }
+        }
+    }
+
+    ++(*num_tags);
+    *tagstats = realloc(*tagstats, (*num_tags) * sizeof(tagstats_t));
+    (*tagstats)[(*num_tags) - 1].tag = tag;
+    (*tagstats)[(*num_tags) - 1].count = 1;
+}
+
+
+
+static int tagstats_sort(const void *p1, const void *p2)
+{
+    return strcasecmp(((tagstats_t *) p1)->tag, ((tagstats_t *) p2)->tag);
+}
+
+
+
+static void print_tags(tagstats_t *tagstats, size_t num_tags)
+{
+    if (tagstats != NULL) {
+        qsort(tagstats, num_tags, sizeof(tagstats_t), tagstats_sort);
+        for (size_t tidx = 0; tidx < num_tags; ++tidx) {
+            if (tidx > 0) {
+                fprintf(opt.outfile, " | ");
+            }
+            fprintf(opt.outfile, "%s (%d)", tagstats[tidx].tag, (int) tagstats[tidx].count);
+        }
+        fprintf(opt.outfile, "\n");
+    }
 }
 
 
@@ -997,7 +1110,7 @@ static int list_styles()
         /*
          *  Display all shapes
          */
-        if (opt.query != NULL) {
+        if (query_is_undoc()) {
             fprintf(opt.outfile, "Sample:\n%s\n", d->sample);
         }
         else {
@@ -1036,6 +1149,8 @@ static int list_styles()
         }
         qsort(list, anz_designs, sizeof(design_t *), style_sort);
 
+        tagstats_t *tagstats = NULL;
+        size_t num_tags = 0;
         if (opt.query == NULL) {
             print_design_list_header();
         }
@@ -1065,9 +1180,18 @@ static int list_styles()
                     fprintf(opt.outfile, "%s:\n\n%s\n\n", all_names, list[i]->sample);
                 }
                 BFREE(all_names);
+
+                for (size_t tidx = 0; list[i]->tags[tidx] != NULL; ++tidx) {
+                    count_tag(list[i]->tags[tidx], &tagstats, &num_tags);
+                }
             }
         }
-        BFREE (list);
+        BFREE(list);
+
+        if (opt.query == NULL) {
+            print_tags(tagstats, num_tags);
+            BFREE(tagstats);
+        }
     }
 
     return 0;
