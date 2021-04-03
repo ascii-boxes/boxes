@@ -1445,22 +1445,22 @@ BOX right
 
 author   "Thomas Jensen"
 designer "Thomas Jensen"
-revision "1.0"
-revdate  "June 17, 1999 (Thursday, 19:59h)"
+revision "1.1"
+revdate  "April 3, 2021 (Saturday, 21:13h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "simple, programming, comment, deprecated"
+tags     "simple, programming, comment"
 
 sample
     This can be used for marking code changes with your initials
     (I don't like it, but some people work this way):
 
-    for (j=0; j<blank_count; ++j)        /*@TJ@*/
-        fprintf (opt.outfile, "\n");     /*@TJ@*/
-    blank_count = 0;                     /*@TJ@*/
+    for (j=0; j<blank_count; ++j)        /* XX */
+        fprintf (opt.outfile, "\n");     /* XX */
+    blank_count = 0;                     /* XX */
 ends
 
 shapes {
-    e ("/*@TJ@*/")
+    e ("/* XX */")
 }
 
 padding { right 4 }
