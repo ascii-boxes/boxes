@@ -171,7 +171,10 @@ top part or a bottom part, the default is yes.
 config file, along with a sample box and information about it's creator.
 Also checks syntax of the entire config file. If used in connection with
 .B \-d\fP,
-displays detailed information about the specified design.
+displays detailed information about the specified design. If used in
+connection with
+.B \-q\fP,
+displays only the design and alias names, but no further information.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-m
@@ -227,6 +230,27 @@ the box.
 .br
 By default, unless specified otherwise in the config file, no padding is
 used.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B \-q \fIquery\fP
+Query designs by tag. Can only be used in combination with
+.B \-l\fP.
+If used in other contexts, behavior is undefined.
+.br
+The
+.I query
+argument is a comma-separated list of tags which can be present on a design
+in order to match. A tag may optionally be prefixed with
+.I \+
+in order to require that a tag be present, or with
+.I \-
+in order to exclude designs which have that tag.
+.br
+Using this option alters the behavior of
+.B \-l
+so that only the design names are printed. This is intended for use by scripts.
+Alias names are printed below their primary design name, and postfixed with
+.I (alias)\fP.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-r
