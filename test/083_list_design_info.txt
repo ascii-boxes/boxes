@@ -17,7 +17,7 @@ Reversion Rules:        1. (glob) "\*\\/" TO "*/"
 Minimum Box Dimensions: 5 x 3  (width x height)
 Default Padding:        left 1, right 1
 Default Killblank:      yes
-Tags:                   programming, box
+Tags:                   simple, programming, box
 Elastic Shapes:         N, E, S, W
 Defined Shapes:          NW: "/*" 
                           N: "*" 

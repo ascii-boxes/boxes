@@ -28,7 +28,7 @@ designer "(public domain)"
 revision "1.0"
 revdate "March 18, 1999 (Thursday, 15:25h)"
 created "March 18, 1999 (Thursday, 15:25h)"
-tags    "programming, box"
+tags    "simple, programming, box"
 
 sample
     /*************/
@@ -283,7 +283,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     /*                               */
@@ -317,7 +317,7 @@ designer "(public domain)"
 revision "1.1"
 revdate  "August 18, 1999 (Wednesday, 17:01h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     /*
@@ -353,7 +353,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "October 25, 1999 (Monday 10:16h)"
 created  "October 25, 1999 (Monday 10:16h)"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     /**
@@ -389,7 +389,7 @@ designer "(public domain)"
 revision "1.2"
 revdate  "October 19, 2012 (Friday, 17:32h)"
 created  "March 18, 1999 (Thursday, 15:26h)"
-tags     "programming, box"
+tags     "simple, programming, box"
 
 sample
     <!-- - - - - - - - - - - -->
@@ -426,7 +426,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "March 18, 1999 (Thursday, 15:27h)"
 created  "March 18, 1999 (Thursday, 15:27h)"
-tags     "programming, box"
+tags     "simple, programming, box"
 
 sample
     #############
@@ -1330,7 +1330,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     //
@@ -1360,7 +1360,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     #
@@ -1389,7 +1389,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     <!--                                     -->
@@ -1417,7 +1417,7 @@ designer "Bram Moolenaar"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     "
@@ -1448,7 +1448,7 @@ designer "Thomas Jensen"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "programming, comment, deprecated"
+tags     "simple, programming, comment, deprecated"
 
 sample
     This can be used for marking code changes with your initials
@@ -1482,7 +1482,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "March 15, 2000 (Wednesday 12:17h)"
 created  "March 15, 2000 (Wednesday 12:17h)"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     --
@@ -1514,7 +1514,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "March 15, 2000 (Wednesday 12:24h)"
 created  "March 15, 2000 (Wednesday 12:24h)"
-tags     "programming, box"
+tags     "simple, programming, box"
 
 sample
     ---------------
@@ -1548,7 +1548,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "December 01, 2016 (Thursday 15:20h)"
 created  "December 01, 2016 (Thursday 15:20h)"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     %
@@ -1578,7 +1578,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "December 01, 2016 (Thursday 15:21h)"
 created  "December 01, 2016 (Thursday 15:21h)"
-tags     "programming, box"
+tags     "simple, programming, box"
 
 sample
     %=============%
@@ -1612,7 +1612,7 @@ designer "Christian Molls <CMolls@gmx.net>"
 revdate  "Tue Aug 15 23:02:02 CEST 2000"
 created  "Tue Aug 15 23:01:50 CEST 2000"
 revision "1.0"
-tags     "artwork"
+tags     "simple, artwork"
 
 sample
     ,----[ mp3-wav ]
@@ -1649,7 +1649,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "Tue Sep 19 12:06:51 CEST 2000"
 created  "Tue Sep 19 12:06:51 CEST 2000"
-tags     "programming, box"
+tags     "simple, programming, box"
 
 sample
     /****************
@@ -1686,7 +1686,7 @@ author   "Fredrik Steen <fsteen@stone.nu>"
 designer "Fredrik Steen <fsteen@stone.nu>"
 revision "1.0"
 created  "April 25, 2001 (Wed 11:00)"
-tags     "artwork, box"
+tags     "simple, artwork, box"
 
 sample
     +-------------+
@@ -1761,7 +1761,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "February 20, 2006 (Monday, 20:36h)"
 created  "February 20, 2006 (Monday, 20:36h)"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     ;;
@@ -1788,7 +1788,7 @@ BOX underline
 author   "Elmar Loos <elInfo@gmx.net>"
 designer "Elmar Loos <elInfo@gmx.net>"
 revision "1.0"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     // Bla, foo bar!
@@ -2075,7 +2075,7 @@ designer "Michael Tiernan <Michael.Tiernan@gMail.com>"
 revision "1.5"
 revdate  "Wed May 14 11:41:27 EDT 2014"
 created  "Wed May 14 11:41:27 EDT 2014"
-tags     "artwork, box"
+tags     "simple, artwork, box"
 
 sample
     (*************)
@@ -2544,7 +2544,7 @@ author   "Matt Thompson <fortran(at)gmail(dot)com>"
 designer "(public domain)"
 revision "1.0"
 created  "2018-02-08"
-tags     "programming, box"
+tags     "simple, programming, box"
 
 sample
     !!!!!!!!!!!!!
@@ -2576,7 +2576,7 @@ author   "Matt Thompson <fortran(at)gmail(dot)com>"
 designer "(public domain)"
 revision "1.0"
 created  "2018-02-08"
-tags     "programming, comment"
+tags     "simple, programming, comment"
 
 sample
     !
@@ -2698,7 +2698,7 @@ designer "schallee_@_darkmist.net"
 revision "1.0"
 revdate  "3 Oct 2019"
 created  "3 Oct 2019"
-tags     "programming, box"
+tags     "simple, programming, box"
 
 sample
     /*----------------+
@@ -2734,7 +2734,7 @@ author   "Ricky Anderson <ricky.anderson2696@gmail.com>"
 designer "(public domain)"
 revision "1.0"
 created  "2019-11-17"
-tags     "programming, box"
+tags     "simple, programming, box"
 
 sample
     """""""""""""""""""""""""""""""""""""""""""""""""""""""
