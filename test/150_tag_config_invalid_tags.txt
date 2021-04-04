@@ -1,0 +1,38 @@
+:ARGS
+-f 150_tag_config_invalid_tags.cfg -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+boxes: 150_tag_config_invalid_tags.cfg: line 32: invalid tag -- Invalid1
+boxes: 150_tag_config_invalid_tags.cfg: line 32: invalid tag -- 2invalid
+boxes: 150_tag_config_invalid_tags.cfg: line 32: invalid tag -- invalid3-
+boxes: 150_tag_config_invalid_tags.cfg: line 32: invalid tag -- -invalid4
+boxes: 150_tag_config_invalid_tags.cfg: line 32: invalid tag -- in--valid5
+boxes: 150_tag_config_invalid_tags.cfg: line 33: invalid tag -- in space valid6
+boxes: 150_tag_config_invalid_tags.cfg: line 59: invalid tag -- in space valid7
+3 Available Styles in "150_tag_config_invalid_tags.cfg":
+--------------------------------------------------------
+
+designA:
+
+    AAA
+    AAA foo
+    AAA
+
+
+designB:
+
+    BBB
+    BBB foo
+    BBB
+
+
+designC:
+
+    CCC
+    CCC foo
+    CCC
+
+
+tag1 (1) | tag2 (1) | tag3 (1) | tag4 (1) | tag5 (1) | tag6 (1)
+:EOF

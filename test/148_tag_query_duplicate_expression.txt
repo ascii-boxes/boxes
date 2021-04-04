@@ -1,0 +1,7 @@
+:ARGS
+-f 14x_tag_query.cfg -l -q -tag1,+tag1
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: duplicate query expression -- +tag1
+:EOF
