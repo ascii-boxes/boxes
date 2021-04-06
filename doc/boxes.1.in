@@ -7,7 +7,8 @@ boxes \- text mode box and comment drawing filter
 .SH SYNOPSIS
 .B boxes
 [\-hlmrv] [\-a\ format] [\-d\ design] [\-f\ file] [\-i\ indent] [\-k\ bool]
-[\-n\ encoding] [\-p\ pad] [\-s\ size] [\-t\ tabopts] [infile [outfile]]
+[\-n\ encoding] [\-p\ pad] [\-q query] [\-s\ size] [\-t\ tabopts]
+[infile [outfile]]
 .SH DESCRIPTION
 .I Boxes
 is a text filter which can draw any kind of box around its input text. Box
@@ -171,10 +172,7 @@ top part or a bottom part, the default is yes.
 config file, along with a sample box and information about it's creator.
 Also checks syntax of the entire config file. If used in connection with
 .B \-d\fP,
-displays detailed information about the specified design. If used in
-connection with
-.B \-q\fP,
-displays only the design and alias names, but no further information.
+displays detailed information about the specified design.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-m
@@ -233,24 +231,26 @@ used.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-q \fIquery\fP
-Query designs by tag. Can only be used in combination with
-.B \-l\fP.
-If used in other contexts, behavior is undefined.
-.br
+Query designs by tag. In contrast to
+.B \-l\fP,
+this will only print the matching design names. This option is normally used
+stand-alone; if used in combination with other options, behavior is undefined.
 The
 .I query
 argument is a comma-separated list of tags which can be present on a design
 in order to match. A tag may optionally be prefixed with
 .I \+
-in order to require that a tag be present, or with
+in order to require that it be present, or with
 .I \-
-in order to exclude designs which have that tag.
+in order to exclude designs which have that tag. Each tag can only occur once
+per query.
 .br
-Using this option alters the behavior of
-.B \-l
-so that only the design names are printed. This is intended for use by scripts.
-Alias names are printed below their primary design name, and postfixed with
+This option is intended for use by scripts. Alias names are printed below
+their primary design name, and postfixed with
 .I (alias)\fP.
+.br
+Example:
+.I boxes -q programming,-comment
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-r

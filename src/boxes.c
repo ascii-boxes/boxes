@@ -97,7 +97,7 @@ static void usage(FILE *st)
     fprintf(st, "        -m       mend box, i.e. remove it and redraw it afterwards\n");
     fprintf(st, "        -n enc   Character encoding of input and output [default: %s]\n", locale_charset());
     fprintf(st, "        -p fmt   padding [default: none]\n");
-    fprintf(st, "        -q qry   in combination with -l, query design list by tag\n"); /* with (undoc) arg, trigger undocumented webui stuff */
+    fprintf(st, "        -q qry   query the list of designs by tag\n"); /* with "(undoc)" as query, trigger undocumented webui stuff instead */
     fprintf(st, "        -r       remove box\n");
     fprintf(st, "        -s wxh   box size (width w and/or height h)\n");
     fprintf(st, "        -t str   tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
@@ -948,16 +948,35 @@ static void print_tags(tagstats_t *tagstats, size_t num_tags)
 
 
 
-static int list_styles()
-/*
- *  Generate sorted listing of available box styles.
- *  Uses design name from BOX spec and sample picture plus author.
- *
- *  RETURNS:  != 0   on error (out of memory)
- *            == 0   on success
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/**
+ * Create a sorted shallow copy of the design array.
+ * @returns a new array, for which memory was allocated. All pointers in the array point to the original data.
+ *      Returns `NULL` when out of memory.
  */
+static design_t **sort_designs_by_name()
+{
+    design_t **result = (design_t **) malloc(anz_designs * sizeof(design_t *));
+    if (result != NULL) {
+        for (int i = 0; i < anz_designs; ++i) {
+            result[i] = &(designs[i]);
+        }
+        qsort(result, anz_designs, sizeof(design_t *), style_sort);
+    }
+    else {
+        perror(PROJECT);
+    }
+    return result;
+}
+
+
+
+/**
+ * Generate sorted listing of available box styles.
+ * Uses design name from BOX spec and sample picture plus author.
+ * @returns != 0   on error (out of memory);
+ *          == 0   on success
+ */
+static int list_styles()
 {
     int i;
 
@@ -1136,64 +1155,62 @@ static int list_styles()
 
 
     else {
-        design_t **list;                 /* temp list for sorting */
-
-        list = (design_t **) calloc(anz_designs, sizeof(design_t *));
-        if (list == NULL) {
-            perror(PROJECT);
-            return 1;
-        }
-
-        for (i = 0; i < anz_designs; ++i) {
-            list[i] = &(designs[i]);
-        }
-        qsort(list, anz_designs, sizeof(design_t *), style_sort);
-
         tagstats_t *tagstats = NULL;
         size_t num_tags = 0;
-        if (opt.query == NULL) {
-            print_design_list_header();
+        design_t **list = sort_designs_by_name();     /* temp list for sorting */
+        if (list == NULL) {
+            return 1;
         }
+        print_design_list_header();
+
         for (i = 0; i < anz_designs; ++i) {
-            if (opt.query != NULL) {
-                if (filter_by_tag(list[i]->tags)) {
-                    fprintf(opt.outfile, "%s\n", list[i]->name);
-                    for (size_t aidx = 0; list[i]->aliases[aidx] != NULL; ++aidx) {
-                        fprintf(opt.outfile, "%s (alias)\n", list[i]->aliases[aidx]);
-                    }
-                }
+            char *all_names = names(list[i]);
+            if (list[i]->author && list[i]->designer && strcmp(list[i]->author, list[i]->designer) != 0) {
+                fprintf(opt.outfile, "%s\n%s, coded by %s:\n\n%s\n\n", all_names,
+                        list[i]->designer, list[i]->author, list[i]->sample);
+            }
+            else if (list[i]->designer) {
+                fprintf(opt.outfile, "%s\n%s:\n\n%s\n\n", all_names, list[i]->designer, list[i]->sample);
+            }
+            else if (list[i]->author) {
+                fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n\n%s\n\n", all_names,
+                        list[i]->author, list[i]->sample);
             }
             else {
-                char *all_names = names(list[i]);
-                if (list[i]->author && list[i]->designer && strcmp(list[i]->author, list[i]->designer) != 0) {
-                    fprintf(opt.outfile, "%s\n%s, coded by %s:\n\n%s\n\n", all_names,
-                            list[i]->designer, list[i]->author, list[i]->sample);
-                }
-                else if (list[i]->designer) {
-                    fprintf(opt.outfile, "%s\n%s:\n\n%s\n\n", all_names, list[i]->designer, list[i]->sample);
-                }
-                else if (list[i]->author) {
-                    fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n\n%s\n\n", all_names,
-                            list[i]->author, list[i]->sample);
-                }
-                else {
-                    fprintf(opt.outfile, "%s:\n\n%s\n\n", all_names, list[i]->sample);
-                }
-                BFREE(all_names);
+                fprintf(opt.outfile, "%s:\n\n%s\n\n", all_names, list[i]->sample);
+            }
+            BFREE(all_names);
 
-                for (size_t tidx = 0; list[i]->tags[tidx] != NULL; ++tidx) {
-                    count_tag(list[i]->tags[tidx], &tagstats, &num_tags);
-                }
+            for (size_t tidx = 0; list[i]->tags[tidx] != NULL; ++tidx) {
+                count_tag(list[i]->tags[tidx], &tagstats, &num_tags);
             }
         }
         BFREE(list);
 
-        if (opt.query == NULL) {
-            print_tags(tagstats, num_tags);
-            BFREE(tagstats);
-        }
+        print_tags(tagstats, num_tags);
+        BFREE(tagstats);
     }
 
+    return 0;
+}
+
+
+
+static int query_by_tag()
+{
+    design_t **list = sort_designs_by_name();                 /* temp list for sorting */
+    if (list == NULL) {
+        return 1;
+    }
+    for (int i = 0; i < anz_designs; ++i) {
+        if (filter_by_tag(list[i]->tags)) {
+            fprintf(opt.outfile, "%s\n", list[i]->name);
+            for (size_t aidx = 0; list[i]->aliases[aidx] != NULL; ++aidx) {
+                fprintf(opt.outfile, "%s (alias)\n", list[i]->aliases[aidx]);
+            }
+        }
+    }
+    BFREE(list);
     return 0;
 }
 
@@ -1623,6 +1640,14 @@ int main(int argc, char *argv[])
      */
     if (opt.l) {
         rc = list_styles();
+        exit(rc);
+    }
+
+    /*
+     *  If "-q" option was given, print results of tag query and exit.
+     */
+    if (opt.query != NULL && opt.query[0] != NULL && !query_is_undoc()) {
+        rc = query_by_tag();
         exit(rc);
     }
 

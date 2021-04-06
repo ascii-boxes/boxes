@@ -348,7 +348,7 @@ static int design_needed(pass_to_bison *bison_args)
         return design_has_name(&(curdes), (char *) opt.design);
     }
     else {
-        if (opt.r || opt.l) {
+        if (opt.r || opt.l || (opt.query != NULL && !query_is_undoc())) {
             return 1;
         }
         if (bison_args->design_idx == 0) {
@@ -748,9 +748,9 @@ int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char
 
     /*
      *  Check if we need to continue parsing. If not, return.
-     *  The condition here must correspond to design_needed() in parsecode.c.
+     *  The condition here must correspond to the function design_needed().
      */
-    if (opt.design_choice_by_user || (!opt.r && !opt.l)) {
+    if (opt.design_choice_by_user || (!opt.r && !opt.l && (opt.query == NULL || query_is_undoc()))) {
         bison_args->num_designs = bison_args->design_idx + 1;
         return RC_ACCEPT;
     }

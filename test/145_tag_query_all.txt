@@ -1,5 +1,5 @@
 :ARGS
--f 14x_tag_query.cfg -l -q (all)
+-f 14x_tag_query.cfg -q (all)
 :INPUT
 :OUTPUT-FILTER
 :EXPECTED

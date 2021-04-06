@@ -1,6 +1,0 @@
-:ARGS
--f 14x_tag_query.cfg -l -q non-existent
-:INPUT
-:OUTPUT-FILTER
-:EXPECTED
-:EOF
