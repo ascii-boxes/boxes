@@ -28,9 +28,9 @@ GEN_HDR    = parser.h boxes.h lex.yy.h
 GEN_SRC    = parser.c lex.yy.c
 GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
 ORIG_HDRCL = boxes.in.h config.h
-ORIG_HDR   = $(ORIG_HDRCL) discovery.h generate.h lexer.h parsing.h regulex.h remove.h shape.h tools.h unicode.h
+ORIG_HDR   = $(ORIG_HDRCL) discovery.h generate.h lexer.h parsecode.h parsing.h regulex.h remove.h shape.h tools.h unicode.h
 ORIG_GEN   = lexer.l parser.y
-ORIG_NORM  = boxes.c discovery.c generate.c parsing.c regulex.c remove.c shape.c tools.c unicode.c
+ORIG_NORM  = boxes.c discovery.c generate.c parsecode.c parsing.c regulex.c remove.c shape.c tools.c unicode.c
 ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
 ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 
@@ -98,6 +98,7 @@ regulex.o:   regulex.c regulex.h boxes.h tools.h unicode.h config.h | check_dir
 getopt.o:    misc/getopt.c misc/getopt.h | check_dir
 parser.o:    parser.c boxes.h lex.yy.h parser.h parsing.h tools.h shape.h discovery.h config.h | check_dir
 lex.yy.o:    lex.yy.c parser.h boxes.h parsing.h tools.h shape.h config.h | check_dir
+parsecode.o: parsecode.c parser.h boxes.h tools.h lex.yy.h config.h | check_dir
 
 package: $(BOXES_EXECUTABLE_NAME)
 	if [ -z "$(PKG_NAME)" ] ; then exit 1 ; fi

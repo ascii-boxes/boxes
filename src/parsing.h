@@ -19,7 +19,7 @@
  */
 
 /*
- * Configuration file parsing
+ * Invocation of the configuration file parser
  */
 
 #ifndef PARSING_H

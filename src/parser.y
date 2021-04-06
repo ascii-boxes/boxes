@@ -23,6 +23,7 @@
  * Yacc parser for boxes configuration files
  */
 
+#include "config.h"
 #include "boxes.h"
 
 
@@ -65,7 +66,7 @@ typedef struct {
     /** number of parent config files (size of parent_configs array) */
     size_t num_parent_configs;
 
-    /** the flex scanner, which is explicitly passed to reentrant bison */
+    /** the flex scanner state, which is explicitly passed to reentrant bison */
     void *lexer_state;
 } pass_to_bison;
 
@@ -76,417 +77,28 @@ typedef struct {
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <strings.h>
 
-#include "discovery.h"
 #include "shape.h"
 #include "tools.h"
 #include "parsing.h"
 #include "parser.h"
 #include "lex.yy.h"
+#include "parsecode.h"
 
-
-/*
- *  Valid characters to be used as string delimiters. Note that the
- *  following list must correspond to the DELIM definition in lexer.l.
- */
-#define LEX_SDELIM  "\"~'`!@%&*=:;<>?/|.\\"
 
 /** required for bison-flex bridge */
 #define scanner bison_args->lexer_state
 
-/** the current design being parsed */
-#define curdes (bison_args->designs[bison_args->design_idx])
-
-
-
-static int check_sizes(pass_to_bison *bison_args)
-/*
- *  For the author's convenience, it is required that shapes on one side
- *  have equal width (vertical sides) and height (horizontal sides).
- *
- *  RETURNS:  == 0   no problem detected
- *            != 0   on error (prints error message, too)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int i, j, k;
-
-    #ifdef PARSER_DEBUG
-        fprintf (stderr, "check_sizes()\n");
-    #endif
-
-    for (i=0; i<ANZ_SIDES; ++i) {
-        if (i == 0 || i == 2) {
-            /*
-             *  horizontal
-             */
-            for (j=0; j<SHAPES_PER_SIDE-1; ++j) {
-                if (curdes.shape[sides[i][j]].height == 0) {
-                    continue;
-                }
-                for (k=j+1; k<SHAPES_PER_SIDE; ++k) {
-                    if (curdes.shape[sides[i][k]].height == 0) {
-                        continue;
-                    }
-                    if (curdes.shape[sides[i][j]].height != curdes.shape[sides[i][k]].height) {
-                        yyerror(bison_args, "All shapes on horizontal sides must be of "
-                                "equal height (%s: %d, %s: %d)\n",
-                                shape_name[sides[i][j]], curdes.shape[sides[i][j]].height,
-                                shape_name[sides[i][k]], curdes.shape[sides[i][k]].height);
-                        return 1;
-                    }
-                }
-            }
-        }
-        else {
-            /*
-             *  vertical
-             */
-            for (j=0; j<SHAPES_PER_SIDE-1; ++j) {
-                if (curdes.shape[sides[i][j]].width == 0) {
-                    continue;
-                }
-                for (k=j+1; k<SHAPES_PER_SIDE; ++k) {
-                    if (curdes.shape[sides[i][k]].width == 0) {
-                        continue;
-                    }
-                    if (curdes.shape[sides[i][j]].width != curdes.shape[sides[i][k]].width) {
-                        yyerror(bison_args, "All shapes on vertical sides must be of "
-                                "equal width (%s: %d, %s: %d)\n",
-                                shape_name[sides[i][j]], curdes.shape[sides[i][j]].width,
-                                shape_name[sides[i][k]], curdes.shape[sides[i][k]].width);
-                        return 1;
-                    }
-                }
-            }
-        }
-    }
-
-    return 0;                            /* all clear */
-}
-
-
-
-static int corner_check(pass_to_bison *bison_args)
-/*
- *  Check that no corners are elastic.
- *
- *  RETURNS:  == 0   no problem detected
- *            != 0   on error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int c;
-
-    #ifdef PARSER_DEBUG
-        fprintf (stderr, "corner_check()\n");
-    #endif
-
-    for (c=0; c<ANZ_CORNERS; ++c) {
-        if (curdes.shape[corners[c]].elastic) {
-            yyerror(bison_args, "Corners may not be elastic (%s)", shape_name[corners[c]]);
-            return 1;
-        }
-    }
-
-    return 0;                            /* all clear */
-}
-
-
-
-static shape_t non_existent_elastics(pass_to_bison *bison_args)
-{
-    shape_t i;
-
-    #ifdef PARSER_DEBUG
-        fprintf (stderr, "non_existent_elastics()\n");
-    #endif
-
-    for (i=0; i<ANZ_SHAPES; ++i) {
-        if (curdes.shape[i].elastic && isempty(curdes.shape+i)) {
-            return i;
-        }
-    }
-
-    return (shape_t) ANZ_SHAPES;         /* all elastic shapes exist */
-}
-
-
-
-static int insufficient_elasticity(pass_to_bison *bison_args)
-{
-    int i, j, ef;
-
-    #ifdef PARSER_DEBUG
-        fprintf (stderr, "insufficient_elasticity()\n");
-    #endif
-
-    for (i=0; i<ANZ_SIDES; ++i) {
-        for (j=1,ef=0; j<4; ++j) {
-            if (curdes.shape[sides[i][j]].elastic) {
-                ++ef;
-            }
-        }
-        if (ef != 1 && ef != 2) {
-            return 1;                    /* error */
-        }
-    }
-
-    return 0;                            /* all clear */
-}
-
-
-
-static int adjoining_elastics(pass_to_bison *bison_args)
-{
-    int i, j, ef;
-
-    #ifdef PARSER_DEBUG
-        fprintf (stderr, "adjoining_elastics()\n");
-    #endif
-
-    for (i=0; i<ANZ_SIDES; ++i) {
-        ef = 0;
-        for (j=1; j<4; ++j) {
-            if (isempty(curdes.shape+sides[i][j])) {
-                continue;
-            }
-            if (curdes.shape[sides[i][j]].elastic) {
-                if (ef) {
-                    return 1;            /* error detected */
-                } else {
-                    ef = 1;
-                }
-            }
-            else {
-                ef = 0;
-            }
-        }
-    }
-
-    return 0;                            /* all clear */
-}
-
-
-
-static int perform_se_check(pass_to_bison *bison_args)
-/*
- *  (shape-elastic check)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    shape_t s_rc;
-
-    s_rc = non_existent_elastics(bison_args);
-    if (s_rc != ANZ_SHAPES) {
-        yyerror(bison_args, "Shape %s has been specified as elastic but doesn't exist",
-                shape_name[s_rc]);
-        return 1;
-    }
-
-    if (corner_check(bison_args)) {
-        /* Error message printed in check func */
-        return 1;
-    }
-
-    if (insufficient_elasticity(bison_args)) {
-        yyerror(bison_args, "There must be exactly one or two elastic shapes per side");
-        return 1;
-    }
-
-    if (adjoining_elastics(bison_args)) {
-        yyerror(bison_args, "Two adjoining shapes may not be elastic");
-        return 1;
-    }
-
-    return 0;
-}
-
-
-
-static void chg_strdelims (pass_to_bison *bison_args, const char asesc, const char asdel)
-{
-    #ifdef PARSER_DEBUG
-        fprintf (stderr, " STATUS: chg_strdelims ('%c', '%c') - This changes lexer behavior!\n", asesc, asdel);
-    #endif
-    bison_args->sesc = asesc;
-    bison_args->sdel = asdel;
-}
-
-
-
-static void init_design(pass_to_bison *bison_args, design_t *design)
-{
-    memset (design, 0, sizeof(design_t));
-    design->aliases = (char **) calloc(1, sizeof(char *));
-    design->indentmode = DEF_INDENTMODE;
-    design->defined_in = bison_args->config_file;
-    design->tags = (char **) calloc(1, sizeof(char *));
-}
-
-
-
-static void recover(pass_to_bison *bison_args)
-/*
- *  Reset parser to neutral state, so a new design can be parsed.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-     bison_args->num_mandatory = 0;
-     bison_args->time_for_se_check = 0;
-     bison_args->num_shapespec = 0;
-     chg_strdelims(bison_args, '\\', '\"');
-
-     /*
-      *  Clear current design
-      */
-     BFREE (curdes.name);
-     BFREE (curdes.author);
-     BFREE (curdes.aliases);
-     BFREE (curdes.designer);
-     BFREE (curdes.created);
-     BFREE (curdes.revision);
-     BFREE (curdes.revdate);
-     BFREE (curdes.sample);
-     BFREE (curdes.tags);
-     init_design(bison_args, &(curdes));
-}
-
-
-
-static int design_has_name(design_t *design, char *name)
-{
-    int result = 0;
-    if (strcasecmp(name, design->name) == 0) {
-        result = 1;
-    }
-    else {
-        for (size_t aidx = 0; design->aliases[aidx] != NULL; ++aidx) {
-            if (strcasecmp(name, design->aliases[aidx]) == 0) {
-                result = 1;
-                break;
-            }
-        }
-    }
-    return result;
-}
-
-
-
-/**
- * Determine if the design currently being parsed is one that we will need.
- * @param bison_args the bison state
- * @return flag
- */
-static int design_needed(pass_to_bison *bison_args)
-{
-    if (opt.design_choice_by_user) {
-        return design_has_name(&(curdes), (char *) opt.design);
-    }
-    else {
-        if (opt.r || opt.l) {
-            return 1;
-        }
-        if (bison_args->design_idx == 0) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-
-
-static int design_name_exists(pass_to_bison *bison_args, char *name)
-{
-    int result = 0;
-    for (int i = 0; i < bison_args->design_idx; ++i) {
-        if (design_has_name(bison_args->designs + i, name)) {
-            result = 1;
-            break;
-        }
-    }
-    return result;
-}
-
-
-
-static int tag_add(pass_to_bison *bison_args, char *tag)
-{
-    int rc = 0;
-    if (tag_is_valid(tag)) {
-        if (!array_contains0(curdes.tags, tag)) {
-            size_t num_tags = array_count0(curdes.tags);
-            curdes.tags = (char **) realloc(curdes.tags, (num_tags + 2) * sizeof(char *));
-            curdes.tags[num_tags] = tag;
-            curdes.tags[num_tags + 1] = NULL;
-        }
-        else {
-            yyerror(bison_args, "duplicate tag -- %s", tag);
-            rc = 1;
-        }
-    }
-    else {
-        yyerror(bison_args, "invalid tag -- %s", tag);
-        rc = 2;
-    }
-    return rc;
-}
-
-
-
-static char *tag_next_comma(char *s)
-{
-    char *comma = strchr(s, ',');
-    if (comma == NULL) {
-        comma = s + strlen(s);
-    }
-    return comma;
-}
-
-
-
-static int tag_split_add(pass_to_bison *bison_args, char *tag)
-{
-    int rc = 0;
-    char *s = tag;
-    char *c = NULL;
-    do {
-        c = tag_next_comma(s);
-        char *single_tag = trimdup(s, c - 1);
-        int rc_add = tag_add(bison_args, single_tag);
-        if (rc_add != 0) {
-            rc = rc_add;
-        }
-        s = c + 1;
-    } while (*c != '\0');
-    return rc;
-}
-
-
-
-/**
- * Add tag to list of current design's tag after validity checking.
- * @param bison_args the parser state
- * @param tag a single tag, or a comma-separated list of tags
- * @return error code, 0 on success, anything else on failure
- */
-static int tag_record(pass_to_bison *bison_args, char *tag)
-{
-    int rc = 0;
-    if (strchr(tag, ',') != NULL) {
-        rc = tag_split_add(bison_args, tag);
-    }
-    else {
-        char *trimmed = trimdup(tag, tag + strlen(tag) - 1);
-        rc = tag_add(bison_args, trimmed);
-    }
-    return rc;
+/** invoke a parsecode action and react to its return code */
+#define invoke_action(action) {   \
+    int rc = (action);            \
+    if (rc == RC_ERROR) {         \
+        YYERROR;                  \
+    } else if (rc == RC_ABORT) {  \
+        YYABORT;                  \
+    } else if (rc == RC_ACCEPT) { \
+        YYACCEPT;                 \
+    }                             \
 }
 
 }
@@ -545,16 +157,7 @@ static int tag_record(pass_to_bison *bison_args, char *tag)
 
 first_rule:
     {
-        /*
-         *  Initialize parser data structures
-         */
-        bison_args->designs = (design_t *) calloc (1, sizeof(design_t));
-        if (bison_args->designs == NULL) {
-            perror (PROJECT);
-            YYABORT;
-        }
-        bison_args->num_designs = 1;
-        init_design(bison_args, bison_args->designs);
+        invoke_action(action_init_parser(bison_args));
     }
 
 config_file
@@ -586,50 +189,7 @@ config_file
 
 parent_def: YPARENT FILENAME
     {
-        char *filepath = $2;
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "parent config file specified: [%s]\n", filepath);
-        #endif
-        if (filepath == NULL || filepath[0] == '\0') {
-            bison_args->skipping = 1;
-            yyerror(bison_args, "parent reference is empty");
-            YYERROR;
-        }
-        else if (strcasecmp(filepath, ":global:") == 0) {    /* special token */
-            filepath = discover_config_file(1);
-            if (filepath == NULL) {
-                bison_args->skipping = 1;   /* prevent redundant "skipping to next design" message */
-                yyerror(bison_args, "parent reference to global config which cannot be found");
-                YYERROR;
-            }
-        }
-        else {
-            FILE *f = fopen(filepath, "r");
-            if (f == NULL) {
-                bison_args->skipping = 1;
-                yyerror(bison_args, "parent config file not found: %s", filepath);
-                YYERROR;
-            }
-            else {
-                fclose(f);
-            }
-        }
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "parent config file path resolved: [%s]\n", filepath);
-        #endif
-        
-        int is_new = !array_contains(bison_args->parent_configs, bison_args->num_parent_configs, filepath);
-        if (!is_new) {
-            #ifdef PARSER_DEBUG
-                fprintf (stderr, "duplicate parent / cycle: [%s]\n", filepath);
-            #endif
-        }
-        else {
-            bison_args->parent_configs = realloc(bison_args->parent_configs,
-                    (bison_args->num_parent_configs + 1) * sizeof(char *));
-            bison_args->parent_configs[bison_args->num_parent_configs] = filepath;
-            ++(bison_args->num_parent_configs);
-        }
+        invoke_action(action_parent_config(bison_args, $2));
     }
 
 config_file: config_file design_or_error | design_or_error | config_file parent_def | parent_def ;
@@ -647,95 +207,20 @@ design_or_error: design | error
 
 alias: WORD
     {
-        if (design_name_exists(bison_args, $1)) {
-            yyerror(bison_args, "alias already in use -- %s", $1);
-            YYERROR;
-        }
-        size_t num_aliases = array_count0(curdes.aliases);
-        curdes.aliases = (char **) realloc(curdes.aliases, (num_aliases + 2) * sizeof(char *));
-        curdes.aliases[num_aliases] = strdup($1);
-        curdes.aliases[num_aliases + 1] = NULL;
+        invoke_action(action_add_alias(bison_args, $1));
     }
 
 alias_list: alias | alias_list ',' alias;
 
-design_id: WORD | WORD ',' alias_list
+design_id: WORD | WORD ',' alias_list;
 
 design: YBOX design_id
     {
-        chg_strdelims(bison_args, '\\', '\"');
-        bison_args->speeding = 0;
-        bison_args->skipping = 0;
-
-        curdes.name = (char *) strdup($<s>2);
-        if (curdes.name == NULL) {
-            perror (PROJECT);
-            YYABORT;
-        }
-
-        if (!design_needed(bison_args)) {
-            bison_args->speeding = 1;
-            begin_speedmode(scanner);
-            init_design(bison_args, &(curdes));
-            YYERROR;
-        }
+        invoke_action(action_start_parsing_design(bison_args, $<s>2));
     }
 layout YEND WORD
     {
-        char *design_primary_name = $<s>2;
-        design_t *tmp;
-        char *p;
-
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "--------- ADDING DESIGN \"%s\".\n", design_primary_name);
-        #endif
-
-        if (strcasecmp (design_primary_name, $6)) {
-            yyerror(bison_args, "box design name differs at BOX and END");
-            YYERROR;
-        }
-        if (bison_args->num_mandatory < 3) {
-            yyerror(bison_args, "entries SAMPLE, SHAPES, and ELASTIC are mandatory");
-            YYERROR;
-        }
-        if (design_name_exists(bison_args, design_primary_name)) {
-            yyerror(bison_args, "duplicate box design name -- %s", design_primary_name);
-            YYERROR;
-        }
-
-        p = design_primary_name;
-        while (*p) {
-            if (*p < 32 || *p > 126) {
-                yyerror(bison_args, "box design name must consist of printable standard ASCII characters.");
-                YYERROR;
-            }
-            ++p;
-        }
-
-        bison_args->num_mandatory = 0;
-        bison_args->time_for_se_check = 0;
-        bison_args->num_shapespec = 0;
-
-        /*
-         *  Check if we need to continue parsing. If not, return.
-         *  The condition here must correspond to design_needed().
-         */
-        if (opt.design_choice_by_user || (!opt.r && !opt.l)) {
-            bison_args->num_designs = bison_args->design_idx + 1;
-            YYACCEPT;
-        }
-
-        /*
-         *  Allocate space for next design
-         */
-        ++(bison_args->design_idx);
-        tmp = (design_t *) realloc(bison_args->designs, (bison_args->design_idx + 1) * sizeof(design_t));
-        if (tmp == NULL) {
-            perror (PROJECT);
-            YYABORT;
-        }
-        bison_args->designs = tmp;
-        init_design(bison_args, &(curdes));
+        invoke_action(action_add_design(bison_args, $<s>2, $6));
     }
 ;
 
@@ -753,64 +238,7 @@ tag_list: tag_entry | tag_list ',' tag_entry;
 
 entry: KEYWORD STRING
     {
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "entry rule fulfilled [%s = %s]\n", $1, $2);
-        #endif
-        if (strcasecmp ($1, "author") == 0) {
-            curdes.author = (char *) strdup ($2);
-            if (curdes.author == NULL) {
-                perror (PROJECT);
-                YYABORT;
-            }
-        }
-        else if (strcasecmp ($1, "designer") == 0) {
-            curdes.designer = (char *) strdup ($2);
-            if (curdes.designer == NULL) {
-                perror (PROJECT);
-                YYABORT;
-            }
-        }
-        else if (strcasecmp ($1, "revision") == 0) {
-            curdes.revision = (char *) strdup ($2);
-            if (curdes.revision == NULL) {
-                perror (PROJECT);
-                YYABORT;
-            }
-        }
-        else if (strcasecmp ($1, "created") == 0) {
-            curdes.created = (char *) strdup ($2);
-            if (curdes.created == NULL) {
-                perror (PROJECT);
-                YYABORT;
-            }
-        }
-        else if (strcasecmp ($1, "revdate") == 0) {
-            curdes.revdate = (char *) strdup ($2);
-            if (curdes.revdate == NULL) {
-                perror (PROJECT);
-                YYABORT;
-            }
-        }
-        else if (strcasecmp ($1, "tags") == 0) {
-            tag_record(bison_args, $2);    /* discard return code (we print warnings, but tolerate the problem) */
-        }
-        else if (strcasecmp ($1, "indent") == 0) {
-            if (strcasecmp ($2, "text") == 0 ||
-                strcasecmp ($2, "box") == 0 ||
-                strcasecmp ($2, "none") == 0) {
-                curdes.indentmode = $2[0];
-            }
-            else {
-                yyerror(bison_args, "indent keyword must be followed by \"text\", "
-                         "\"box\", or \"none\"");
-                YYERROR;
-            }
-        }
-        else {
-            yyerror(bison_args, "internal parser error (unrecognized: %s) in line %d "
-                    "of %s.", $1, __LINE__, __FILE__);
-            YYERROR;
-        }
+        invoke_action(action_record_keyword(bison_args, $1, $2));
     }
 
 | YPARENT FILENAME
@@ -833,20 +261,7 @@ entry: KEYWORD STRING
 
 | YCHGDEL YDELWORD
     {
-        if (strlen($2) != 2) {
-            yyerror(bison_args, "invalid string delimiter specification -- %s", $2);
-            YYERROR;
-        }
-        if (($2)[0] == ($2)[1]) {
-            yyerror(bison_args, "string delimiter and escape char may not be the same");
-            YYERROR;
-        }
-        if (strchr (LEX_SDELIM, ($2)[1]) == NULL) {
-            yyerror(bison_args, "invalid string delimiter -- %c (try one of %s)",
-                    ($2)[1], LEX_SDELIM);
-            YYERROR;
-        }
-        chg_strdelims(bison_args, $2[0], $2[1]);
+        invoke_action(action_chg_delim(bison_args, $2));
     }
 
 | YTAGS '(' tag_list ')' | YTAGS tag_entry
@@ -892,156 +307,7 @@ block: YSAMPLE STRING YENDSAMPLE
 
 | YSHAPES  '{' slist  '}'
     {
-        int     i,j;
-        shape_t fshape;                  /* found shape */
-        int     fside;                   /* first side */
-        int     sc;                      /* side counter */
-        int     side;                    /* effective side */
-        int     rc;                      /* received return code */
-
-        /*
-         *  At least one shape must be specified
-         */
-        if (bison_args->num_shapespec < 1) {
-            yyerror(bison_args, "must specify at least one non-empty shape per design");
-            YYERROR;
-        }
-
-        /*
-         *  Ensure that all corners have been specified. Generate corners
-         *  as necessary, starting at any side which already includes at
-         *  least one shape in order to ensure correct measurements.
-         */
-        fshape = findshape (curdes.shape, ANZ_SHAPES);
-        if (fshape == ANZ_SHAPES) {
-            yyerror(bison_args, "internal error");
-            YYABORT;                        /* never happens ;-) */
-        }
-        fside = on_side (fshape, 0);
-        if (fside == ANZ_SIDES) {
-            yyerror(bison_args, "internal error");
-            YYABORT;                        /* never happens ;-) */
-        }
-
-        for (sc=0,side=fside; sc<ANZ_SIDES; ++sc,side=(side+1)%ANZ_SIDES) {
-            shape_t   nshape;               /* next shape */
-            sentry_t *c;                    /* corner to be processed */
-            c = curdes.shape + sides[side][SHAPES_PER_SIDE-1];
-
-            if (isempty(c)) {
-                nshape = findshape (c, SHAPES_PER_SIDE);
-                if (side == BLEF || side == BRIG) {
-                    if (nshape == SHAPES_PER_SIDE) {
-                        c->height = 1;
-                    } else {
-                        c->height = c[nshape].height;
-                    }
-                    c->width = curdes.shape[fshape].width;
-                }
-                else {
-                    if (nshape == SHAPES_PER_SIDE) {
-                        c->width = 1;
-                    } else {
-                        c->width = c[nshape].width;
-                    }
-                    c->height = curdes.shape[fshape].height;
-                }
-                c->elastic = 0;
-                rc = genshape (c->width, c->height, &(c->chars));
-                if (rc) {
-                    YYABORT;
-                }
-            }
-
-            fshape = sides[side][SHAPES_PER_SIDE-1];
-        }
-
-        /*
-         *  For all sides whose side shapes have not been defined, generate
-         *  an elastic middle side shape.
-         */
-        for (side=0; side<ANZ_SIDES; ++side) {
-            int found = 0;
-            for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
-                if (isempty (curdes.shape + sides[side][i])) {
-                    continue;
-                } else {
-                    found = 1;
-                }
-            }
-            if (!found) {
-                sentry_t *c = curdes.shape + sides[side][SHAPES_PER_SIDE/2];
-                if (side == BLEF || side == BRIG) {
-                    c->width = curdes.shape[sides[side][0]].width;
-                    c->height = 1;
-                }
-                else {
-                    c->width = 1;
-                    c->height = curdes.shape[sides[side][0]].height;
-                }
-                c->elastic = 1;
-                rc = genshape (c->width, c->height, &(c->chars));
-                if (rc) {
-                    YYABORT;
-                }
-            }
-        }
-
-        if (check_sizes(bison_args)) {
-            YYERROR;
-        }
-
-        ++(bison_args->num_mandatory);
-        if (++(bison_args->time_for_se_check) > 1) {
-            if (perform_se_check(bison_args) != 0) {
-                YYERROR;
-            }
-        }
-
-        /*
-         *  Compute minimum height/width of a box of current design
-         */
-        for (i=0; i<ANZ_SIDES; ++i) {
-            size_t c = 0;
-            if (i % 2) {                 /* vertical sides */
-                for (j=0; j<SHAPES_PER_SIDE; ++j) {
-                    if (!isempty(curdes.shape + sides[i][j])) {
-                        c += curdes.shape[sides[i][j]].height;
-                    }
-                }
-                if (c > curdes.minheight) {
-                    curdes.minheight = c;
-                }
-            }
-            else {                       /* horizontal sides */
-                for (j=0; j<SHAPES_PER_SIDE; ++j) {
-                    if (!isempty(curdes.shape + sides[i][j])) {
-                        c += curdes.shape[sides[i][j]].width;
-                    }
-                }
-                if (c > curdes.minwidth) {
-                    curdes.minwidth = c;
-                }
-            }
-        }
-
-        /*
-         *  Compute height of highest shape in design
-         */
-        for (i=0; i<ANZ_SHAPES; ++i) {
-            if (isempty(curdes.shape + i)) {
-                continue;
-            }
-            if (curdes.shape[i].height > curdes.maxshapeheight) {
-                curdes.maxshapeheight = curdes.shape[i].height;
-            }
-        }
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Minimum box dimensions: width %d height %d\n",
-                    (int) curdes.minwidth, (int) curdes.minheight);
-            fprintf (stderr, "Maximum shape height: %d\n",
-                    (int) curdes.maxshapeheight);
-        #endif
+        invoke_action(action_finalize_shapes(bison_args));
     }
 
 | YELASTIC '(' elist ')'
@@ -1132,8 +398,7 @@ elist: elist ',' elist_entry | elist_entry;
 elist_entry: SHAPE
     {
         #ifdef PARSER_DEBUG
-            fprintf (stderr, "Marked \'%s\' shape as elastic\n",
-                    shape_name[(int)$1]);
+            fprintf (stderr, "Marked \'%s\' shape as elastic\n", shape_name[(int) $1]);
         #endif
         curdes.shape[$1].elastic = 1;
     }
@@ -1237,44 +502,9 @@ shape_lines: shape_lines ',' STRING
 
 wlist: wlist wlist_entry | wlist_entry;
 
-
 wlist_entry: WORD YNUMBER
     {
-        if ($2 < 0) {
-            yyerror(bison_args, "padding must be a positive integer (%s %d) (ignored)", $1, $2);
-        }
-        else {
-            size_t len1 = strlen ($1);
-            if (len1 <= 3 && !strncasecmp ("all", $1, len1)) {
-                curdes.padding[BTOP] = $2;
-                curdes.padding[BBOT] = $2;
-                curdes.padding[BLEF] = $2;
-                curdes.padding[BRIG] = $2;
-            }
-            else if (len1 <= 10 && !strncasecmp ("horizontal", $1, len1)) {
-                curdes.padding[BRIG] = $2;
-                curdes.padding[BLEF] = $2;
-            }
-            else if (len1 <= 8 && !strncasecmp ("vertical", $1, len1)) {
-                curdes.padding[BTOP] = $2;
-                curdes.padding[BBOT] = $2;
-            }
-            else if (len1 <= 3 && !strncasecmp ("top", $1, len1)) {
-                curdes.padding[BTOP] = $2;
-            }
-            else if (len1 <= 5 && !strncasecmp ("right", $1, len1)) {
-                curdes.padding[BRIG] = $2;
-            }
-            else if (len1 <= 4 && !strncasecmp ("left", $1, len1)) {
-                curdes.padding[BLEF] = $2;
-            }
-            else if (len1 <= 6 && !strncasecmp ("bottom", $1, len1)) {
-                curdes.padding[BBOT] = $2;
-            }
-            else {
-                yyerror(bison_args, "invalid padding area %s (ignored)", $1);
-            }
-        }
+        invoke_action(action_padding_entry(bison_args, $1, $2));
     }
 ;
 
