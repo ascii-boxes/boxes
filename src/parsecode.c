@@ -337,10 +337,24 @@ static int design_has_name(design_t *design, char *name)
 
 
 
+static int full_parse_required()
+{
+    int result = 0;
+    if (!opt.design_choice_by_user) {
+        result = opt.r || opt.l || (opt.query != NULL && !query_is_undoc());
+    }
+    #ifdef DEBUG
+        fprintf(stderr, "full_parse_required() -> %s\n", result ? "true" : "false");
+    #endif
+    return result;
+}
+
+
+
 /**
  * Determine if the design currently being parsed is one that we will need.
  * @param bison_args the bison state
- * @return flag
+ * @return result flag
  */
 static int design_needed(pass_to_bison *bison_args)
 {
@@ -348,10 +362,7 @@ static int design_needed(pass_to_bison *bison_args)
         return design_has_name(&(curdes), (char *) opt.design);
     }
     else {
-        if (opt.r || opt.l || (opt.query != NULL && !query_is_undoc())) {
-            return 1;
-        }
-        if (bison_args->design_idx == 0) {
+        if (full_parse_required() || bison_args->design_idx == 0) {
             return 1;
         }
     }
@@ -748,9 +759,8 @@ int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char
 
     /*
      *  Check if we need to continue parsing. If not, return.
-     *  The condition here must correspond to the function design_needed().
      */
-    if (opt.design_choice_by_user || (!opt.r && !opt.l && (opt.query == NULL || query_is_undoc()))) {
+    if (!full_parse_required()) {
         bison_args->num_designs = bison_args->design_idx + 1;
         return RC_ACCEPT;
     }
