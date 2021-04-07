@@ -164,7 +164,6 @@ typedef struct {
 
     size_t   *tabpos;                    /* tab positions in expanded work strings, or NULL if not needed */
     size_t    tabpos_len;                /* number of tabs in a line */
-    size_t    num_leading_blanks;        /* number of spaces at the start of the line after justification */
     size_t   *posmap;                    /* for each character in `text`, position of corresponding char in `mbtext`. Needed for box removal. */
 } line_t;
 

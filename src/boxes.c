@@ -1488,7 +1488,6 @@ static int read_all_input(const int use_stdin)
              */
             input.lines[input.anz_lines].text = NULL;  /* we haven't used it yet! */
             analyze_line_ascii(input.lines + input.anz_lines);
-            input.lines[input.anz_lines].num_leading_blanks = 0;
 
             ++input.anz_lines;
         }
