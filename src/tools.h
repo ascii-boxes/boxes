@@ -115,6 +115,17 @@ char *trimdup(char *s, char *e);
 int tag_is_valid(char *tag);
 
 
+/**
+ * Duplicate at most `n` bytes from the given string `s`.  Memory for the new string is obtained with `malloc()`, and
+ * can be freed with `free()`. A terminating null byte is added. We include this implementation because the libc's 
+ * `strndup()` is not consistently available across all platforms.
+ * @param s a string
+ * @param n maximum number of characters to copy (excluding the null byte)
+ * @returns a new string, or `NULL` if either `s` was also `NULL`, or out of memory
+ */
+char *bx_strndup(const char *s, size_t n);
+
+
 #endif
 
 /*EOF*/                                          /* vim: set cindent sw=4: */

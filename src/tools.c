@@ -694,9 +694,8 @@ char *trimdup(char *s, char *e)
     while (e > s && (*e == ' ' || *e == '\t')) {
         --e;
     }
-    return strndup(s, e - s + 1);
+    return bx_strndup(s, e - s + 1);
 }
-
 
 
 
@@ -712,6 +711,28 @@ int tag_is_valid(char *tag)
         && strchr("abcdefghijklmnopqrstuvwxyz", tag[0]) != NULL
         && tag[len - 1] != '-'
         && strstr(tag, "--") == NULL;
+}
+
+
+
+char *bx_strndup(const char *s, size_t n)
+{
+    if (s == NULL) {
+        return NULL;
+    }
+
+    size_t len = strlen(s);
+    if (n < len) {
+        len = n;
+    }
+
+    char *result = (char *) malloc(len + 1);
+    if (result == NULL) {
+        return NULL;
+    }
+
+    result[len] = '\0';
+    return (char *) memcpy(result, s, len);
 }
 
 
