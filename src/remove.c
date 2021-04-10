@@ -1103,7 +1103,7 @@ void output_input(const int trim_only)
         }
 
         fprintf(opt.outfile, "%s%s%s", indentspc, u32_strconv_to_output(advance32(input.lines[j].mbtext, indent)),
-                (input.final_newline || j < input.anz_lines - 1 ? "\n" : ""));
+                (input.final_newline || j < input.anz_lines - 1 ? opt.eol : ""));
         BFREE (indentspc);
     }
 }

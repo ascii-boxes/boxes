@@ -34,6 +34,11 @@
 #include <unitypes.h>
 #include <uniwidth.h>
 
+#ifdef __MINGW32__
+#include <fcntl.h>  /* _O_BINARY */
+#include <io.h>     /* _setmode() */
+#endif
+
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
@@ -69,19 +74,18 @@ opt_t opt;                           /* command line options */
 input_t input = INPUT_INITIALIZER;   /* input lines */
 
 
-
 /*       _\|/_
          (o o)
  +----oOO-{_}-OOo------------------------------------------------------------+
  |                           F u n c t i o n s                               |
  +--------------------------------------------------------------------------*/
 
-static void usage(FILE *st)
-/*
- *  Print usage information on stream st.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+/**
+ * Print usage information on stream `st`.
+ * @param st the stream to print to
  */
+static void usage(FILE *st)
 {
     char *config_file = discover_config_file(0);
 
@@ -89,6 +93,8 @@ static void usage(FILE *st)
     fprintf(st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
     fprintf(st, "        -c str   use single shape box design where str is the W shape\n");
     fprintf(st, "        -d name  box design [default: first one in file]\n");
+    fprintf(st, "        -e eol   Override line break type (experimental) [default: %s]\n",
+                                  strcmp(EOL_DEFAULT, "\r\n") == 0 ? "CRLF" : "LF");
     fprintf(st, "        -f file  configuration file [default: %s]\n", config_file != NULL ? config_file : "none");
     fprintf(st, "        -h       print usage information\n");
     fprintf(st, "        -i mode  indentation mode [default: box]\n");
@@ -108,12 +114,11 @@ static void usage(FILE *st)
 
 
 
-static void usage_short(FILE *st)
-/*
- *  Print abbreviated usage information on stream st.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/**
+ * Print abbreviated usage information on stream `st`.
+ * @param st the stream to print to
  */
+static void usage_short(FILE *st)
 {
     fprintf(st, "Usage: %s [options] [infile [outfile]]\n", PROJECT);
     fprintf(st, "Try `%s -h' for more information.\n", PROJECT);
@@ -121,16 +126,35 @@ static void usage_short(FILE *st)
 
 
 
-static void usage_long(FILE *st)
-/*
- *  Print usage information on stream st, including a header text.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/**
+ * Print usage information on stream `st`, including a header text.
+ * @param st the stream to print to
  */
+static void usage_long(FILE *st)
 {
     fprintf(st, "%s - draws any kind of box around your text (or removes it)\n", PROJECT);
     fprintf(st, "        Website: https://boxes.thomasjensen.com/\n");
     usage(st);
+}
+
+
+
+/**
+ * Set *stdout* to binary mode, so that we can control the line terminator. This function only ever does anything on
+ * Windows, because on Linux, we already do have control over line terminators.
+ * @return the *stdout* stream, reconfigured to binary if necessary
+ */
+static FILE *get_stdout_configured()
+{
+    #ifdef __MINGW32__
+        if (opt.eol != NULL) {
+            int rc = _setmode(fileno(stdout), _O_BINARY);
+            if (rc == -1) {
+                perror(PROJECT);
+            }
+        }
+    #endif
+    return stdout;
 }
 
 
@@ -236,6 +260,7 @@ static int process_commandline(int argc, char *argv[])
      */
     memset(&opt, 0, sizeof(opt_t));
     opt.tabstop = DEF_TABSTOP;
+    opt.eol = EOL_DEFAULT;
     opt.f = NULL;
     opt.tabexp = 'e';
     opt.killblank = -1;
@@ -257,7 +282,7 @@ static int process_commandline(int argc, char *argv[])
      *  Parse Command Line
      */
     do {
-        oc = getopt(argc, argv, "a:c:d:f:hi:k:lmn:p:q:rs:t:v");
+        oc = getopt(argc, argv, "a:c:d:e:f:hi:k:lmn:p:q:rs:t:v");
 
         switch (oc) {
 
@@ -363,6 +388,22 @@ static int process_commandline(int argc, char *argv[])
                     return 1;
                 }
                 opt.design_choice_by_user = 1;
+                break;
+
+            case 'e':
+                /*
+                 *  EOL Override
+                 */
+                if (strcasecmp(optarg, "CRLF") == 0) {
+                    opt.eol = "\r\n";
+                } else if (strcasecmp(optarg, "LF") == 0) {
+                    opt.eol = "\n";
+                } else if (strcasecmp(optarg, "CR") == 0) {
+                    opt.eol = "\r";
+                } else {
+                    fprintf(stderr, "%s: invalid eol spec -- %s\n", PROJECT, optarg);
+                    return 1;
+                }
                 break;
 
             case 'f':
@@ -620,7 +661,7 @@ static int process_commandline(int argc, char *argv[])
      */
     if (argv[optind] == NULL) {          /* neither infile nor outfile given */
         opt.infile = stdin;
-        opt.outfile = stdout;
+        opt.outfile = get_stdout_configured();
     }
 
     else if (argv[optind + 1] && argv[optind + 2]) {       /* illegal third file */
@@ -642,13 +683,13 @@ static int process_commandline(int argc, char *argv[])
         }
 
         if (argv[optind + 1] == NULL) {
-            opt.outfile = stdout;        /* no outfile given */
+            opt.outfile = get_stdout_configured();        /* no outfile given */
         }
         else if (strcmp(argv[optind + 1], "-") == 0) {
-            opt.outfile = stdout;        /* use stdout for output */
+            opt.outfile = get_stdout_configured();        /* use stdout for output */
         }
         else {
-            opt.outfile = fopen(argv[optind + 1], "w");
+            opt.outfile = fopen(argv[optind + 1], "wb");
             if (opt.outfile == NULL) {
                 perror(PROJECT);
                 if (opt.infile != stdin) {
@@ -683,6 +724,8 @@ static int process_commandline(int argc, char *argv[])
         fprintf (stderr, "\n");
         fprintf (stderr, "- Mend box: %d\n", opt.mend);
         fprintf (stderr, "- Design Definition W shape: %s\n", opt.cld? opt.cld: "n/a");
+        fprintf (stderr, "- Line terminator used: %s\n",
+            strcmp(opt.eol, "\r\n") == 0 ? "CRLF" : (strcmp(opt.eol, "\r") == 0 ? "CR" : "LF"));
     #endif
 
     return 0;
@@ -942,7 +985,7 @@ static void print_tags(tagstats_t *tagstats, size_t num_tags)
             }
             fprintf(opt.outfile, "%s (%d)", tagstats[tidx].tag, (int) tagstats[tidx].count);
         }
-        fprintf(opt.outfile, "\n");
+        fprintf(opt.outfile, "%s", opt.eol);
     }
 }
 
@@ -990,13 +1033,12 @@ static int list_styles()
         memset(&space, ' ', LINE_MAX_BYTES);
         space[LINE_MAX_BYTES] = '\0';
 
-        fprintf(opt.outfile, "Complete Design Information for \"%s\":\n",
-                d->name);
+        fprintf(opt.outfile, "Complete Design Information for \"%s\":%s", d->name, opt.eol);
         fprintf(opt.outfile, "-----------------------------------");
         for (i = strlen(d->name); i > 0; --i) {
             fprintf(opt.outfile, "-");
         }
-        fprintf(opt.outfile, "\n");
+        fprintf(opt.outfile, "%s", opt.eol);
 
         fprintf(opt.outfile, "Alias Names:            ");
         size_t aidx = 0;
@@ -1007,66 +1049,66 @@ static int list_styles()
         if (aidx == 0) {
             fprintf(opt.outfile, "none");
         }
-        fprintf(opt.outfile, "\n");
+        fprintf(opt.outfile, "%s", opt.eol);
 
-        fprintf(opt.outfile, "Author:                 %s\n",
-                d->author ? d->author : "(unknown author)");
-        fprintf(opt.outfile, "Original Designer:      %s\n",
-                d->designer ? d->designer : "(unknown artist)");
-        fprintf(opt.outfile, "Creation Date:          %s\n",
-                d->created ? d->created : "(unknown)");
+        fprintf(opt.outfile, "Author:                 %s%s",
+                d->author ? d->author : "(unknown author)", opt.eol);
+        fprintf(opt.outfile, "Original Designer:      %s%s",
+                d->designer ? d->designer : "(unknown artist)", opt.eol);
+        fprintf(opt.outfile, "Creation Date:          %s%s",
+                d->created ? d->created : "(unknown)", opt.eol);
 
-        fprintf(opt.outfile, "Current Revision:       %s%s%s\n",
+        fprintf(opt.outfile, "Current Revision:       %s%s%s%s",
                 d->revision ? d->revision : "",
                 d->revision && d->revdate ? " as of " : "",
-                d->revdate ? d->revdate : (d->revision ? "" : "(unknown)"));
+                d->revdate ? d->revdate : (d->revision ? "" : "(unknown)"), opt.eol);
 
-        fprintf(opt.outfile, "Configuration File:     %s\n", d->defined_in);
+        fprintf(opt.outfile, "Configuration File:     %s%s", d->defined_in, opt.eol);
 
         fprintf(opt.outfile, "Indentation Mode:       ");
         switch (d->indentmode) {
             case 'b':
-                fprintf(opt.outfile, "box (indent box)\n");
+                fprintf(opt.outfile, "box (indent box)%s", opt.eol);
                 break;
             case 't':
-                fprintf(opt.outfile, "text (retain indentation inside of box)\n");
+                fprintf(opt.outfile, "text (retain indentation inside of box)%s", opt.eol);
                 break;
             default:
-                fprintf(opt.outfile, "none (discard indentation)\n");
+                fprintf(opt.outfile, "none (discard indentation)%s", opt.eol);
                 break;
         }
 
         fprintf(opt.outfile, "Replacement Rules:      ");
         if (d->anz_reprules > 0) {
             for (i = 0; i < (int) d->anz_reprules; ++i) {
-                fprintf(opt.outfile, "%d. (%s) \"%s\" WITH \"%s\"\n", i + 1,
+                fprintf(opt.outfile, "%d. (%s) \"%s\" WITH \"%s\"%s", i + 1,
                         d->reprules[i].mode == 'g' ? "glob" : "once",
-                        d->reprules[i].search, d->reprules[i].repstr);
+                        d->reprules[i].search, d->reprules[i].repstr, opt.eol);
                 if (i < (int) d->anz_reprules - 1) {
                     fprintf(opt.outfile, "                        ");
                 }
             }
         }
         else {
-            fprintf(opt.outfile, "none\n");
+            fprintf(opt.outfile, "none%s", opt.eol);
         }
         fprintf(opt.outfile, "Reversion Rules:        ");
         if (d->anz_revrules > 0) {
             for (i = 0; i < (int) d->anz_revrules; ++i) {
-                fprintf(opt.outfile, "%d. (%s) \"%s\" TO \"%s\"\n", i + 1,
+                fprintf(opt.outfile, "%d. (%s) \"%s\" TO \"%s\"%s", i + 1,
                         d->revrules[i].mode == 'g' ? "glob" : "once",
-                        d->revrules[i].search, d->revrules[i].repstr);
+                        d->revrules[i].search, d->revrules[i].repstr, opt.eol);
                 if (i < (int) d->anz_revrules - 1) {
                     fprintf(opt.outfile, "                        ");
                 }
             }
         }
         else {
-            fprintf(opt.outfile, "none\n");
+            fprintf(opt.outfile, "none%s", opt.eol);
         }
 
-        fprintf(opt.outfile, "Minimum Box Dimensions: %d x %d  (width x height)\n",
-                (int) d->minwidth, (int) d->minheight);
+        fprintf(opt.outfile, "Minimum Box Dimensions: %d x %d  (width x height)%s",
+                (int) d->minwidth, (int) d->minheight, opt.eol);
 
         fprintf(opt.outfile, "Default Padding:        ");
         if (d->padding[BTOP] || d->padding[BRIG]
@@ -1092,15 +1134,14 @@ static int list_styles()
             if (d->padding[BBOT]) {
                 fprintf(opt.outfile, "bottom %d", d->padding[BBOT]);
             }
-            fprintf(opt.outfile, "\n");
+            fprintf(opt.outfile, "%s", opt.eol);
         }
         else {
-            fprintf(opt.outfile, "none\n");
+            fprintf(opt.outfile, "none%s", opt.eol);
         }
 
-        fprintf(opt.outfile, "Default Killblank:      %s\n",
-                empty_side(opt.design->shape, BTOP) &&
-                        empty_side(opt.design->shape, BBOT) ? "no" : "yes");
+        fprintf(opt.outfile, "Default Killblank:      %s%s",
+                empty_side(opt.design->shape, BTOP) && empty_side(opt.design->shape, BBOT) ? "no" : "yes", opt.eol);
 
         fprintf(opt.outfile, "Tags:                   ");
         size_t tidx = 0;
@@ -1111,7 +1152,7 @@ static int list_styles()
         if (tidx == 0) {
             fprintf(opt.outfile, "none");
         }
-        fprintf(opt.outfile, "\n");
+        fprintf(opt.outfile, "%s", opt.eol);
 
         fprintf(opt.outfile, "Elastic Shapes:         ");
         sstart = 0;
@@ -1124,13 +1165,13 @@ static int list_styles()
                 sstart = 1;
             }
         }
-        fprintf(opt.outfile, "\n");
+        fprintf(opt.outfile, "%s", opt.eol);
 
         /*
          *  Display all shapes
          */
         if (query_is_undoc()) {
-            fprintf(opt.outfile, "Sample:\n%s\n", d->sample);
+            fprintf(opt.outfile, "Sample:%s%s%s", opt.eol, d->sample, opt.eol);
         }
         else {
             int first_shape = 1;
@@ -1140,11 +1181,12 @@ static int list_styles()
                 }
                 for (w = 0; w < d->shape[i].height; ++w) {
                     char *escaped_line = escape(d->shape[i].chars[w], d->shape[i].width);
-                    fprintf(opt.outfile, "%-24s%3s%c \"%s\"%c\n",
+                    fprintf(opt.outfile, "%-24s%3s%c \"%s\"%c%s",
                             (first_shape == 1 && w == 0 ? "Defined Shapes:" : ""),
                             (w == 0 ? shape_name[i] : ""), (w == 0 ? ':' : ' '),
                             escaped_line,
-                            (w < d->shape[i].height - 1 ? ',' : ' ')
+                            (w < d->shape[i].height - 1 ? ',' : ' '),
+                            opt.eol
                     );
                     BFREE (escaped_line);
                 }
@@ -1166,18 +1208,23 @@ static int list_styles()
         for (i = 0; i < anz_designs; ++i) {
             char *all_names = names(list[i]);
             if (list[i]->author && list[i]->designer && strcmp(list[i]->author, list[i]->designer) != 0) {
-                fprintf(opt.outfile, "%s\n%s, coded by %s:\n\n%s\n\n", all_names,
-                        list[i]->designer, list[i]->author, list[i]->sample);
+                fprintf(opt.outfile, "%s%s%s, coded by %s:%s%s%s%s%s", all_names, opt.eol,
+                        list[i]->designer, list[i]->author, opt.eol, opt.eol,
+                        list[i]->sample, opt.eol, opt.eol);
             }
             else if (list[i]->designer) {
-                fprintf(opt.outfile, "%s\n%s:\n\n%s\n\n", all_names, list[i]->designer, list[i]->sample);
+                fprintf(opt.outfile, "%s%s%s:%s%s%s%s%s", all_names, opt.eol,
+                        list[i]->designer, opt.eol, opt.eol,
+                        list[i]->sample, opt.eol, opt.eol);
             }
             else if (list[i]->author) {
-                fprintf(opt.outfile, "%s\nunknown artist, coded by %s:\n\n%s\n\n", all_names,
-                        list[i]->author, list[i]->sample);
+                fprintf(opt.outfile, "%s%sunknown artist, coded by %s:%s%s%s%s%s", all_names, opt.eol,
+                        list[i]->author, opt.eol, opt.eol,
+                        list[i]->sample, opt.eol, opt.eol);
             }
             else {
-                fprintf(opt.outfile, "%s:\n\n%s\n\n", all_names, list[i]->sample);
+                fprintf(opt.outfile, "%s:%s%s%s%s%s", all_names, opt.eol, opt.eol,
+                        list[i]->sample, opt.eol, opt.eol);
             }
             BFREE(all_names);
 
@@ -1204,9 +1251,9 @@ static int query_by_tag()
     }
     for (int i = 0; i < anz_designs; ++i) {
         if (filter_by_tag(list[i]->tags)) {
-            fprintf(opt.outfile, "%s\n", list[i]->name);
+            fprintf(opt.outfile, "%s%s", list[i]->name, opt.eol);
             for (size_t aidx = 0; list[i]->aliases[aidx] != NULL; ++aidx) {
-                fprintf(opt.outfile, "%s (alias)\n", list[i]->aliases[aidx]);
+                fprintf(opt.outfile, "%s (alias)%s", list[i]->aliases[aidx], opt.eol);
             }
         }
     }

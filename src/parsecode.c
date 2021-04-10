@@ -30,6 +30,8 @@
 
 #include "discovery.h"
 #include "tools.h"
+#include "regulex.h"
+#include "unicode.h"
 #include "parsecode.h"
 #include "parsing.h"
 #include "parser.h"
@@ -41,6 +43,8 @@
  *  following list must correspond to the DELIM definition in lexer.l.
  */
 #define LEX_SDELIM  "\"~'`!@%&*=:;<>?/|.\\"
+
+static pcre2_code *eol_pattern = NULL;
 
 
 
@@ -920,6 +924,49 @@ int action_add_alias(pass_to_bison *bison_args, char *alias_name)
     curdes.aliases = (char **) realloc(curdes.aliases, (num_aliases + 2) * sizeof(char *));
     curdes.aliases[num_aliases] = strdup(alias_name);
     curdes.aliases[num_aliases + 1] = NULL;
+    return RC_SUCCESS;
+}
+
+
+
+static char *adjust_eols(char *sample)
+{
+    if (eol_pattern == NULL) {
+        eol_pattern = compile_pattern("(?(?=\r)(\r\n?)|(\n))");
+    }
+    uint32_t *u32_sample = u32_strconv_from_input(sample);
+    uint32_t *replaced = regex_replace(eol_pattern, opt.eol, u32_sample, strlen(sample), 1);
+    char *result = u32_strconv_to_output(replaced);
+    BFREE(replaced);
+    BFREE(u32_sample);
+    return result;
+}
+
+
+
+int action_sample_block(pass_to_bison *bison_args, char *sample)
+{
+    #ifdef PARSER_DEBUG
+        fprintf(stderr, "SAMPLE block rule satisfied\n");
+    #endif
+
+    if (curdes.sample) {
+        yyerror(bison_args, "duplicate SAMPLE block");
+        return RC_ERROR;
+    }
+
+    char *p = sample;
+    while ((*p == '\r' || *p == '\n') && *p != '\0') {
+        p++;
+    }
+    char *line = adjust_eols(p);
+    if (line == NULL) {
+        perror(PROJECT);
+        return RC_ABORT;
+    }
+
+    curdes.sample = line;
+    ++(bison_args->num_mandatory);
     return RC_SUCCESS;
 }
 

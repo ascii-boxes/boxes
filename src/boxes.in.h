@@ -119,11 +119,20 @@ extern design_t *designs;
 extern int anz_designs;
 
 
+/* system default line terminator */
+#ifdef __MINGW32__
+    #define EOL_DEFAULT "\r\n"
+#else
+    #define EOL_DEFAULT "\n"
+#endif
+
+
 typedef struct {                         /* Command line options: */
     int       l;                         /** list available designs */
     char     *f;                         /** the string specified as argument to -f ; config file path */
     int       mend;                      /** 1 if -m is given, 2 in 2nd loop */
     char    **query;                     /** parsed tag query expression passed in via -q; also, special handling of web UI needs */
+    char     *eol;                       /** line break to use. Never NULL, default to EOL_DEFAULT. */
     int       r;                         /** remove box from input */
     int       tabstop;                   /** tab stop distance */
     char      tabexp;                    /** tab expansion mode (for leading tabs) */

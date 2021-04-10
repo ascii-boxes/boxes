@@ -6,8 +6,8 @@
 boxes \- text mode box and comment drawing filter
 .SH SYNOPSIS
 .B boxes
-[\-hlmrv] [\-a\ format] [\-d\ design] [\-f\ file] [\-i\ indent] [\-k\ bool]
-[\-n\ encoding] [\-p\ pad] [\-q query] [\-s\ size] [\-t\ tabopts]
+[\-hlmrv] [\-a\ format] [\-d\ design] [\-e\ eol] [\-f\ file] [\-i\ indent]
+[\-k\ bool] [\-n\ encoding] [\-p\ pad] [\-q query] [\-s\ size] [\-t\ tabopts]
 [infile [outfile]]
 .SH DESCRIPTION
 .I Boxes
@@ -130,6 +130,25 @@ is not specified.
 .B \-d \fIstring\fP
 Design selection. The one argument of this option is the name of the design to
 use.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+.B \-e \fIeol\fP
+Override line terminator.
+.I eol
+can be
+.I CR\fP,
+.I LF\fP, or
+.I CRLF\fP.
+The default is to use the system-specific line terminator, which means
+.I CRLF
+on Windows, and
+.I LF
+otherwise. This option should only be used in an emergency, because normally
+the system-specific line terminator will be just fine. This option is
+considered experimental, and may go away in a future version of
+.I boxes\fP.
+Let us know in <URL:https://github.com/ascii-boxes/boxes/issues/60> if you
+think we should keep it.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-f \fIstring\fP

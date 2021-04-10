@@ -98,7 +98,7 @@ regulex.o:   regulex.c regulex.h boxes.h tools.h unicode.h config.h | check_dir
 getopt.o:    misc/getopt.c misc/getopt.h | check_dir
 parser.o:    parser.c boxes.h lex.yy.h parser.h parsing.h tools.h shape.h discovery.h config.h | check_dir
 lex.yy.o:    lex.yy.c parser.h boxes.h parsing.h tools.h shape.h config.h | check_dir
-parsecode.o: parsecode.c parser.h boxes.h tools.h lex.yy.h config.h | check_dir
+parsecode.o: parsecode.c parser.h boxes.h tools.h lex.yy.h regulex.h unicode.h config.h | check_dir
 
 package: $(BOXES_EXECUTABLE_NAME)
 	if [ -z "$(PKG_NAME)" ] ; then exit 1 ; fi

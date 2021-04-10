@@ -148,6 +148,17 @@ void recover(pass_to_bison *bison_args);
 int tag_record(pass_to_bison *bison_args, char *tag);
 
 
+/**
+ * Add the sample block to the current design.
+ * @param bison_args the parser state
+ * @param sample the sample block content (non-empty when this is invoked)
+ * @return 0: success;
+ *         1: YYERROR must be invoked
+ *         2: YYABORT must be invoked
+ */
+int action_sample_block(pass_to_bison *bison_args, char *sample);
+
+
 #endif
 
 /*EOF*/                                       /* vim: set cindent sw=4: */

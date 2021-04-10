@@ -80,26 +80,26 @@ void print_design_list_header()
 
     fprintf(opt.outfile, "%d Available Style%s", anz_designs, anz_designs == 1 ? "" : "s");
     if (num_parent_configs > 0) {
-        fprintf(opt.outfile, ":\n");
+        fprintf(opt.outfile, ":%s", opt.eol);
         fprintf(opt.outfile, "-----------------%s", anz_designs == 1 ? "" : "-");
         for (int i = strlen(buf); i > 0; --i) {
             fprintf(opt.outfile, "-");
         }
-        fprintf(opt.outfile, "\n\n");
-        fprintf(opt.outfile, "Configuration Files:\n");
-        fprintf(opt.outfile, "    - %s\n", first_config_file);
+        fprintf(opt.outfile, "%s%s", opt.eol, opt.eol);
+        fprintf(opt.outfile, "Configuration Files:%s", opt.eol);
+        fprintf(opt.outfile, "    - %s%s", first_config_file, opt.eol);
         for (size_t i = 0; i < num_parent_configs; i++) {
-            fprintf(opt.outfile, "    - %s (parent)\n", parent_configs[i]);
+            fprintf(opt.outfile, "    - %s (parent)%s", parent_configs[i], opt.eol);
         }
     }
     else {
-        fprintf(opt.outfile, " in \"%s\":\n", first_config_file);
+        fprintf(opt.outfile, " in \"%s\":%s", first_config_file, opt.eol);
         fprintf(opt.outfile, "-----------------------%s", anz_designs == 1 ? "" : "-");
         for (int i = strlen(first_config_file) + strlen(buf); i > 0; --i) {
             fprintf(opt.outfile, "-");
         }
     }
-    fprintf(opt.outfile, "\n\n");
+    fprintf(opt.outfile, "%s%s", opt.eol, opt.eol);
 }
 
 

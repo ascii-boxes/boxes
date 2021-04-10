@@ -277,32 +277,7 @@ entry: KEYWORD STRING
 
 block: YSAMPLE STRING YENDSAMPLE
     {
-        /*
-         *  SAMPLE block    (STRING is non-empty if we get here)
-         */
-        char *line;
-
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "SAMPLE block rule satisfied\n");
-        #endif
-
-        if (curdes.sample) {
-            yyerror(bison_args, "duplicate SAMPLE block");
-            YYERROR;
-        }
-
-        char *p = $2;
-        while ((*p == '\r' || *p == '\n') && *p != '\0') {
-            p++;
-        }
-        line = (char *) strdup (p);
-        if (line == NULL) {
-            perror (PROJECT);
-            YYABORT;
-        }
-
-        curdes.sample = line;
-        ++(bison_args->num_mandatory);
+        invoke_action(action_sample_block(bison_args, $2));
     }
 
 | YSHAPES  '{' slist  '}'
