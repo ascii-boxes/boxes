@@ -1,0 +1,40 @@
+:ARGS
+-f 160_list_designs_author_designer.cfg -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+4 Available Styles in "160_list_designs_author_designer.cfg":
+-------------------------------------------------------------
+
+designA
+designerA, coded by authorA:
+
+    AAA
+    AAA foo
+    AAA
+
+
+designB
+unknown artist, coded by authorB:
+
+    BBB
+    BBB foo
+    BBB
+
+
+designC
+designerC:
+
+    CCC
+    CCC foo
+    CCC
+
+
+designD:
+
+    DDD
+    DDD foo
+    DDD
+
+
+:EOF

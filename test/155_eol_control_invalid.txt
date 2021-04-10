@@ -1,0 +1,11 @@
+:DESC
+Test that invalid line terminator specs are properly reported.
+
+:ARGS
+-e INVALID
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: invalid eol spec -- INVALID
+:EOF

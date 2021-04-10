@@ -1,0 +1,16 @@
+:DESC
+Test that the line terminator can be forced to CRLF.
+
+:ENV
+export BOXES_TEST_XXD=1
+:ARGS
+-f ../boxes-config -d c -e crlf
+:INPUT
+foo
+:OUTPUT-FILTER
+s/^.*([0-9a-fA-F]{4}):/0000\1:/
+:EXPECTED
+00000000: 2f2a 2a2a 2a2a 2a2a 2f0d 0a2f 2a20 666f  /*******/../* fo
+00000010: 6f20 2a2f 0d0a 2f2a 2a2a 2a2a 2a2a 2f0d  o */../*******/.
+00000020: 0a                                       .
+:EOF
