@@ -14,3 +14,4 @@ addons:
     - libunistring-dev
     - libpcre2-dev
     - diffutils
+    - vim-common
