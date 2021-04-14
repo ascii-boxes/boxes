@@ -85,11 +85,11 @@ typedef struct {
     char      *revdate;              /* date of current revision */
     char      *sample;
     char       indentmode;           /* 'b', 't', or 'n' */
-    sentry_t   shape[ANZ_SHAPES];
+    sentry_t   shape[NUM_SHAPES];
     size_t     maxshapeheight;       /* height of highest shape in design */
     size_t     minwidth;
     size_t     minheight;
-    int        padding[ANZ_SIDES];
+    int        padding[NUM_SIDES];
     char     **tags;
     char      *defined_in;           /* path to config file where this was defined */
 
@@ -120,7 +120,7 @@ typedef struct {                     /* Command line options: */
     int       l;                     /** `-l`: list available designs */
     int       mend;                  /** `-m`: 1 if -m is given, 2 in 2nd loop */
     char     *encoding;              /** `-n`: character encoding override for input and output text */
-    int       padding[ANZ_SIDES];    /** `-p`: in spaces or lines resp. */
+    int       padding[NUM_SIDES];    /** `-p`: in spaces or lines resp. */
     char    **query;                 /** `-q`: parsed tag query expression passed in via -q; also, special handling of web UI needs */
     int       r;                     /** `-r`: remove box from input */
     long      reqwidth;              /** `-s`: requested box width */

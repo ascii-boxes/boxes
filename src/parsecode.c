@@ -97,7 +97,7 @@ static int check_sizes(pass_to_bison *bison_args)
         fprintf (stderr, "check_sizes()\n");
     #endif
 
-    for (i=0; i<ANZ_SIDES; ++i) {
+    for (i=0; i<NUM_SIDES; ++i) {
         if (i == 0 || i == 2) {
             /*
              *  horizontal
@@ -165,7 +165,7 @@ static int corner_check(pass_to_bison *bison_args)
         fprintf (stderr, "corner_check()\n");
     #endif
 
-    for (c=0; c<ANZ_CORNERS; ++c) {
+    for (c=0; c<NUM_CORNERS; ++c) {
         if (curdes.shape[corners[c]].elastic) {
             yyerror(bison_args, "Corners may not be elastic (%s)", shape_name[corners[c]]);
             return 1;
@@ -185,13 +185,13 @@ static shape_t non_existent_elastics(pass_to_bison *bison_args)
         fprintf (stderr, "non_existent_elastics()\n");
     #endif
 
-    for (i=0; i<ANZ_SHAPES; ++i) {
+    for (i=0; i<NUM_SHAPES; ++i) {
         if (curdes.shape[i].elastic && isempty(curdes.shape+i)) {
             return i;
         }
     }
 
-    return (shape_t) ANZ_SHAPES;         /* all elastic shapes exist */
+    return (shape_t) NUM_SHAPES;         /* all elastic shapes exist */
 }
 
 
@@ -204,7 +204,7 @@ static int insufficient_elasticity(pass_to_bison *bison_args)
         fprintf (stderr, "insufficient_elasticity()\n");
     #endif
 
-    for (i=0; i<ANZ_SIDES; ++i) {
+    for (i=0; i<NUM_SIDES; ++i) {
         for (j=1,ef=0; j<4; ++j) {
             if (curdes.shape[sides[i][j]].elastic) {
                 ++ef;
@@ -228,7 +228,7 @@ static int adjoining_elastics(pass_to_bison *bison_args)
         fprintf (stderr, "adjoining_elastics()\n");
     #endif
 
-    for (i=0; i<ANZ_SIDES; ++i) {
+    for (i=0; i<NUM_SIDES; ++i) {
         ef = 0;
         for (j=1; j<4; ++j) {
             if (isempty(curdes.shape+sides[i][j])) {
@@ -257,7 +257,7 @@ int perform_se_check(pass_to_bison *bison_args)
     shape_t s_rc;
 
     s_rc = non_existent_elastics(bison_args);
-    if (s_rc != ANZ_SHAPES) {
+    if (s_rc != NUM_SHAPES) {
         yyerror(bison_args, "Shape %s has been specified as elastic but doesn't exist",
                 shape_name[s_rc]);
         return 1;
@@ -493,18 +493,18 @@ int action_finalize_shapes(pass_to_bison *bison_args)
      *  as necessary, starting at any side which already includes at
      *  least one shape in order to ensure correct measurements.
      */
-    fshape = findshape (curdes.shape, ANZ_SHAPES);
-    if (fshape == ANZ_SHAPES) {
+    fshape = findshape (curdes.shape, NUM_SHAPES);
+    if (fshape == NUM_SHAPES) {
         yyerror(bison_args, "internal error");
         return RC_ABORT;
     }
     fside = on_side (fshape, 0);
-    if (fside == ANZ_SIDES) {
+    if (fside == NUM_SIDES) {
         yyerror(bison_args, "internal error");
         return RC_ABORT;
     }
 
-    for (sc=0,side=fside; sc<ANZ_SIDES; ++sc,side=(side+1)%ANZ_SIDES) {
+    for (sc=0,side=fside; sc<NUM_SIDES; ++sc,side=(side+1)%NUM_SIDES) {
         shape_t   nshape;               /* next shape */
         sentry_t *c;                    /* corner to be processed */
         c = curdes.shape + sides[side][SHAPES_PER_SIDE-1];
@@ -541,7 +541,7 @@ int action_finalize_shapes(pass_to_bison *bison_args)
      *  For all sides whose side shapes have not been defined, generate
      *  an elastic middle side shape.
      */
-    for (side=0; side<ANZ_SIDES; ++side) {
+    for (side=0; side<NUM_SIDES; ++side) {
         int found = 0;
         for (i=1; i<SHAPES_PER_SIDE-1; ++i) {
             if (isempty (curdes.shape + sides[side][i])) {
@@ -582,7 +582,7 @@ int action_finalize_shapes(pass_to_bison *bison_args)
     /*
      *  Compute minimum height/width of a box of current design
      */
-    for (i=0; i<ANZ_SIDES; ++i) {
+    for (i=0; i<NUM_SIDES; ++i) {
         size_t c = 0;
         if (i % 2) {                 /* vertical sides */
             for (j=0; j<SHAPES_PER_SIDE; ++j) {
@@ -609,7 +609,7 @@ int action_finalize_shapes(pass_to_bison *bison_args)
     /*
      *  Compute height of highest shape in design
      */
-    for (i=0; i<ANZ_SHAPES; ++i) {
+    for (i=0; i<NUM_SHAPES; ++i) {
         if (isempty(curdes.shape + i)) {
             continue;
         }

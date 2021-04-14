@@ -128,7 +128,7 @@ static opt_t *create_new_opt()
         result->eol = "\n";      /* we must default to "\n" instead of EOL_DEFAULT as long as stdout is in text mode */
         result->tabexp = 'e';
         result->killblank = -1;
-        for (int i = 0; i < ANZ_SIDES; ++i) {
+        for (int i = 0; i < NUM_SIDES; ++i) {
             result->padding[i] = -1;
         }
     }

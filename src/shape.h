@@ -32,18 +32,18 @@ typedef enum {
 
 extern char *shape_name[];
 
-#define ANZ_SHAPES 16
+#define NUM_SHAPES 16
 
 #define SHAPES_PER_SIDE 5
-#define ANZ_SIDES       4
-#define ANZ_CORNERS     4
+#define NUM_SIDES       4
+#define NUM_CORNERS     4
 
 extern shape_t north_side[SHAPES_PER_SIDE];  /* groups of shapes, clockwise */
 extern shape_t  east_side[SHAPES_PER_SIDE];
 extern shape_t south_side[SHAPES_PER_SIDE];
 extern shape_t  west_side[SHAPES_PER_SIDE];
-extern shape_t corners[ANZ_CORNERS];
-extern shape_t *sides[ANZ_SIDES];
+extern shape_t corners[NUM_CORNERS];
+extern shape_t *sides[NUM_SIDES];
 
 
 typedef struct {

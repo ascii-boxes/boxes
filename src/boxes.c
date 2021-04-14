@@ -116,7 +116,7 @@ static int build_design(design_t **adesigns, const char *cld)
     }
     strcpy(dp->shape[W].chars[0], cld);
 
-    for (i = 0; i < ANZ_SHAPES; ++i) {
+    for (i = 0; i < NUM_SHAPES; ++i) {
         c = dp->shape + i;
 
         if (i == NNW || i == NNE || i == WNW || i == ENE || i == W
@@ -732,7 +732,7 @@ int main(int argc, char *argv[])
          *  Adjust box size to fit requested padding value
          *  Command line-specified box size takes precedence over padding.
          */
-        for (i = 0; i < ANZ_SIDES; ++i) {
+        for (i = 0; i < NUM_SIDES; ++i) {
             if (opt.padding[i] > -1) {
                 opt.design->padding[i] = opt.padding[i];
             }
@@ -814,7 +814,7 @@ int main(int argc, char *argv[])
             #ifdef DEBUG
                 fprintf (stderr, "Generating Box ...\n");
             #endif
-            thebox = (sentry_t *) calloc(ANZ_SIDES, sizeof(sentry_t));
+            thebox = (sentry_t *) calloc(NUM_SIDES, sizeof(sentry_t));
             if (thebox == NULL) {
                 perror(PROJECT);
                 exit(EXIT_FAILURE);

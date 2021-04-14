@@ -46,7 +46,7 @@ shape_t south_side[SHAPES_PER_SIDE] = {SE, SSE, S, SSW, SW};
 
 shape_t west_side[SHAPES_PER_SIDE] = {SW, WSW, W, WNW, NW};
 
-shape_t corners[ANZ_CORNERS] = {NW, NE, SE, SW};
+shape_t corners[NUM_CORNERS] = {NW, NE, SE, SW};
 
 shape_t *sides[] = {north_side, east_side, south_side, west_side};
 
@@ -88,7 +88,7 @@ int on_side(const shape_t s, const int idx)
  *      idx  which occurence to return (0 == first, 1 == second (for corners)
  *
  *  RETURNS: side number (BTOP etc.)  on success
- *           ANZ_SIDES                on error (e.g. idx==1 && s no corner)
+ *           NUM_SIDES                on error (e.g. idx==1 && s no corner)
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
@@ -97,7 +97,7 @@ int on_side(const shape_t s, const int idx)
     int i;
     int found = 0;
 
-    for (side = 0; side < ANZ_SIDES; ++side) {
+    for (side = 0; side < NUM_SIDES; ++side) {
         for (i = 0; i < SHAPES_PER_SIDE; ++i) {
             if (sides[side][i] == s) {
                 if (found == idx) {
@@ -109,7 +109,7 @@ int on_side(const shape_t s, const int idx)
         }
     }
 
-    return ANZ_SIDES;
+    return NUM_SIDES;
 }
 
 
@@ -310,7 +310,7 @@ shape_t leftmost(const int aside, const int cnt)
  *  (BTOP or BBOT), skipping cnt shapes. Corners are not considered.
  *
  *  RETURNS:    shape       if shape was found
- *              ANZ_SHAPES  on error (e.g. cnt too high)
+ *              NUM_SHAPES  on error (e.g. cnt too high)
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
@@ -319,7 +319,7 @@ shape_t leftmost(const int aside, const int cnt)
     int s;
 
     if (cnt < 0) {
-        return ANZ_SHAPES;
+        return NUM_SHAPES;
     }
 
     if (aside == BTOP) {
@@ -331,7 +331,7 @@ shape_t leftmost(const int aside, const int cnt)
                         ++s;
             }
             if (s == SHAPES_PER_SIDE - 1) {
-                return ANZ_SHAPES;
+                return NUM_SHAPES;
             }
         } while (c++ < cnt);
         return north_side[s];
@@ -345,13 +345,13 @@ shape_t leftmost(const int aside, const int cnt)
                 --s;
             }
             if (!s) {
-                return ANZ_SHAPES;
+                return NUM_SHAPES;
             }
         } while (c++ < cnt);
         return south_side[s];
     }
 
-    return ANZ_SHAPES;
+    return NUM_SHAPES;
 }
 
 

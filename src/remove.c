@@ -260,7 +260,7 @@ static int hmm(const int aside, const size_t follow,
     }
 
     sh = leftmost(aside, cnt);
-    if (sh == ANZ_SHAPES) {
+    if (sh == NUM_SHAPES) {
         return 1;
     }
 
@@ -270,7 +270,7 @@ static int hmm(const int aside, const size_t follow,
 
     if (cmp == 0) {
         if (p + cs->width == ecs) {
-            if (leftmost(aside, cnt + 1) == ANZ_SHAPES) {
+            if (leftmost(aside, cnt + 1) == NUM_SHAPES) {
                 return 0;                /* good! all clear, it matched */
             } else {
                 return 3;
@@ -529,7 +529,7 @@ static design_t *detect_design()
     char *s;
     line_t shpln;                  /* a line which is part of a shape */
     size_t a;
-    int empty[ANZ_SIDES];
+    int empty[NUM_SIDES];
 
     for (dcnt = 0; dcnt < anz_designs; ++dcnt, ++d) {
         #ifdef DEBUG
@@ -538,7 +538,7 @@ static design_t *detect_design()
         #endif
         hits = 0;
 
-        for (j = 0; j < ANZ_SIDES; ++j) {
+        for (j = 0; j < NUM_SIDES; ++j) {
             empty[j] = empty_side(d->shape, j);
         }
         #ifdef DEBUG
@@ -546,7 +546,7 @@ static design_t *detect_design()
                 empty[BTOP], empty[BLEF], empty[BBOT], empty[BRIG]);
         #endif
 
-        for (scnt = 0; scnt < ANZ_SHAPES; ++scnt) {
+        for (scnt = 0; scnt < NUM_SHAPES; ++scnt) {
 
             switch (scnt) {
                 case NW:

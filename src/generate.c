@@ -690,7 +690,7 @@ int generate_box(sentry_t *thebox)
     return 0;                            /* all clear */
 
     err:
-    for (i = 0; i < ANZ_SIDES; ++i) {
+    for (i = 0; i < NUM_SIDES; ++i) {
         if (!isempty(&(thebox[i]))) {
             BFREE (thebox[i].chars);     /* free only pointer array */
             memset(thebox + i, 0, sizeof(sentry_t));

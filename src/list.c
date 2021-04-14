@@ -304,7 +304,7 @@ static void print_design_details(design_t *d)
 
     fprintf(opt.outfile, "Elastic Shapes:         ");
     int sstart = 0;
-    for (int i = 0; i < ANZ_SHAPES; ++i) {
+    for (int i = 0; i < NUM_SHAPES; ++i) {
         if (isempty(d->shape + i)) {
             continue;
         }
@@ -323,7 +323,7 @@ static void print_design_details(design_t *d)
     }
     else {
         int first_shape = 1;
-        for (int i = 0; i < ANZ_SHAPES; ++i) {
+        for (int i = 0; i < NUM_SHAPES; ++i) {
             if (isdeepempty(d->shape + i)) {
                 continue;
             }
