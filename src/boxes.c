@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
             memcpy(&input, raw_input, sizeof(input_t));
             BFREE(raw_input);
         }
-        if (input.anz_lines == 0) {
+        if (input.num_lines == 0) {
             exit(EXIT_SUCCESS);
         }
 
@@ -388,7 +388,7 @@ int main(int argc, char *argv[])
         }
         pad = opt.design->padding[BTOP] + opt.design->padding[BBOT];
         if (pad > 0) {
-            pad += input.anz_lines;
+            pad += input.num_lines;
             pad += opt.design->shape[NW].height + opt.design->shape[SW].height;
             if (pad > opt.design->minheight) {
                 if (opt.reqheight) {

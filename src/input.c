@@ -141,7 +141,7 @@ int apply_substitutions(input_t *result, const int mode)
     /*
      *  Apply regular expression substitutions to input lines
      */
-    for (k = 0; k < result->anz_lines; ++k) {
+    for (k = 0; k < result->num_lines; ++k) {
         opt.design->current_rule = rules;
         for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
             #ifdef REGEXP_DEBUG
@@ -178,7 +178,7 @@ int apply_substitutions(input_t *result, const int mode)
      */
     if (opt.design->indentmode == 't') {
         int rc;
-        rc = get_indent(result->lines, result->anz_lines);
+        rc = get_indent(result->lines, result->num_lines);
         if (rc >= 0) {
             result->indent = (size_t) rc;
         } else {
@@ -222,7 +222,7 @@ input_t *read_all_input()
 
     while (fgets(buf, LINE_MAX_BYTES + 2, opt.infile))
     {
-        if (result->anz_lines % 100 == 0) {
+        if (result->num_lines % 100 == 0) {
             input_size += 100;
             line_t *tmp = (line_t *) realloc(result->lines, input_size * sizeof(line_t));
             if (tmp == NULL) {
@@ -233,7 +233,7 @@ input_t *read_all_input()
             result->lines = tmp;
         }
 
-        memset(result->lines + result->anz_lines, 0, sizeof(line_t));
+        memset(result->lines + result->num_lines, 0, sizeof(line_t));
 
         uint32_t *mbtemp = u32_strconv_from_input(buf);
         size_t len_chars = u32_strlen(mbtemp);
@@ -246,24 +246,24 @@ input_t *read_all_input()
         if (len_chars > 0) {
             uint32_t *temp = NULL;
             len_chars = expand_tabs_into(mbtemp, opt.tabstop, &temp,
-                                         &(result->lines[result->anz_lines].tabpos),
-                                         &(result->lines[result->anz_lines].tabpos_len));
+                                         &(result->lines[result->num_lines].tabpos),
+                                         &(result->lines[result->num_lines].tabpos_len));
             if (len_chars == 0) {
                 perror(PROJECT);
                 BFREE (result->lines);
                 return NULL;
             }
-            result->lines[result->anz_lines].mbtext = temp;
+            result->lines[result->num_lines].mbtext = temp;
             BFREE(mbtemp);
             temp = NULL;
         }
         else {
-            result->lines[result->anz_lines].mbtext = mbtemp;
+            result->lines[result->num_lines].mbtext = mbtemp;
         }
-        result->lines[result->anz_lines].mbtext_org = result->lines[result->anz_lines].mbtext;
-        result->lines[result->anz_lines].num_chars = len_chars;
+        result->lines[result->num_lines].mbtext_org = result->lines[result->num_lines].mbtext;
+        result->lines[result->num_lines].num_chars = len_chars;
 
-        ++result->anz_lines;
+        ++result->num_lines;
     }
 
     if (ferror(stdin)) {
@@ -284,7 +284,7 @@ int analyze_input(input_t *result)
     /*
      * Build ASCII equivalent of the multi-byte string, update line stats
      */
-    for (size_t i = 0; i < result->anz_lines; ++i) {
+    for (size_t i = 0; i < result->num_lines; ++i) {
         analyze_line_ascii(result, result->lines + i);
     }
 
@@ -298,7 +298,7 @@ int analyze_input(input_t *result)
     /*
      *  Compute indentation
      */
-    int rc = get_indent(result->lines, result->anz_lines);
+    int rc = get_indent(result->lines, result->num_lines);
     if (rc >= 0) {
         result->indent = (size_t) rc;
     } else {
@@ -310,7 +310,7 @@ int analyze_input(input_t *result)
      *  a box or if the user wants to retain it inside the box)
      */
     if (opt.design->indentmode != 't' && opt.r == 0) {
-        for (size_t i = 0; i < result->anz_lines; ++i) {
+        for (size_t i = 0; i < result->num_lines; ++i) {
             #ifdef DEBUG
                 fprintf(stderr, "%2d: mbtext = \"%s\" (%d chars)\n", (int) i,
                     u32_strconv_to_output(result->lines[i].mbtext), (int) result->lines[i].num_chars);

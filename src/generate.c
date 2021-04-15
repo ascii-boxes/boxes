@@ -265,9 +265,9 @@ static int vert_precalc(const sentry_t *sarr,
      *  Ensure minimum height for insides of box in order to ensure
      *  minimum box size required by current design
      */
-    if (input.anz_lines >= (opt.design->minheight - sarr[west_side[0]].height -
+    if (input.num_lines >= (opt.design->minheight - sarr[west_side[0]].height -
             sarr[west_side[SHAPES_PER_SIDE - 1]].height)) {
-        target_height = input.anz_lines;
+        target_height = input.num_lines;
     }
     else {
         target_height = opt.design->minheight - sarr[west_side[0]].height -
@@ -858,7 +858,7 @@ int output_box(const sentry_t *thebox)
     /*
      *  Compute number of empty lines in box (vfill).
      */
-    vfill = nol - thebox[BTOP].height - thebox[BBOT].height - input.anz_lines;
+    vfill = nol - thebox[BTOP].height - thebox[BBOT].height - input.num_lines;
     vfill -= opt.design->padding[BTOP] + opt.design->padding[BBOT];
     if (opt.valign == 'c') {
         vfill1 = vfill / 2;
@@ -972,7 +972,7 @@ int output_box(const sentry_t *thebox)
 
         else if (j < nol - thebox[BBOT].height) {
             long ti = j - thebox[BTOP].height - (vfill - vfill2);
-            if (ti < (long) input.anz_lines) {      /* box content (lines) */
+            if (ti < (long) input.num_lines) {      /* box content (lines) */
                 int shift = justify_line(input.lines + ti, hpr - hpl);
                 restored_indent = tabbify_indent(ti, indentspc, indentspclen);
                 uint32_t *mbtext_shifted = advance32(input.lines[ti].mbtext, shift < 0 ? (size_t) (-shift) : 0);
@@ -984,7 +984,7 @@ int output_box(const sentry_t *thebox)
                                thebox[BRIG].chars[j]);
             }
             else {                       /* bottom vfill */
-                restored_indent = tabbify_indent(input.anz_lines - 1, indentspc, indentspclen);
+                restored_indent = tabbify_indent(input.num_lines - 1, indentspc, indentspclen);
                 concat_strings(obuf, LINE_MAX_BYTES + 1, 4, restored_indent,
                                skip_left ? "" : thebox[BLEF].chars[j], nspaces(thebox[BTOP].width),
                                thebox[BRIG].chars[j]);
@@ -992,7 +992,7 @@ int output_box(const sentry_t *thebox)
         }
 
         else {                           /* box bottom */
-            restored_indent = tabbify_indent(input.anz_lines - 1, indentspc, indentspclen);
+            restored_indent = tabbify_indent(input.num_lines - 1, indentspc, indentspclen);
             concat_strings(obuf, LINE_MAX_BYTES + 1, 4, restored_indent,
                            skip_left ? "" : thebox[BLEF].chars[j],
                            thebox[BBOT].chars[j - (nol - thebox[BBOT].height)],

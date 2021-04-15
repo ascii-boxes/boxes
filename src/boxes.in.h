@@ -158,7 +158,7 @@ typedef struct {
 
 typedef struct {
     line_t *lines;
-    size_t  anz_lines;               /* number of entries in input TODO rename to num_lines */
+    size_t  num_lines;               /* number of entries in input */
     size_t  maxline;                 /* length of longest input line */
     size_t  indent;                  /* number of leading spaces found */
     int     final_newline;           /* true if the last line of input ends with newline */

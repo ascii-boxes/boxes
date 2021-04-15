@@ -459,7 +459,7 @@ char *tabbify_indent(const size_t lineno, char *indentspc, const size_t indentsp
     if (opt.tabexp != 'k') {
         return indentspc;
     }
-    if (lineno >= input.anz_lines) {
+    if (lineno >= input.num_lines) {
         return NULL;
     }
     if (indentspc_len == 0) {
@@ -509,7 +509,7 @@ void print_input_lines(const char *heading)
 {
     fprintf(stderr, "Input Lines%s:\n", heading != NULL ? heading : "");
     fprintf(stderr, "     [num_chars] \"real text\" [num_cols] \"ascii_text\"\n");
-    for (size_t i = 0; i < input.anz_lines; ++i) {
+    for (size_t i = 0; i < input.num_lines; ++i) {
         fprintf(stderr, "%4d [%02d] \"%s\"  [%02d] \"%s\"", (int) i,
                 (int) input.lines[i].num_chars, u32_strconv_to_output(input.lines[i].mbtext),
                 (int) input.lines[i].len, input.lines[i].text);

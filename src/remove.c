@@ -354,16 +354,16 @@ static int detect_horiz(const int aside, size_t *hstart, size_t *hend)
     }
     else {
         follow = mheight - 1;
-        line = input.lines + input.anz_lines - 1;
+        line = input.lines + input.num_lines - 1;
     }
 
-    for (lcnt = 0; lcnt < mheight && lcnt < input.anz_lines
+    for (lcnt = 0; lcnt < mheight && lcnt < input.num_lines
             && line >= input.lines; ++lcnt) {
         goeast = gowest = 0;
 
         #ifdef DEBUG
             fprintf(stderr, "----- Processing line index %2d -----------------------------------------------\n",
-                    (int) (aside == BTOP ? lcnt : input.anz_lines - lcnt - 1));
+                    (int) (aside == BTOP ? lcnt : input.num_lines - lcnt - 1));
         #endif
 
         do {
@@ -470,13 +470,13 @@ static int detect_horiz(const int aside, size_t *hstart, size_t *hend)
                 if (aside == BTOP) {
                     *hstart = lcnt;
                 } else {
-                    *hend = (input.anz_lines - lcnt - 1) + 1;
+                    *hend = (input.num_lines - lcnt - 1) + 1;
                 }
             }
             if (aside == BTOP) {
                 *hend = lcnt + 1;
             } else {
-                *hstart = input.anz_lines - lcnt - 1;
+                *hstart = input.num_lines - lcnt - 1;
             }
         }
         else {
@@ -571,9 +571,9 @@ static design_t *detect_design()
                         for (k = 0; k < d->shape[scnt].height; ++k) {
                             a = k;
                             if (scnt == SW) {
-                                a += input.anz_lines - d->shape[scnt].height;
+                                a += input.num_lines - d->shape[scnt].height;
                             }
-                            if (a >= input.anz_lines) {
+                            if (a >= input.num_lines) {
                                 break;
                             }
                             for (p = input.lines[a].text; *p == ' ' || *p == '\t'; ++p) {
@@ -612,9 +612,9 @@ static design_t *detect_design()
                         for (k = 0; k < d->shape[scnt].height; ++k) {
                             a = k;
                             if (scnt == SE) {
-                                a += input.anz_lines - d->shape[scnt].height;
+                                a += input.num_lines - d->shape[scnt].height;
                             }
-                            if (a >= input.anz_lines) {
+                            if (a >= input.num_lines) {
                                 break;
                             }
                             for (p = input.lines[a].text + input.lines[a].len - 1;
@@ -662,9 +662,9 @@ static design_t *detect_design()
                             for (k = 0; k < d->shape[scnt].height; ++k) {
                                 a = k;
                                 if (scnt >= SSE && scnt <= SSW) {
-                                    a += input.anz_lines - d->shape[scnt].height;
+                                    a += input.num_lines - d->shape[scnt].height;
                                 }
-                                if (a >= input.anz_lines) {
+                                if (a >= input.num_lines) {
                                     break;
                                 }
                                 for (p = input.lines[a].text;
@@ -717,9 +717,9 @@ static design_t *detect_design()
          *  non-empty shape line. If so, generate a hit.
          */
         if (((empty[BTOP] ? 0 : d->shape[NW].height)
-                + (empty[BBOT] ? 0 : d->shape[SW].height)) < input.anz_lines) {
+                + (empty[BBOT] ? 0 : d->shape[SW].height)) < input.num_lines) {
             for (k = empty[BTOP] ? 0 : d->shape[NW].height;
-                    k < input.anz_lines - (empty[BBOT] ? 0 : d->shape[SW].height);
+                    k < input.num_lines - (empty[BBOT] ? 0 : d->shape[SW].height);
                     ++k) {
                 for (p = input.lines[k].text; *p == ' ' || *p == '\t'; ++p) {
                 }
@@ -862,7 +862,7 @@ int remove_box()
      *  add a number of spaces equal to the east side width.
      */
     const size_t normalized_len = input.maxline + opt.design->shape[NE].width;
-    for (j = 0; j < input.anz_lines; ++j) {
+    for (j = 0; j < input.num_lines; ++j) {
         add_spaces_to_line(input.lines + j, normalized_len - input.lines[j].len);
     }
     #ifdef DEBUG
@@ -893,10 +893,10 @@ int remove_box()
      *  Phase 2: Find out how many lines belong to the bottom of the box
      */
     if (empty_side(opt.design->shape, BBOT)) {
-        textend = input.anz_lines;
-        boxend = input.anz_lines;
+        textend = input.num_lines;
+        boxend = input.num_lines;
         #ifdef DEBUG
-            fprintf(stderr, "----> Bottom box side is empty: boxend == textend == %d.\n", (int) input.anz_lines);
+            fprintf(stderr, "----> Bottom box side is empty: boxend == textend == %d.\n", (int) input.num_lines);
         #endif
     }
     else {
@@ -904,8 +904,8 @@ int remove_box()
         boxend = 0;
         detect_horiz(BBOT, &textend, &boxend);
         if (textend == 0 && boxend == 0) {
-            textend = input.anz_lines;
-            boxend = input.anz_lines;
+            textend = input.num_lines;
+            boxend = input.num_lines;
         }
         #ifdef DEBUG
             fprintf(stderr, "----> Last line of box body (text) is %d, ", (int) (textend - 1));
@@ -1022,26 +1022,26 @@ int remove_box()
     if (textstart > boxstart) {
         for (j = boxstart; j < textstart; ++j) BFREE (input.lines[j].text);
         memmove(input.lines + boxstart, input.lines + textstart,
-                (input.anz_lines - textstart) * sizeof(line_t));
-        input.anz_lines -= textstart - boxstart;
+                (input.num_lines - textstart) * sizeof(line_t));
+        input.num_lines -= textstart - boxstart;
         textend -= textstart - boxstart;
         boxend -= textstart - boxstart;
     }
     if (boxend > textend) {
         for (j = textend; j < boxend; ++j) BFREE (input.lines[j].text);
-        if (boxend < input.anz_lines) {
+        if (boxend < input.num_lines) {
             memmove(input.lines + textend, input.lines + boxend,
-                    (input.anz_lines - boxend) * sizeof(line_t));
+                    (input.num_lines - boxend) * sizeof(line_t));
         }
-        input.anz_lines -= boxend - textend;
+        input.num_lines -= boxend - textend;
     }
     input.maxline = 0;
-    for (j = 0; j < input.anz_lines; ++j) {
+    for (j = 0; j < input.num_lines; ++j) {
         if (input.lines[j].len - input.lines[j].invis > input.maxline) {
             input.maxline = input.lines[j].len - input.lines[j].invis;
         }
     }
-    memset(input.lines + input.anz_lines, 0,
+    memset(input.lines + input.num_lines, 0,
            (BMAX (textstart - boxstart, (size_t) 0) + BMAX (boxend - textend, (size_t) 0)) * sizeof(line_t));
 
     #ifdef DEBUG
@@ -1069,7 +1069,7 @@ void output_input(const int trim_only)
     #ifdef DEBUG
         fprintf(stderr, "output_input() - enter (trim_only=%d)\n", trim_only);
     #endif
-    for (size_t j = 0; j < input.anz_lines; ++j) {
+    for (size_t j = 0; j < input.num_lines; ++j) {
         if (input.lines[j].text == NULL) {
             continue;
         }
@@ -1103,7 +1103,7 @@ void output_input(const int trim_only)
         }
 
         fprintf(opt.outfile, "%s%s%s", indentspc, u32_strconv_to_output(advance32(input.lines[j].mbtext, indent)),
-                (input.final_newline || j < input.anz_lines - 1 ? opt.eol : ""));
+                (input.final_newline || j < input.num_lines - 1 ? opt.eol : ""));
         BFREE (indentspc);
     }
 }
