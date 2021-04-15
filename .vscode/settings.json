@@ -35,7 +35,7 @@
     ],
     "todo-tree.general.statusBar": "total",
     "todo-tree.general.tags": ["TODO", "FIXME", "CHECK"],
-    "todo-tree.regex.regex": "(//|#|<!--|\"|/\\*|^\\s*\\*)\\s*($TAGS)",
+    "todo-tree.regex.regex": "(//|#|<!--|\"|/\\*|^\\s*\\*).*?($TAGS)",
     "todo-tree.tree.expanded": true,
     "todo-tree.tree.showCountsInTree": true,
 
