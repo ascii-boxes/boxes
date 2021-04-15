@@ -156,8 +156,6 @@ typedef struct {
     size_t   *posmap;                /* for each character in `text`, position of corresponding char in `mbtext`. Needed for box removal. */
 } line_t;
 
-
-#ifndef FILE_LEXER_L
 typedef struct {
     line_t *lines;
     size_t  anz_lines;               /* number of entries in input */
@@ -169,7 +167,6 @@ typedef struct {
 #define INPUT_INITIALIZER {NULL, 0, 0, LINE_MAX_BYTES, 0}
 
 extern input_t input;
-#endif /*!FILE_LEXER_L*/
 
 
 #endif /* BOXES_H */

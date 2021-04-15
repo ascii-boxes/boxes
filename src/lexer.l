@@ -60,10 +60,8 @@ void inflate_inbuf(void *yyscanner, const char *configfile);
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "shape.h"
-#define FILE_LEXER_L
 #include "boxes.h"
-#undef FILE_LEXER_L
+#include "shape.h"
 #include "tools.h"
 #include "parsing.h"
 #include "parser.h"
