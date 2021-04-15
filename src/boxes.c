@@ -19,29 +19,20 @@
  */
 
 #include "config.h"
-#include <errno.h>
 #include <locale.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <strings.h>
-
-#include <unictype.h>
-#include <unistdio.h>
-#include <unistr.h>
-#include <unitypes.h>
-#include <uniwidth.h>
+#include <uniconv.h>
 
 #include "boxes.h"
 #include "cmdline.h"
-#include "list.h"
-#include "shape.h"
-#include "tools.h"
 #include "discovery.h"
 #include "generate.h"
+#include "input.h"
+#include "list.h"
 #include "parsing.h"
-#include "regulex.h"
 #include "remove.h"
+#include "tools.h"
 #include "unicode.h"
 
 
@@ -53,11 +44,11 @@
  +--------------------------------------------------------------------------*/
 
 design_t *designs = NULL;            /* available box designs */
-int anz_designs = 0;                 /* no of designs after parsing */
+int anz_designs = 0;                 /* number of designs after parsing TODO rename to num_designs */
 
 opt_t opt;                           /* command line options */
 
-input_t input = INPUT_INITIALIZER;   /* input lines */
+input_t input;                       /* input lines */
 
 
 /*       _\|/_
@@ -232,358 +223,6 @@ static int query_by_tag()
 
 
 
-static int get_indent(const line_t *lines, const size_t lines_size)
-/*
- *  Determine indentation of given lines in spaces.
- *
- *      lines      the lines to examine
- *      lines_size number of lines to examine
- *
- *  Lines are assumed to be free of trailing whitespace.
- *
- *  RETURNS:    >= 0   indentation in spaces
- *               < 0   error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int res = LINE_MAX_BYTES;  /* result */
-    int nonblank = 0;          /* true if one non-blank line found */
-
-    if (lines == NULL) {
-        fprintf(stderr, "%s: internal error\n", PROJECT);
-        return -1;
-    }
-    if (lines_size == 0) {
-        return 0;
-    }
-
-    for (size_t j = 0; j < lines_size; ++j) {
-        if (lines[j].len > 0) {
-            nonblank = 1;
-            size_t ispc = strspn(lines[j].text, " ");
-            if ((int) ispc < res) {
-                res = ispc;
-            }
-        }
-    }
-
-    if (nonblank) {
-        return res;            /* success */
-    } else {
-        return 0;              /* success, but only blank lines */
-    }
-}
-
-
-
-static int apply_substitutions(const int mode)
-/*
- *  Apply regular expression substitutions to input text.
- *
- *    mode == 0   use replacement rules (box is being *drawn*)
- *         == 1   use reversion rules (box is being *removed*)
- *
- *  Attn: This modifies the actual input array!
- *
- *  RETURNS:  == 0   success
- *            != 0   error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    size_t anz_rules;
-    reprule_t *rules;
-    size_t j, k;
-
-    if (opt.design == NULL) {
-        return 1;
-    }
-
-    if (mode == 0) {
-        anz_rules = opt.design->anz_reprules;
-        rules = opt.design->reprules;
-    }
-    else if (mode == 1) {
-        anz_rules = opt.design->anz_revrules;
-        rules = opt.design->revrules;
-    }
-    else {
-        fprintf(stderr, "%s: internal error\n", PROJECT);
-        return 2;
-    }
-
-    /*
-     *  Compile regular expressions
-     */
-    #ifdef REGEXP_DEBUG
-        fprintf(stderr, "Compiling %d %s rule patterns\n", (int) anz_rules, mode ? "reversion" : "replacement");
-    #endif
-    errno = 0;
-    opt.design->current_rule = rules;
-    for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
-        rules[j].prog = compile_pattern(rules[j].search);
-        if (rules[j].prog == NULL) {
-            return 5;
-        }
-    }
-    opt.design->current_rule = NULL;
-    if (errno) {
-        return 3;
-    }
-
-    /*
-     *  Apply regular expression substitutions to input lines
-     */
-    for (k = 0; k < input.anz_lines; ++k) {
-        opt.design->current_rule = rules;
-        for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
-            #ifdef REGEXP_DEBUG
-            fprintf (stderr, "regex_replace(0x%p, \"%s\", \"%s\", %d, \'%c\') == ",
-                    rules[j].prog, rules[j].repstr, u32_strconv_to_output(input.lines[k].mbtext),
-                    (int) input.lines[k].num_chars, rules[j].mode);
-            #endif
-            uint32_t *newtext = regex_replace(rules[j].prog, rules[j].repstr,
-                                              input.lines[k].mbtext, input.lines[k].num_chars, rules[j].mode == 'g');
-            #ifdef REGEXP_DEBUG
-                fprintf (stderr, "\"%s\"\n", newtext ? u32_strconv_to_output(newtext) : "NULL");
-            #endif
-            if (newtext == NULL) {
-                return 1;
-            }
-
-            BFREE(input.lines[k].mbtext_org);  /* original address allocated for mbtext */
-            input.lines[k].mbtext = newtext;
-            input.lines[k].mbtext_org = newtext;
-
-            analyze_line_ascii(input.lines + k);
-
-            #ifdef REGEXP_DEBUG
-                fprintf (stderr, "input.lines[%d] == {%d, \"%s\"}\n", (int) k,
-                    (int) input.lines[k].num_chars, u32_strconv_to_output(input.lines[k].mbtext));
-            #endif
-        }
-        opt.design->current_rule = NULL;
-    }
-
-    /*
-     *  If text indentation was part of the lines processed, indentation
-     *  may now be different -> recalculate input.indent.
-     */
-    if (opt.design->indentmode == 't') {
-        int rc;
-        rc = get_indent(input.lines, input.anz_lines);
-        if (rc >= 0) {
-            input.indent = (size_t) rc;
-        } else {
-            return 4;
-        }
-    }
-
-    return 0;
-}
-
-
-
-static int has_linebreak(const uint32_t *s, const int len)
-/*
- *  Determine if the given line of raw text is ended by a line break.
- *
- *  s: the string to check
- *  len: length of s in characters
- *
- *  RETURNS:  != 0   line break found
- *            == 0   line break not found
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int result = 0;
-    if (s != NULL && len > 0) {
-        ucs4_t the_last = s[len - 1];
-        result = u32_cmp(&char_cr, &the_last, 1) == 0 || u32_cmp(&char_newline, &the_last, 1) == 0;
-        #if defined(DEBUG)
-            fprintf(stderr, "has_linebreak: (%#010x) %d\n", (int) the_last, result);
-        #endif
-    }
-    return result;
-}
-
-
-
-static int read_all_input(const int use_stdin)
-/*
- *  Read entire input (possibly from stdin) and store it in 'input' array.
- *
- *  Tabs are expanded.
- *  Might allocate slightly more memory than it needs. Trade-off for speed.
- *
- *  use_stdin: flag indicating whether to read from stdin (use_stdin != 0)
- *             or use the data currently present in input (use_stdin == 0).
- *
- *  RETURNS:  != 0   on error (out of memory)
- *            == 0   on success
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    char buf[LINE_MAX_BYTES + 3];    /* input buffer incl. newline + zero terminator */
-    size_t len_chars;
-    size_t input_size = 0;           /* number of elements allocated */
-    uint32_t *mbtemp = NULL;         /* temp string for preparing the multi-byte input */
-    size_t i;
-    int rc;
-
-    input.indent = LINE_MAX_BYTES;
-    input.maxline = 0;
-
-    if (use_stdin) {
-        input.anz_lines = 0;
-
-        /*
-         *  Start reading
-         */
-        while (fgets(buf, LINE_MAX_BYTES + 2, opt.infile)) {
-            if (input.anz_lines % 100 == 0) {
-                input_size += 100;
-                line_t *tmp = (line_t *) realloc(input.lines, input_size * sizeof(line_t));
-                if (tmp == NULL) {
-                    perror(PROJECT);
-                    BFREE (input.lines);
-                    return 1;
-                }
-                input.lines = tmp;
-            }
-
-            mbtemp = u32_strconv_from_input(buf);
-            len_chars = u32_strlen(mbtemp);
-            input.final_newline = has_linebreak(mbtemp, len_chars);
-            input.lines[input.anz_lines].posmap = NULL;
-            input.lines[input.anz_lines].tabpos = NULL;
-            input.lines[input.anz_lines].tabpos_len = 0;
-
-            if (opt.r) {
-                if (is_char_at(mbtemp, len_chars - 1, char_newline)) {
-                    set_char_at(mbtemp, len_chars - 1, char_nul);
-                    --len_chars;
-                }
-                if (is_char_at(mbtemp, len_chars - 1, char_cr)) {
-                    set_char_at(mbtemp, len_chars - 1, char_nul);
-                    --len_chars;
-                }
-            }
-            else {
-                btrim32(mbtemp, &len_chars);
-            }
-
-            /*
-             * Expand tabs
-             */
-            if (len_chars > 0) {
-                uint32_t *temp = NULL;
-                len_chars = expand_tabs_into(mbtemp, opt.tabstop, &temp,
-                                             &(input.lines[input.anz_lines].tabpos),
-                                             &(input.lines[input.anz_lines].tabpos_len));
-                if (len_chars == 0) {
-                    perror(PROJECT);
-                    BFREE (input.lines);
-                    return 1;
-                }
-                input.lines[input.anz_lines].mbtext = temp;
-                BFREE(mbtemp);
-                temp = NULL;
-            }
-            else {
-                input.lines[input.anz_lines].mbtext = mbtemp;
-            }
-            input.lines[input.anz_lines].mbtext_org = input.lines[input.anz_lines].mbtext;
-            input.lines[input.anz_lines].num_chars = len_chars;
-
-            /*
-             * Build ASCII equivalent of the multi-byte string, update line stats
-             */
-            input.lines[input.anz_lines].text = NULL;  /* we haven't used it yet! */
-            analyze_line_ascii(input.lines + input.anz_lines);
-
-            ++input.anz_lines;
-        }
-
-        if (ferror(stdin)) {
-            perror(PROJECT);
-            BFREE (input.lines);
-            return 1;
-        }
-    }
-
-    else {
-        /* recalculate input statistics for redrawing the mended box */
-        for (i = 0; i < input.anz_lines; ++i) {
-            analyze_line_ascii(input.lines + i);
-        }
-    }
-
-    /*
-     *  Exit if there was no input at all
-     */
-    if (input.lines == NULL || input.lines[0].text == NULL) {
-        return 0;
-    }
-
-    /*
-     *  Compute indentation
-     */
-    rc = get_indent(input.lines, input.anz_lines);
-    if (rc >= 0) {
-        input.indent = (size_t) rc;
-    } else {
-        return 1;
-    }
-
-    /*
-     *  Remove indentation, unless we want to preserve it (when removing
-     *  a box or if the user wants to retain it inside the box)
-     */
-    if (opt.design->indentmode != 't' && opt.r == 0) {
-        for (i = 0; i < input.anz_lines; ++i) {
-            #ifdef DEBUG
-                fprintf(stderr, "%2d: mbtext = \"%s\" (%d chars)\n", (int) i,
-                    u32_strconv_to_output(input.lines[i].mbtext), (int) input.lines[i].num_chars);
-            #endif
-            if (input.lines[i].num_chars >= input.indent) {
-                memmove(input.lines[i].text, input.lines[i].text + input.indent,
-                        input.lines[i].len - input.indent + 1);
-                input.lines[i].len -= input.indent;
-
-                input.lines[i].mbtext = advance32(input.lines[i].mbtext, input.indent);
-                input.lines[i].num_chars -= input.indent;
-            }
-            #ifdef DEBUG
-                fprintf(stderr, "%2d: mbtext = \"%s\" (%d chars)\n", (int) i,
-                    u32_strconv_to_output(input.lines[i].mbtext), (int) input.lines[i].num_chars);
-            #endif
-        }
-        input.maxline -= input.indent;
-    }
-
-    /*
-     *  Apply regular expression substitutions
-     */
-    if (opt.r == 0) {
-        if (apply_substitutions(0) != 0) {
-            return 1;
-        }
-    }
-
-#ifdef DEBUG
-    fprintf (stderr, "Encoding: %s\n", encoding);
-    print_input_lines(NULL);
-#endif
-
-    return 0;
-}
-
-
-
 /*       _\|/_
          (o o)
  +----oOO-{_}-OOo------------------------------------------------------------+
@@ -720,9 +359,19 @@ int main(int argc, char *argv[])
         #ifdef DEBUG
             fprintf (stderr, "Reading all input ...\n");
         #endif
-        rc = read_all_input(opt.mend);
-        if (rc) {
+        input_t *raw_input = NULL;
+        if (opt.mend != 0) {
+            raw_input = read_all_input();
+            if (raw_input == NULL) {
+                exit(EXIT_FAILURE);
+            }
+        }
+        if (analyze_input(raw_input ? raw_input : &input)) {
             exit(EXIT_FAILURE);
+        }
+        if (raw_input) {
+            memcpy(&input, raw_input, sizeof(input_t));
+            BFREE(raw_input);
         }
         if (input.anz_lines == 0) {
             exit(EXIT_SUCCESS);
@@ -798,7 +447,7 @@ int main(int argc, char *argv[])
             if (rc) {
                 exit(EXIT_FAILURE);
             }
-            rc = apply_substitutions(1);
+            rc = apply_substitutions(&input, 1);
             if (rc) {
                 exit(EXIT_FAILURE);
             }

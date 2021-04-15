@@ -35,8 +35,8 @@
 #include <unitypes.h>
 #include <uniwidth.h>
 
-#include "shape.h"
 #include "boxes.h"
+#include "shape.h"
 #include "unicode.h"
 #include "tools.h"
 
@@ -616,7 +616,7 @@ static size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **a
 
 
 
-void analyze_line_ascii(line_t *line)
+void analyze_line_ascii(input_t *input_ptr, line_t *line)
 {
     size_t num_esc = 0;
     char *ascii;
@@ -631,8 +631,8 @@ void analyze_line_ascii(line_t *line)
     BFREE(line->posmap);
     line->posmap = map;
 
-    if (line->len > input.maxline) {
-        input.maxline = line->len;
+    if (line->len > input_ptr->maxline) {
+        input_ptr->maxline = line->len;
     }
 }
 

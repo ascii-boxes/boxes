@@ -811,7 +811,7 @@ static void add_spaces_to_line(line_t* line, const size_t n)
     u32_set(line->mbtext + line->num_chars, char_space, n);
     set_char_at(line->mbtext, line->num_chars + n, char_nul);
     line->num_chars += n;
-    analyze_line_ascii(line);
+    analyze_line_ascii(&input, line);
 }
 
 

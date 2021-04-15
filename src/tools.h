@@ -78,7 +78,7 @@ char *nspaces(const size_t n);
 
 void print_input_lines(const char *heading);
 
-void analyze_line_ascii(line_t *line);
+void analyze_line_ascii(input_t *input_ptr, line_t *line);
 
 int array_contains(char **array, const size_t array_len, const char *s);
 

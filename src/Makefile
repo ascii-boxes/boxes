@@ -28,9 +28,11 @@ GEN_HDR    = parser.h boxes.h lex.yy.h
 GEN_SRC    = parser.c lex.yy.c
 GEN_FILES  = $(GEN_SRC) $(GEN_HDR)
 ORIG_HDRCL = boxes.in.h config.h
-ORIG_HDR   = $(ORIG_HDRCL) cmdline.h discovery.h generate.h list.h parsecode.h parsing.h regulex.h remove.h shape.h tools.h unicode.h
+ORIG_HDR   = $(ORIG_HDRCL) cmdline.h discovery.h generate.h input.h list.h parsecode.h parsing.h regulex.h remove.h \
+             shape.h tools.h unicode.h
 ORIG_GEN   = lexer.l parser.y
-ORIG_NORM  = boxes.c cmdline.c discovery.c generate.c list.c parsecode.c parsing.c regulex.c remove.c shape.c tools.c unicode.c
+ORIG_NORM  = boxes.c cmdline.c discovery.c generate.c input.c list.c parsecode.c parsing.c regulex.c remove.c shape.c \
+             tools.c unicode.c
 ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
 ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 
@@ -86,11 +88,12 @@ parser.c parser.h: parser.y lex.yy.h | check_dir
 lex.yy.c lex.yy.h: lexer.l | check_dir
 	$(LEX) --header-file=lex.yy.h $<
 
-boxes.o:     boxes.c boxes.h cmdline.h discovery.h regulex.h shape.h tools.h unicode.h generate.h list.h remove.h config.h | check_dir
+boxes.o:     boxes.c boxes.h cmdline.h discovery.h generate.h input.h list.h remove.h tools.h unicode.h config.h | check_dir
 cmdline.o:   cmdline.c cmdline.h boxes.h tools.h config.h | check_dir
 discovery.o: discovery.c discovery.h boxes.h tools.h config.h | check_dir
 generate.o:  generate.c generate.h boxes.h shape.h tools.h unicode.h config.h | check_dir
 getopt.o:    misc/getopt.c misc/getopt.h | check_dir
+input.o:     input.c boxes.h input.h regulex.h tools.h unicode.h config.h | check_dir
 lex.yy.o:    lex.yy.c parser.h boxes.h parsing.h tools.h shape.h config.h | check_dir
 list.o:      list.c list.h boxes.h parsing.h tools.h config.h | check_dir
 parsecode.o: parsecode.c parser.h boxes.h tools.h lex.yy.h regulex.h unicode.h config.h | check_dir
