@@ -29,6 +29,7 @@
 
 #include "boxes.h"
 #include "parsing.h"
+#include "query.h"
 #include "tools.h"
 #include "list.h"
 

@@ -37,6 +37,7 @@
 
 #include "boxes.h"
 #include "discovery.h"
+#include "query.h"
 #include "tools.h"
 #include "cmdline.h"
 
@@ -105,16 +106,6 @@ void usage_long(FILE *st)
     fprintf(st, "        -v       print version information\n");
 
     BFREE(config_file);
-}
-
-
-
-static int validate_tag(char *tag)
-{
-    if (strcmp(tag, QUERY_ALL) == 0 || strcmp(tag, QUERY_UNDOC) == 0) {
-        return 1;
-    }
-    return tag_is_valid(tag);
 }
 
 
@@ -427,70 +418,11 @@ static int padding(opt_t *result, char *optarg)
  * @param optarg the argument to `-q` on the command line
  * @returns 0 on success, anything else on error
  */
-static int query_by_tag(opt_t *result, char *optarg)
+static int query(opt_t *result, char *optarg)
 {
-    char **query = NULL;
-    char *dup = strdup(optarg);   /* required because strtok() modifies its input */
-
-    int contains_positive_element = 0;
-    size_t num_expr = 0;
-    for (char *q = strtok(dup, ","); q != NULL; q = strtok(NULL, ","))
-    {
-        char *trimmed = trimdup(q, q + strlen(q) - 1);
-        if (strlen(trimmed) == 0) {
-            BFREE(trimmed);
-            continue;
-        }
-
-        if (trimmed[0] != '-') {
-            contains_positive_element = 1;
-        }
-
-        char *raw_tag = (trimmed[0] == '+' || trimmed[0] == '-') ? (trimmed + 1) : trimmed;
-        if (!validate_tag(raw_tag)) {
-            fprintf(stderr, "%s: not a tag -- %s\n", PROJECT, raw_tag);
-            return 1;
-        }
-        if (query != NULL) {
-            for (size_t i = 0; query[i] != NULL; ++i) {
-                char *restag = (query[i][0] == '+' || query[i][0] == '-') ? (query[i] + 1) : query[i];
-                if (strcasecmp(restag, raw_tag) == 0) {
-                    fprintf(stderr, "%s: duplicate query expression -- %s\n", PROJECT, trimmed);
-                    return 1;
-                }
-            }
-        }
-
-        ++num_expr;
-        query = (char **) realloc(query, (num_expr + 1) * sizeof(char *));
-        if (query == NULL) {
-            perror(PROJECT);
-            break;
-        }
-        query[num_expr - 1] = trimmed;
-        query[num_expr] = NULL;
-    }
-    BFREE(dup);
-
-    if (num_expr == 0) {
-        fprintf(stderr, "%s: empty tag query -- %s\n", PROJECT, optarg);
-        return 1;
-    }
-
-    if (!contains_positive_element) {
-        ++num_expr;
-        query = (char **) realloc(query, (num_expr + 1) * sizeof(char *));
-        if (query == NULL) {
-            perror(PROJECT);
-        }
-        else {
-            query[num_expr - 1] = QUERY_ALL;
-            query[num_expr] = NULL;
-        }
-    }
-
+    char **query = parse_query(optarg);
     result->query = query;
-    return 0;
+    return query != NULL ? 0 : 1;
 }
 
 
@@ -771,7 +703,7 @@ opt_t *process_commandline(int argc, char *argv[])
                 break;
 
             case 'q':
-                if (query_by_tag(result, optarg) != 0) {
+                if (query(result, optarg) != 0) {
                     return NULL;
                 }
                 break;

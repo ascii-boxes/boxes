@@ -134,13 +134,6 @@ typedef struct {                     /* Command line options: */
 
 extern opt_t opt;
 
-#define QUERY_ALL "(all)"
-#define QUERY_UNDOC "(undoc)"
-
-/** Check if -q "(undoc)" was specified. */
-int query_is_undoc();
-
-
 
 typedef struct {
     size_t    len;                   /* length of visible text in columns (visible character positions in a text terminal), which is the same as the length of the 'text' field */

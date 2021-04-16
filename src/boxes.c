@@ -31,6 +31,7 @@
 #include "input.h"
 #include "list.h"
 #include "parsing.h"
+#include "query.h"
 #include "remove.h"
 #include "tools.h"
 #include "unicode.h"
@@ -153,71 +154,6 @@ static int build_design(design_t **adesigns, const char *cld)
     dp->minwidth = dp->shape[W].width + 2;
     dp->minheight = 3;
 
-    return 0;
-}
-
-
-
-int query_is_undoc()
-{
-    return opt.query != NULL && strcmp(opt.query[0], QUERY_UNDOC) == 0 && opt.query[1] == NULL;
-}
-
-
-
-static int filter_by_tag(char **tags)
-{
-    #ifdef DEBUG
-        fprintf(stderr, "filter_by_tag(");
-        for (size_t tidx = 0; tags[tidx] != NULL; ++tidx) {
-            fprintf(stderr, "%s%s", tidx > 0 ? ", " : "", tags[tidx]);
-        }
-    #endif
-
-    int result = array_contains0(opt.query, QUERY_ALL);
-    if (opt.query != NULL) {
-        for (size_t qidx = 0; opt.query[qidx] != NULL; ++qidx) {
-            if (opt.query[qidx][0] == '+') {
-                result = array_contains0(tags, opt.query[qidx] + 1);
-                if (!result) {
-                    break;
-                }
-            }
-            else if (opt.query[qidx][0] == '-') {
-                if (array_contains0(tags, opt.query[qidx] + 1)) {
-                    result = 0;
-                    break;
-                }
-            }
-            else if (array_contains0(tags, opt.query[qidx])) {
-                result = 1;
-            }
-        }
-    }
-
-    #ifdef DEBUG
-        fprintf(stderr, ") -> %d\n", result);
-    #endif
-    return result;
-}
-
-
-
-static int query_by_tag()
-{
-    design_t **list = sort_designs_by_name();                 /* temp list for sorting */
-    if (list == NULL) {
-        return 1;
-    }
-    for (int i = 0; i < num_designs; ++i) {
-        if (filter_by_tag(list[i]->tags)) {
-            fprintf(opt.outfile, "%s%s", list[i]->name, opt.eol);
-            for (size_t aidx = 0; list[i]->aliases[aidx] != NULL; ++aidx) {
-                fprintf(opt.outfile, "%s (alias)%s", list[i]->aliases[aidx], opt.eol);
-            }
-        }
-    }
-    BFREE(list);
     return 0;
 }
 
