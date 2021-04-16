@@ -110,12 +110,12 @@ static int style_sort(const void *p1, const void *p2)
 
 design_t **sort_designs_by_name()
 {
-    design_t **result = (design_t **) malloc(anz_designs * sizeof(design_t *));
+    design_t **result = (design_t **) malloc(num_designs * sizeof(design_t *));
     if (result != NULL) {
-        for (int i = 0; i < anz_designs; ++i) {
+        for (int i = 0; i < num_designs; ++i) {
             result[i] = &(designs[i]);
         }
-        qsort(result, anz_designs, sizeof(design_t *), style_sort);
+        qsort(result, num_designs, sizeof(design_t *), style_sort);
     }
     else {
         perror(PROJECT);
@@ -360,7 +360,7 @@ int list_designs()
         }
         print_design_list_header();
 
-        for (int i = 0; i < anz_designs; ++i) {
+        for (int i = 0; i < num_designs; ++i) {
             char *all_names = names(list[i]);
             if (list[i]->author && list[i]->designer && strcmp(list[i]->author, list[i]->designer) != 0) {
                 fprintf(opt.outfile, "%s%s%s, coded by %s:%s%s%s%s%s", all_names, opt.eol,

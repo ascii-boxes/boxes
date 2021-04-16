@@ -76,12 +76,12 @@ static int open_yy_config_file(pass_to_bison *bison_args)
 void print_design_list_header()
 {
     char buf[42];
-    sprintf(buf, "%d", anz_designs);
+    sprintf(buf, "%d", num_designs);
 
-    fprintf(opt.outfile, "%d Available Style%s", anz_designs, anz_designs == 1 ? "" : "s");
+    fprintf(opt.outfile, "%d Available Style%s", num_designs, num_designs == 1 ? "" : "s");
     if (num_parent_configs > 0) {
         fprintf(opt.outfile, ":%s", opt.eol);
-        fprintf(opt.outfile, "-----------------%s", anz_designs == 1 ? "" : "-");
+        fprintf(opt.outfile, "-----------------%s", num_designs == 1 ? "" : "-");
         for (int i = strlen(buf); i > 0; --i) {
             fprintf(opt.outfile, "-");
         }
@@ -94,7 +94,7 @@ void print_design_list_header()
     }
     else {
         fprintf(opt.outfile, " in \"%s\":%s", first_config_file, opt.eol);
-        fprintf(opt.outfile, "-----------------------%s", anz_designs == 1 ? "" : "-");
+        fprintf(opt.outfile, "-----------------------%s", num_designs == 1 ? "" : "-");
         for (int i = strlen(first_config_file) + strlen(buf); i > 0; --i) {
             fprintf(opt.outfile, "-");
         }

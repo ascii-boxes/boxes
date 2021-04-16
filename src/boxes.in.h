@@ -101,7 +101,7 @@ typedef struct {
 } design_t;
 
 extern design_t *designs;
-extern int anz_designs;
+extern int num_designs;
 
 
 typedef struct {                     /* Command line options: */

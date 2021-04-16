@@ -44,7 +44,7 @@
  +--------------------------------------------------------------------------*/
 
 design_t *designs = NULL;            /* available box designs */
-int anz_designs = 0;                 /* number of designs after parsing TODO rename to num_designs */
+int num_designs = 0;                 /* number of designs after parsing */
 
 opt_t opt;                           /* command line options */
 
@@ -209,7 +209,7 @@ static int query_by_tag()
     if (list == NULL) {
         return 1;
     }
-    for (int i = 0; i < anz_designs; ++i) {
+    for (int i = 0; i < num_designs; ++i) {
         if (filter_by_tag(list[i]->tags)) {
             fprintf(opt.outfile, "%s%s", list[i]->name, opt.eol);
             for (size_t aidx = 0; list[i]->aliases[aidx] != NULL; ++aidx) {
@@ -284,14 +284,14 @@ int main(int argc, char *argv[])
         if (designs == NULL) {
             exit(EXIT_FAILURE);
         }
-        anz_designs = (int) r_num_designs;
+        num_designs = (int) r_num_designs;
     }
     else {
         rc = build_design(&designs, opt.cld);
         if (rc) {
             exit(EXIT_FAILURE);
         }
-        anz_designs = 1;
+        num_designs = 1;
     }
     BFREE (opt.design);
     opt.design = designs;

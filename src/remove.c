@@ -531,7 +531,7 @@ static design_t *detect_design()
     size_t a;
     int empty[NUM_SIDES];
 
-    for (dcnt = 0; dcnt < anz_designs; ++dcnt, ++d) {
+    for (dcnt = 0; dcnt < num_designs; ++dcnt, ++d) {
         #ifdef DEBUG
         fprintf (stderr, "CONSIDERING DESIGN ---- \"%s\" ---------------\n",
                 d->name);
