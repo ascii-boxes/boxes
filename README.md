@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ascii-boxes/boxes.svg?branch=master)](https://travis-ci.org/ascii-boxes/boxes)
+[![Build Status](https://github.com/ascii-boxes/boxes/actions/workflows/boxes.yml/badge.svg)](https://github.com/ascii-boxes/boxes/actions/workflows/boxes.yml)
 
 # boxes
 

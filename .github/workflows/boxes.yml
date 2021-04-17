@@ -1,0 +1,17 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: add-packages
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y git flex bison libunistring-dev libpcre2-dev diffutils vim-common
+    - name: make
+      run: make
+    - name: make test
+      run: make test
