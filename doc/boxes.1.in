@@ -1,6 +1,6 @@
-.\" @(#)boxes.1 2.0.0 02/14/2021
+.\" @(#)boxes.1 2.0.0 04/17/2021
 .\"
-.TH boxes 1 "February 14 2021"
+.TH boxes 1 "April 17 2021"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter
@@ -40,69 +40,69 @@ contain whitespace and must consist of one or more of the following
 components:
 .br
 
-.B h\fPx
+.I h\fPx
 \- horizontal alignment of the input text block inside a potentially larger
 box. Possible values for
 .I x
 are
-.B l
+.I l
 (ell, for left alignment),
-.B c
+.I c
 (center), or
-.B r
+.I r
 (right). This does not affect the justification of text lines within the
 input text block (use the
-.B j
+.I j
 argument instead).
 .br
-.B v\fPx
+.I v\fPx
 \- vertical alignment of the input text block inside a potentially larger
 box. Possible values for
 .I x
 are
-.B t
+.I t
 (for top alignment),
-.B c
+.I c
 (center), or
-.B b
+.I b
 (bottom).
 .br
-.B j\fPx
+.I j\fPx
 \- justification of lines within the input text block. Possible values for
 .I x
 are
-.B l
+.I l
 (ell, for left justification),
-.B c
+.I c
 (center), or
-.B r
+.I r
 (right). This does not affect the alignment of the input text block itself
 within the box. Use the
-.B h
+.I h
 and
-.B v
+.I v
 arguments for input text block positioning.
 .br
 
 Short hand notations (can be combined with the above arguments):
 .br
-.B l
+.I l
 (ell) \- short for
-.B h\fPl\fBv\fPc\fBj\fPl
+.I h\fPl\fIv\fPc\fIj\fPl
 .br
-.B c
+.I c
 \- short for
-.B h\fPc\fBv\fPc\fBj\fPc
+.I h\fPc\fIv\fPc\fIj\fPc
 .br
-.B r
+.I r
 \- short for
-.B h\fPr\fBv\fPc\fBj\fPr
+.I h\fPr\fIv\fPc\fIj\fPr
 .br
 
 The factory default setting for
 .B \-a
 is
-.B h\fPl\fBv\fPt.
+.I h\fPl\fIv\fPt.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-c \fIstring\fP
@@ -129,7 +129,7 @@ is not specified.
 .TP 0.6i
 .B \-d \fIstring\fP
 Design selection. The one argument of this option is the name of the design to
-use.
+use, which may either be a design's primary name or any of its alias names.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-e \fIeol\fP
@@ -161,35 +161,50 @@ can also be a directory which contains a configuration file. More information
 on this topic below in the CONFIGURATION FILE section.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
+.B \-\-help
+.TQ
 .B \-h
 Print usage information.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-i \fIstring\fP
-Indentation mode. Possible arguments are "text" (indent text inside of
-box), "box" (indent box, not text inside of box), or "none" (throw away
-indentation). Arguments may be abbreviated. The default is to indent the
-box, but not the text.
+Indentation mode. Possible arguments are
+.I text
+(indent text inside of box),
+.I box
+(indent box, not text inside of box), or
+.I none
+(throw away indentation). Arguments may be abbreviated. The default is
+.I box\fP.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-k \fIbool\fP
 Kill leading/trailing blank lines on removal. The value of
 .I bool
-can be specified as on, yes, true, 1, or t, all meaning yes, or off, no,
-false, 0, or f, which mean no. This is case\-insensitive. This option only
-takes effect in connection with
+is either
+.I true
+or
+.I false\fP.
+This option only takes effect in connection with
 .B \-r\fP.
-If set to yes, leading and trailing blank lines will be removed from the
-output. If set to no, the entire content of the former box is returned.
-The default is no, if both the top and the bottom part of the box are open,
-as is the case with most regional comments. If the box's design defines a
-top part or a bottom part, the default is yes.
+If set to
+.I true\fP,
+leading and trailing blank lines will be removed from the
+output. If set to
+.I false\fP,
+the entire content of the former box is returned.
+The default is
+.I false\fP,
+if both the top and the bottom part of the box are open, as is the case with
+most regional comments. If the box's design defines a top part or a bottom
+part, the default is
+.I true\fP.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-l
 (ell) List designs. Produces a listing of all available box designs in the
-config file, along with a sample box and information about it's creator.
-Also checks syntax of the entire config file. If used in connection with
+config file, along with a sample box and information about its creator.
+Also checks the syntax of the entire config file. If used together with
 .B \-d\fP,
 displays detailed information about the specified design.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -201,7 +216,7 @@ and redraws it afterwards. The mended box is drawn according to the
 options given. This may be important to know when it comes to restoring
 padding, indentation, etc. for the mended box. Implies
 .B \-k
-false.
+.I false\fP.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-n \fIencoding\fP
@@ -218,29 +233,30 @@ sides of the box. The argument string may not contain whitespace and must
 consist of a combination of the following characters, each followed by a
 number indicating the padding in spaces:
 .br
-.B a
+.I a
 \- (all) give padding for all sides at once
 .br
-.B h
+.I h
 \- (horiz) give padding for both horizontal sides
 .br
-.B v
+.I v
 \- (vertical) give padding for both vertical sides
 .br
-.B b
+.I b
 \- (bottom) give padding for bottom (south) side
 .br
-.B l
+.I l
 \- (left) give padding for left (west) side
 .br
-.B t
+.I t
 \- (top) give padding for top (north) side
 .br
-.B r
+.I r
 \- (right) give padding for right (east) side
 .br
 Example:
-.B \-p a\fP4\fBt\fP2
+.B \-p
+.I a\fP4\fIt\fP2
 would define the padding to be 4 characters on all sides, except for the
 top of the box, where the input text block will be only 2 lines away from
 the box.
@@ -273,14 +289,14 @@ Example:
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 .B \-r
-Remove box. Removes an existing box instead of drawing it. Which design to
-use is detected automatically. In order to save time or in case the
-detection does not decide correctly, combine with
+Remove an existing box. Which design to use is detected automatically. In
+order to save time or in case the detection does not decide correctly, combine
+with
 .B \-d
 to specify the design. The default is to draw a new box.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-s \fIwidth\fBx\fPheight\fP
+.B \-s \fIwidth\fBx\fIheight
 Box size. This option specifies the desired box size in units of columns
 (for width) and lines (for height).
 If only a single number is given as argument, this number specifies the
@@ -427,7 +443,8 @@ documentation.
 .\" =======================================================================
 .SH AUTHOR
 .I Boxes
-was made by Thomas Jensen and the \fIboxes\fP contributors.
+was made by Thomas Jensen and the \fIboxes\fP contributors. It has been
+lovingly maintained since 1999.
 .br
 For a full list of contributors, see
 .br
