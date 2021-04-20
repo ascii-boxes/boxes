@@ -39,6 +39,8 @@ ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 
 .PHONY: check_dir clean build debug package flags_unix flags_win32 flags_
 
+.NOTPARALLEL:
+
 check_dir:
 	@if [ "$(shell pwd | sed -e 's/^.*\///')" != "out" ] ; then \
 	    echo ERROR: Please call make from the top level directory. ; \
