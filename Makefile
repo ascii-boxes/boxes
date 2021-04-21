@@ -20,7 +20,7 @@
 
 # The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/share/boxes
-GIT_STATUS = ($(shell git describe --dirty --always))
+GIT_STATUS = $(shell git describe --dirty --always 2>/dev/null || echo "n/a")
 BVERSION   = 2.1.0
 
 ALL_FILES  = LICENSE README.md boxes-config
@@ -76,7 +76,8 @@ $(OUT_DIR):
 replaceinfos: $(OUT_DIR)/boxes.h doc/boxes.1
 
 $(OUT_DIR)/boxes.h: src/boxes.in.h Makefile | $(OUT_DIR)
-	sed -e 's/--BVERSION--/$(BVERSION) $(GIT_STATUS)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' src/boxes.in.h > $(OUT_DIR)/boxes.h
+	$(eval VERSION_STRING := $(shell if [ "${GIT_STATUS}" = "n/a" ]; then echo "${BVERSION}"; else echo "${BVERSION} (${GIT_STATUS})"; fi))
+	sed -e 's/--BVERSION--/$(VERSION_STRING)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' src/boxes.in.h > $(OUT_DIR)/boxes.h
 
 doc/boxes.1: doc/boxes.1.in Makefile
 	sed -e 's/--BVERSION--/$(BVERSION)/; s/--GLOBALCONF--/$(subst /,\/,$(GLOBALCONF))/' doc/boxes.1.in > doc/boxes.1
