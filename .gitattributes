@@ -11,6 +11,5 @@ tools/VERIFICATION.txt text eol=crlf
 /test/*.txt text eol=lf
 
 # some files which are currently in ISO-8859-15 encoding
-/boxes.vim text working-tree-encoding=ISO_8859-15
 /src/lexer.l text working-tree-encoding=ISO_8859-15
 /test/111_manual_encoding_iso.txt text working-tree-encoding=ISO_8859-15
