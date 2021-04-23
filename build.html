@@ -11,8 +11,6 @@ Here's how to build your own version of *boxes* using the
 The boxes development platform is currently Debian Linux on WSL2. The author also supports MinGW on win32 and derived
 from that, a choco package for Windows.
 
-Experience shows that *boxes* is generally quite easy to port.
-
 
 ## Building on Linux / UNIX
 
@@ -22,24 +20,22 @@ In order to build on Linux:
    or [clone the GitHub
    repo](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository){:target="_blank"}.
 2. Install Prerequisites:  
-   on Debian:
+   The following command is for Debian (APT), but those packages have the same names across most distros.
 
-       sudo apt-get install -y build-essential diffutils flex bison libunistring-dev libpcre2-dev git
+       sudo apt-get install -y build-essential diffutils flex bison libunistring-dev libpcre2-dev git vim-common
 
-   In other words, we depend on:
-   - gcc and make
-   - [Git](https://git-scm.com/){:target="_blank"} - compile time dependency
-   - [Flex](https://github.com/westes/flex){:target="_blank"} - compile time dependency
-   - [Bison](http://www.gnu.org/software/bison/){:target="_blank"} - compile time dependency
-   - [linunistring](https://www.gnu.org/software/libunistring/) - runtime dependency (unicode handling)
-   - [PCRE2](http://www.pcre.org/) - runtime dependency (regular expressions)
+   Of those, only [libunistring](https://www.gnu.org/software/libunistring/) and [PCRE2](http://www.pcre.org/) are
+   libraries that are used at runtime. Everything else is just for building, including
+   [Flex](https://github.com/westes/flex){:target="_blank"} and
+   [Bison](http://www.gnu.org/software/bison/){:target="_blank"}. `vim-common` provides the *xxd* tool, which is used
+   by some of our test cases.
 
 3. The location of the system-wide config file is compiled in, so if you don't like it's default location, you can edit
    the top level *Makefile* and change the value of `GLOBALCONF` to whereever you want the system-wide config file to
-   reside. Note that each user may have his/her own config file in *$HOME/.boxes*.  
+   reside. Note that each user may have his/her own config file in *$HOME/.boxes* or other locations.  
    Also note that the value of `GLOBALCONF` is a full file name. It does **not** specify a directory into which to copy
    the config file.
-4. In the top level directory, type `make && make test`. Find the resulting binary in the *src* folder. In case of
+4. From the top level directory, type `make && make test`. Find the resulting binary in the *out* folder. In case of
    problems, check the [compilation faq]({{ site.baseurl }}/docs/faq.html#q5).
 
 That should be all. *Boxes* is built so that this works almost everywhere.
@@ -54,17 +50,19 @@ In order to deploy your newly created binary on Linux/UNIX, these steps are reco
   as being the name of the system-wide boxes config file.
   Note that the value of `GLOBALCONF` is the name of the file,
   and **not** the name of a directory into which to copy the file.
-  So, the name of the config file is changed from *boxes-config* to just *boxes*.
-- Copy *src/boxes* (the binary) to a location which is in your path.
+  So, the name of the config file may be changed from *boxes-config* to just *boxes*.
+- Copy *out/boxes* (the binary) to a location which is in your path.
 
 Example (as root):
 
     cp doc/boxes.1 /usr/share/man/man1
     cp boxes-config /usr/share/boxes
-    cp src/boxes /usr/bin
+    cp out/boxes /usr/bin
 
 If you want to make your own changes to the config file, copy the system-wide config file
-into your home as *$HOME/.boxes*, then modify it. Boxes will use *$HOME/.boxes* if it exists.
+into your home as *$HOME/.boxes*, then modify it. Boxes will use *$HOME/.boxes* if it exists.  
+Since *boxes* v2.1.0, you can also start your local config with `parent :global:`, which will inherit everything from
+the global file, and you can add or override box designs in your local file.
 
 <p><br/></p>
 
@@ -79,37 +77,44 @@ too. Here's how to build on Windows.
 
 In order to build *boxes* on Windows, the required win32 executable can be created like this:
 
-1. Install [MinGW32](http://www.mingw.org/){:target="_blank"}
-2. Configure MinGW32
+1. Install [MinGW](http://mingw-w64.org/){:target="_blank"}
+2. Configure MinGW
 3. Open a MinGW shell and run `make win32`
 
 Basically very simple, but there may be a few pitfalls, so we'll go through each step in detail.
 
-### 1. Install MinGW32
+### 1. Install MinGW
 
-1. Download MinGW from [mingw.org](http://www.mingw.org/){:target="_blank"} by pressing the **Download Installer**
-   button in the top right corner of the page. You'll receive a mingw-get-setup.exe.
-2. Right-click mingw-get-setup.exe and choose **Run as Administrator** from the pop-up menu.  
-   This brings up the Installation Preferences.
-3. Choose `C:\MinGW` as installation directory. This is really important. If for some reason you cannot use this highly
+1. Download MinGW from [SourceForge](https://sourceforge.net/projects/mingw/){:target="_blank"}.
+   You'll receive a small mingw-get-setup.exe.
+2. Right-click mingw-get-setup.exe and choose **Run as Administrator** from the pop-up menu.
+3. Press **Install**.
+4. This will download the *Installation Manager*. Some time later, you can make some choices.  
+   Make sure that you install to `C:\MinGW`. This is really important. If for some reason you cannot use this highly
    recommended directory, choose another one that has a short path, does not contain spaces (!), and does not include a
-   Windows "special path". For example, `C:\MinGW_2`.
-4. Select "install support for GUI" (yes, even though *boxes* has no GUI) and install "for all users".
-5. Press **Continue** and wait for download of the *Installation Manager*.
-6. After the download of the Installation Manager is completed, press **Continue** again.  
-   The Installation Manager opens.
-7. In the Installation Manager menu, select *Installation* &rarr; *Update Catalogue*.
-8. Choose **mingw32-base** and **msys-base**. Also, further down, under *MSYS / MinGW Developer Toolkit*, choose
-   **msys-bison** and **msys-flex**. Under *MinGW / MinGW Contributed*, choose **mingw32-libunistring**. PCRE2 is
-   unfortunately not available here, so we must handle this in a later step. For each of the above components, choose
-   all the items (bin, doc, lic, etc.).  
+   Windows "special path". For example, `C:\MinGW_2`.  
+   Select "install support for GUI" (yes, even though *boxes* has no GUI) and install "for all users".
+5. In the Installation Manager menu, select *Installation* &rarr; *Update Catalogue*.
+6. Choose the following packages:
+
+       mingw32-base
+       msys-base
+       mingw32-libunistring
+       mingw32-libiconv
+       msys-diffutils
+       msys-dos2unix
+       msys-zip
+       msys-unzip
+   
+   PCRE2 is unfortunately not available here, so we must handle this in a later step. For each of the above components,
+   choose all the items (bin, doc, lic, etc.). We also don't choose flex and bison.  
    **Do not** install <tt>mingw-developer-toolkit</tt>, because if on 64bit, this requires tweaking of several
    environment variables to get gcc to use 32bit libs all around (which may be hard to get right for laymen).
-9. In the menu, select *Installation* &rarr; *Apply Changes*.
-   Something like 120 Packages will be installed, which may take a few minutes.
-10. Upon success, select *Installation* &rarr; *Quit* from the menu.
+7. In the menu, select *Installation* &rarr; *Apply Changes*.
+   Something like 113 Packages will be installed, which may take a few minutes.
+8. Upon success, select *Installation* &rarr; *Quit* from the menu.
 
-### 2. Configure MinGW32
+### 2. Configure MinGW
 
 1. Change into C:\MinGW\msys\1.0\etc.
 2. Copy the file *fstab.sample* to a new file called simply *fstab*.
@@ -135,26 +140,29 @@ Basically very simple, but there may be a few pitfalls, so we'll go through each
 
        cd /boxes
 
-3. Download and build PCRE2. We only need the static library for UTF-32. With a little luck, and *curl* installed,
-   you can simply:
+3. Make sure curl is on your path. That normally means that you download and install it separately from its
+   [website](https://curl.se/windows/). At the end of this step, you should be able to `curl -V` from within the
+   MinGW shell.
+4. Download and build PCRE2, and download flex and bison. This is summarily handled by
 
-       make win32.pcre
+       make win32.prereq
 
    In case this doesn't work, you must somehow get PCRE2 to compile on your own. The goal is to have
-   *pcre2-10.36/.libs/libpcre2-32.a* available. The version number of PCRE may change in the future.
+   *pcre2-10.36/.libs/libpcre2-32.a* available.  We only need the static library for UTF-32. The version number of
+   PCRE may change in the future.
 
-4. Next, just
+4. Next,
 
        make win32
 
    If you want to create an executable with debug information, call `make clean && make win32.debug` instead.
-3. boxes.exe is created in /boxes/src.
+3. boxes.exe is created in /boxes/out.
 4. Run `make test` to check that your executable is working OK.
 
 
 ### 4. Deployment
 
-In order to run boxes on any Windows machine, two files are required:
+In order to run *boxes* on any Windows machine, two files are required:
 
 - boxes.exe
 - boxes.cfg
