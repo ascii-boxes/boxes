@@ -6,8 +6,8 @@ title: Manpage of boxes(1)
 <div class="well bxpage">
 
 <h1>boxes</h1>
-Section: User Commands  (1)<BR>Updated: February 16 2021<BR>
-[ <A HREF="index.html">Return to Main Contents</A> ]
+Section: User Commands  (1)<BR>Updated: April 18 2021<BR>
+[ <A HREF="{{ site.baseurl }}/docs/">Return to Main Contents</A> ]
 
 <h2>NAME
 <a name="NAME"></a>
@@ -21,17 +21,15 @@ mode box and comment drawing filter</p>
 <a name="SYNOPSIS"></a>
 </h2>
 
-
 <p style="margin-left:11%; margin-top: 1em"><b>boxes</b>
-[-hlmrv] [-a&nbsp;format] [-d&nbsp;design] [-f&nbsp;file]
-[-i&nbsp;indent] [-k&nbsp;bool] [-n&nbsp;encoding]
-[-p&nbsp;pad] [-s&nbsp;size] [-t&nbsp;tabopts] [infile
-[outfile]]</p>
+[-hlmrv] [-a&nbsp;format] [-d&nbsp;design] [-e&nbsp;eol]
+[-f&nbsp;file] [-i&nbsp;indent] [-k&nbsp;bool]
+[-n&nbsp;encoding] [-p&nbsp;pad] [-q&nbsp;query] [-s&nbsp;size]
+[-t&nbsp;tabopts] [infile [outfile]]</p>
 
 <h2>DESCRIPTION
 <a name="DESCRIPTION"></a>
 </h2>
-
 
 <p style="margin-left:11%; margin-top: 1em"><i>Boxes</i> is
 a text filter which can draw any kind of box around its
@@ -40,9 +38,8 @@ complex ASCII art. A box can also be removed and repaired,
 even if it has been badly damaged by editing of the text
 inside. Since boxes may be open on any side, <i>boxes</i>
 can also be used to create regional comments in any
-programming language. New box designs of all sorts can
-easily be added and shared by appending to a configuration
-file.</p>
+programming language. New box designs can be added and
+shared by appending to a configuration file.</p>
 
 <p style="margin-left:11%; margin-top: 1em"><i>boxes</i> is
 a command line tool, but also integrates with any text
@@ -50,7 +47,7 @@ editor that supports filters. The <i>boxes</i> website has
 examples on how to configure editor integration for various
 text editors: <br>
 
-<a href=https://boxes.thomasjensen.com/docs/install.html>https://boxes.thomasjensen.com/docs/install.html</a></p>
+<a href="{{ site.baseurl }}/docs/install.html">{{ site.baseurl }}/docs/install.html</a></p>
 
 <h2>OPTIONS
 <a name="OPTIONS"></a>
@@ -67,33 +64,33 @@ is read from left to right. The format string may not
 contain whitespace and must consist of one or more of the
 following components:</p>
 
-<p style="margin-left:20%; margin-top: 1em"><b>h</b>x -
+<p style="margin-left:20%; margin-top: 1em"><i>h</i>x -
 horizontal alignment of the input text block inside a
 potentially larger box. Possible values for <i>x</i> are
-<b>l</b> (ell, for left alignment), <b>c</b> (center), or
-<b>r</b> (right). This does not affect the justification of
-text lines within the input text block (use the <b>j</b>
-argument instead). <b><br>
-v</b>x - vertical alignment of the input text block inside a
+<i>l</i> (ell, for left alignment), <i>c</i> (center), or
+<i>r</i> (right). This does not affect the justification of
+text lines within the input text block (use the <i>j</i>
+argument instead). <i><br>
+v</i>x - vertical alignment of the input text block inside a
 potentially larger box. Possible values for <i>x</i> are
-<b>t</b> (for top alignment), <b>c</b> (center), or <b>b</b>
-(bottom). <b><br>
-j</b>x - justification of lines within the input text block.
-Possible values for <i>x</i> are <b>l</b> (ell, for left
-justification), <b>c</b> (center), or <b>r</b> (right). This
+<i>t</i> (for top alignment), <i>c</i> (center), or <i>b</i>
+(bottom). <i><br>
+j</i>x - justification of lines within the input text block.
+Possible values for <i>x</i> are <i>l</i> (ell, for left
+justification), <i>c</i> (center), or <i>r</i> (right). This
 does not affect the alignment of the input text block itself
-within the box. Use the <b>h</b> and <b>v</b> arguments for
+within the box. Use the <i>h</i> and <i>v</i> arguments for
 input text block positioning.</p>
 
 <p style="margin-left:20%; margin-top: 1em">Short hand
 notations (can be combined with the above arguments):
-<b><br>
-l</b> (ell) - short for <b>h</b>l<b>v</b>c<b>j</b>l <b><br>
-c</b> - short for <b>h</b>c<b>v</b>c<b>j</b>c <b><br>
-r</b> - short for <b>h</b>r<b>v</b>c<b>j</b>r</p>
+<i><br>
+l</i> (ell) - short for <code>hlvcjl</code> <i><br>
+c</i> - short for <code>hcvcjc</code> <i><br>
+r</i> - short for <code>hrvcjr</code></p>
 
 <p style="margin-left:20%; margin-top: 1em">The factory
-default setting for <b>-a</b> is <b>h</b>l<b>v</b>t.</p>
+default setting for <b>-a</b> is <i>h</i>l<i>v</i>t.</p>
 
 <p style="margin-left:11%;"><b>-c</b> <i>string</i></p>
 
@@ -117,50 +114,65 @@ specified.</p>
 <p style="margin-left:11%;"><b>-d</b> <i>string</i></p>
 
 <p style="margin-left:20%;">Design selection. The one
-argument of this option is the name of the design to
-use.</p>
+argument of this option is the name of the design to use,
+which may either be a design&rsquo;s primary name or any of
+its alias names.</p>
+
+<p style="margin-left:11%;"><b>-e</b> <i>eol</i></p>
+
+<p style="margin-left:20%;">Override line terminator.
+<i>eol</i> can be <i>CR</i>, <i>LF</i>, or <i>CRLF</i>. The
+default is to use the system-specific line terminator, which
+means <i>CRLF</i> on Windows, and <i>LF</i> otherwise. This
+option should only be used in an emergency, because normally
+the system-specific line terminator will be just fine. This
+option is considered experimental, and may go away in a
+future version of <i>boxes</i>. Let us know in
+<a href="https://github.com/{{ site.github }}/issues/60">https://github.com/{{ site.github }}/issues/60</a>
+if you think we should keep it.</p>
 
 <p style="margin-left:11%;"><b>-f</b> <i>string</i></p>
 
 <p style="margin-left:20%;">Use alternate config file. The
 one argument of this option is the name of a valid
-<i>boxes</i> config file, containing new and exciting
-designs!</p>
+<i>boxes</i> config file. The argument of <b>-f</b> can also
+be a directory which contains a configuration file. More
+information on this topic below in the CONFIGURATION FILE
+section.</p>
 
-<p style="margin-left:11%;"><b>-h</b></p>
+<p style="margin-left:11%;"><b>--help</b><br><b>-h</b></p>
 
 <p style="margin-left:20%;">Print usage information.</p>
+
 
 <p style="margin-left:11%;"><b>-i</b> <i>string</i></p>
 
 <p style="margin-left:20%;">Indentation mode. Possible
-arguments are &quot;text&quot; (indent text inside of box),
-&quot;box&quot; (indent box, not text inside of box), or
-&quot;none&quot; (throw away indentation). Arguments may be
-abbreviated. The default is to indent the box, but not the
-text.</p>
+arguments are <i>text</i> (indent text inside of box),
+<i>box</i> (indent box, not text inside of box), or
+<i>none</i> (throw away indentation). Arguments may be
+abbreviated. The default is <i>box</i>.</p>
 
 <p style="margin-left:11%;"><b>-k</b> <i>bool</i></p>
 
 <p style="margin-left:20%;">Kill leading/trailing blank
-lines on removal. The value of <i>bool</i> can be specified
-as on, yes, true, 1, or t, all meaning yes, or off, no,
-false, 0, or f, which mean no. This is case-insensitive.
-This option only takes effect in connection with <b>-r</b>.
-If set to yes, leading and trailing blank lines will be
-removed from the output. If set to no, the entire content of
-the former box is returned. The default is no, if both the
-top and the bottom part of the box are open, as is the case
-with most regional comments. If the box&rsquo;s design
-defines a top part or a bottom part, the default is yes.</p>
+lines on removal. The value of <i>bool</i> is either
+<i>true</i> or <i>false</i>. This option only takes effect
+in connection with <b>-r</b>. If set to <i>true</i>, leading
+and trailing blank lines will be removed from the output. If
+set to <i>false</i>, the entire content of the former box is
+returned. The default is <i>false</i>, if both the top and
+the bottom part of the box are open, as is the case with
+most regional comments. If the box&rsquo;s design defines a
+top part or a bottom part, the default is <i>true</i>.</p>
 
 <p style="margin-left:11%;"><b>-l</b></p>
 
 <p style="margin-left:20%;">(ell) List designs. Produces a listing of all available
 box designs in the config file, along with a sample box and
-information about it&rsquo;s creator. Also checks syntax of
-the entire config file. If used in connection with
-<b>-d</b>, displays detailed information about the specified
+information about its creator. Also checks the syntax of the
+entire config file. If used together with <b>-d</b>,
+displays detailed information about the specified
 design.</p>
 
 <p style="margin-left:11%;"><b>-m</b></p>
@@ -169,7 +181,7 @@ design.</p>
 with <b>-r</b>, and redraws it afterwards. The mended box is
 drawn according to the options given. This may be important
 to know when it comes to restoring padding, indentation,
-etc. for the mended box. Implies <b>-k</b> false.</p>
+etc. for the mended box. Implies <b>-k</b> <i>false</i>.</p>
 
 <p style="margin-left:11%;"><b>-n</b> <i>encoding</i></p>
 
@@ -188,31 +200,47 @@ spaces around the input text block for all sides of the box.
 The argument string may not contain whitespace and must
 consist of a combination of the following characters, each
 followed by a number indicating the padding in spaces:
-<b><br>
-a</b> - (all) give padding for all sides at once <b><br>
-h</b> - (horiz) give padding for both horizontal sides
-<b><br>
-v</b> - (vertical) give padding for both vertical sides
-<b><br>
-b</b> - (bottom) give padding for bottom (south) side
-<b><br>
-l</b> - (left) give padding for left (west) side <b><br>
-t</b> - (top) give padding for top (north) side <b><br>
-r</b> - (right) give padding for right (east) side <br>
-Example: <b>-p a</b>4<b>t</b>2 would define the padding to
-be 4 characters on all sides, except for the top of the box,
-where the input text block will be only 2 lines away from
-the box. <br>
+<i><br>
+a</i> - (all) give padding for all sides at once <i><br>
+h</i> - (horiz) give padding for both horizontal sides
+<i><br>
+v</i> - (vertical) give padding for both vertical sides
+<i><br>
+b</i> - (bottom) give padding for bottom (south) side
+<i><br>
+l</i> - (left) give padding for left (west) side <i><br>
+t</i> - (top) give padding for top (north) side <i><br>
+r</i> - (right) give padding for right (east) side <br>
+Example: <b>-p</b> <i>a</i>4<i>t</i>2 would define the
+padding to be 4 characters on all sides, except for the top
+of the box, where the input text block will be only 2 lines
+away from the box. <br>
 By default, unless specified otherwise in the config file,
 no padding is used.</p>
 
+<p style="margin-left:11%;"><b>-q</b> <i>query</i></p>
+
+<p style="margin-left:20%;">Query designs by tag. In
+contrast to <b>-l</b>, this will only print the matching
+design names. This option is normally used stand-alone; if
+used in combination with other options, behavior is
+undefined. The <i>query</i> argument is a comma-separated
+list of tags which can be present on a design in order to
+match. A tag may optionally be prefixed with <i>+</i> in
+order to require that it be present, or with <i>-</i> in
+order to exclude designs which have that tag. Each tag can
+only occur once per query. <br>
+This option is intended for use by scripts. Alias names are
+printed below their primary design name, and postfixed with
+<i>(alias)</i>. <br>
+Example: <i>boxes -q programming,-comment</i></p>
+
 <p style="margin-left:11%;"><b>-r</b></p>
 
-<p style="margin-left:20%;">Remove box. Removes an existing box instead of drawing
-it. Which design to use is detected automatically. In order
-to save time or in case the detection does not decide
-correctly, combine with <b>-d</b> to specify the design. The
-default is to draw a new box.</p>
+<p style="margin-left:20%;">Remove an existing box. Which design to use is detected
+automatically. In order to save time or in case the
+detection does not decide correctly, combine with <b>-d</b>
+to specify the design. The default is to draw a new box.</p>
 
 <p style="margin-left:11%;"><b>-s</b>
 <i>width</i><b>x</b><i>height</i></p>
@@ -266,23 +294,74 @@ example is 4.</p>
 <p style="margin-left:20%;">Print out current version number.</p>
 
 
-<h2>CONFIGURATION FILES
-<a name="CONFIGURATION FILES"></a>
+<h2>CONFIGURATION FILE
+<a name="CONFIGURATION FILE"></a>
 </h2>
 
 
 <p style="margin-left:11%; margin-top: 1em"><i>Boxes</i>
-will use the configuration file specified on the command
-line (using <b>-f</b>). If no config file is specified on
-the command line, <i>boxes</i> will check for the BOXES
-environment variable, which may contain a filename to use.
-If BOXES is not set, <i>boxes</i> will try to read
-$HOME/.boxes and use it as a config file. Failing that,
-<i>boxes</i> will try to read the system-wide config file
-(see FILES).</p>
+will look for the configuration file in several places, some
+of which are given by the XDG specification. <b><br>
+1.</b> <i>-f</i> option [file or dir]</p>
+
+<p style="margin-left:20%;">When a configuration file is
+specified on the command line, we will use that. The
+<b>-f</b> option can also specify a directory. Any location
+specified via <b>-f</b> must exist, or <i>boxes</i> will
+terminate with an error.</p>
+
+<p style="margin-left:11%;"><b>2.</b> <i>BOXES</i>
+environment variable [file or dir]</p>
+
+<p style="margin-left:20%;">If no config file is specified
+on the command line, <i>boxes</i> will check for the BOXES
+environment variable, which may contain a filename or
+directory to use. Any location specified via the BOXES
+environment variable must exist, or <i>boxes</i> will
+terminate with an error.</p>
+
+<p style="margin-left:11%;"><b>3.</b> <i>$HOME</i> [dir]
+<b><br>
+4.</b> <i>$XDG_CONFIG_HOME/boxes</i> [dir] <b><br>
+5.</b> <i>$HOME/.config/boxes</i> [dir] <b><br>
+6.</b> <i>/usr/share/boxes</i> [file] <b><br>
+7.</b> <i>/etc/xdg/boxes</i> [dir] <b><br>
+8.</b> <i>/usr/local/share/boxes</i> [dir] <b><br>
+9.</b> <i>/usr/share/boxes</i> [dir]</p>
+
+<p style="margin-left:20%;">Either one of these last two
+directory locations might have the same name as the global
+config file from <b>6</b>. That&rsquo;s fine. It just means
+that we first look for a file of that name, and then for a
+directory containing the file.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The XDG
+environment variable <i>XDG_CONFIG_DIRS</i> is not
+supported. However, its default value is supported via steps
+<b>8</b> and <b>9</b> above. <br>
+In the above list, whenever a step is designated with [dir],
+the <br>
+following file names will be found, in this order:</p>
+
+<p style="margin-left:20%;"><b>1.</b> .boxes <b><br>
+2.</b> box-designs <b><br>
+3.</b> boxes-config <b><br>
+4.</b> boxes</p>
+
+<p style="margin-left:11%; margin-top: 1em">As soon as the
+first valid file is found, we use that and stop the
+search.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The recommended
+location for a user-specific configuration file is
+<i>$HOME/.boxes</i> or <i>$HOME/.config/boxes/.boxes</i>. A
+global configuration file should be located at
+<i>/usr/share/boxes</i>. But all of the other locations are
+fully supported, too.</p>
 
 <p style="margin-left:11%; margin-top: 1em">The syntax of
-<i>boxes</i> config files is described on the website.</p>
+<i>boxes</i> config files is described on the website at
+<a href="{{ site.baseurl }}/docs/config-syntax.html">{{ site.baseurl }}/docs/config-syntax.html</a>.</p>
 
 <h2>EXAMPLES
 <a name="EXAMPLES"></a>
@@ -291,17 +370,16 @@ $HOME/.boxes and use it as a config file. Failing that,
 
 <p style="margin-left:11%; margin-top: 1em">Examples on how
 to invoke <i>boxes</i> may be found on the website at
-<a href=https://boxes.thomasjensen.com/examples.html>https://boxes.thomasjensen.com/examples.html</a>.
+<a href="{{ site.baseurl }}/examples.html">{{ site.baseurl }}/examples.html</a>.
+<br>
 Try</p>
 
-<p style="margin-left:11%; margin-top: 1em">
-<pre style="margin-left:11%"><code>echo &quot;Good Bye World!&quot; | boxes -d nuke</code></pre></p>
+<pre style="margin-left:11%;"><code>echo &quot;Good Bye World!&quot; | boxes -d nuke</code></pre>
 
 <p style="margin-left:11%; margin-top: 1em"><i>Boxes</i>
 also combines nicely with other tools. Try</p>
 
-<p style="margin-left:11%; margin-top: 1em">
-<pre style="margin-left:11%"><code>figlet &quot;boxes . . . !&quot; | lolcat -f | boxes -d unicornthink</code></pre></p>
+<pre style="margin-left:11%;"><code>figlet &quot;boxes . . . !&quot; | lolcat -f | boxes -d unicornthink</code></pre>
 
 <h2>AVAILABILITY
 <a name="AVAILABILITY"></a>
@@ -310,7 +388,7 @@ also combines nicely with other tools. Try</p>
 
 <p style="margin-left:11%; margin-top: 1em">The
 <i>boxes</i> website is
-<a href=https://boxes.thomasjensen.com/>https://boxes.thomasjensen.com/</a>. It contains a
+<a href="{{ site.baseurl }}"/>https://boxes.thomasjensen.com/</a>. It contains a
 number of examples illustrating this manual page as well as
 more in-depth documentation.</p>
 
@@ -320,13 +398,13 @@ more in-depth documentation.</p>
 
 
 <p style="margin-left:11%; margin-top: 1em"><i>Boxes</i>
-was made by Thomas Jensen and many great contributors. <br>
-For a full list, see <br>
+was made by Thomas Jensen and the <i>boxes</i> contributors.
+It has been lovingly maintained since 1999. <br>
+For a full list of contributors, see
 
-<a href=https://boxes.thomasjensen.com/contributing.html#contributors>https://boxes.thomasjensen.com/contributing.html#contributors</a>
-<br>
+<a href="{{ site.baseurl }}/contributing.html#contributors">{{ site.baseurl }}/contributing.html#contributors</a>
 and
-<a href=https://github.com/ascii-boxes/boxes/graphs/contributors>https://github.com/ascii-boxes/boxes/graphs/contributors</a>.
+<a href="https://github.com/{{ site.github }}/graphs/contributors">https://github.com/{{ site.github }}/graphs/contributors</a>.
 <br>
 Please refer to the <i>boxes</i> website for the
 maintainer&rsquo;s current email address.</p>
@@ -337,7 +415,7 @@ maintainer&rsquo;s current email address.</p>
 
 
 <p style="margin-left:11%; margin-top: 1em">This is
-<i>boxes</i> version 2.0.0.</p>
+<i>boxes</i> version {{ site.currentVersion }}.</p>
 
 <h2>LICENSE
 <a name="LICENSE"></a>
@@ -347,46 +425,27 @@ maintainer&rsquo;s current email address.</p>
 <p style="margin-left:11%; margin-top: 1em"><i>boxes</i> is
 free software under the terms of the GNU General Public
 License, version 2. Details in the LICENSE file:
-<a href=https://raw.githubusercontent.com/ascii-boxes/boxes/v2.0.0/LICENSE>https://raw.githubusercontent.com/ascii-boxes/boxes/v2.0.0/LICENSE</a></p>
-
-<h2>ENVIRONMENT
-<a name="ENVIRONMENT"></a>
-</h2>
+<a href="{{ site.link_license }}">{{ site.link_license }}</a></p>
 
 
-<p style="margin-left:11%; margin-top: 1em"><i>Boxes</i>
-recognizes the following environment variables:</p>
+<h2>ENVIRONMENT<a name="ENVIRONMENT"></a></h2>
 
-<p style="margin-left:11%; margin-top: 1em">HOME</p>
+<p style="margin-left:11%; margin-top: 1em"><i>Boxes</i> recognizes the following environment variables:</p>
 
-<p style="margin-left:26%;">The user&rsquo;s home directory.</p>
+<dl style="margin-left: 11%">
+<dt>BOXES</dt>
+<dd>Absolute path of the <i>boxes</i> configuration file. If this is specified, it must refer
+to an existing file or directory.</dd>
+<dt>HOME</dt>
+<dd>The user's home directory.</dd>
+<dt>XDG_CONFIG_HOME</dt>
+<dd>The root of the configuration file location as per the XDG specification.</dd>
+</dl>
 
-<p style="margin-left:11%; margin-top: 1em">BOXES</p>
-
-<p style="margin-left:26%;">Name of <i>boxes</i> configuration file, if different
-from ~/.boxes.</p>
-
-
-
-<h2>FILES
-<a name="FILES"></a>
-</h2>
-
-<p style="margin-left:11%; margin-top: 1em">$HOME/.boxes</p>
-
-<p style="margin-left:26%;"><i>boxes</i> configuration file
-(takes precedence over system-wide configuration file)</p>
-
-<p style="margin-left:11%;">/usr/share/boxes</p>
-
-<p style="margin-left:26%;">system-wide configuration
-file</p>
 
 <h2>SEE ALSO
 <a name="SEE ALSO"></a>
 </h2>
-
-
 
 <p style="margin-left:11%; margin-top: 1em"><b>figlet</b>(6),
 <b>iconv</b>(1), <b>lolcat</b>(6)</p>

@@ -40,8 +40,8 @@ kramdown:
 
 exclude: ['README.md', 'LICENSE', 'src/', 'doc/', 'pcre2-10.36/', 'flex_bison_2.5.24/', 'vs', 'cmake-build-debug/', 'coverage/', 'out/']
 
-currentVersion: 2.0.0
-link_license: 'https://raw.githubusercontent.com/ascii-boxes/boxes/v2.0.0/LICENSE'
+currentVersion: 2.1.0
+link_license: 'https://raw.githubusercontent.com/ascii-boxes/boxes/v2.1.0/LICENSE'
 
 # boxes custom variables
 defaults:
