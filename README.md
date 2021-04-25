@@ -8,6 +8,8 @@
 [filter program](https://boxes.thomasjensen.com/docs/filters.html) that draws ASCII art boxes
 around your input text ([examples](https://boxes.thomasjensen.com/examples.html)).
 
+![example boxes](README-0.gif)
+
 For more information, please visit [the website](https://boxes.thomasjensen.com/).
 
 ## Status
