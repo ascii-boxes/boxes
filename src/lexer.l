@@ -99,7 +99,7 @@ static void report_state(char *symbol, char *text, char *expected_state_str);
 %s SHAPES
 
 
-PWORD     [a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*
+PWORD     [a-zA-ZÃ¤Ã¶Ã¼Ã„Ã–Ãœ][a-zA-Z0-9\-_Ã¼Ã¤Ã¶ÃœÃ„Ã–ÃŸ]*
 PWHITE    [\n \r\t]
 PBOX      Box
 SDELIM    [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
