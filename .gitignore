@@ -2,10 +2,10 @@
 .project
 .idea/
 .jekyll-metadata
+/.jekyll-cache/
 *.o
 *.a
 _support/
-idee
 doc/boxes.1
 doc/*.tar.gz
 *.tar.gz
