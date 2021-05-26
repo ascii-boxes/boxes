@@ -14,7 +14,7 @@ These are the frequently asked questions about the *boxes* program and their ans
 
 These questions are *actually* "frequently asked". For general information on the *boxes* program, installation
 instructions, and information on box design creation please refer to the
-[*boxes* documentation]({{ site.baseurl }}/docs/).
+[*boxes* documentation]({{ site.baseurl }}/).
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
@@ -22,7 +22,7 @@ instructions, and information on box design creation please refer to the
    level=3 slug="q1"
    text="Q. 1. What is a text filter program?" %}
 
-There is a [separate page]({{ site.baseurl }}/docs/filters.html) explaining this. *Boxes* is mostly used as such a
+There is a [separate page]({{ site.baseurl }}/filters.html) explaining this. *Boxes* is mostly used as such a
 filter program. 
 
 

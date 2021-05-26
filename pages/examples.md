@@ -301,7 +301,7 @@ whereas there are two leading spaces in the input text. This is because the &quo
 horizontal padding of one space. Since *boxes* assumes it has added the padding space, it also attempts to removes
 the same number of spaces when removing the box. Thus, if you were to add a new box around the text, the box internal
 indentation would be retained. It is easily possible to use this feature to make an editor key mapping which repairs
-a box for you (see [installation]({{ site.baseurl}}/docs/install.html) in the documentation section).
+a box for you (see [installation]({{ site.baseurl}}/editors.html) in the documentation section).
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}

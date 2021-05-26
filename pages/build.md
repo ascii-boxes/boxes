@@ -43,7 +43,7 @@ In order to build on Linux:
    Also note that the value of `GLOBALCONF` is a full file name. It does **not** specify a directory into which to copy
    the config file.
 4. From the top level directory, type `make && make test`. Find the resulting binary in the *out* folder. In case of
-   problems, check the [compilation faq]({{ site.baseurl }}/docs/faq.html#q5).
+   problems, check the [compilation faq]({{ site.baseurl }}/faq.html#q5).
 
 That should be all. *Boxes* is built so that this works almost everywhere.
 

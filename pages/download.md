@@ -8,7 +8,7 @@ last_modified_at: 2021-02-17 21:37:44 +0100
 # Download *Boxes*
 
 The current release is **version {{ site.currentVersion }}**. For older revisions, feel free to browse the
-[release history]({{ site.baseurl }}/docs/releases.html).
+[release history]({{ site.baseurl }}/releases.html).
 
 
 ## Binaries
