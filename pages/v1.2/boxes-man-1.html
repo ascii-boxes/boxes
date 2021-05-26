@@ -1,0 +1,536 @@
+---
+title: Manpage of boxes(1)
+permalink: /v1.2/boxes-man-1.html
+longContent: true
+bxVersion: v1.2
+created_at: 1999-04-06
+last_modified_at: 2015-05-28 17:15:00 +0200
+---
+
+<H1>boxes</H1>
+
+{% include version-select.html currentVersion=page.bxVersion contentPiece="boxes-man-1" %}
+
+<p>Section: User Commands  (1)<BR>Updated: January 16 2015</p>
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+    level=2 slug="NAME"
+    text="NAME" %}
+
+boxes - text mode box and comment drawing filter
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+    level=2 slug="SYNOPSIS"
+    text="SYNOPSIS" %}
+
+<B>boxes</B>
+
+[-hlmrv] [-a&nbsp;format] [-d&nbsp;design] [-f&nbsp;file] [-i&nbsp;indent] [-k&nbsp;bool]
+[-p&nbsp;pad] [-s&nbsp;size] [-t&nbsp;tabopts] [infile [outfile]]
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+    level=2 slug="DESCRIPTION"
+    text="DESCRIPTION" %}
+
+<I>Boxes</I>
+
+is a text filter which can draw any kind of box around its input text. Box
+design choices range from simple boxes to complex ASCII art. A box can also
+be removed and repaired, even if it has been badly damaged by editing of the
+text inside. Since boxes may be open on any side,
+<I>boxes</I>
+
+can also be used to create regional comments in any programming language.
+New box designs of all sorts can easily be added and shared by appending to
+a free format configuration file.
+<BR>
+
+<I>boxes</I>
+
+was originally intended to be used with the <I>vim(1)</I>
+text editor, but it can be tied to any text editor which supports filters,
+as well as called from the command line as a standalone tool.
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+    level=2 slug="OPTIONS"
+    text="OPTIONS" %}
+
+Options offered by <I>boxes</I> are the following:
+
+<DL COMPACT>
+<DT><B>-a </B><I>string</I>
+
+<DD>
+Alignment/positioning of text inside box. This option takes a format string
+argument which is read from left to right. The format string may not
+contain whitespace and must consist of one or more of the following
+components:
+<BR>
+
+<P>
+<B>h</B>x
+
+- horizontal alignment of the input text block inside a potentially larger
+box. Possible values for
+<I>x</I>
+
+are
+<B>l</B>
+
+(ell, for left alignment),
+<B>c</B>
+
+(center), or
+<B>r</B>
+
+(right). This does not affect the justification of text lines within the
+input text block (use the
+<B>j</B>
+
+argument instead).
+<BR>
+
+<B>v</B>x
+
+- vertical alignment of the input text block inside a potentially larger
+box. Possible values for
+<I>x</I>
+
+are
+<B>t</B>
+
+(for top alignment),
+<B>c</B>
+
+(center), or
+<B>b</B>
+
+(bottom).
+<BR>
+
+<B>j</B>x
+
+- justification of lines within the input text block. Possible values for
+<I>x</I>
+
+are
+<B>l</B>
+
+(ell, for left justification),
+<B>c</B>
+
+(center), or
+<B>r</B>
+
+(right). This does not affect the alignment of the input text block itself
+within the box. Use the
+<B>h</B>
+
+and
+<B>v</B>
+
+arguments for input text block positioning.
+<BR>
+
+<P>
+Short hand notations (can be combined with the above arguments):
+<BR>
+
+<B>l</B>
+
+(ell) - short for
+<B>h</B>l<B>v</B>c<B>j</B>l
+
+<BR>
+
+<B>c</B>
+
+- short for
+<B>h</B>c<B>v</B>c<B>j</B>c
+
+<BR>
+
+<B>r</B>
+
+- short for
+<B>h</B>r<B>v</B>c<B>j</B>r
+
+<BR>
+
+<P>
+The factory default setting for
+<B>-a</B>
+
+is
+<B>h</B>l<B>v</B>t.
+
+
+<DT><B>-c </B><I>string</I>
+
+<DD>
+Command line design definition for simple cases. The argument of this
+option is the definition for the &quot;west&quot; (W) shape. The defined shape must
+consist of exactly one line, i.e. no multi-line shapes are allowed. The
+<B>-c</B>
+
+option is intended as a shortcut for those cases where simple regional
+comments are to be created, which only need a certain character or sequence
+of characters to be placed in front of every line. In such cases, it is
+much more convenient to simply specify
+<B>-c</B>
+
+than to do a complete design definition in one's config file, where the
+only shape defined is the west shape.
+<BR>
+
+This option implies a
+<B>-d</B>
+
+and does not access the config file.
+<B>-c</B>
+
+may of course be used in conjunction with any of the other options. By default,
+<B>-c</B>
+
+is not specified.
+
+<DT><B>-d </B><I>string</I>
+
+<DD>
+Design selection. The one argument of this option is the name of the design to
+use.
+
+<DT><B>-f </B><I>string</I>
+
+<DD>
+Use alternate config file. The one argument of this option is the name of a
+valid
+<I>boxes</I>
+
+config file, containing new and exciting designs!
+
+<DT><B>-h</B>
+
+<DD>
+Print usage information.
+
+<DT><B>-i </B><I>string</I>
+
+<DD>
+Indentation mode. Possible arguments are &quot;text&quot; (indent text inside of
+box), &quot;box&quot; (indent box, not text inside of box), or &quot;none&quot; (throw away
+indentation). Arguments may be abbreviated. The default is to indent the
+box, but not the text.
+
+<DT><B>-k </B><I>bool</I>
+
+<DD>
+Kill leading/trailing blank lines on removal. The value of
+<I>bool</I>
+
+can be specified as on, yes, true, 1, or t, all meaning yes, or off, no,
+false, 0, or f, which mean no. This is case-insensitive. This option only
+takes effect in connection with
+<B>-r</B>.
+
+If set to yes, leading and trailing blank lines will be removed from the
+output. If set to no, the entire content of the former box is returned.
+The default is no, if both the top and the bottom part of the box are open,
+as is the case with most regional comments. If the box's design defines a
+top part or a bottom part, the default is yes.
+
+<DT><B>-l</B>
+
+<DD>
+(ell) List designs. Produces a listing of all available box designs in the
+config file, along with a sample box and information about it's creator.
+Also checks syntax of the entire config file. If used in connection with
+<B>-d</B>,
+
+displays detailed information about the specified design.
+
+<DT><B>-m</B>
+
+<DD>
+Mend box. This removes a (potentially broken) box as with
+<B>-r</B>,
+
+and redraws it afterwards. The mended box is drawn according to the
+options given. This may be important to know when it comes to restoring
+padding, identation, etc. for the mended box. Implies
+<B>-k</B>
+
+false.
+
+<DT><B>-p </B><I>string</I>
+
+<DD>
+Padding. Specify padding in spaces around the input text block for all
+sides of the box. The argument string may not contain whitespace and must
+consist of a combination of the following characters, each followed by a
+number indicating the padding in spaces:
+<BR>
+
+<B>a</B>
+
+- (all) give padding for all sides at once
+<BR>
+
+<B>h</B>
+
+- (horiz) give padding for both horizontal sides
+<BR>
+
+<B>v</B>
+
+- (vertical) give padding for both vertical sides
+<BR>
+
+<B>b</B>
+
+- (bottom) give padding for bottom (south) side
+<BR>
+
+<B>l</B>
+
+- (left) give padding for left (west) side
+<BR>
+
+<B>t</B>
+
+- (top) give padding for top (north) side
+<BR>
+
+<B>r</B>
+
+- (right) give padding for right (east) side
+<BR>
+
+Example:
+<B>-p a</B>4<B>t</B>2
+
+would define the padding to be 4 characters on all sides, except for the
+top of the box, where the input text block will be only 2 lines away from
+the box.
+<BR>
+
+By default, unless specified otherwise in the config file, no padding is
+used.
+
+<DT><B>-r</B>
+
+<DD>
+Remove box. Removes an existing box instead of drawing it. Which design to
+use is detected automatically. In order to save time or in case the
+detection does not decide correctly, combine with
+<B>-d</B>
+
+to specify the design. The default is to draw a new box.
+
+<DT><B>-s </B><I>width</I><B>x</B>height
+
+<DD>
+Box size. This option specifies the desired box size in units of columns
+(for width) and lines (for height).
+If only a single number is given as argument, this number specifies the
+desired box width. A single number prefixed by 'x' specifies only the box
+height.  The actual resulting box size may vary depending on the individual
+shape sizes of the chosen design. Also, other command line options may
+influence the box size (such as
+<B>-p</B>).
+
+<BR>
+
+By default, the smallest possible box is created around the text.
+
+<DT><B>-t </B><I>string</I>
+
+<DD>
+Tab handling. This option controls how tab characters in the input text are
+handled. The option string must always begin with a
+<I>uint</I>
+
+number indicating the distance between tab stops. It is important that this
+value be set correctly, or tabulator characters will upset your input text.
+The correct tab distance value depends on the settings used for the text
+you are processing. A common value is 8.
+<BR>
+
+Immediately following the tab distance, an optional character can be appended,
+telling
+<I>boxes</I>
+
+how to treat the leading tabs. The following options are available:
+<BR>
+
+<B>e</B>
+
+- expand tabs into spaces
+<BR>
+
+<B>k</B>
+
+- keep tabs as close to what they were as possible
+<BR>
+
+<B>u</B>
+
+- unexpand tabs. This makes
+<I>boxes</I>
+
+turn as many spaces as possible into tabs.
+<BR>
+
+<P>
+In order to maintain backwards compatibility, the
+<B>-t</B>
+
+<I>string</I>
+
+can be just a number. In that case,
+<B>e</B>
+
+is assumed for tab handling, which removes all tabs and replaces them with
+spaces. The factory default for the
+<B>-t</B>
+
+option is simply 8, which is just such a case.
+<BR>
+
+For example, you could specify
+<B>-t </B>4u
+
+in order to have your leading tabs unexpanded. In the box content, tabs are
+always converted into spaces. The tab distance in this example is 4.
+
+<DT><B>-v</B>
+<DD>
+Print out current version number.
+</DL>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+    level=2 slug="CONFIGURATION FILES"
+    text="CONFIGURATION FILES" %}
+
+<I>Boxes</I>
+
+will use the configuration file specified on the command line (using
+<B>-f</B>).
+
+If no config file is specified on the command line,
+<I>boxes</I>
+
+will check for the BOXES environment variable, which may contain a filename
+to use. If BOXES is not set,
+<I>boxes</I>
+
+will try to read $HOME/.boxes and use it as a config file. Failing that,
+<I>boxes</I>
+
+will try to read the system-wide config file (see FILES).
+<P>
+
+The syntax of
+<I>boxes</I>
+
+config files is described on the website (see below). They are quite
+self-explanatory, though.
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+    level=2 slug="AVAILABILITY"
+    text="AVAILABILITY" %}
+
+<I>Boxes</I>
+
+is available from its website at
+<A HREF="{{ site.url }}{{ site.baseurl }}/">{{ site.url }}{{ site.baseurl }}/</A>.
+The website also features a number
+of examples illustrating this manual page as well as more in-depth
+documentation.
+<P>
+
+Check out <I>vim(1)</I>
+at <A HREF="http://www.vim.org/" target="_blank">vim.org</A>!
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+    level=2 slug="AUTHOR"
+    text="AUTHOR" %}
+
+<I>Boxes</I>
+
+was made by Thomas Jensen &lt; boxes at thomasjensen dot com &gt;.
+<BR>
+
+Please see the <I>boxes</I> website for the most current email address.
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+    level=2 slug="VERSION"
+    text="VERSION" %}
+
+This is <I>boxes</I> {{ page.bxVersion }}.
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+    level=2 slug="BUGS"
+    text="BUGS" %}
+
+Although it is doing fine in most cases, imho the design autodetector
+needs some more work.
+<BR>
+
+Should you notice any other unspecified behavior, please tell the author!
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+    level=2 slug="ENVIRONMENT"
+    text="ENVIRONMENT" %}
+
+<I>Boxes</I>
+
+recognizes the following environment variables:
+<DL COMPACT>
+<DT>HOME<DD>
+The user's home directory.
+<DT>BOXES<DD>
+Name of
+<I>boxes</I>
+configuration file, if different from <tt>~/.boxes</tt>.
+</DL>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+    level=2 slug="FILES"
+    text="FILES" %}
+
+<DL COMPACT>
+<DT>$HOME/.boxes<DD>
+<I>boxes</I>
+
+configuration file
+<DT>/usr/share/boxes<DD>
+system-wide configuration file
+
+</DL>
+
+<HR>
+This document was created by
+<A HREF="http://users.actrix.gen.nz/michael/vhman2html.html" target="_blank">man2html</A>,
+using the manual pages.

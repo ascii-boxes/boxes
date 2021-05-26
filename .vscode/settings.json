@@ -1,0 +1,42 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.idea": true,
+        "**/_site": true,
+        "**/_support": true,
+        "**/cmake-build-debug": true,
+        "**/coverage": true,
+        "**/flex_bison_*": true,
+        "**/out": true,
+        "**/pcre2-*": true
+    },
+    "editor.autoClosingBrackets": "never",
+    "editor.dragAndDrop": false,
+    "editor.formatOnSave": false,
+    "editor.renderWhitespace": "selection",
+    "editor.rulers": [120],
+    "editor.wordWrapColumn": 120,
+    "files.encoding": "utf8",
+
+    "todo-tree.highlights.defaultHighlight": {
+        "foreground": "red",
+        "rulerLane": "full"
+    },
+    "todo-tree.filtering.excludeGlobs": [
+        "**/out/**",
+        "**/build/**",
+        "**/.vscode/**",
+        "**/.github/**",
+        "**/_site/**",
+        "**/_support/**",
+        "**/flex_bison_*/**",
+        "**/pcre2-*/**",
+        "**/_sass/bootstrap-*/**",
+        "**/_sass/bootswatch-*/**"
+    ],
+    "todo-tree.general.statusBar": "total",
+    "todo-tree.general.tags": ["TODO", "FIXME", "CHECK"],
+    "todo-tree.regex.regex": "(//|#|<!--|\\{%\\-? comment \\-?%\\}|\"|/\\*|^\\s*\\*).*?($TAGS)",
+    "todo-tree.tree.expanded": true,
+    "todo-tree.tree.showCountsInTree": true
+}

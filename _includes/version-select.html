@@ -1,0 +1,47 @@
+{%- comment -%}
+
+    Outputs a dropdown with specific boxes versions for which we have documentation.
+
+    Parameters:
+        - currentVersion: the version of the current page, e.g. 'v2.1.0'
+        - contentPiece: the page to target, e.g. 'config-syntax'
+
+{%- endcomment -%}
+
+
+{%- comment -%} ------------ Determine the list of boxes versions ------------ {%- endcomment -%}
+
+{%- assign versions = "" | split: "," -%}
+{%- for p in site.pages -%}
+    {%- if p.bxVersion -%}
+        {%- assign versions = versions | push: p.bxVersion -%}
+    {%- endif -%}
+{%- endfor - %}
+{%- assign versions = versions | sort | uniq | reverse -%}
+
+
+{%- comment -%} ------------ Output the dopdown control ------------ {%- endcomment -%}
+
+<form>
+    <div class="form-group my-4 row">
+        <div class="col-4 col-md-3 col-xl-2">
+            <label for="bxVersionSelect" class="form-label"><i>Boxes</i> Version:</label>
+        </div>
+        <div class="col-4 col-md-3 col-lg-2">
+            <select class="form-control form-select" id="bxVersionSelect">
+                {%- for v in versions %}
+                <option value="{{ v }}"
+                    {%- if include.currentVersion == v %} selected {%- endif -%}>{{ v }}</option>
+                {%- endfor - %}
+            </select>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.getElementById("bxVersionSelect").onchange = function() {
+        if (this.selectedIndex >= 0) {
+            window.location.href = '{{ site.baseurl }}/' + this.value + '/{{ include.contentPiece }}.html';
+        }        
+    };
+</script>

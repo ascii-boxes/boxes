@@ -1,0 +1,6 @@
+---
+layout: none
+permalink: /box-designs.txt
+---
+This content has moved to https://boxes.thomasjensen.com/box-designs.html
+Please update your bookmarks.

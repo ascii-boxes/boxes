@@ -1,0 +1,45 @@
+---
+title: What's New
+layout: default
+redirect_from:
+  - /archive.html
+created_at: 1999-04-06
+---
+
+<div class="news">
+    {%- if paginator.page == 1 -%}
+        <h1 class="page-heading mb-4">{{ page.title }}</h1>
+    {%- else -%}
+      <div class="mb-4">
+        {%- include paginator.html -%}
+      </div>
+    {%- endif -%}
+
+    {%- if site.paginate -%}
+        {%- assign posts = paginator.posts -%}
+    {%- else -%}
+        {%- assign posts = site.posts -%}
+    {%- endif -%}
+
+    {%- if posts.size > 0 -%}
+        {%- if page.list_title -%}
+            <h2 class="post-list-heading">{{ page.list_title }}</h2>
+        {%- endif -%}
+
+        {%- for post in posts -%}
+        <div class="card mb-4">
+          <div class="card-header"><a class="bx-post-link" href="{{ post.url | relative_url }}">{{-
+              post.date | date: "%b %-d, %Y" }} - <span class="font-weight-bold">{{ post.title | escape }}</span></a></div>
+          <div class="card-body">
+            <div class="card-text">{{- post.content | split: '<!--break-->' | first | markdownify | remove: '<p>' | remove: '</p>' -}}
+              {%- if post.content contains '<!--break-->' %} <a href="{{ post.url | relative_url }}"> &nbsp; ... read more</a>{% endif %}</div>
+          </div>
+        </div>
+        {% endfor -%}
+
+        <div class="mt-4">
+          {%- include paginator.html -%}
+        </div>
+    {%- endif -%}
+
+</div>

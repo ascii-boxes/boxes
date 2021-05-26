@@ -1,0 +1,352 @@
+/* boxes-specific CSS added by us */
+
+
+/*
+ * Unify fonts
+ */
+ul, ol, li, dd, .footer, table, nav, div.card-text {
+    font-family: $font-family-serif;
+}
+
+ul.pagination, li.page-item, p.post-meta, .card-header, .card-subtitle, .navbar-brand, .navbar-text {
+    font-family: $font-family-sans-serif;
+}
+
+
+/*
+ * Text
+ */
+.text-muted a {
+    color: lighten($link-color, 15%)
+}
+li {
+    margin-bottom: $spacer;
+}
+
+
+/*
+ * at-mentions of github users, e.g. @tsjensen
+ */
+.atmention a {
+    color: inherit;
+    font-weight: bold;
+}
+
+
+/*
+ * Metadata card at bottom of page
+ */
+.bx-page-metadata {
+    background-color: $body-bg !important;
+    > .card-body {
+        padding: $card-spacer-x / 3 $card-spacer-x / 2;
+    }
+    .stats-part {
+        font-family: $font-family-sans-serif;
+        font-size: $font-size-sm;
+        white-space: nowrap;
+        margin-right: 2rem;
+    }
+}
+
+
+/*
+ * Tables
+ */
+th {
+    color: $headings-color;
+}
+
+
+/*
+ * Body margins for navbar/footer
+ */
+body {
+    margin-bottom: 54px; /* footer height + 24px (from .footer-moving) */
+}
+body.longContent {
+    margin-bottom: 0;
+}
+
+
+/*
+ * Top Navbar
+ */
+nav.navbar {
+    .navbar-brand {
+        padding: 0;
+        color: $headings-color !important;
+        > img {
+            position: relative;
+            top: -4px;
+            height: 28px;
+        }
+    }
+    .navbar-text {
+        font-size: $font-size-base;
+        padding-top: 3px;   /* from difference to navbar-brand font size */
+        padding-bottom: 0;
+    }
+    &.bg-light {
+        background-color: $light !important;
+        border: 0;
+        border-bottom: 1px solid $border-color;
+    }
+    li {
+        margin-bottom: 0;
+    }
+}
+
+
+/*
+ * Code
+ */
+pre {
+    background-color: $light;
+    border-radius: $border-radius-lg !important;
+    padding: $spacer/2;
+    line-height: 1.15em;  /* not too narrow, or underscores start disappearing */
+    > code {
+        padding: 0;
+        border-radius: 0;
+    }
+}
+li pre {
+    margin: 0;
+}
+code {
+    color: inherit;
+    background-color: $light;
+    border-radius: $border-radius-sm;
+    padding: 2px 3px;
+}
+
+
+/*
+ * Images
+ */
+.img-shad {
+    margin-top: 10px;
+    -moz-box-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
+    -webkit-box-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
+    box-shadow: 1px 1px 4px rgba(34, 34, 34, 0.6);
+    margin-bottom: 4px;
+    margin-left: 3px;
+}
+
+
+/*
+ * Sidebar
+ */
+.sidebar {
+    margin-left: $spacer;
+    .sidebar-heading {
+        color: $headings-color;
+        font-weight: bold;
+        display: block;
+        width: 100%;
+        border-top: 1px solid $card-border-color;
+    }
+    .row ul {
+        width: 100%;
+        li {
+            margin-bottom: 0;
+        }
+        li.current {
+            a {
+                /* color: $body-color; */
+                color: white;
+            }
+            margin-right: $spacer;
+            /* background-color: lighten($primary, 30%); */
+            background-color: $primary;
+            border-radius: $border-radius;
+        }
+    }
+    > .row:first-child .sidebar-heading {
+        border-top: none;
+    }
+}
+
+
+/*
+ * Our fixed footer. If page.longContent, it will not be fixed, but simply placed after the content on the page.
+ * On screen size XS, it will always be treated as if page.longContent. When page.short-content-xs, it will again be
+ * a fixed footer even on XS, because the page does not contain enough content to even fill a smart phone screen.
+ */
+.footer {
+    padding: 4px 0;
+    text-align: center;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    font-size: $font-size-sm;
+    border-top: 1px solid $border-color;
+}
+.footer p {
+    margin: 0;
+}
+.footer-moving {
+    position: static;
+    bottom: auto;
+    left: auto;
+    width: auto;
+    margin-top: 24px;
+}
+.footer-part {
+    display: inline;
+    a {
+        color: $text-muted;
+    }
+}
+.footer-sep {
+    padding: 0 0.5em;
+}
+@media (max-width: 575.98px) {
+    body {
+        padding-bottom: 0;
+        margin-bottom: 0 !important;
+    }
+    .footer {
+        padding: 4px 0;
+        text-align: center;
+        width: auto;
+        position: static;
+        bottom: auto;
+        left: auto;
+        margin-top: 24px;
+    }
+    body.short-content-xs footer.footer {
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+        left: 0;
+    }
+}
+@media (max-width: 767.98px) {
+    .footer-part {
+        display: block;
+    }
+    .footer-sep {
+        display: none;
+    }
+    body {
+        margin-bottom: 52px + 24px;
+    }
+}
+
+
+/*
+ * Headings
+ */
+h1 > a > svg {
+    height: 0.75 * $h1-font-size;
+    width: 0.75 * $h1-font-size;
+}
+h2 > a > svg {
+    height: 0.75 * $h2-font-size;
+    width: 0.75 * $h1-font-size;
+}
+h3 > a > svg {
+    height: 0.75 * $h3-font-size;
+    width: 0.75 * $h1-font-size;
+}
+h4 > a > svg {
+    height: 0.75 * $h4-font-size;
+    width: 0.75 * $h1-font-size;
+}
+h5 > a > svg {
+    height: 0.75 * $h5-font-size;
+    width: 0.75 * $h1-font-size;
+}
+h6 > a > svg {
+    height: 0.75 * $h6-font-size;
+    width: 0.75 * $h1-font-size;
+}
+h1 > a > svg, h2 > a > svg, h3 > a > svg, h4 > a > svg, h5 > a > svg, h6 > a > svg {
+    position: relative;
+    top: -3px;
+}
+h2, h3, h4 {
+    margin-top: $spacer * 2;
+}
+h1, h2, h3, h4 {
+    margin-bottom: map-get($spacers, 3);
+}
+h1, h2, h3, h4, h5, h6 {
+    a {
+        display: none;
+    }
+}
+h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover {
+    a, a:hover {
+        display: inline;
+        margin-left: 0.75 * $spacer;
+        svg {
+            fill: $primary !important;
+        }
+    }
+}
+
+
+/*
+ * Paginaton
+ */
+li.page-item.active > a {
+    pointer-events: none;
+    cursor: default;
+}
+
+
+/*
+ * What's new page / cards
+ */
+a.bx-post-link {
+    color: inherit;
+}
+div.card-text pre.highlight {
+    margin: 0;
+}
+
+
+/*
+ * Title Page
+ */
+.carousel {
+    .carousel-indicators {
+        li {
+            opacity: .4;
+        }
+        li.active {
+            opacity: 1;
+        }
+    }
+    .carousel-inner {
+        border-radius: $border-radius-sm;
+    }
+}
+
+.card {
+    background-color: $light;
+    .card-header {
+        font-weight: bold;
+        color: $headings-color;
+        a {
+            color: $headings-color;
+        }
+    }
+    .card-footer {
+        a {
+            margin: 0;
+        }
+    }
+}
+
+
+/*
+ * Limit size of embedded videos.
+ */
+div.bxEmbedContainer {
+    max-width: 400px;
+}

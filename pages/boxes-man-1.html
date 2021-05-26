@@ -1,0 +1,472 @@
+---
+title: Manpage of boxes(1)
+permalink: /boxes-man-1.html
+redirect_from:
+  - /docs/boxes-man-1.html
+longContent: true
+created_at: 1999-04-06
+last_modified_at: 2021-04-24 14:44:35 +0200
+---
+
+<h1>boxes</h1>
+
+{% assign thisVersion = site.currentVersion | prepend: 'v' -%}
+{% include version-select.html currentVersion=thisVersion contentPiece="boxes-man-1" %}
+
+<p>Section: User Commands  (1)<BR>Updated: April 18 2021</p>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="NAME"
+   text="NAME" %}
+
+<p style="margin-left:11%; margin-top: 1em">boxes - text
+mode box and comment drawing filter</p>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="SYNOPSIS"
+   text="SYNOPSIS" %}
+
+<p style="margin-left:11%; margin-top: 1em"><b>boxes</b>
+[-hlmrv] [-a&nbsp;format] [-d&nbsp;design] [-e&nbsp;eol]
+[-f&nbsp;file] [-i&nbsp;indent] [-k&nbsp;bool]
+[-n&nbsp;encoding] [-p&nbsp;pad] [-q&nbsp;query] [-s&nbsp;size]
+[-t&nbsp;tabopts] [infile [outfile]]</p>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="DESCRIPTION"
+   text="DESCRIPTION" %}
+
+<p style="margin-left:11%; margin-top: 1em"><i>Boxes</i> is
+a text filter which can draw any kind of box around its
+input text. Box design choices range from simple boxes to
+complex ASCII art. A box can also be removed and repaired,
+even if it has been badly damaged by editing of the text
+inside. Since boxes may be open on any side, <i>boxes</i>
+can also be used to create regional comments in any
+programming language. New box designs can be added and
+shared by appending to a configuration file.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><i>boxes</i> is
+a command line tool, but also integrates with any text
+editor that supports filters. The <i>boxes</i> website has
+examples on how to configure editor integration for various
+text editors: <br>
+
+<a href="{{ site.baseurl }}/editors.html">{{ site.url }}{{ site.baseurl }}/editors.html</a></p>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="OPTIONS"
+   text="OPTIONS" %}
+
+<p style="margin-left:11%; margin-top: 1em">Options offered
+by <i>boxes</i> are the following: <b><br>
+-a</b> <i>string</i></p>
+
+<p style="margin-left:20%;">Alignment/positioning of text
+inside box. This option takes a format string argument which
+is read from left to right. The format string may not
+contain whitespace and must consist of one or more of the
+following components:</p>
+
+<p style="margin-left:20%; margin-top: 1em"><i>h</i>x -
+horizontal alignment of the input text block inside a
+potentially larger box. Possible values for <i>x</i> are
+<i>l</i> (ell, for left alignment), <i>c</i> (center), or
+<i>r</i> (right). This does not affect the justification of
+text lines within the input text block (use the <i>j</i>
+argument instead). <i><br>
+v</i>x - vertical alignment of the input text block inside a
+potentially larger box. Possible values for <i>x</i> are
+<i>t</i> (for top alignment), <i>c</i> (center), or <i>b</i>
+(bottom). <i><br>
+j</i>x - justification of lines within the input text block.
+Possible values for <i>x</i> are <i>l</i> (ell, for left
+justification), <i>c</i> (center), or <i>r</i> (right). This
+does not affect the alignment of the input text block itself
+within the box. Use the <i>h</i> and <i>v</i> arguments for
+input text block positioning.</p>
+
+<p style="margin-left:20%; margin-top: 1em">Short hand
+notations (can be combined with the above arguments):
+<i><br>
+l</i> (ell) - short for <code>hlvcjl</code> <i><br>
+c</i> - short for <code>hcvcjc</code> <i><br>
+r</i> - short for <code>hrvcjr</code></p>
+
+<p style="margin-left:20%; margin-top: 1em">The factory
+default setting for <b>-a</b> is <i>h</i>l<i>v</i>t.</p>
+
+<p style="margin-left:11%;"><b>-c</b> <i>string</i></p>
+
+<p style="margin-left:20%;">Command line design definition
+for simple cases. The argument of this option is the
+definition for the &quot;west&quot; (W) shape. The defined
+shape must consist of exactly one line, i.e. no multi-line
+shapes are allowed. The <b>-c</b> option is intended as a
+shortcut for those cases where simple regional comments are
+to be created, which only need a certain character or
+sequence of characters to be placed in front of every line.
+In such cases, it is much more convenient to simply specify
+<b>-c</b> than to do a complete design definition in
+one&rsquo;s config file, where the only shape defined is the
+west shape. <br>
+This option implies a <b>-d</b> and does not access the
+config file. <b>-c</b> may of course be used in conjunction
+with any of the other options. By default, <b>-c</b> is not
+specified.</p>
+
+<p style="margin-left:11%;"><b>-d</b> <i>string</i></p>
+
+<p style="margin-left:20%;">Design selection. The one
+argument of this option is the name of the design to use,
+which may either be a design&rsquo;s primary name or any of
+its alias names.</p>
+
+<p style="margin-left:11%;"><b>-e</b> <i>eol</i></p>
+
+<p style="margin-left:20%;">Override line terminator.
+<i>eol</i> can be <i>CR</i>, <i>LF</i>, or <i>CRLF</i>. The
+default is to use the system-specific line terminator, which
+means <i>CRLF</i> on Windows, and <i>LF</i> otherwise. This
+option should only be used in an emergency, because normally
+the system-specific line terminator will be just fine. This
+option is considered experimental, and may go away in a
+future version of <i>boxes</i>. Let us know in
+<a href="https://github.com/{{ site.github }}/issues/60">https://github.com/{{ site.github }}/issues/60</a>
+if you think we should keep it.</p>
+
+<p style="margin-left:11%;"><b>-f</b> <i>string</i></p>
+
+<p style="margin-left:20%;">Use alternate config file. The
+one argument of this option is the name of a valid
+<i>boxes</i> config file. The argument of <b>-f</b> can also
+be a directory which contains a configuration file. More
+information on this topic below in the CONFIGURATION FILE
+section.</p>
+
+<p style="margin-left:11%;"><b>--help</b><br><b>-h</b></p>
+
+<p style="margin-left:20%;">Print usage information.</p>
+
+
+<p style="margin-left:11%;"><b>-i</b> <i>string</i></p>
+
+<p style="margin-left:20%;">Indentation mode. Possible
+arguments are <i>text</i> (indent text inside of box),
+<i>box</i> (indent box, not text inside of box), or
+<i>none</i> (throw away indentation). Arguments may be
+abbreviated. The default is <i>box</i>.</p>
+
+<p style="margin-left:11%;"><b>-k</b> <i>bool</i></p>
+
+<p style="margin-left:20%;">Kill leading/trailing blank
+lines on removal. The value of <i>bool</i> is either
+<i>true</i> or <i>false</i>. This option only takes effect
+in connection with <b>-r</b>. If set to <i>true</i>, leading
+and trailing blank lines will be removed from the output. If
+set to <i>false</i>, the entire content of the former box is
+returned. The default is <i>false</i>, if both the top and
+the bottom part of the box are open, as is the case with
+most regional comments. If the box&rsquo;s design defines a
+top part or a bottom part, the default is <i>true</i>.</p>
+
+<p style="margin-left:11%;"><b>-l</b></p>
+
+<p style="margin-left:20%;">(ell) List designs. Produces a listing of all available
+box designs in the config file, along with a sample box and
+information about its creator. Also checks the syntax of the
+entire config file. If used together with <b>-d</b>,
+displays detailed information about the specified
+design.</p>
+
+<p style="margin-left:11%;"><b>-m</b></p>
+
+<p style="margin-left:20%;">Mend box. This removes a (potentially broken) box as
+with <b>-r</b>, and redraws it afterwards. The mended box is
+drawn according to the options given. This may be important
+to know when it comes to restoring padding, indentation,
+etc. for the mended box. Implies <b>-k</b> <i>false</i>.</p>
+
+<p style="margin-left:11%;"><b>-n</b> <i>encoding</i></p>
+
+<p style="margin-left:20%;">Character encoding. Overrides
+the character encoding of the input and output text. Choose
+from the list shown by <i>iconv -l</i>. If an invalid
+character encoding is specified here, <i>UTF-8</i> is used
+as a fallback. The default is to use the system encoding,
+which is normally the best course of action. So don&rsquo;t
+specify this option unless you have to.</p>
+
+<p style="margin-left:11%;"><b>-p</b> <i>string</i></p>
+
+<p style="margin-left:20%;">Padding. Specify padding in
+spaces around the input text block for all sides of the box.
+The argument string may not contain whitespace and must
+consist of a combination of the following characters, each
+followed by a number indicating the padding in spaces:
+<i><br>
+a</i> - (all) give padding for all sides at once <i><br>
+h</i> - (horiz) give padding for both horizontal sides
+<i><br>
+v</i> - (vertical) give padding for both vertical sides
+<i><br>
+b</i> - (bottom) give padding for bottom (south) side
+<i><br>
+l</i> - (left) give padding for left (west) side <i><br>
+t</i> - (top) give padding for top (north) side <i><br>
+r</i> - (right) give padding for right (east) side <br>
+Example: <b>-p</b> <i>a</i>4<i>t</i>2 would define the
+padding to be 4 characters on all sides, except for the top
+of the box, where the input text block will be only 2 lines
+away from the box. <br>
+By default, unless specified otherwise in the config file,
+no padding is used.</p>
+
+<p style="margin-left:11%;"><b>-q</b> <i>query</i></p>
+
+<p style="margin-left:20%;">Query designs by tag. In
+contrast to <b>-l</b>, this will only print the matching
+design names. This option is normally used stand-alone; if
+used in combination with other options, behavior is
+undefined. The <i>query</i> argument is a comma-separated
+list of tags which can be present on a design in order to
+match. A tag may optionally be prefixed with <code>+</code> in
+order to require that it be present, or with <code>-</code> in
+order to exclude designs which have that tag. Each tag can
+only occur once per query. <br>
+This option is intended for use by scripts. Alias names are
+printed below their primary design name, and postfixed with
+<code>(alias)</code>. <br>
+Example: <code>boxes -q programming,-comment</code></p>
+
+<p style="margin-left:11%;"><b>-r</b></p>
+
+<p style="margin-left:20%;">Remove an existing box. Which design to use is detected
+automatically. In order to save time or in case the
+detection does not decide correctly, combine with <b>-d</b>
+to specify the design. The default is to draw a new box.</p>
+
+<p style="margin-left:11%;"><b>-s</b>
+<i>width</i><b>x</b><i>height</i></p>
+
+<p style="margin-left:20%;">Box size. This option specifies
+the desired box size in units of columns (for width) and
+lines (for height). If only a single number is given as
+argument, this number specifies the desired box width. A
+single number prefixed by &rsquo;x&rsquo; specifies only the
+box height. The actual resulting box size may vary depending
+on the individual shape sizes of the chosen design. Also,
+other command line options may influence the box size (such
+as <b>-p</b>). <br>
+By default, the smallest possible box is created around the
+text.</p>
+
+<p style="margin-left:11%;"><b>-t</b> <i>string</i></p>
+
+<p style="margin-left:20%;">Tab handling. This option
+controls how tab characters in the input text are handled.
+The option string must always begin with a <i>uint</i>
+number indicating the distance between tab stops. It is
+important that this value be set correctly, or tabulator
+characters will upset your input text. The correct tab
+distance value depends on the settings used for the text you
+are processing. A common value is 8. <br>
+Immediately following the tab distance, an optional
+character can be appended, telling <i>boxes</i> how to treat
+the leading tabs. The following options are available:
+<b><br>
+e</b> - expand tabs into spaces <b><br>
+k</b> - keep tabs as close to what they were as possible
+<b><br>
+u</b> - unexpand tabs. This makes <i>boxes</i> turn as many
+spaces as possible into tabs.</p>
+
+<p style="margin-left:20%; margin-top: 1em">In order to
+maintain backwards compatibility, the <b>-t</b>
+<i>string</i> can be just a number. In that case, <b>e</b>
+is assumed for tab handling, which removes all tabs and
+replaces them with spaces. The factory default for the
+<b>-t</b> option is simply 8, which is just such a case.
+<br>
+For example, you could specify <b>-t</b> 4u in order to have
+your leading tabs unexpanded. In the box content, tabs are
+always converted into spaces. The tab distance in this
+example is 4.</p>
+
+<p style="margin-left:11%;"><b>-v</b></p>
+
+<p style="margin-left:20%;">Print out current version number.</p>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="CONFIGURATION FILE"
+   text="CONFIGURATION FILE" %}
+
+<p style="margin-left:11%; margin-top: 1em"><i>Boxes</i>
+will look for the configuration file in several places, some
+of which are given by the XDG specification. <b><br>
+1.</b> <i>-f</i> option [file or dir]</p>
+
+<p style="margin-left:20%;">When a configuration file is
+specified on the command line, we will use that. The
+<b>-f</b> option can also specify a directory. Any location
+specified via <b>-f</b> must exist, or <i>boxes</i> will
+terminate with an error.</p>
+
+<p style="margin-left:11%;"><b>2.</b> <i>BOXES</i>
+environment variable [file or dir]</p>
+
+<p style="margin-left:20%;">If no config file is specified
+on the command line, <i>boxes</i> will check for the BOXES
+environment variable, which may contain a filename or
+directory to use. Any location specified via the BOXES
+environment variable must exist, or <i>boxes</i> will
+terminate with an error.</p>
+
+<p style="margin-left:11%;"><b>3.</b> <i>$HOME</i> [dir]
+<b><br>
+4.</b> <i>$XDG_CONFIG_HOME/boxes</i> [dir] <b><br>
+5.</b> <i>$HOME/.config/boxes</i> [dir] <b><br>
+6.</b> <i>/usr/share/boxes</i> [file] <b><br>
+7.</b> <i>/etc/xdg/boxes</i> [dir] <b><br>
+8.</b> <i>/usr/local/share/boxes</i> [dir] <b><br>
+9.</b> <i>/usr/share/boxes</i> [dir]</p>
+
+<p style="margin-left:20%;">Either one of these last two
+directory locations might have the same name as the global
+config file from <b>6</b>. That&rsquo;s fine. It just means
+that we first look for a file of that name, and then for a
+directory containing the file.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The XDG
+environment variable <i>XDG_CONFIG_DIRS</i> is not
+supported. However, its default value is supported via steps
+<b>8</b> and <b>9</b> above. <br>
+In the above list, whenever a step is designated with [dir],
+the <br>
+following file names will be found, in this order:</p>
+
+<p style="margin-left:20%;"><b>1.</b> .boxes <b><br>
+2.</b> box-designs <b><br>
+3.</b> boxes-config <b><br>
+4.</b> boxes</p>
+
+<p style="margin-left:11%; margin-top: 1em">As soon as the
+first valid file is found, we use that and stop the
+search.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The recommended
+location for a user-specific configuration file is
+<i>$HOME/.boxes</i> or <i>$HOME/.config/boxes/.boxes</i>. A
+global configuration file should be located at
+<i>/usr/share/boxes</i>. But all of the other locations are
+fully supported, too.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The syntax of
+<i>boxes</i> config files is described on the website at
+<a href="{{ site.url }}{{ site.baseurl }}/config-syntax.html">{{ site.url }}{{ site.baseurl }}/config-syntax.html</a>.</p>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="EXAMPLES"
+   text="EXAMPLES" %}
+
+<p style="margin-left:11%; margin-top: 1em">Examples on how
+to invoke <i>boxes</i> may be found on the website at
+<a href="{{ site.url }}{{ site.baseurl }}/examples.html">{{ site.url }}{{ site.baseurl }}/examples.html</a>.
+<br>
+Try</p>
+
+<pre style="margin-left:11%;"><code>echo &quot;Good Bye World!&quot; | boxes -d nuke</code></pre>
+
+<p style="margin-left:11%; margin-top: 1em"><i>Boxes</i>
+also combines nicely with other tools. Try</p>
+
+<pre style="margin-left:11%;"><code>figlet &quot;boxes . . . !&quot; | lolcat -f | boxes -d unicornthink</code></pre>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="AVAILABILITY"
+   text="AVAILABILITY" %}
+
+<p style="margin-left:11%; margin-top: 1em">The
+<i>boxes</i> website is
+<a href="{{ site.baseurl }}/">{{ site.url }}{{ site.baseurl }}/</a>. It contains a
+number of examples illustrating this manual page as well as
+more in-depth documentation.</p>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="AUTHOR"
+   text="AUTHOR" %}
+
+<p style="margin-left:11%; margin-top: 1em"><i>Boxes</i>
+was made by Thomas Jensen and the <i>boxes</i> contributors.
+It has been lovingly maintained since 1999. <br>
+For a full list of contributors, see
+
+<a href="{{ site.url }}{{ site.baseurl }}/contributing.html#contributors">{{ site.url }}{{ site.baseurl }}/contributing.html#contributors</a>
+and
+<a href="https://github.com/{{ site.github }}/graphs/contributors">https://github.com/{{ site.github }}/graphs/contributors</a>.
+<br>
+Please refer to the <i>boxes</i> website for the
+maintainer&rsquo;s current email address.</p>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="VERSION"
+   text="VERSION" %}
+
+<p style="margin-left:11%; margin-top: 1em">This is
+<i>boxes</i> version {{ site.currentVersion }}.</p>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="LICENSE"
+   text="LICENSE" %}
+
+<p style="margin-left:11%; margin-top: 1em"><i>boxes</i> is
+free software under the terms of the GNU General Public
+License, version 2. Details in the LICENSE file:
+<a href="{{ site.link_license }}">{{ site.link_license }}</a></p>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="ENVIRONMENT"
+   text="ENVIRONMENT" %}
+
+<p style="margin-left:11%; margin-top: 1em"><i>Boxes</i> recognizes the following environment variables:</p>
+
+<dl style="margin-left: 11%">
+<dt>BOXES</dt>
+<dd style="margin-left: 9%;">Absolute path of the <i>boxes</i> configuration file. If this is specified, it must refer
+to an existing file or directory.</dd>
+<dt>HOME</dt>
+<dd style="margin-left: 9%;">The user's home directory.</dd>
+<dt>XDG_CONFIG_HOME</dt>
+<dd style="margin-left: 9%;">The root of the configuration file location as per the XDG specification.</dd>
+</dl>
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="SEE ALSO"
+   text="SEE ALSO" %}
+
+<p style="margin-left:11%; margin-top: 1em"><b>figlet</b>(6),
+<b>iconv</b>(1), <b>lolcat</b>(6)</p>

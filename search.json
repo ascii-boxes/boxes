@@ -1,0 +1,19 @@
+---
+layout: none
+---
+[
+{% for post in site.pages %}
+  {%- capture page_ext -%}{{ post.name | slice: -3, 3 }}{%- endcapture -%}
+  {%- if page_ext == ".md" -%}
+{
+  "title"    : "{{ post.title | strip_html | escape }}",
+  "name"     : "{{ post.name | strip_html | escape }}",
+  "url"      : "{{ site.baseurl }}{{ post.url }}",
+  "category" : "{{ post.category }}",
+  "tags"     : "{{ post.tags | join: ', ' }}",
+  "date"     : "{{ post.date }}",
+  "content"  : "{{ post.content | markdownify | strip_html | downcase | slugify | replace: "-", " " | escape }}"
+} {%- unless forloop.last -%},{%- endunless -%}
+  {%- endif -%}
+{% endfor %}
+]

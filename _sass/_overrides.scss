@@ -1,0 +1,36 @@
+/* Values changed from their bootstrap / bootswatch values */
+
+/* Colors from the "merlot" theme */
+$body-color: #473e38;
+$body-bg: #ece4d8;
+$text-muted: #8b786f;
+$headings-color: #7c334f;
+$link-color: #417090 !default;
+$light: #fff6e9 !default;
+$pagination-bg: #fff6e9;
+$pagination-disabled-bg: #fff6e9;
+$input-bg: #fff6e9 !default;
+$table-accent-bg: rgba($light, 0.5);
+$dropdown-bg: $light;
+$dropdown-link-color: $body-color;
+$dropdown-divider-bg: rgba(#000, .125);  /* $card-border-color */
+$nav-divider-color: rgba(#000, .125);  /* $card-border-color */
+$primary: #417090 !default;
+
+
+/* slightly more compact cards, which we use in the what's new page only */
+$card-spacer-y: .5rem !default;
+$card-spacer-x: 1rem !default;
+
+/* color of the carousel controls on the title page */
+$carousel-control-color:       #343a40 !default;  /* $body-color */
+$carousel-indicator-active-bg: #343a40 !default;  /* $body-color */
+$carousel-caption-color:       #343a40 !default;  /* $body-color */
+
+
+/*
+ * Additional spacer stages
+ */
+$spacers: (
+    6: (1rem * 5)   /* $spacer is 1rem */
+);

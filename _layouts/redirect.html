@@ -6,13 +6,13 @@
     <title>{{ site.name }} - Moved content</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,follow">
-    <meta http-equiv="refresh" content="0; url={{ page.redirect }}" />
+    <meta http-equiv="refresh" content="0; url={{ page.redirect.to }}" />
 </head>
 
 <body>
 
 <div>
-<p>This page has moved to <A HREF="{{ page.redirect }}">{{ page.redirect }}</A>.</p>
+<p>This page has moved to <A HREF="{{ page.redirect.to }}">{{ page.redirect.to }}</A>.</p>
 <p>Please update your bookmarks.</p>
 </div>
 

@@ -1,13 +1,41 @@
-{% include header.html %}
-<div class="container container-left">
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+
+    {%- include head.html -%}
+
+<body{% if page.longContent %} class="longContent"{% elsif page.shortContentXs %} class="short-content-xs"{% endif %}>
+
+{% include navbar.html %}
+
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="container-xl">
     <div class="row">
-        <div class="col-md-3 hidden-xs">
-            {% include sidebar.html %}
-        </div>
-        <div class="col-md-9">
-            {{ content }}
+    <div class="col-md-3 pt-3 d-none d-md-inline">{% include sidebar.html %}</div>
+    <div class="col-md-9 pt-3">
+    {% capture page_ext %}{{ page.name | slice: -3, 3 | downcase }}{% endcapture -%}
+    {% if page_ext == '.md' %}
+        {{- content | markdownify -}}
+    {% else %}
+        {{- content -}}
+    {% endif %}
+
+    {%- if page.created_at and page.last_modified_at %}
+    <div class="card card-narrow bx-page-metadata mt-4">
+        <div class="card-body">
+            <p class="card-text text-muted">
+                <span class="stats-part">Page created: {{ page.created_at | date: "%B %e, %Y" }}</span>
+                <span class="stats-part">Last updated: {{ page.last_modified_at | date: "%B %e, %Y" }}</span>
+            </p>
         </div>
     </div>
+    {%- endif %}
+    </div></div>
 </div>
+</div>
+</main>
 
-{% include footer.html %}
+{% include footer.html -%}
+
+</body>
+</html>

@@ -2,7 +2,6 @@
 layout: post
 title: Boxes becomes part of Windows 10
 date: 2016-08-02 13:24:00 +0100
-comments: false
 ---
 
 <i>Boxes</i> is now part of Windows 10! This sounds amazing, and it is - albeit, to be honest,
@@ -18,8 +17,7 @@ help being a little proud of the fact! <!--break-->
 target="_blank">guide</a> on how to do that. After starting a bash in the Ubuntu Subsystem,
 you can activate <i>boxes</i> by typing:</p>
 
-<p><pre style="background-color:white; border:0;">
-<b>tsjensen@FRACTAL:~$ sudo su -</b>
+<pre><code><b>tsjensen@FRACTAL:~$ sudo su -</b>
 [sudo] password for tsjensen:
 <b>root@FRACTAL:~# apt-get install boxes</b>
 Reading package lists... Done
@@ -32,10 +30,10 @@ Preparing to unpack .../boxes_1.1.1-3_amd64.deb ...
 Unpacking boxes (1.1.1-3) ...
 Processing triggers for man-db (2.6.7.1-1ubuntu1) ...
 Setting up boxes (1.1.1-3) ...
-<b>root@FRACTAL:~#</b></pre></p>
+<b>root@FRACTAL:~#</b></code></pre>
 
 <p>Now, all boxes features are present:</p>
-<p><img src="/images/windows10-ubuntu-1.png"/></p>
+<p><img class="img-fluid" src="/images/windows10-ubuntu-1.png"/></p>
 
 <p>Even the manual page is available:</p>
-<p><img src="/images/windows10-ubuntu-2.png"/></p>
+<p><img class="img-fluid" src="/images/windows10-ubuntu-2.png"/></p>

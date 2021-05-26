@@ -2,7 +2,6 @@
 layout: post
 title: "Modern command line tool"
 date: 2020-01-15 12:00:00 +0100
-comments: false
 ---
 
 [Patrick Drechsler](https://github.com/draptik) included *boxes* in his list of [Modern Linux Command Line

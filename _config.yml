@@ -1,53 +1,76 @@
-# Jekyll configuration
+# Jekyll Configuration
 
+# General metadata
 name: boxes
-description: Command line ASCII boxes unlimited!
+title: boxes
+description: 'Command line ASCII boxes unlimited!'
+tagline: 'Command line ASCII boxes unlimited!'
 
-plugins:
-  - jemoji
-  - jekyll-paginate
-  - jekyll-sitemap
-
-# url is currently only used only for the RSS feed in feed.xml
-url: https://boxes.thomasjensen.com
-
-# baseurl will often be '', but for a project page on gh-pages, it needs to
-# be the project name.
-# *** IMPORTANT: If your local "jekyll serve" throws errors change this to '' or
-#     run it like so: jekyll serve --baseurl=''
-#baseurl: /boxes
+# Deployment
 baseurl: ''
+url: 'https://boxes.thomasjensen.com'
 
+# Social Media
 github: 'ascii-boxes/boxes'
+twitter_username: tj_impl
 
-# Set this to your UA-# value, or '' to disable the block completely
-gaaccount: ''
+# Plugins from the whitelist at https://github.com/github/pages-gem/blob/master/lib/github-pages/plugins.rb
+plugins:
+  - jekyll-paginate
+  - jekyll-redirect-from
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jemoji
 
-# Set this to your disqus shortname to enable comments. Note that the 'comments'
-# setting below must also be true. Individual posts can override 'comments' to
-# disable on a post-by-post basis
-disqus: ''
-comments: false
+# Which paths are processed by Jekyll to appear under _site/
+exclude:
+  - .sass-cache/
+  - .jekyll-cache/
+  - CNAME
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - cmake-build-debug/
+  - coverage/
+  - doc/
+  - flex_bison_2.5.24/
+  - js.bat
+  - out/
+  - pcre2-10.36/
+  - src/
+  - vs
 
+include:
+  - pages/
+
+# Permalinks / blog post URLs
 permalink: /:year/:month/:title:output_ext
-paginate: 10
 future: true
 
-highlighter: rouge
-markdown: kramdown
-kramdown:
-  input: GFM
+# Split the what's new page into multiple pages
+paginate: 10
+paginate_path: /blog/page:num/
 
-exclude: ['README.md', 'LICENSE', 'src/', 'doc/', 'pcre2-10.36/', 'flex_bison_2.5.24/', 'vs', 'cmake-build-debug/', 'coverage/', 'out/']
+# Analytics
+plausible:
+    data_domain: 'boxes.thomasjensen.com'
 
-currentVersion: 2.1.0
-link_license: 'https://raw.githubusercontent.com/ascii-boxes/boxes/v2.1.0/LICENSE'
+# Minify CSS
+sass:
+    style: compressed
+
+# Do not create redirects.json file
+redirect_from:
+    json: false
 
 # boxes custom variables
+currentVersion: '2.1.0'
+link_license: 'https://raw.githubusercontent.com/ascii-boxes/boxes/v2.1.0/LICENSE'
+
+# Page frontmatter defaults
 defaults:
   -
     scope:
-      path: ""   # everywhere
+      path: "" # an empty string here means all files in the project
     values:
-      bxemail: '&lt;boxes(at)thomasjensen.com&gt;'
-      sitehost: 'boxes.thomasjensen.com'
+      layout: default

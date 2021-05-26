@@ -1,16 +1,17 @@
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="span12 footer navbar-inverse navbar-fixed-bottom">
-            <p class="copyright"><b>{{ site.name }}</b> &copy;1999 by
-			<A target="_blank" HREF="https://thomasjensen.com/">Thomas Jensen</A><span class="hidden-xs"> {{ page.bxemail }}</span><br/>
-			Website powered by <a target="_blank" href="https://jekyllrb.com/">Jekyll</a>,
-			theme by <a target="_blank" href="https://github.com/scotte/jekyll-clean">Scott Emmons</a>
-            <span class="hidden-xs">under <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution</a></span></p>
-        </div>
-    </div>
-</div>
+<footer class="footer {% if page.longContent == true %}footer-moving{% endif %} bg-light"
+    ><div class="container-fluid"><div class="row">
+    <div class="col text-center text-muted">
+        <div class="footer-part"><b>{{ site.name }}</b> &copy;&nbsp;1999-2021 <a href="https://thomasjensen.com"
+            target="_blank">Thomas&nbsp;Jensen</a><span
+                class="d-none d-sm-inline"> and the</span><span class="d-inline d-sm-none">,</span>
+            <i>boxes</i> contributors<span class="footer-sep">●</span></div
+            ><div class="footer-part"><a href="{{ site.baseurl }}/website-attribution.html">website license
+                attribution</a></div>
+    </div></div></div
+></footer>
 
-{% include disqus-counts.html %}
-
-</body>
-</html>
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" crossorigin="anonymous"
+        integrity="sha384-Qg00WFl9r0Xr6rUqNLv1ffTSSKEFFCDCKVyHZ+sVt8KuvG99nWw5RNvbhuKgif9z"></script>
+<script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"></script>

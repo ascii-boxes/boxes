@@ -1,0 +1,51 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<div class="container-xl">
+    <a class="navbar-brand" href="{{ site.baseurl }}/">
+        {%- if page.url == '/' -%}
+            {{- site.name -}}
+        {%- else -%}
+            <img src="{{ site.baseurl }}/images/boxes-bar.png" alt="boxes">
+        {%- endif -%}
+    </a>
+    <span class="navbar-text d-none d-sm-inline mr-auto">{{ site.tagline }}</span>
+    <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#navbarColor02"
+            aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarColor02">
+        <ul class="navbar-nav mr-auto">
+            <!-- The navigation is only shown on SM or smaller (else in sidebar): -->
+            {%- for groupitem in site.data.navigation.toc %}
+            <li class="nav-item dropdown d-inline d-md-none">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+                   aria-haspopup="true" aria-expanded="false">{{ groupitem.group }}</a>
+                <div class="dropdown-menu">
+                    {%- for entry in groupitem.subfolderitems -%}
+                    {%- if entry.divider %}
+                    <div class="dropdown-divider"></div>
+                    {%- else -%}
+                    {%- assign eurl = site.baseurl | append: entry.url %}
+                    <a class="dropdown-item" href="{{ eurl }}">{{ entry.title }}</a>
+                    {%- endif -%}
+                    {%- endfor %}
+                </div>
+            </li>
+            {%- endfor -%}
+
+            {%- if jekyll.environment == 'development' %}
+            <!-- Helper for development which always shows the active bootstrap size: -->
+            <li class="nav-item ml-4">
+                <div class="navbar-text text-white bg-dark px-2">
+                    <span class="d-inline d-sm-none">XS</span>
+                    <span class="d-none d-sm-inline d-md-none">SM</span>
+                    <span class="d-none d-md-inline d-lg-none">MD</span>
+                    <span class="d-none d-lg-inline d-xl-none">LG</span>
+                    <span class="d-none d-xl-inline">XL</span>
+                </div>
+            </li>
+            {%- endif %}
+        </ul>
+    </div>
+</div>
+</nav>

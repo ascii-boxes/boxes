@@ -1,18 +1,30 @@
-<div class="sidebar well">
-<img src="{{ site.baseurl}}/images/boxes.png" alt="boxes" class="hidden-md" style="margin: 12px 0 12px -9px;" />
-<img src="{{ site.baseurl}}/images/boxes-md.png" alt="boxes" class="visible-md" style="margin: 12px 0 12px 3px;" />
-<div style="clear:both;">{{ site.description }}</div>
-</div>
+{%- comment -%}
 
-<div class="sidebar well">
-    <h1>Recent Posts</h1>
-    <ul>
-        {% for post in site.posts limit:6 %}
-          <li><a href="{{ site.baseurl}}{{ post.url }}">{{ post.title }}</a></li>
-        {% endfor %}
-    </ul>
-</div>
+    Outputs the sidebar aka. left-hand navigation.
 
-<div class="sidebar well">
-{% include links-list.html %}
+{%- endcomment -%}
+
+<div class="sidebar">
+    {% for groupitem in site.data.navigation.toc %}
+    <div class="row">
+        <div class="sidebar-heading mr-lg-5">{{ groupitem.group }}</div>
+        <ul>
+            {%- for entry in groupitem.subfolderitems -%}
+                {%- unless entry.divider -%}
+                    {%- assign urlstart_editors = page.url | slice: 0, 9 -%}
+                    {%- assign urlstart_protocol = entry.url | slice: 0, 4 -%}
+                    {%- if page.bxVersion -%}
+                        {%- assign pgurl = page.url | remove_first: '/' | remove_first: page.bxVersion -%}
+                    {%- elsif urlstart_editors == "/editors-" -%}
+                        {%- assign pgurl = "/editors.html" -%}
+                    {%- else %}
+                        {%- assign pgurl = page.url -%}
+                    {%- endif %}
+            <li{% if pgurl == entry.url %} class="current" {%- endif
+                -%}><a href="{{- entry.url | relative_url -}}">{{ entry.title }}</a></li>
+                {%- endunless -%}
+            {%- endfor %}
+        </ul>
+    </div>
+    {%- endfor %}
 </div>

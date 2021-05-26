@@ -1,0 +1,20 @@
+{%- comment -%}
+
+    Outputs an HTML heading with id reference and permalink hover
+
+    Parameters:
+        - level: 1..6 the level of the heading
+        - text: the visible text of the heading
+        - slug: the reference for URLs, defaults to slug from text
+
+{%- endcomment -%}
+
+{%- capture slug_from_text -%}{{ include.text | slugify }}{%- endcapture -%}
+
+<h{{- include.level | default: 2 }} id="{{- include.slug | default: slug_from_text -}}">
+    {{- include.text -}}
+    <a href="#{{- include.slug | default: slug_from_text -}}">
+        {%- include paperclip.svg -%}
+    </a>
+    {%- comment -%} removes a line break {%- endcomment -%}
+</h{{- include.level | default: 2 -}}>

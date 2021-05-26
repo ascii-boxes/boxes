@@ -1,0 +1,31 @@
+{%- comment -%}
+
+    Outputs the paginator navigation controls
+
+{%- endcomment -%}
+
+{% if site.paginate -%}
+    <ul class="pagination">
+        {% if paginator.previous_page -%}
+            <li class="page-item"><a class="page-link" href="{{ paginator.previous_page_path | relative_url }}">&laquo; Prev</a></li>
+        {%- else -%}
+            <li class="page-item disabled"><a class="page-link" href="#">&laquo; Prev</a></li>
+        {%- endif -%}
+
+        {%- for page in (1..paginator.total_pages) -%}
+            {% if page == paginator.page -%}
+                <li class="page-item active"><a class="page-link" href="#">{{ page }}</a></li>
+            {%- elsif page == 1 -%}
+                <li class="page-item"><a class="page-link" href="{{ '/blog/' | relative_url }}">{{ page }}</a></li>
+            {%- else -%}
+                <li class="page-item"><a class="page-link" href="{{ site.paginate_path | relative_url | replace: ':num', page }}">{{ page }}</a></li>
+            {%- endif -%}
+        {%- endfor -%}
+
+        {%- if paginator.next_page -%}
+            <li class="page-item"><a class="page-link" href="{{ paginator.next_page_path | relative_url }}">Next &raquo;</a></li>
+        {%- else -%}
+            <li class="page-item disabled"><a class="page-link" href="#">Next &raquo;</a></li>
+        {%- endif %}
+    </ul>
+{%- endif %}

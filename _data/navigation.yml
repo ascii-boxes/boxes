@@ -1,0 +1,47 @@
+toc:
+  - group: Project
+    subfolderitems:
+      - title: "What's New"
+        url: /blog/
+      - title: Release Notes
+        url: /releases.html
+      - title: License
+        url: https://github.com/ascii-boxes/boxes/blob/master/LICENSE
+      - title: 'F.A.Q.'
+        url: /faq.html
+  - group: Usage
+    subfolderitems:
+      - title: Download
+        url: /download.html
+      - title: Examples
+        url: /examples.html
+      - title: Editor Integration
+        url: /editors.html
+      - title: Manual Page
+        url: /boxes-man-1.html
+  - group: Custom Designs
+    subfolderitems:
+      - title: General Concept
+        url: /config-general.html
+      - title: Config File Syntax
+        url: /config-syntax.html
+      - title: Step-by-Step
+        url: /config-step.html
+      - title: Complete examples
+        url: /config-complete_exp.html
+      - divider: true
+      - title: List of Designs
+        url: /box-designs.html
+  - group: Contributing
+    subfolderitems:
+      - title: Contributing
+        url: /contributing.html
+      - title: Building
+        url: /build.html
+      - title: Testing
+        url: /testing.html
+      - title: Team
+        url: /team.html
+      - divider: true
+      - title: GitHub
+        url: https://github.com/ascii-boxes/boxes/
