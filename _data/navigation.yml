@@ -19,7 +19,7 @@ toc:
         url: /editors.html
       - title: Manual Page
         url: /boxes-man-1.html
-  - group: Custom Designs
+  - group: Box Designs
     subfolderitems:
       - title: General Concept
         url: /config-general.html

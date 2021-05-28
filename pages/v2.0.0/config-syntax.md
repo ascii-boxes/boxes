@@ -4,7 +4,7 @@ permalink: /v2.0.0/config-syntax.html
 longContent: true
 bxVersion: v2.0.0
 created_at: 1999-04-06
-last_modified_at: 2019-06-09 21:49:00 +0200
+last_modified_at: 2021-05-28 22:11:00 +0200
 ---
 
 # Config File Syntax
@@ -231,6 +231,18 @@ the box design itself. In other words, this is the artist who originally created
 
 Please try to give both fields always. Especially in those cases where existing ASCII art from the internet is adapted
 for use with *boxes*, it is important (and good manners) to give credit to the original artist.
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=3
+   text="Tags" %}
+
+<PRE><b>TAGS</b> &quot;<i>tag1</i>, <i>tag2</i>, <i>tag3</i>&quot;</PRE>
+
+The `tags` statement applies one or more tags to the box design. This is currently purely informational, but we plan
+to implement a *tag query* functionality in a later version of *boxes*. A tag can only contain the lower-case letters
+`a-z`, digits, or a dash (`-`). It must not start with a dash.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}

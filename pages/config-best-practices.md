@@ -14,11 +14,11 @@ through this list.
 
 - **Align Shape Lines** – Multi-line shapes should be arranged in the configuration file so that their lines align.
   This makes it much easier for a human to recognize the shapes. For example,
-  ```
-  n ("/'''\",
-     "|   |",
-     "\___/")
-  ```
+
+      n ("/'''\",
+         "|   |",
+         "\___/")
+
   is easier to read than just `n("/'''\","|   |","\___/")`, although *boxes* considers both the same.
 
 - **Apply Proper Tags** – In our official config file, all box designs should be properly tagged using the `tags`

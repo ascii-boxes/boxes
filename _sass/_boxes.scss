@@ -112,6 +112,7 @@ pre {
     > code {
         padding: 0;
         border-radius: 0;
+        white-space: pre;
     }
 }
 code {
@@ -119,6 +120,7 @@ code {
     background-color: $light;
     border-radius: $border-radius-sm;
     padding: 2px 3px;
+    white-space: pre-wrap;
 }
 
 

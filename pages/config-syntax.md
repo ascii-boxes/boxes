@@ -6,15 +6,13 @@ redirect_from:
   - /docs/config-syntax.shtml
 longContent: true
 created_at: 1999-04-06
-last_modified_at: 2021-04-24 14:44:35 +0200
+last_modified_at: 2021-05-28 22:11:00 +0200
 ---
 
 # Config File Syntax
 
 {% assign thisVersion = site.currentVersion | prepend: 'v' -%}
 {%- include version-select.html currentVersion=thisVersion contentPiece="config-syntax" %}
-
-<!-- TODO describe tags -->
 
 The *boxes* config file is a succession of box design definitions.
 Everything following a pound sign (`#`) is considered a **comment** (unless, of course, the pound sign is part of a
@@ -255,6 +253,35 @@ the box design itself. In other words, this is the artist who originally created
 
 Please try to give both fields always. Especially in those cases where existing ASCII art from the internet is adapted
 for use with *boxes*, it is important (and good manners) to give credit to the original artist.
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=3
+   text="Tags" %}
+
+Since *boxes* v2.1.0:
+
+<PRE><b>TAGS</b> (&quot;<i>tag1</i>&quot;, &quot;<i>tag2</i>&quot;, &quot;<i>tag3</i>&quot;)</PRE>
+
+or, in all versions of *boxes*:
+
+<PRE><b>TAGS</b> &quot;<i>tag1</i>, <i>tag2</i>, <i>tag3</i>&quot;</PRE>
+
+The legacy notation has the advantage of being backwards compatible with all versions of *boxes*, which is why we use
+it exclusively in the official config file. But once we're reasonably sure that all the world is at least on v2.1.0,
+we can upgrade that.
+
+The `tags` statement applies one or more tags to the box design which can later be used to find and select the design
+in a tag query. A tag can only contain the lower-case letters `a-z`, digits, or a dash (`-`). It must not start with
+a dash.
+
+At the end of the output of `boxes -l`, *boxes* will print a summary of all tags found in the configuration,
+complete with counts of how often the tag was encountered.
+
+A *tag query* can be issued by invoking `boxes -q`. *Boxes* will then print the names of all matching box designs.
+Details about tag queries can be found in the [manual page]({{ site.baseurl }}/boxes-man-1.html#OPTIONS) for the `-q`
+option.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
