@@ -47,4 +47,4 @@ It is precision work to finalize the box design. But this needs to be done only 
 and reused easily.
 
 
-Read on in the next part: [Complete Examples of Box Designs]({{ site.baseurl }}/config-complete_exp.html)
+Read on in the next part: [Configuration File Best Practices]({{ site.baseurl }}/config-best-practices.html)

@@ -236,21 +236,25 @@ achieved by `-p h0` or `-p a0`.
 
 Imagine you want to comment out the following C code:
 
-    if (!s2 || *s2 == '\0')
-        return (char *) s1;  /* error 1 */
-    if (!s1 || *s1 == '\0')
-        return NULL;         /* error 2 */
-    if (skip < 0)
-        skip = 0;            /* foo bar */
+```c
+if (!s2 || *s2 == '\0')
+    return (char *) s1;  /* error 1 */
+if (!s1 || *s1 == '\0')
+    return NULL;         /* error 2 */
+if (skip < 0)
+    skip = 0;            /* foo bar */
+```
 
 `boxes -d c-cmt`
 
-    /* if (!s2 || *s2 == '\0')                 */
-    /*     return (char *) s1;  /* error 1 *\/ */
-    /* if (!s1 || *s1 == '\0')                 */
-    /*     return NULL;         /* error 2 *\/ */
-    /* if (skip < 0)                           */
-    /*     skip = 0;            /* foo bar *\/ */
+```c
+/* if (!s2 || *s2 == '\0')                 */
+/*     return (char *) s1;  /* error 1 *\/ */
+/* if (!s1 || *s1 == '\0')                 */
+/*     return NULL;         /* error 2 *\/ */
+/* if (skip < 0)                           */
+/*     skip = 0;            /* foo bar *\/ */
+```
 
 Note that the closing comment tags in the input text have been escaped by adding a backslash between the asterisk and
 the slash. This way, the comments that have been commented out along with the rest of the code will not interfere with
@@ -258,12 +262,14 @@ the new comments.
 
 `boxes -r`
 
-    if (!s2 || *s2 == '\0')
-        return (char *) s1;  /* error 1 */
-    if (!s1 || *s1 == '\0')
-        return NULL;         /* error 2 */
-    if (skip < 0)
-        skip = 0;            /* foo bar */
+```c
+if (!s2 || *s2 == '\0')
+    return (char *) s1;  /* error 1 */
+if (!s1 || *s1 == '\0')
+    return NULL;         /* error 2 */
+if (skip < 0)
+    skip = 0;            /* foo bar */
+```
 
 Should you decide to reactivate the code previouly commented out, the escaped closing comment tags are changed back
 into normal ones. This is achieved by the `replace` and `reverse` statements in the config file entry describing this

@@ -27,8 +27,8 @@ toc:
         url: /config-syntax.html
       - title: Step-by-Step
         url: /config-step.html
-      - title: Complete examples
-        url: /config-complete_exp.html
+      - title: Best Practices
+        url: /config-best-practices.html
       - divider: true
       - title: List of Designs
         url: /box-designs.html
