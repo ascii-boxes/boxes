@@ -13,6 +13,12 @@ url: 'https://boxes.thomasjensen.com'
 # Social Media
 github: 'ascii-boxes/boxes'
 twitter_username: tj_impl
+twitter:
+    username: tj_impl
+    card: summary
+logo: images/boxes-sq-256.png
+author:
+    twitter: tj_impl
 
 # Plugins from the whitelist at https://github.com/github/pages-gem/blob/master/lib/github-pages/plugins.rb
 plugins:
