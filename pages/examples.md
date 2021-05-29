@@ -122,8 +122,8 @@ This uses the third possible argument to the **-a** option, `j`. `jr` stands for
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2
-   text="Quick alignment/positioning" %}
+   level=2 slug="quick-alignment-positioning"
+   text="Quick alignment/<wbr/>positioning" %}
 
 `boxes -d dog -a c`
 

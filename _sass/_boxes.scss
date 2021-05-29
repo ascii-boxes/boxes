@@ -59,6 +59,9 @@ ol ul li, ul ul li {
 th {
     color: $headings-color;
 }
+table.table-striped tr:last-child {
+    border-bottom: 1px solid $table-border-color;
+}
 
 
 /*
@@ -113,6 +116,7 @@ pre {
         padding: 0;
         border-radius: 0;
         white-space: pre;
+        word-wrap: normal;
     }
 }
 code {
@@ -121,6 +125,7 @@ code {
     border-radius: $border-radius-sm;
     padding: 2px 3px;
     white-space: pre-wrap;
+    word-wrap: normal;
 }
 
 

@@ -11,41 +11,56 @@ The current release is **version {{ site.currentVersion }}**. For older revision
 [release history]({{ site.baseurl }}/releases.html).
 
 
-## Binaries
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2
+   text="Binaries" %}
 
-*boxes* binaries are available on multiple platforms:
-{% comment %} TODO properly reference known packages {% endcomment %}
+The best way to get *boxes* is via your package manager. Here are some package managers which we know have a
+*boxes* package, but there are more - just try it on yours.
 
-**Windows**
-
-- Option 1 - Using [Chocolatey](https://chocolatey.org/): Just type `choco install boxes.portable`
-- Option 2 - Install from ZIP:
-  [Download ZIP](https://github.com/{{ site.github }}/releases/download/v{{ site.currentVersion }}/boxes-{{
-  site.currentVersion }}-intel-win32.zip), extract and put it somewhere on the PATH. Make sure to put boxes.exe and
-  boxes.cfg in the same directory.
-
-**MacOS X**
-
-- Just type `brew install boxes`.\\
-  This works for both 32bit and 64bit MacOS.
-
-**Linux**
-
-- Just type `apt-get install boxes`.\\
-  This works for Debian and debian-based Linuxes, such as Ubuntu, including the Windows 10 Ubuntu Subsystem.
-
-
-## Miscellaneous
-
-  - The current [list of available box designs]({{ site.baseurl }}/box-designs.html)
-  - A [Vim syntax file](https://raw.githubusercontent.com/{{ site.github }}/master/boxes.vim){:target="_blank"} to
-    enable the Vim editor to apply syntax highlighting to *boxes* config files
+<table class="table table-striped w-auto">
+  <thead>
+    <tr>
+      <th scope="col">Platform</th>
+      <th scope="col">Tool</th>
+      <th scope="col">Command</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Linux</td>   <td>apt</td>   <td><code>apt-get install -y boxes</code></td></tr>
+    <tr><td>Linux</td>   <td>dnf</td>   <td><code>dnf install boxes</code></td></tr>
+    <tr><td>MacOS</td>   <td>brew</td>  <td><code>brew install boxes</code></td></tr>
+    <tr><td>Windows</td> <td>choco</td> <td><code>choco install boxes.portable</code></td></tr>
+  </tbody>
+</table>
 
 
-## Sources
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=3 slug="windows"
+   text="Windows Portable ZIP" %}
 
-The *boxes* sources are now all on GitHub, including previous releases
-([build instructions]({{ site.baseurl }}/build.html)):
+For Windows, we also have a portable ZIP which you can unpack somewhere in your `PATH`. Make sure to put boxes.exe and
+boxes.cfg in the same directory. Get the ZIP file
+[here](https://github.com/{{ site.github }}/releases/download/v{{ site.currentVersion }}/boxes-{{
+  site.currentVersion }}-intel-win32.zip).
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=3
+   text="Vim Syntax File" %}
+
+We also have a [Vim syntax file](https://raw.githubusercontent.com/{{ site.github }}/master/boxes.vim){:target="_blank"}
+which enables the Vim editor to apply syntax highlighting to *boxes* config files.
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2
+   text="Sources" %}
+
+The *boxes* sources are on GitHub, including previous releases ([build instructions]({{ site.baseurl }}/build.html)):
 
 [https://github.com/{{ site.github }}](https://github.com/{{ site.github }}){:target="_blank"}
-
