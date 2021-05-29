@@ -26,7 +26,7 @@ supports filters. The
 website has examples on how to configure editor integration for various
 text editors:
 .br
-<URL:https://boxes.thomasjensen.com/docs/install.html>
+<URL:https://boxes.thomasjensen.com/editors.html>
 .\" =======================================================================
 .SH OPTIONS
 Options offered by
@@ -417,7 +417,7 @@ other locations are fully supported, too.
 The syntax of
 .I boxes
 config files is described on the website at
-<URL:https://boxes.thomasjensen.com/docs/config-syntax.html>.
+<URL:https://boxes.thomasjensen.com/config-syntax.html>.
 .\" =======================================================================
 .SH EXAMPLES
 Examples on how to invoke
@@ -448,7 +448,7 @@ lovingly maintained since 1999.
 .br
 For a full list of contributors, see
 .br
-<URL:https://boxes.thomasjensen.com/contributing.html#contributors>
+<URL:https://boxes.thomasjensen.com/team.html#contributors>
 .br
 and <URL:https://github.com/ascii-boxes/boxes/graphs/contributors>.
 .br

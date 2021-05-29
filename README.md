@@ -26,8 +26,8 @@ It should give you something like that:
     /*******/
 
 Type `boxes -l` to get a long list of box designs to use. Detailed usage information is in the
-[manual page](https://boxes.thomasjensen.com/docs/boxes-man-1.html) and on the website. Consider
-[tying *boxes* to your editor](https://boxes.thomasjensen.com/docs/install.html),
+[manual page](https://boxes.thomasjensen.com/boxes-man-1.html) and on the website. Consider
+[tying *boxes* to your editor](https://boxes.thomasjensen.com/editors.html),
 so that it can be invoked by a simple keypress.
 
 ## Status
@@ -50,12 +50,12 @@ have already been two new releases with significant new functionality.
 The website has information on [building from source](https://boxes.thomasjensen.com/build.html),
 [testing](https://boxes.thomasjensen.com/testing.html), and
 [contributing](https://boxes.thomasjensen.com/contributing.html) to the source code.<br/>
-*Boxes* has received support from many [contributors](https://boxes.thomasjensen.com/contributing.html#contributors)
+*Boxes* has received support from many [contributors](https://boxes.thomasjensen.com/team.html#contributors)
 over the years, and continues to benefit greatly from contributions. Many thanks for that!
 
 ## Custom box designs
 
-You can define [your own box designs](https://boxes.thomasjensen.com/docs/)!
+You can define [your own box designs](https://boxes.thomasjensen.com/config-general.html)!
 
 We appreciate the creative new box designs that you craft for *boxes*.
 If you think that others should have your box designs, please feel free to submit them in the
