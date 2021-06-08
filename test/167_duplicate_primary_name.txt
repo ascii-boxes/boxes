@@ -1,0 +1,19 @@
+:DESC
+Test that two designs in the same file may not have the same name. The second one is invalid and should be skipped.
+
+:ARGS
+-f 167_duplicate_primary_name.cfg -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+boxes: 167_duplicate_primary_name.cfg: line 35: duplicate box design name -- designA
+boxes: 167_duplicate_primary_name.cfg: line 35: skipping to next design
+1 Available Style in "167_duplicate_primary_name.cfg":
+------------------------------------------------------
+
+designA:
+
+    designA
+
+
+:EOF

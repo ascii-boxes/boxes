@@ -38,6 +38,12 @@ typedef struct {
     /** index into `*designs` */
     int design_idx;
 
+    /** Box designs already parsed from child config files, if any. Else NULL */
+    design_t *child_configs;
+
+    /** the size of `*child_configs` */
+    size_t num_child_configs;
+
     /** the path to the config file we are parsing */
     char *config_file;
 

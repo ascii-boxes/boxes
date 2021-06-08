@@ -161,13 +161,15 @@ static pass_to_flex new_flex_extra_data(pass_to_bison *bison_args)
 
 
 
-static pass_to_bison parse_config_file(const char *config_file)
+static pass_to_bison parse_config_file(const char *config_file, design_t *child_configs, size_t num_child_configs)
 {
     #ifdef DEBUG
         fprintf (stderr, "Parsing Config File %s ...\n", config_file);
     #endif
 
     pass_to_bison bison_args = new_bison_args(config_file);
+    bison_args.child_configs = child_configs;
+    bison_args.num_child_configs = num_child_configs;
 	pass_to_flex flex_extra_data = new_flex_extra_data(&bison_args);
     current_bison_args = &bison_args;
 
@@ -272,7 +274,7 @@ design_t *parse_config_files(const char *p_first_config_file, size_t *r_num_desi
     first_config_file = p_first_config_file;
     const char *config_file = p_first_config_file;
     do {
-        pass_to_bison bison_args = parse_config_file(config_file);
+        pass_to_bison bison_args = parse_config_file(config_file, result, *r_num_designs);
         ++parents_parsed;
         #ifdef DEBUG
             fprintf (stderr, "bison_args returned: "

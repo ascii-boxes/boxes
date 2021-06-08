@@ -323,6 +323,20 @@ void recover(pass_to_bison *bison_args)
 
 
 
+static int design_has_alias(design_t *design, char *alias)
+{
+    int result = 0;
+    for (size_t aidx = 0; design->aliases[aidx] != NULL; ++aidx) {
+        if (strcasecmp(alias, design->aliases[aidx]) == 0) {
+            result = 1;
+            break;
+        }
+    }
+    return result;
+}
+
+
+
 static int design_has_name(design_t *design, char *name)
 {
     int result = 0;
@@ -330,12 +344,7 @@ static int design_has_name(design_t *design, char *name)
         result = 1;
     }
     else {
-        for (size_t aidx = 0; design->aliases[aidx] != NULL; ++aidx) {
-            if (strcasecmp(name, design->aliases[aidx]) == 0) {
-                result = 1;
-                break;
-            }
-        }
+        result = design_has_alias(design, name);
     }
     return result;
 }
@@ -381,6 +390,20 @@ static int design_name_exists(pass_to_bison *bison_args, char *name)
     int result = 0;
     for (int i = 0; i < bison_args->design_idx; ++i) {
         if (design_has_name(bison_args->designs + i, name)) {
+            result = 1;
+            break;
+        }
+    }
+    return result;
+}
+
+
+
+static int alias_exists_in_child_configs(pass_to_bison *bison_args, char *alias)
+{
+    int result = 0;
+    for (size_t i = 0; i < bison_args->num_child_configs; ++i) {
+        if (design_has_alias(bison_args->child_configs + i, alias)) {
             result = 1;
             break;
         }
@@ -921,10 +944,17 @@ int action_add_alias(pass_to_bison *bison_args, char *alias_name)
         yyerror(bison_args, "alias already in use -- %s", alias_name);
         return RC_ERROR;
     }
-    size_t num_aliases = array_count0(curdes.aliases);
-    curdes.aliases = (char **) realloc(curdes.aliases, (num_aliases + 2) * sizeof(char *));
-    curdes.aliases[num_aliases] = strdup(alias_name);
-    curdes.aliases[num_aliases + 1] = NULL;
+    if (alias_exists_in_child_configs(bison_args, alias_name)) {
+        #ifdef PARSER_DEBUG
+            fprintf (stderr, "alias already used by child config, dropping: %s\n", alias_name);
+        #endif
+    }
+    else {
+        size_t num_aliases = array_count0(curdes.aliases);
+        curdes.aliases = (char **) realloc(curdes.aliases, (num_aliases + 2) * sizeof(char *));
+        curdes.aliases[num_aliases] = strdup(alias_name);
+        curdes.aliases[num_aliases + 1] = NULL;
+    }
     return RC_SUCCESS;
 }
 

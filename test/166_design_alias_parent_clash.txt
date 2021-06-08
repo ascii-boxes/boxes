@@ -1,0 +1,28 @@
+:DESC
+Test that when an alias is defined in a child config AND in a parent config, the child config wins. The parent design
+loses the alias.
+
+:ARGS
+-f 166_design_alias_parent_clash.cfg -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+2 Available Styles:
+-------------------
+
+Configuration Files:
+    - 166_design_alias_parent_clash.cfg
+    - 166_design_alias_parent_clash.parent.cfg (parent)
+
+
+designA alias alias2:
+
+    A from parent config
+
+
+designB alias alias1:
+
+    B from regular config
+
+
+:EOF

@@ -1,0 +1,27 @@
+:DESC
+Test that when overriding a design that has alias names, the alias names in the child design do not cause a uniqueness
+error, and properly override the parent alias names.
+
+:ARGS
+-f 165_design_alias_parent_override.cfg -d designA -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+Complete Design Information for "designA":
+------------------------------------------
+Alias Names:            alias1, alias3
+Author:                 (unknown author)
+Original Designer:      (unknown artist)
+Creation Date:          (unknown)
+Current Revision:       (unknown)
+Configuration File:     165_design_alias_parent_override.cfg
+Indentation Mode:       box (indent box)
+Replacement Rules:      none
+Reversion Rules:        none
+Minimum Box Dimensions: 4 x 3  (width x height)
+Default Padding:        none
+Default Killblank:      no
+Tags:                   none
+Elastic Shapes:         N, E, S, W
+Defined Shapes:           W: "Ab" 
+:EOF

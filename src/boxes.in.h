@@ -76,14 +76,14 @@ typedef struct {
 
 
 typedef struct {
-    char      *name;
+    char      *name;                 /* primary name of the box design */
     char     **aliases;              /* zero-terminated array of alias names of the design */
     char      *author;               /* creator of the configuration file entry */
     char      *designer;             /* creator of the original ASCII artwork */
     char      *created;              /* date created, free format */
     char      *revision;             /* revision number of design */
     char      *revdate;              /* date of current revision */
-    char      *sample;
+    char      *sample;               /* the complete sample block in one string */
     char       indentmode;           /* 'b', 't', or 'n' */
     sentry_t   shape[NUM_SHAPES];
     size_t     maxshapeheight;       /* height of highest shape in design */
