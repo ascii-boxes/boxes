@@ -710,7 +710,8 @@ int tag_is_valid(char *tag)
         && strspn(tag, "abcdefghijklmnopqrstuvwxyz-0123456789") == len
         && strchr("abcdefghijklmnopqrstuvwxyz", tag[0]) != NULL
         && tag[len - 1] != '-'
-        && strstr(tag, "--") == NULL;
+        && strstr(tag, "--") == NULL
+        && strcmp(tag, "none") != 0;
 }
 
 
