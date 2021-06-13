@@ -48,9 +48,6 @@
 int action_init_parser(pass_to_bison *bison_args);
 
 
-int action_chg_delim(pass_to_bison *bison_args, char *delim_expr);
-
-
 /**
  * Rule action called when a shape list was fully parsed.
  * @param bison_args the parser state

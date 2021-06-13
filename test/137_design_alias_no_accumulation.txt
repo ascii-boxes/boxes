@@ -1,5 +1,5 @@
 :DESC
-Test that the list of aliases is properly reset when lexer is in speedmode.
+Test that the list of aliases is properly reset when parser is in speedmode.
 
 :ARGS
 -f 137_design_alias_no_accumulation.cfg -d alias3b -l

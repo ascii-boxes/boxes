@@ -11,7 +11,7 @@ that speedmode is properly terminated.)
 :EXPECTED
 boxes: 131_data/B.cfg: line 32: entries SAMPLE, SHAPES, and ELASTIC are mandatory
 boxes: 131_data/B.cfg: line 32: skipping to next design
-boxes: 131_data/A.cfg: line 29: string expected
+boxes: 131_data/A.cfg: line 29: syntax error
 boxes: 131_data/A.cfg: line 29: skipping to next design
 3 Available Styles:
 -------------------

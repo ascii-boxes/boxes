@@ -47,12 +47,6 @@ typedef struct {
     /** the path to the config file we are parsing */
     char *config_file;
 
-    /** the currently active string delimiter character */
-    char sdel;
-
-    /** the currently active string escape character */
-    char sesc;
-
     int num_mandatory;
 
     int time_for_se_check;
@@ -140,7 +134,7 @@ typedef struct {
 %token <shape> SHAPE
 %token <num> YNUMBER
 %token <c> YRXPFLAG
-%token <s> YDELWORD
+%token <s> YDELIMSPEC
 
 %type <sentry> shape_def
 %type <sentry> shape_lines
@@ -203,7 +197,16 @@ config_file: config_file design_or_error | design_or_error | config_file parent_
 
 design_or_error: design | error
     {
-        if (!(bison_args->speeding) && !(bison_args->skipping)) {
+        /* reset alias list, as those are collected even when speedmode is on */
+        #ifdef PARSER_DEBUG
+            fprintf (stderr, " Parser: Discarding token [skipping=%s, speeding=%s]\n",
+                bison_args->skipping ? "true" : "false", bison_args->speeding ? "true" : "false");
+        #endif
+        if (curdes.aliases[0] != NULL) {
+            BFREE(curdes.aliases);
+            curdes.aliases = (char **) calloc(1, sizeof(char *));
+        }
+        if (!bison_args->speeding && !bison_args->skipping) {
             recover(bison_args);
             yyerror(bison_args, "skipping to next design");
             bison_args->skipping = 1;
@@ -260,14 +263,14 @@ entry: KEYWORD STRING
         }
         else {
             #ifdef PARSER_DEBUG
-                fprintf (stderr, "%s: Discarding entry [%s = %s].\n", PROJECT, "parent", filename);
+                fprintf (stderr, " Parser: Discarding entry [%s = %s].\n", "parent", filename);
             #endif
         }
     }
 
-| YCHGDEL YDELWORD
+| YCHGDEL YDELIMSPEC
     {
-        invoke_action(action_chg_delim(bison_args, $2));
+        /* string delimiters were changed - this is a lexer thing. ignore here. */
     }
 
 | YTAGS '(' tag_list ')' | YTAGS tag_entry
@@ -275,7 +278,7 @@ entry: KEYWORD STRING
 | WORD STRING
     {
         #ifdef PARSER_DEBUG
-            fprintf (stderr, "%s: Discarding entry [%s = %s].\n", PROJECT, $1, $2);
+            fprintf (stderr, " Parser: Discarding entry [%s = %s].\n", $1, $2);
         #endif
     }
 ;
@@ -491,5 +494,6 @@ wlist_entry: WORD YNUMBER
 
 
 %%
+
 
 /*EOF*/                                          /* vim: set sw=4 cindent: */

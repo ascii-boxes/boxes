@@ -29,16 +29,20 @@
 typedef struct {
     int yyerrcnt;
 
-    /** pointer to the currently active string delimiter character in bison_args */
-    char *sdel_ptr;
+    /** the currently active string delimiter character */
+    char sdel;
 
-    /** pointer to the currently active string escape character in bison_args */
-    char *sesc_ptr;
+    /** the currently active string escape character */
+    char sesc;
 } pass_to_flex;
 
 
-
-void begin_speedmode(void *yyscanner);
+/*
+ *  Valid characters to be used as string delimiters. Note that the
+ *  following list must correspond to the SDELIM definition below.
+ */
+#define LEX_SDELIM  "\"~'`!@%&*=:;<>?/|.\\"
+#define LEX_SDELIM_RECOMMENDED  "\"~'!|"
 
 
 /**
@@ -73,6 +77,8 @@ static void report_state_char(char *symbol, char c, char *expected_state_str);
 
 static void report_state(char *symbol, char *text, char *expected_state_str);
 
+static int change_string_delimiters(pass_to_flex *extra, char *delim_expr);
+
 %}
 
 
@@ -91,17 +97,16 @@ static void report_state(char *symbol, char *text, char *expected_state_str);
 %option yylineno
 
 
-%x DELWORD
-%x PARENT
+%x BOX
 %x SAMPLE
-%x SPEEDMODE
-%s ELASTIC
-%s SHAPES
+%x SHAPES
+%x ELASTIC
+%x DELIMSPEC
+%x PARENT
 
 
 PWORD     [a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*
-PWHITE    [\n \r\t]
-PBOX      Box
+PWHITE    [ \t\r\n]
 SDELIM    [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
 PPARENT   parent
 PFILENAME [^\r\n]+
@@ -109,38 +114,39 @@ PFILENAME [^\r\n]+
 
 %%
 
-
-<INITIAL,DELWORD,ELASTIC,SHAPES>[ \r\t] /* ignore whitespace */
-
-<INITIAL,DELWORD,ELASTIC,SHAPES>\n {}
-
-
-<DELWORD>[^ \t\r\n]+ {
     /*
-     *  String delimiter spec - like WORD, but allow any character
+     * Precedence of rules:
+     * - The rule that matches the most text wins.
+     * - If two rules match the same amount of text, the one defined first (further up) wins.
+     */
+
+
+<INITIAL,BOX,DELIMSPEC,ELASTIC,SHAPES>{PWHITE}  /* ignore whitespace */
+
+<DELIMSPEC>[^ \t\r\n]+ {
+    /*
+     * String delimiter spec - like WORD, but allow any character
      */
     yylval->s = (char *) strdup (yytext);
-    if (yylval->s == NULL) {
-        perror (PROJECT);
-        exit (EXIT_FAILURE);
+    BEGIN(BOX);
+    report_state("YDELIMS", yytext, "INITIAL");
+    if (change_string_delimiters(yyextra, yylval->s) != 0) {
+        return YUNREC;
     }
-    BEGIN(INITIAL);
-    report_state("YDELWOR", yytext, "INITIAL");
-    return YDELWORD;
+    return YDELIMSPEC;
 }
 
 
-{SDELIM}.*$ {
+<BOX,SHAPES>{SDELIM}.*$ {
     /*
-     *  Strings  --  first match everything starting from a potential
-     *  string delimiter until the end of the line. We will give back what
-     *  we don't need and also detect unterminated strings.
+     * Strings  --  first match everything starting from a potential string delimiter until the end of the line. We
+     * will give back what we don't need and also detect unterminated strings. Strings always end on the same line.
      */
     char *p;
     int rest_len = yyleng - 1;           /* length of string pointed to by p */
     int qcnt = 0;                        /* esc char count in current string */
 
-    if (yytext[0] != *(yyextra->sdel_ptr)) {
+    if (yytext[0] != yyextra->sdel) {
         REJECT;                          /* that was not our delimiter */
     }
 
@@ -152,14 +158,14 @@ PFILENAME [^\r\n]+
     p = yylval->s;
 
     while (*p) {
-        if (*p == *(yyextra->sesc_ptr)) {
+        if (*p == yyextra->sesc) {
             memmove (p, p+1, rest_len);     /* incl. '\0' */
             ++qcnt;
             --rest_len;
             if (*p == '\0')
                 break;
         }
-        else if (*p == *(yyextra->sdel_ptr)) {
+        else if (*p == yyextra->sdel) {
             *p = '\0';
             yyless ((p-yylval->s)+2+qcnt);   /* string plus quotes */
             #ifdef LEXER_DEBUG
@@ -177,7 +183,7 @@ PFILENAME [^\r\n]+
 }
 
 
-{PPARENT} {
+<INITIAL>{PPARENT} {
     BEGIN(PARENT);
     report_state("YPARENT", yytext, "PARENT");
     return YPARENT;
@@ -204,18 +210,17 @@ PFILENAME [^\r\n]+
     report_state("     NL", "", "INITIAL");
 }
 
-Sample {
+
+<BOX>Sample {
     BEGIN(SAMPLE);
     report_state("YSAMPLE", yytext, "SAMPLE");
     return YSAMPLE;
 }
 
-
 <SAMPLE>\n {
     if (yyleng > 1)
         yymore();
 }
-
 
 <SAMPLE>^[ \t]*ends[ \t\r]*$ {
     char *p = yytext + yyleng -1;
@@ -239,8 +244,6 @@ Sample {
     btrim (yylval->s, &len);
     if (len > 0) {
         strcat (yylval->s, "\n");        /* memory was allocated with strdup */
-        BEGIN(INITIAL);
-        report_state(" STRING", yylval->s, "INITIAL");
         return STRING;
     }
     else {
@@ -252,53 +255,56 @@ Sample {
     }
 }
 
-
 <SAMPLE>. yymore();
 
-
-ends[ \t\r]*$ {
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, "YENDSAM: %s\n", yytext);
-    #endif
+<SAMPLE>ends[ \t\r]*$ {
+    /* reached because the other rule pushes it back so a proper end token can be returned */
+    BEGIN(BOX);
+    report_state("YENDSAM", yytext, "BOX");
     return YENDSAMPLE;
 }
 
 
-Tags {
+<BOX>Tags {
     #ifdef LEXER_DEBUG
         fprintf (stderr, "  YTAGS: %s\n", yytext);
     #endif
     return YTAGS;
 }
 
-Elastic {
+<BOX>Elastic {
     BEGIN(ELASTIC);
     report_state("YELASTC", yytext, "ELASTIC");
     return YELASTIC;
 }
 
-Shapes {
+<BOX>Shapes {
     BEGIN(SHAPES);
     report_state("YSHAPES", yytext, "SHAPES");
     return YSHAPES;
 }
 
-{PBOX} {
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, "   YBOX: %s\n", yytext);
-    #endif
+<INITIAL>Box {
+    BEGIN(BOX);
+    report_state("   YBOX", yytext, "BOX");
     yyextra->yyerrcnt = 0;
+    change_string_delimiters(yyextra, "\\\"");
     return YBOX;
 }
 
-Replace { return YREPLACE; }
-Reverse { return YREVERSE; }
-Padding { return YPADDING; }
-End     { return YEND;     }
-To      { return YTO;      }
-With    { return YWITH;    }
-Global  { yylval->c = 'g'; return YRXPFLAG; }
-Once    { yylval->c = 'o'; return YRXPFLAG; }
+<BOX>Replace { return YREPLACE; }
+<BOX>Reverse { return YREVERSE; }
+<BOX>Padding { return YPADDING; }
+<BOX>To      { return YTO;      }
+<BOX>With    { return YWITH;    }
+<BOX>Global  { yylval->c = 'g'; return YRXPFLAG; }
+<BOX>Once    { yylval->c = 'o'; return YRXPFLAG; }
+<BOX>End     {
+    BEGIN(INITIAL);
+    report_state("   YEND", yytext, "INITIAL");
+    change_string_delimiters(yyextra, "\\\"");
+    return YEND;
+}
 
 
 <SHAPES,ELASTIC>nw  { yylval->shape = NW;  return SHAPE; }
@@ -319,21 +325,21 @@ Once    { yylval->c = 'o'; return YRXPFLAG; }
 <SHAPES,ELASTIC>wnw { yylval->shape = WNW; return SHAPE; }
 
 <ELASTIC>\) {
-    BEGIN(INITIAL);
-    report_state_char("SYMBOL", yytext[0], "INITIAL");
+    BEGIN(BOX);
+    report_state_char("SYMBOL", yytext[0], "BOX");
     return yytext[0];
 }
 
 <SHAPES>\} {
-    BEGIN(INITIAL);
-    report_state_char("SYMBOL", yytext[0], "INITIAL");
+    BEGIN(BOX);
+    report_state_char("SYMBOL", yytext[0], "BOX");
     return yytext[0];
 }
 
 
-author|designer|created|revision|revdate|indent {
+<BOX>author|designer|created|revision|revdate|indent {
     /*
-     *  general key words
+     * general key words
      */
     #ifdef LEXER_DEBUG
         fprintf (stderr, "KEYWORD: %s\n", yytext);
@@ -347,17 +353,20 @@ author|designer|created|revision|revdate|indent {
 }
 
 
-Delimiter|Delim {
+<BOX>Delimiter|Delim {
     /*
-     *  Change string delimiting characters
+     * Change string delimiting characters
      */
-    BEGIN(DELWORD);
-    report_state("YCHGDEL", yytext, "DELWORD");
+    BEGIN(DELIMSPEC);
+    report_state("YCHGDEL", yytext, "DELIMSPEC");
     return YCHGDEL;
 }
 
 
-{PWORD} {
+<INITIAL,BOX>{PWORD} {
+    /*
+     * a free-floating word which is not a string, i.e. it does not have delimiting characters
+     */
     #ifdef LEXER_DEBUG
         fprintf (stderr, "   WORD: %s\n", yytext);
     #endif
@@ -370,7 +379,7 @@ Delimiter|Delim {
 }
 
 
-[\+-]?[0-9]+ {
+<BOX>[\+-]?[0-9]+ {
     #ifdef LEXER_DEBUG
         fprintf (stderr, "YNUMBER: %s\n", yytext);
     #endif
@@ -379,7 +388,7 @@ Delimiter|Delim {
 }
 
 
-[,(){}] {
+<BOX,SHAPES,ELASTIC>[,(){}] {
     #ifdef LEXER_DEBUG
         fprintf (stderr, " SYMBOL: \'%c\'\n", yytext[0]);
     #endif
@@ -387,7 +396,7 @@ Delimiter|Delim {
 }
 
 
-#.*$ {
+<INITIAL,BOX,SHAPES,ELASTIC>#.*$ {
     /* ignore comments */
     #ifdef LEXER_DEBUG
         fprintf (stderr, "COMMENT: %s\n", yytext+1);
@@ -395,23 +404,13 @@ Delimiter|Delim {
 }
 
 
-. {
-    if ((yyextra->yyerrcnt)++ < LEX_MAX_WARN)
-        yyerror(NULL, "Unrecognized input char \'%s\'", yytext);
+<INITIAL,BOX,SHAPES,ELASTIC>. {
+    /* a character that made no sense where it was encountered. Let the parser handle it. */
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, " YUNREC: \'%c\'\n", yytext[0]);
+    #endif
     return YUNREC;
 }
-
-
-<SPEEDMODE>{PBOX}{PWHITE}+{PWORD}|{PPARENT} {
-    /* end speedmode, but then give back the whole match so BOX or PARENT can be started properly */
-    yyless(0);
-    BEGIN(INITIAL);
-    report_state(" STATUS", "", "INITIAL");
-}
-
-<SPEEDMODE>\n {}
-
-<SPEEDMODE>. /* ignore anything else */
 
 
 %%
@@ -433,19 +432,10 @@ void inflate_inbuf(void *yyscanner, const char *configfile)
 
 
 
-void begin_speedmode(void *yyscanner)
-{
-    struct yyguts_t *yyg = (struct yyguts_t *) yyscanner;
-    BEGIN(SPEEDMODE);
-    report_state(" STATUS", "begin_speedmode()", "SPEEDMODE");
-}
-
-
-
 static void report_state_char(char *symbol, char c, char *expected_state_str)
 {
     char *s = (char *) malloc(4);
-    sprintf(s, "'%c'", c);
+    sprintf(s, "'%c'", c >= ' ' && c <= 126 ? c : '?');
     report_state(symbol, s, expected_state_str);
     BFREE(s);
 }
@@ -461,6 +451,32 @@ static void report_state(char *symbol, char *text, char *expected_state_str)
     if (lexerDebug) {
         fprintf(stderr, "%7s: %s -- STATE %s\n", symbol, text, expected_state_str);
     }
+}
+
+
+
+static int change_string_delimiters(pass_to_flex *extra, char *delim_expr)
+{
+    if (strlen(delim_expr) != 2) {
+        yyerror(NULL, "invalid string delimiter specification -- %s", delim_expr);
+        return 1;
+    }
+    if (delim_expr[0] == delim_expr[1]) {
+        yyerror(NULL, "string delimiter and escape char may not be the same");
+        return 1;
+    }
+    if (strchr (LEX_SDELIM, delim_expr[1]) == NULL) {
+        yyerror(NULL, "invalid string delimiter -- %c (try one of %s)", delim_expr[1], LEX_SDELIM_RECOMMENDED);
+        return 1;
+    }
+
+    #ifdef LEXER_DEBUG
+        fprintf(stderr, "YDELIMS: change_string_delimiters('%c', '%c')\n", delim_expr[0], delim_expr[1]);
+    #endif
+    extra->sesc = delim_expr[0];
+    extra->sdel = delim_expr[1];
+
+    return 0;
 }
 
 

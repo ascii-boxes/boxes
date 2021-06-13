@@ -1,0 +1,27 @@
+:DESC
+Test that the keyword 'parent' may occur as a regular string in a sample block, without triggering parent config file
+resolution.
+
+:ARGS
+-f 168_parent_keyword_in_sample_ok.cfg -d designB -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+Complete Design Information for "designB":
+------------------------------------------
+Alias Names:            none
+Author:                 (unknown author)
+Original Designer:      (unknown artist)
+Creation Date:          (unknown)
+Current Revision:       (unknown)
+Configuration File:     168_parent_keyword_in_sample_ok.cfg
+Indentation Mode:       box (indent box)
+Replacement Rules:      none
+Reversion Rules:        none
+Minimum Box Dimensions: 3 x 3  (width x height)
+Default Padding:        none
+Default Killblank:      no
+Tags:                   none
+Elastic Shapes:         N, E, S, W
+Defined Shapes:           W: "B" 
+:EOF

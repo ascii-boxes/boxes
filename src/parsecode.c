@@ -39,45 +39,8 @@
 #include "lex.yy.h"
 
 
-/*
- *  Valid characters to be used as string delimiters. Note that the
- *  following list must correspond to the DELIM definition in lexer.l.
- */
-#define LEX_SDELIM  "\"~'`!@%&*=:;<>?/|.\\"
 
 static pcre2_code *eol_pattern = NULL;
-
-
-
-static void chg_strdelims (pass_to_bison *bison_args, const char asesc, const char asdel)
-{
-    #ifdef PARSER_DEBUG
-        fprintf (stderr, " STATUS: chg_strdelims ('%c', '%c') - This changes lexer behavior!\n", asesc, asdel);
-    #endif
-    bison_args->sesc = asesc;
-    bison_args->sdel = asdel;
-}
-
-
-
-int action_chg_delim(pass_to_bison *bison_args, char *delim_expr)
-{
-    if (strlen(delim_expr) != 2) {
-        yyerror(bison_args, "invalid string delimiter specification -- %s", delim_expr);
-        return RC_ERROR;
-    }
-    if (delim_expr[0] == delim_expr[1]) {
-        yyerror(bison_args, "string delimiter and escape char may not be the same");
-        return RC_ERROR;
-    }
-    if (strchr (LEX_SDELIM, delim_expr[1]) == NULL) {
-        yyerror(bison_args, "invalid string delimiter -- %c (try one of %s)",
-                delim_expr[1], LEX_SDELIM);
-        return RC_ERROR;
-    }
-    chg_strdelims(bison_args, delim_expr[0], delim_expr[1]);
-    return RC_SUCCESS;
-}
 
 
 
@@ -95,7 +58,7 @@ static int check_sizes(pass_to_bison *bison_args)
     int i, j, k;
 
     #ifdef PARSER_DEBUG
-        fprintf (stderr, "check_sizes()\n");
+        fprintf (stderr, " Parser: check_sizes()\n");
     #endif
 
     for (i=0; i<NUM_SIDES; ++i) {
@@ -163,7 +126,7 @@ static int corner_check(pass_to_bison *bison_args)
     int c;
 
     #ifdef PARSER_DEBUG
-        fprintf (stderr, "corner_check()\n");
+        fprintf (stderr, " Parser: corner_check()\n");
     #endif
 
     for (c=0; c<NUM_CORNERS; ++c) {
@@ -183,7 +146,7 @@ static shape_t non_existent_elastics(pass_to_bison *bison_args)
     shape_t i;
 
     #ifdef PARSER_DEBUG
-        fprintf (stderr, "non_existent_elastics()\n");
+        fprintf (stderr, " Parser: non_existent_elastics()\n");
     #endif
 
     for (i=0; i<NUM_SHAPES; ++i) {
@@ -202,7 +165,7 @@ static int insufficient_elasticity(pass_to_bison *bison_args)
     int i, j, ef;
 
     #ifdef PARSER_DEBUG
-        fprintf (stderr, "insufficient_elasticity()\n");
+        fprintf (stderr, " Parser: insufficient_elasticity()\n");
     #endif
 
     for (i=0; i<NUM_SIDES; ++i) {
@@ -226,7 +189,7 @@ static int adjoining_elastics(pass_to_bison *bison_args)
     int i, j, ef;
 
     #ifdef PARSER_DEBUG
-        fprintf (stderr, "adjoining_elastics()\n");
+        fprintf (stderr, " Parser: adjoining_elastics()\n");
     #endif
 
     for (i=0; i<NUM_SIDES; ++i) {
@@ -304,7 +267,6 @@ void recover(pass_to_bison *bison_args)
      bison_args->num_mandatory = 0;
      bison_args->time_for_se_check = 0;
      bison_args->num_shapespec = 0;
-     chg_strdelims(bison_args, '\\', '\"');
 
      /*
       *  Clear current design
@@ -358,7 +320,7 @@ static int full_parse_required()
         result = opt.r || opt.l || (opt.query != NULL && !query_is_undoc());
     }
     #ifdef DEBUG
-        fprintf(stderr, "full_parse_required() -> %s\n", result ? "true" : "false");
+        fprintf(stderr, " Parser: full_parse_required() -> %s\n", result ? "true" : "false");
     #endif
     return result;
 }
@@ -642,9 +604,9 @@ int action_finalize_shapes(pass_to_bison *bison_args)
         }
     }
     #ifdef PARSER_DEBUG
-        fprintf (stderr, "Minimum box dimensions: width %d height %d\n",
+        fprintf (stderr, " Parser: Minimum box dimensions: width %d height %d\n",
                 (int) curdes.minwidth, (int) curdes.minheight);
-        fprintf (stderr, "Maximum shape height: %d\n",
+        fprintf (stderr, " Parser: Maximum shape height: %d\n",
                 (int) curdes.maxshapeheight);
     #endif
     return RC_SUCCESS;
@@ -662,7 +624,6 @@ int action_finalize_shapes(pass_to_bison *bison_args)
  */
 int action_start_parsing_design(pass_to_bison *bison_args, char *design_name)
 {
-    chg_strdelims(bison_args, '\\', '\"');
     bison_args->speeding = 0;
     bison_args->skipping = 0;
 
@@ -674,9 +635,10 @@ int action_start_parsing_design(pass_to_bison *bison_args, char *design_name)
 
     if (!design_needed(bison_args)) {
         bison_args->speeding = 1;
-        begin_speedmode(bison_args->lexer_state);
-        init_design(bison_args, &(curdes));
-        return RC_ERROR;
+        #ifdef PARSER_DEBUG
+            fprintf (stderr, " Parser: Skipping to next design (lexer doesn't know!)\n");
+        #endif
+        return RC_ERROR;         /* trigger the parser's `error` rule, which will skip to the next design */
     }
     return RC_SUCCESS;
 }
@@ -693,7 +655,7 @@ int action_start_parsing_design(pass_to_bison *bison_args, char *design_name)
 int action_parent_config(pass_to_bison *bison_args, char *filepath)
 {
     #ifdef PARSER_DEBUG
-        fprintf (stderr, "parent config file specified: [%s]\n", filepath);
+        fprintf (stderr, " Parser: parent config file specified: [%s]\n", filepath);
     #endif
     if (filepath == NULL || filepath[0] == '\0') {
         bison_args->skipping = 1;
@@ -720,13 +682,13 @@ int action_parent_config(pass_to_bison *bison_args, char *filepath)
         }
     }
     #ifdef PARSER_DEBUG
-        fprintf (stderr, "parent config file path resolved: [%s]\n", filepath);
+        fprintf (stderr, " Parser: parent config file path resolved: [%s]\n", filepath);
     #endif
     
     int is_new = !array_contains(bison_args->parent_configs, bison_args->num_parent_configs, filepath);
     if (!is_new) {
         #ifdef PARSER_DEBUG
-            fprintf (stderr, "duplicate parent / cycle: [%s]\n", filepath);
+            fprintf (stderr, " Parser: duplicate parent / cycle: [%s]\n", filepath);
         #endif
     }
     else {
@@ -822,7 +784,7 @@ int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char
 int action_record_keyword(pass_to_bison *bison_args, char *keyword, char *value)
 {
     #ifdef PARSER_DEBUG
-        fprintf (stderr, "entry rule fulfilled [%s = %s]\n", keyword, value);
+        fprintf (stderr, " Parser: entry rule fulfilled [%s = %s]\n", keyword, value);
     #endif
     if (strcasecmp (keyword, "author") == 0) {
         curdes.author = (char *) strdup (value);
@@ -946,7 +908,7 @@ int action_add_alias(pass_to_bison *bison_args, char *alias_name)
     }
     if (alias_exists_in_child_configs(bison_args, alias_name)) {
         #ifdef PARSER_DEBUG
-            fprintf (stderr, "alias already used by child config, dropping: %s\n", alias_name);
+            fprintf (stderr, " Parser: alias already used by child config, dropping: %s\n", alias_name);
         #endif
     }
     else {
@@ -978,7 +940,7 @@ static char *adjust_eols(char *sample)
 int action_sample_block(pass_to_bison *bison_args, char *sample)
 {
     #ifdef PARSER_DEBUG
-        fprintf(stderr, "SAMPLE block rule satisfied\n");
+        fprintf(stderr, " Parser: SAMPLE block rule satisfied\n");
     #endif
 
     if (curdes.sample) {
