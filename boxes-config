@@ -192,7 +192,7 @@ author   "Thomas Jensen"
 revision "1.2"
 revdate  "August 18, 1999 (Wednesday, 17:00h)"
 created  "March 17, 1999 (Wednesday, 17:04h)"
-tags     "artwork, box, scroll"
+tags     "artwork, box, scroll, large"
 
 SAMPLE
      / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \
@@ -2115,7 +2115,7 @@ designer "Michael Naylor <mnaylor@math.fsu.edu>"
 revision "1.0"
 created  "Saturday, 02-Jan-16 12:42:31 UTC+1"
 revdate  "Saturday, 02-Jan-16 12:42:31 UTC+1"
-tags     "artwork, box"
+tags     "artwork, box, large"
 
 sample
     ._____. ._____. .________________________________________. ._____. ._____.
@@ -2306,7 +2306,7 @@ author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 created  "2014-02-13 08:41:11"
 revision "1.0"
-tags     "artwork, box"
+tags     "artwork, box, large"
 
 sample
      .--(0)    (0)--.
@@ -2604,7 +2604,7 @@ designer "Hayley Jane Wakenshaw"
 author   "Thomas Jensen"
 created  "2019-03-31"
 revision "1.0"
-tags     "artwork, box, sign"
+tags     "artwork, box, sign, large"
 
 sample
                          ,---.           ,---.
@@ -2771,7 +2771,7 @@ author   "Thomas Jensen"
 designer "dc"
 revision "1.0"
 created  "2021-06-13"
-tags     "artwork, box"
+tags     "artwork, box, large"
 
 sample
               _       _       _       _       _       _       _       _       _       _       _
@@ -2869,4 +2869,4 @@ END weave
 # ============================================================================
 
 
-#EOF                                               vim: set ai sw=4 syn=boxes:
+#EOF                                     vim: set ai sw=4 expandtab syn=boxes:
