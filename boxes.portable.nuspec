@@ -3,7 +3,7 @@
     <metadata>
         <id>boxes.portable</id>
         <title>boxes (Portable)</title>
-        <version>2.1.0</version>
+        <version>2.1.1</version>
         <authors>The Boxes Contributors</authors>
         <owners>Thomas Jensen</owners>
         <summary>Command Line ASCII Boxes Unlimited!</summary>
@@ -83,10 +83,10 @@ these locations (in order):
         <tags>ascii ascii-art filter command-line cli</tags>
         <iconUrl>https://boxes.thomasjensen.com/images/boxes-sq-256.png</iconUrl>
         <!-- <license type="expression">GPL-2.0-only</license> -->
-        <licenseUrl>https://raw.githubusercontent.com/ascii-boxes/boxes/v2.1.0/LICENSE</licenseUrl>
+        <licenseUrl>https://raw.githubusercontent.com/ascii-boxes/boxes/v2.1.1/LICENSE</licenseUrl>
         <language>en</language>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <releaseNotes>https://boxes.thomasjensen.com/2021/04/boxes-v2.1.0-released.html</releaseNotes>
+        <releaseNotes>https://boxes.thomasjensen.com/2021/06/boxes-v2.1.1-released.html</releaseNotes>
         <projectSourceUrl>https://github.com/ascii-boxes/boxes</projectSourceUrl>
         <packageSourceUrl>https://github.com/ascii-boxes/boxes/blob/master/boxes.portable.nuspec</packageSourceUrl>
         <docsUrl>https://boxes.thomasjensen.com/docs/</docsUrl>

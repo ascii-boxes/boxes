@@ -1,6 +1,6 @@
-.\" @(#)boxes.1 2.1.0 04/17/2021
+.\" @(#)boxes.1 2.1.1 06/14/2021
 .\"
-.TH boxes 1 "April 17 2021"
+.TH boxes 1 "June 14 2021"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter
