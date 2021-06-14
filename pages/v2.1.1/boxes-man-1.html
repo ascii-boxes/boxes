@@ -1,25 +1,23 @@
 ---
 title: Manpage of boxes(1)
-permalink: /boxes-man-1.html
-redirect_from:
-  - /docs/boxes-man-1.html
+permalink: /v2.1.1/boxes-man-1.html
 longContent: true
+bxVersion: v2.1.1
 created_at: 1999-04-06
 last_modified_at: 2021-06-14 21:32:00 +0200
 ---
 
 <h1>boxes</h1>
 
-{% assign thisVersion = site.currentVersion | prepend: 'v' -%}
-{% include version-select.html currentVersion=thisVersion contentPiece="boxes-man-1" %}
+{% include version-select.html currentVersion=page.bxVersion contentPiece="boxes-man-1" %}
 
 <p>Section: User Commands  (1)<BR>Updated: June 14 2021</p>
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="NAME"
-   text="NAME" %}
+    level=2 slug="NAME"
+    text="NAME" %}
 
 <p style="margin-left:11%; margin-top: 1em">boxes - text
 mode box and comment drawing filter</p>
@@ -27,8 +25,8 @@ mode box and comment drawing filter</p>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="SYNOPSIS"
-   text="SYNOPSIS" %}
+    level=2 slug="SYNOPSIS"
+    text="SYNOPSIS" %}
 
 <p style="margin-left:11%; margin-top: 1em"><b>boxes</b>
 [-hlmrv] [-a&nbsp;format] [-d&nbsp;design] [-e&nbsp;eol]
@@ -39,8 +37,8 @@ mode box and comment drawing filter</p>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="DESCRIPTION"
-   text="DESCRIPTION" %}
+    level=2 slug="DESCRIPTION"
+    text="DESCRIPTION" %}
 
 <p style="margin-left:11%; margin-top: 1em"><i>Boxes</i> is
 a text filter which can draw any kind of box around its
@@ -63,8 +61,8 @@ text editors: <br>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="OPTIONS"
-   text="OPTIONS" %}
+    level=2 slug="OPTIONS"
+    text="OPTIONS" %}
 
 <p style="margin-left:11%; margin-top: 1em">Options offered
 by <i>boxes</i> are the following: <b><br>
@@ -308,8 +306,8 @@ example is 4.</p>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="CONFIGURATION FILE"
-   text="CONFIGURATION FILE" %}
+    level=2 slug="CONFIGURATION FILE"
+    text="CONFIGURATION FILE" %}
 
 <p style="margin-left:11%; margin-top: 1em"><i>Boxes</i>
 will look for the configuration file in several places, some
@@ -378,8 +376,8 @@ fully supported, too.</p>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="EXAMPLES"
-   text="EXAMPLES" %}
+    level=2 slug="EXAMPLES"
+    text="EXAMPLES" %}
 
 <p style="margin-left:11%; margin-top: 1em">Examples on how
 to invoke <i>boxes</i> may be found on the website at
@@ -397,8 +395,8 @@ also combines nicely with other tools. Try</p>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="AVAILABILITY"
-   text="AVAILABILITY" %}
+    level=2 slug="AVAILABILITY"
+    text="AVAILABILITY" %}
 
 <p style="margin-left:11%; margin-top: 1em">The
 <i>boxes</i> website is
@@ -409,8 +407,8 @@ more in-depth documentation.</p>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="AUTHOR"
-   text="AUTHOR" %}
+    level=2 slug="AUTHOR"
+    text="AUTHOR" %}
 
 <p style="margin-left:11%; margin-top: 1em"><i>Boxes</i>
 was made by Thomas Jensen and the <i>boxes</i> contributors.
@@ -427,8 +425,8 @@ maintainer&rsquo;s current email address.</p>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="VERSION"
-   text="VERSION" %}
+    level=2 slug="VERSION"
+    text="VERSION" %}
 
 <p style="margin-left:11%; margin-top: 1em">This is
 <i>boxes</i> version {{ site.currentVersion }}.</p>
@@ -436,8 +434,8 @@ maintainer&rsquo;s current email address.</p>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="LICENSE"
-   text="LICENSE" %}
+    level=2 slug="LICENSE"
+    text="LICENSE" %}
 
 <p style="margin-left:11%; margin-top: 1em"><i>boxes</i> is
 free software under the terms of the GNU General Public
@@ -447,8 +445,8 @@ License, version 2. Details in the LICENSE file:
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="ENVIRONMENT"
-   text="ENVIRONMENT" %}
+    level=2 slug="ENVIRONMENT"
+    text="ENVIRONMENT" %}
 
 <p style="margin-left:11%; margin-top: 1em"><i>Boxes</i> recognizes the following environment variables:</p>
 
@@ -465,8 +463,8 @@ to an existing file or directory.</dd>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
-   level=2 slug="SEE ALSO"
-   text="SEE ALSO" %}
+    level=2 slug="SEE ALSO"
+    text="SEE ALSO" %}
 
 <p style="margin-left:11%; margin-top: 1em"><b>figlet</b>(6),
 <b>iconv</b>(1), <b>lolcat</b>(6)</p>

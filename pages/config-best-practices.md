@@ -29,6 +29,7 @@ through this list.
     don't use this tag.
   - `box` - It's a box that goes around the input text, i.e. at most one open side.
   - `comment` - A regional comment in a programming language.
+  - `large` - A box intended for large content, like figlet fonts, or just lots of text. It wants to be big!
   - `programming` - All comments in a programming language, including boxes which are valid comments. Anything tagged
     `comment` would also be tagged `programming`.
   - `sign` - An ASCII art figure holding or showing a sign which contains the input text.

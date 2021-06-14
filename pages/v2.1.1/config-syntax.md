@@ -1,18 +1,16 @@
 ---
 title: Docs - Config File Syntax
-permalink: /config-syntax.html
-redirect_from:
-  - /docs/config-syntax.html
-  - /docs/config-syntax.shtml
+permalink: /v2.1.1/config-syntax.html
 longContent: true
+bxVersion: v2.1.1
 created_at: 1999-04-06
 last_modified_at: 2021-06-14 21:32:00 +0200
 ---
 
 # Config File Syntax
 
-{% assign thisVersion = site.currentVersion | prepend: 'v' -%}
-{%- include version-select.html currentVersion=thisVersion contentPiece="config-syntax" %}
+{% include version-select.html currentVersion=page.bxVersion contentPiece="config-syntax" %}
+
 
 The *boxes* config file is a succession of box design definitions.
 Everything following a pound sign (`#`) is considered a **comment** (unless, of course, the pound sign is part of a
@@ -280,8 +278,8 @@ At the end of the output of `boxes -l`, *boxes* will print a summary of all tags
 complete with counts of how often the tag was encountered.
 
 A *tag query* can be issued by invoking `boxes -q`. *Boxes* will then print the names of all matching box designs.
-Details about tag queries can be found in the [manual page]({{ site.baseurl }}/boxes-man-1.html#OPTIONS) for the `-q`
-option.
+Details about tag queries can be found in the
+[manual page]({{ site.baseurl }}/{{ page.bxVersion }}/boxes-man-1.html#OPTIONS) for the `-q` option.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}

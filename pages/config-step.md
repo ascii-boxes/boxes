@@ -23,9 +23,6 @@ done in less than five minutes!
      Create your shapes by pasting from the `SAMPLE` block. Remember that all lines in shape definitions must be of
      equal length.
 
-  1. **Add the other entries.**
-     You must at least add the `ELASTIC` entry, but this is also the time to add any other entries you might need.
-
   1. **Take care of quoting.** There are two ways to do that:
 
       - If there are only a few double quotes or backslashes in your strings, tell your editor to double all
@@ -35,6 +32,14 @@ done in less than five minutes!
       - If you've got a lot of double quotes or backslashes in your strings, simply choose some other characters to be
         the special characters. This is achieved via the
         [`delimiter` statement]({{ site.baseurl }}/config-syntax.html#delim).
+
+     It might help to do this in the Vim editor using our
+     [boxes syntax](https://raw.githubusercontent.com/ascii-boxes/boxes/master/boxes.vim). It understands `delim`
+     statements and can help correct the escaping by highlighting were stuff is still broken. But use any editor you
+     like, of course.
+
+  1. **Add the other entries.**
+     You must at least add the `ELASTIC` entry, but this is also the time to add any other entries you might need.
 
   1. **Do not leave your editor just yet.**
      Instead try out your design. This is because if you made a mistake with the line lengths or something, you can
