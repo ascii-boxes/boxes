@@ -22,8 +22,11 @@ ul.pagination, li.page-item, p.post-meta, .card-header, .card-subtitle, .navbar-
 li {
     margin-bottom: $spacer;
 }
-ol ul li, ul ul li {
-    margin-bottom: 0;
+ol ul, ul ul {
+    margin-bottom: $spacer;
+    li {
+        margin-bottom: 0;
+    }
 }
 
 
