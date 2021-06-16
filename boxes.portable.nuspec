@@ -5,7 +5,6 @@
         <title>boxes (Portable)</title>
         <version>2.1.1</version>
         <authors>The Boxes Contributors</authors>
-        <owners>Thomas Jensen</owners>
         <summary>Command Line ASCII Boxes Unlimited!</summary>
         <description><![CDATA[*Boxes* is a command line program that draws a box around its input text. It can remove
 and repair those boxes, too. You can easily make your own box designs if you wish, but many designs are
@@ -44,43 +43,26 @@ or like this:
               '-'/    \
 ```
 
-A more complex call might look like this:
-
-`C:\>echo Spring is in the Air! | boxes -d spring -p h4 -ac`
-```
-      ,
-  /\^/`\
- | \/   |
- | |    |                                           jgs
- \ \    /                                         _ _
-  '\\//'                                        _{ ' }_
-    ||            Spring is in the Air!        { `.!.` }
-    ||                                         ',_/Y\_,'
-    ||  ,                                        {_,_}
-|\  ||  |\                                         |
-| | ||  | |                                      (\|  /)
-| | || / /                                        \| //
- \ \||/ /                                          |//
-  `\\//`   \   \./    \\   \./    \\   \./    \ \\ |/ /
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-```
-
 ### Modifying boxes.cfg
 
 At some point, you may wish to modify existing box designs or even add your own.
-When that happens, you may find that you don't have the necessary access permissions to modify boxes.cfg in
-`%ChocolateyInstall%\lib\boxes.portable\tools` directly. In that case, make a copy of boxes.cfg and place it in one of
-the precedent locations, where *boxes* finds it before the original. When reading the config file, *boxes* will try
-these locations (in order):
+In that case, we recommend that you don't change the central boxes.cfg in `%ChocolateyInstall%\lib\boxes.portable\tools`
+directly, because that one may get updated in subsequent releases. Instead, create a new boxes.cfg in your `%HOME%`
+directory, and place a line in it saying
 
-1. The file specified by the environment variable `BOXES`.
-2. A file called boxes.cfg in the directory specified by the environment variable `HOME`.
-3. The boxes.cfg installed by choco.
+```
+parent :global:
+```
+
+This will make it inherit the global config. You can add any new or modified designs in your new personal config.
+
+Details on where boxes looks for configuration files can be found
+[here](https://github.com/ascii-boxes/boxes/issues/69#issuecomment-782857777).
 
 &nbsp;
 ]]></description>
         <projectUrl>https://boxes.thomasjensen.com/</projectUrl>
-        <tags>ascii ascii-art filter command-line cli</tags>
+        <tags>ascii ascii-art box boxes command-line cli</tags>
         <iconUrl>https://boxes.thomasjensen.com/images/boxes-sq-256.png</iconUrl>
         <!-- <license type="expression">GPL-2.0-only</license> -->
         <licenseUrl>https://raw.githubusercontent.com/ascii-boxes/boxes/v2.1.1/LICENSE</licenseUrl>
@@ -89,7 +71,7 @@ these locations (in order):
         <releaseNotes>https://boxes.thomasjensen.com/2021/06/boxes-v2.1.1-released.html</releaseNotes>
         <projectSourceUrl>https://github.com/ascii-boxes/boxes</projectSourceUrl>
         <packageSourceUrl>https://github.com/ascii-boxes/boxes/blob/master/boxes.portable.nuspec</packageSourceUrl>
-        <docsUrl>https://boxes.thomasjensen.com/docs/</docsUrl>
+        <docsUrl>https://boxes.thomasjensen.com/</docsUrl>
         <bugTrackerUrl>https://github.com/ascii-boxes/boxes/issues</bugTrackerUrl>
     </metadata>
     <files>
