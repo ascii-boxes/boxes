@@ -29,6 +29,8 @@
 /* #define REGEXP_DEBUG 1 */
 /* #define PARSER_DEBUG 1 */
 /* #define LEXER_DEBUG 1 */
+/* #define DISCOVERY_DEBUG 1 */
+
 
 #include <stdio.h>
 #include <unitypes.h>

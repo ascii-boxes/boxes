@@ -14,6 +14,7 @@
                 "REGEXP_DEBUG",
                 "PARSER_DEBUG",
                 "LEXER_DEBUG",
+                "DISCOVERY_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
