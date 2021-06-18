@@ -1,0 +1,19 @@
+:DESC
+Tests that the 'peek' box design properly escapes closing comment tags.
+
+:ARGS
+-d peek -p h2
+:INPUT
+foo();
+bar(); /* a comment */
+baz();
+:OUTPUT-FILTER
+:EXPECTED
+/*       _\|/_
+         (o o)
+ +----oOO-{_}-OOo------------+
+ |  foo();                   |
+ |  bar(); /* a comment *\/  |
+ |  baz();                   |
+ +--------------------------*/
+:EOF

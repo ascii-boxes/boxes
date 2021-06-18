@@ -297,8 +297,8 @@ shapes {
     e ("*/")
 }
 
-replace "\\*/" with "*\\/"               # quote closing comment tags
-reverse "\\*\\\\/" to "*/"
+replace "\\*\\/" with "*\\\\/"               # quote closing comment tags
+reverse "\\*\\\\/" to "*\\/"
 
 Padding { h 1 }
 
@@ -335,8 +335,8 @@ shapes {
 padding { left 2 }
 
 delimiter ?"
-replace "\*/" with "*\/"                 # quote closing comment tags
-reverse "\*\\/" to "*/"
+replace "\*\/" with "*\\/"                 # quote closing comment tags
+reverse "\*\\/" to "*\/"
 
 elastic (s, w)
 
@@ -371,8 +371,8 @@ shapes {
 padding { left 1 }
 
 delimiter ?"
-replace "\*/" with "*\/"                 # quote closing comment tags
-reverse "\*\\/" to "*/"
+replace "\*\/" with "*\\/"                 # quote closing comment tags
+reverse "\*\\/" to "*\/"
 
 elastic (s, w, n)
 
@@ -408,12 +408,46 @@ shapes {
 padding { h 1 }
 
 delim ?"
-replace "-->" with "-\-\>"
+replace "-->" with "-\\-\\>"
 reverse "-\\-\\>" to "-->"
 
 elastic (n,e,s,w)
 
 END html
+
+
+# ============================================================================
+
+
+BOX html-cmt
+
+author   "Thomas Jensen"
+designer "(public domain)"
+revision "1.0"
+revdate  "June 17, 1999 (Thursday, 19:59h)"
+created  "June 17, 1999 (Thursday, 19:59h)"
+tags     "simple, programming, comment"
+
+sample
+    <!--                                     -->
+    <!-- regular comments used in HTML files -->
+    <!--                                     -->
+ends
+
+shapes {
+     w ("<!--")
+     e ("-->")
+}
+
+elastic (e, w)
+
+padding { h 1 }
+
+delim ?"
+replace "-->" with "-\\-\\>"
+reverse "-\\-\\>" to "-->"
+
+END html-cmt
 
 
 # ============================================================================
@@ -1312,8 +1346,8 @@ shapes {
     se  ("/")
 }
 
-replace "\\*/" with "*\\/"               # quote closing comment tags
-reverse "\\*\\\\/" to "*/"
+replace "\\*\\/" with "*\\\\/"               # quote closing comment tags
+reverse "\\*\\\\/" to "*\\/"
 
 elastic (n,e,s,w)
 
@@ -1377,34 +1411,6 @@ padding { left 1}
 elastic (w)
 
 END pound-cmt
-
-
-# ============================================================================
-
-
-BOX html-cmt
-
-author   "Thomas Jensen"
-designer "(public domain)"
-revision "1.0"
-revdate  "June 17, 1999 (Thursday, 19:59h)"
-created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "simple, programming, comment"
-
-sample
-    <!--                                     -->
-    <!-- regular comments used in HTML files -->
-    <!--                                     -->
-ends
-
-shapes {
-     w ("<!-- ")
-     e (" -->")
-}
-
-elastic (e,w)
-
-END html-cmt
 
 
 # ============================================================================
@@ -1665,8 +1671,8 @@ shapes {
 }
 
 delim ?"
-replace "\*/" with "*\/"               # quote closing comment tags
-reverse "\*\\/" to "*/"
+replace "\*\/" with "*\\/"               # quote closing comment tags
+reverse "\*\\/" to "*\/"
 
 padding {
     horiz 1
@@ -2715,8 +2721,8 @@ shapes {
 elastic (n, e, s, w)
 
 delim ?"
-replace "\*/" with "*\/"
-reverse "\*\\/" to "*/"
+replace "\*\/" with "*\\/"
+reverse "\*\\/" to "*\/"
 
 padding {
     horiz 1
@@ -2742,16 +2748,13 @@ sample
     """""""""""""""""""""""""""""""""""""""""""""""""""""""
 ends
 
-delim ?'
+delim \'
 
 shapes {
     nw ('"') n ('"') ne ('"')
      w ('"')          e ('"')
     sw ('"') s ('"') se ('"')
 }
-
-replace '"' with '\"'               # quote closing comment tags
-reverse '\\\"' to '"'
 
 padding {
     horiz 1
