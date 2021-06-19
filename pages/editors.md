@@ -5,7 +5,7 @@ redirect_from:
   - /docs/install.html
   - /docs/install.shtml
 created_at: 1999-04-06
-last_modified_at: 2021-05-04 22:00:00 +0200
+last_modified_at: 2021-06-18 22:00:00 +0200
 ---
 
 # Text Editor Integration
@@ -16,10 +16,10 @@ afterwards with the output of the external program. Most editors can do that.
 
 Currently, we have concrete instructions on how to integrate *boxes* with the following text editors:
 
-### Vim
+### Emacs
 
-<a href="{{ site.baseurl }}/editors-vim.html"><img src="{{ site.baseurl }}/images/vim-logo.png"
-   class="img-fluid ml-lg-5" width="120" height="120" alt="Vim" /></a>
+<a href="{{ site.baseurl }}/editors-emacs.html"><img src="{{ site.baseurl }}/images/emacs-logo.png"
+   class="img-fluid ml-lg-5" width="200" height="249" alt="Emacs" /></a>
 
 
 ### JED
@@ -28,10 +28,10 @@ Currently, we have concrete instructions on how to integrate *boxes* with the fo
    class="img-fluid ml-lg-5" width="183" height="100" alt="JED" /></a>
 
 
-### Emacs
+### Notepad++
 
-<a href="{{ site.baseurl }}/editors-emacs.html"><img src="{{ site.baseurl }}/images/emacs-logo.png"
-   class="img-fluid ml-lg-5" width="200" height="249" alt="Emacs" /></a>
+<a href="{{ site.baseurl }}/editors-notepadplusplus.html"><img src="{{ site.baseurl }}/images/notepadplusplus-logo.png"
+   class="img-fluid ml-lg-5" width="289" height="120" alt="Notepad++" /></a>
 
 
 ### Sublime Text
@@ -40,10 +40,16 @@ Currently, we have concrete instructions on how to integrate *boxes* with the fo
    class="img-fluid ml-lg-5" width="512" height="60" alt="Sublime Text" /></a>
 
 
-### Notepad++
+### Vim
 
-<a href="{{ site.baseurl }}/editors-notepadplusplus.html"><img src="{{ site.baseurl }}/images/notepadplusplus-logo.png"
-   class="img-fluid ml-lg-5" width="289" height="120" alt="Notepad++" /></a>
+<a href="{{ site.baseurl }}/editors-vim.html"><img src="{{ site.baseurl }}/images/vim-logo.png"
+   class="img-fluid ml-lg-5" width="110" height="110" alt="Vim" /></a>
+
+
+### Visual Studio Code
+
+<a href="{{ site.baseurl }}/editors-vscode.html"><img src="{{ site.baseurl }}/images/vscode-logo.png"
+   class="img-fluid ml-lg-5" width="100" height="100" alt="VSCode" /></a>
 
 
 Let us know if you have a recipe of how to do this for another text editor! You can add to this page via GitHub or just
