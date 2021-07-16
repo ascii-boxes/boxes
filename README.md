@@ -1,4 +1,5 @@
 [![Build Status](https://github.com/ascii-boxes/boxes/actions/workflows/boxes.yml/badge.svg)](https://github.com/ascii-boxes/boxes/actions/workflows/boxes.yml)
+[![Latest Version](https://img.shields.io/github/v/release/ascii-boxes/boxes?label=latest)](https://boxes.thomasjensen.com/releases.html)
 
 # boxes
 
