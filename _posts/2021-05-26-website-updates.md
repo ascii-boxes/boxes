@@ -44,7 +44,7 @@ In order to run the website locally, ...
 1. `cd {{ site.name }}`
 1. `git checkout gh-pages`
 1. `bundle install`  
-   This command should take case of installing everything else as per the Gemfile.
+   This command takes care of installing everything else as per the Gemfile.
 1. `bundle exec jekyll serve --watch --incremental --trace`
 
 Now you can browse the website at *http://localhost:4000*

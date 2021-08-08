@@ -128,7 +128,7 @@ Basically very simple, but there may be a few pitfalls, so we'll go through each
    **Do not** install <tt>mingw-developer-toolkit</tt>, because if on 64bit, this requires tweaking of several
    environment variables to get gcc to use 32bit libs all around (which may be hard to get right for laymen).
 7. In the menu, select *Installation* &rarr; *Apply Changes*.
-   Something like 113 Packages will be installed, which may take a few minutes.
+   Something like 80 Packages will be installed, which may take a few minutes.
 8. Upon success, select *Installation* &rarr; *Quit* from the menu.
 
 
