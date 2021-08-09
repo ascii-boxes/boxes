@@ -51,7 +51,7 @@
      (call-process "boxes" nil t nil "-l")
      (goto-char (point-min))
      (let ((retval nil))
-       (while (re-search-forward "^\\([a-zA-Z][a-zA-Z0-9-]+\\)" nil t)
+       (while (re-search-forward "^\\([a-zA-Z][a-zA-Z0-9-_]+\\)" nil t)
 	 (add-to-list 'retval (cons (match-string 1)
 				    (match-string 1))))
        retval)))
