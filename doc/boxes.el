@@ -46,28 +46,26 @@
   "The boxes command.")
 
 (defvar boxes-types-alist
-  (ignore-errors
-   (with-temp-buffer
-     (call-process "boxes" nil t nil "-l")
-     (goto-char (point-min))
-     (let ((retval nil))
-       (while (re-search-forward "^\\([a-zA-Z][a-zA-Z0-9-_]+\\)" nil t)
-	 (add-to-list 'retval (cons (match-string 1)
-				    (match-string 1))))
-       retval)))
+  (let ((the-types (process-lines boxes-command "-q" "(all)"))
+        (the-alist (list)))
+    (dolist (el the-types the-alist)
+      (let ((no-alias (replace-regexp-in-string " *\(alias\) *$" "" el)))
+        (add-to-list 'the-alist 
+                     (cons no-alias no-alias)))))
   "Association of types available to the current boxes implementation." )
 (make-variable-buffer-local 'boxes-types-alist)
 
 (defvar boxes-history nil)
 
 ;;;###autoload
-(defvar boxes-known-modes
+(defcustom boxes-known-modes
   '((c-mode . "c-cmt2") (c++-mode . "c-cmt2") (java-mode . "java-cmt")
     (html-mode . "html-cmt") (sh-mode . "pound-cmt") (perl-mode . "pound-cmt")
     (python-mode . "pound-cmt") (ruby-mode . "pound-cmt")
     (emacs-lisp-mode . "lisp-cmt") (lisp-mode . "lisp-cmt"))
-  "The default comment type based on file names.")
-(make-variable-buffer-local 'boxes-known-modes)
+  "The default comment type based on file names."
+:group 'customize
+)
 
 ;;;###autoload
 (defun boxes-set-default-type (mode)
