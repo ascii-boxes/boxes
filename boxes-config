@@ -2991,4 +2991,28 @@ END normand
 # ============================================================================
 
 
+BOX align
+
+author   "David Yang <davidyang6us(at)gmail(dot)com>"
+designer "(public domain)"
+revision "1.0"
+created  "2021-08-15"
+tags     "simple, formatting"
+
+sample
+    
+      Blank box with nothing rendered that you can wrap text or other boxes in for alignment
+    
+ends
+
+shapes {
+    w ("　")
+}
+elastic (w)
+END align
+
+
+# ============================================================================
+
+
 #EOF                                     vim: set ai sw=4 expandtab syn=boxes:
