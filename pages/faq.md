@@ -5,7 +5,7 @@ redirect_from:
   - /docs/faq.html
   - /docs/faq.shtml
 created_at: 1999-04-06
-last_modified_at: 2021-02-26 22:03:41 +0100
+last_modified_at: 2021-08-14 14:30:00 +0200
 ---
 
 # FAQ
