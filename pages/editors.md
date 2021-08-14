@@ -5,7 +5,7 @@ redirect_from:
   - /docs/install.html
   - /docs/install.shtml
 created_at: 1999-04-06
-last_modified_at: 2021-06-18 22:00:00 +0200
+last_modified_at: 2021-08-15 00:10:51 +0800
 ---
 
 # Text Editor Integration
@@ -20,6 +20,12 @@ Currently, we have concrete instructions on how to integrate *boxes* with the fo
 
 <a href="{{ site.baseurl }}/editors-emacs.html"><img src="{{ site.baseurl }}/images/emacs-logo.png"
    class="img-fluid ml-lg-5" width="200" height="249" alt="Emacs" /></a>
+
+
+### Geany
+
+<a href="{{ site.baseurl }}/editors-geany.html"><img src="{{ site.baseurl }}/images/geany-logo.png"
+   class="img-fluid ml-lg-5" width="200" height="200" alt="Geany" /></a>
 
 
 ### JED
