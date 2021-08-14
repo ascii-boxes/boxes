@@ -101,3 +101,33 @@ Since v2.0.0, *boxes* supports different character encodings for input/output te
 still ASCII (we are working on that). *boxes* normally picks up your system encoding, which on most systems, is simply
 UTF-8. You can override this behavior with `-n`. *boxes* shows what it thinks is the system encoding when you call
 `boxes -h` - the displayed default value for `-n` is the system encoding.
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=3 slug="q7"
+   text="Q. 7. How to align a box within a terminal window?" %}
+
+The *boxes* options only allow aligning the text within a box, but it is actually possible to use *boxes* to align the
+entire box within a terminal window. At least on Unix / Linux ... we don't currently know how to do this on Windows.
+
+This method assumes that `tput cols` yields the width of the terminal window. If it doesn't, you'd have to find another
+way to get this information, for example a `$COLUMNS` environment variable.
+
+Centered:
+
+```shell
+echo -e foo\\ncenter | boxes -d parchment -p h5 | boxes -s $(tput cols) -c x -a hc -i none | cut -c 2-
+```
+
+Right-aligned:
+
+```shell
+echo -e foo\\nright-aligned | boxes -d parchment -p h5 | boxes -s $(tput cols) -c x -a hr -i none | sed -e 's/^x/ /'
+```
+
+Note that we `-a hc` instead of just `-ac`, because we want to align the whole block of text, not individual lines.  
+The result looks like this:
+
+<img src="{{ site.baseurl}}/images/faq-alignment.png" class="img-fluid" width="1400" height="477"
+     alt="box aligned in terminal window" />
