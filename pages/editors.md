@@ -19,13 +19,13 @@ Currently, we have concrete instructions on how to integrate *boxes* with the fo
 ### Emacs
 
 <a href="{{ site.baseurl }}/editors-emacs.html"><img src="{{ site.baseurl }}/images/emacs-logo.png"
-   class="img-fluid ml-lg-5" width="200" height="249" alt="Emacs" /></a>
+   class="img-fluid ml-lg-5" width="150" height="187" alt="Emacs" /></a>
 
 
 ### Geany
 
 <a href="{{ site.baseurl }}/editors-geany.html"><img src="{{ site.baseurl }}/images/geany-logo.png"
-   class="img-fluid ml-lg-5" width="200" height="200" alt="Geany" /></a>
+   class="img-fluid ml-lg-5" width="120" height="120" alt="Geany" /></a>
 
 
 ### JED
