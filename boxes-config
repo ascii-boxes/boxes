@@ -2994,22 +2994,22 @@ END normand
 BOX cowsay
 
 author   "David Yang <davidyang6us@gmail.com>"
-designer "(public domain)"
+designer "Tony Monroe"
 revision "1.0"
 created  "2021-08-16"
 tags     "artwork, speech"
 
 sample
-         _____________________________
-        /                             \
-        |  Boxes can have the cow too |
-        \                             /
-         -----------------------------
-            \   ^__^
-             \  (oo)\_______
-                (__)\       )\/\
-                    ||----w |
-                    ||     ||
+     _____________________________
+    /                             \
+    |  Boxes can have the cow too |
+    \                             /
+     -----------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
 ends
 
 shapes {
@@ -3075,7 +3075,7 @@ END cowsay
 BOX tux
 
 author   "David Yang <davidyang6us@gmail.com>"
-designer "(public domain)"
+designer "Tony Monroe"
 revision "1.0"
 created  "2021-08-16"
 tags     "artwork, speech"
