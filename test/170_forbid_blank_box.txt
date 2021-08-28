@@ -1,0 +1,15 @@
+:DESC
+Check that designs which consist only of whitespace are rejected.
+
+:ARGS
+-f 170_forbid_blank_box.cfg -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: 170_forbid_blank_box.cfg: line 9: must specify at least one non-empty shape per design
+boxes: 170_forbid_blank_box.cfg: line 9: skipping to next design
+boxes: 170_forbid_blank_box.cfg: line 29: must specify at least one non-empty shape per design
+boxes: 170_forbid_blank_box.cfg: line 29: skipping to next design
+boxes: no valid data in config file -- 170_forbid_blank_box.cfg
+boxes: no valid designs found
+:EOF

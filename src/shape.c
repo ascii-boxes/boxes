@@ -201,7 +201,7 @@ int isempty(const sentry_t *shape)
 
 int isdeepempty(const sentry_t *shape)
 /*
- *  Return true if shape is empty, also checking if lines consist of spaces
+ *  Return true if shape is empty, also checking if lines consist of whitespace
  *  only.
  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -215,7 +215,7 @@ int isdeepempty(const sentry_t *shape)
 
     for (j = 0; j < shape->height; ++j) {
         if (shape->chars[j]) {
-            if (strspn(shape->chars[j], " ") != shape->width) {
+            if (strspn(shape->chars[j], " \t") != shape->width) {
                 return 0;
             }
         }
