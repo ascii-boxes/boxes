@@ -1,5 +1,5 @@
 :ARGS
--c #
+-c "#"
 :INPUT
 a
 

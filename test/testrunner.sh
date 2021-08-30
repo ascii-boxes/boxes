@@ -94,9 +94,9 @@ fi
 
 echo "    Invoking: $(basename $boxesBinary) $boxesArgs"
 if [ ! -z "$BOXES_TEST_XXD" ]; then
-    cat $testInputFile | $boxesBinary $boxesArgs | xxd >$testOutputFile 2>&1
+    cat $testInputFile | eval "$boxesBinary $boxesArgs" | xxd >$testOutputFile 2>&1
 else
-    cat $testInputFile | $boxesBinary $boxesArgs >$testOutputFile 2>&1
+    cat $testInputFile | eval "$boxesBinary $boxesArgs" >$testOutputFile 2>&1
 fi
 declare -ir actualReturnCode=$?
 cat $testOutputFile | tr -d '\r' | sed -E -f $testFilterFile | diff - $testExpectationFile

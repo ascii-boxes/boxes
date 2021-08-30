@@ -1,5 +1,5 @@
 :ARGS
--c # -l
+-c "#" -l
 :INPUT
 :OUTPUT-FILTER
 :EXPECTED
