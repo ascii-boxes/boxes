@@ -231,15 +231,6 @@ static int command_line_design(opt_t *result, char *optarg)
         perror(PROJECT);
         return 1;
     }
-    else {
-        line_t templine = {0};
-        templine.len = strlen(result->cld);
-        templine.text = result->cld;
-        if (empty_line(&templine)) {
-            fprintf(stderr, "%s: boxes may not consist entirely of whitespace\n", PROJECT);
-            return 1;
-        }
-    }
     result->design_choice_by_user = 1;
     return 0;
 }

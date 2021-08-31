@@ -1,0 +1,8 @@
+:ARGS
+-s 100 -a hcvc -c " "
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+                                                 foo
+:EOF

@@ -1,0 +1,8 @@
+:ARGS
+-s 100 -a hr -c " "
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+                                                                                                 foo
+:EOF
