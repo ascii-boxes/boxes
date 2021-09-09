@@ -33,11 +33,15 @@ WIN_PCRE2_DIR          = pcre2-$(WIN_PCRE2_VERSION)
 WIN_FLEX_BISON_VERSION = 2.5.24
 WIN_FLEX_BISON_DIR     = flex_bison_$(WIN_FLEX_BISON_VERSION)
 
-.PHONY: clean build win32 debug win32.debug win32.pcre infomsg replaceinfos test package win32.package package_common
+.PHONY: clean build cov win32 debug win32.debug win32.pcre infomsg replaceinfos test covtest \
+        package win32.package package_common
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-build debug: infomsg replaceinfos
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#    Build
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+build cov debug: infomsg replaceinfos
 	$(MAKE) -C src BOXES_PLATFORM=unix LEX=flex YACC=bison $@
 
 win32: infomsg replaceinfos
@@ -64,7 +68,7 @@ win32.prereq:
 	rm pcre2-$(WIN_PCRE2_VERSION).tar.gz
 	rm win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 infomsg:
 	@echo "| For compilation info please refer to the boxes compilation FAQ"
@@ -88,7 +92,10 @@ doc/boxes.1.html: doc/boxes.1
 	rm -f doc/boxes.1.raw.html
 	@echo "Conversion complete. Excessive manual work remains."
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#    Standalone Packaging (Unix / Windows)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 $(OUT_DIR)/$(PKG_NAME).tar.gz:
 	mkdir -p $(OUT_DIR)/$(PKG_NAME)/doc
@@ -116,7 +123,10 @@ package: build
 
 win32.package: win32 $(OUT_DIR)/zip/$(PKG_NAME).zip
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#    Chocolatey Packaging (Windows)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 choco: tools/LICENSE.txt tools/boxes.cfg tools/boxes.exe
 	choco pack --version=$(BVERSION)
@@ -132,17 +142,26 @@ tools/boxes.exe: $(OUT_DIR)/boxes.exe
 
 $(OUT_DIR)/boxes.exe: win32
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#    Test
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+test:
+	cd test; ./testrunner.sh --suite
+
+covtest:
+	cd test; ./testrunner.sh --suite --coverage
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#    Cleanup
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 clean:
 	rm -f $(OUT_DIR)/boxes.h tools/boxes.cfg tools/LICENSE.txt tools/boxes.exe tools/README*.md boxes.portable.*.nupkg
 	rm -f doc/boxes.1 doc/boxes.1.raw.html doc/boxes.1.html
 	$(MAKE) -C src clean
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-test:
-	cd test; ./testrunner.sh -suite
 
 
 #EOF

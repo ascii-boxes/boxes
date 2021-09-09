@@ -11,27 +11,67 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # _____________________________________________________________________________________________________________________
 #
-# Low-tech test runner for boxes.
+# Test runner for the black-box tests.
 # _____________________________________________________________________________________________________________________
 
-if [ $# -ne 1 ]; then
-    echo 'Usage: testrunner.sh {-suite | <testCaseFile>}'
+measureCoverage=false
+if [ $# -lt 1 -o $# -gt 2 ]; then
+    echo 'Usage: testrunner.sh [--coverage] {--suite | <testCaseFile>}'
     echo '       Returns 0 for success, else non-zero'
     exit 2
+elif [ $# -eq 1 ]; then
+    if [ "$1" == "--coverage" ]; then
+        echo 'Usage: testrunner.sh [--coverage] {--suite | <testCaseFile>}'
+        echo '       Returns 0 for success, else non-zero'
+        exit 2
+    fi
+elif [ $# -eq 2 ]; then
+    if [ "$1" != "--coverage" -a "$2" != "--coverage" ]; then
+        echo 'Usage: testrunner.sh [--coverage] {--suite | <testCaseFile>}'
+        echo '       Returns 0 for success, else non-zero'
+        exit 2
+    else
+        measureCoverage=true
+    fi
 fi
+
 if [ ${PWD##*/} != "test" ]; then
     >&2 echo "Please run this script from the test folder."
     exit 2
 fi
+if [ ! -d ../out ]; then
+    >&2 echo "Please run 'make' from the project root to build the executable before running the tests."
+    exit 2
+fi
+
+if [ $measureCoverage == true ]; then
+    if [ $(ls ../out/*.gcno 2>/dev/null | wc -l) -lt 1 ]; then
+        >&2 echo "Binaries not instrumented. Run 'make cov' from the project root."
+        exit 5
+    fi
+    if [ "$1" == "--suite" -o "$2" == "--suite" ]; then
+        rm -f ../out/lcov-baseline.info
+    fi
+    if [ ! -f ../out/lcov-baseline.info ]; then
+        echo "Creating coverage baseline ..."
+        lcov --capture --initial --no-recursion --directory ../out --base-directory ../src \
+            --exclude '*/lex.yy.c' --exclude '*/parser.c' --output-file ../out/lcov-baseline.info
+        echo -e "Coverage baseline created in ../out/lcov-baseline.info\n"
+    fi
+fi
 
 # Execute the entire test suite
-if [ "$1" == "-suite" ]; then
+if [ "$1" == "--suite" -o "$2" == "--suite" ]; then
     declare -i overallResult=0
     declare -i countExecuted=0
     declare -i countFailed=0
     declare tc
     for tc in *.txt; do
-        $0 $tc
+        if [ $measureCoverage == true ]; then
+            $0 --coverage $tc
+        else
+            $0 $tc
+        fi
         if [ $? -ne 0 ]; then
             overallResult=1
             ((countFailed++))
@@ -39,17 +79,41 @@ if [ "$1" == "-suite" ]; then
         ((countExecuted++))
     done
     echo "$countExecuted tests executed, $(($countExecuted-$countFailed)) successful, $countFailed failed."
+
+    if [ $measureCoverage == true ]; then
+        echo -e "\nConsolidating test coverage ..."
+        pushd ../out/test-results
+        find . -name *.info | xargs printf -- '--add-tracefile %s\n' | xargs --exit \
+            lcov --rc lcov_branch_coverage=1 --exclude '*/lex.yy.c' --exclude '*/parser.c' \
+                 --output-file ../lcov-blackbox.info --add-tracefile ../lcov-baseline.info
+        popd
+        echo ""
+
+        declare -r testReportDir=../out/coverage
+        mkdir -p ${testReportDir}
+        genhtml --title "Boxes / black-box tests" --branch-coverage --legend \
+            --output-directory ${testReportDir} ../out/lcov-blackbox.info
+        echo -e "\nTest coverage report created in ${testReportDir}/index.html"
+    fi
     exit $overallResult
 fi
 
 # Execute only a single test
-declare -r testCaseFile="$1"
+declare testCaseFile="$1"
+if [ "$1" == "--coverage" ]; then
+    testCaseFile="$2"
+fi
 if [ ! -f $testCaseFile ]; then
     >&2 echo "Test Case '$testCaseFile' not found."
     exit 3
 fi
 
 echo "Running test case: $testCaseFile"
+
+declare -r testCaseName=${testCaseFile:0:-4}
+if [ $measureCoverage == true ]; then
+    rm -f ../out/*.gcda    # remove any left-over coverage data files
+fi
 
 declare sectionName
 for sectionName in :ARGS :INPUT :OUTPUT-FILTER :EXPECTED :EOF; do
@@ -99,6 +163,18 @@ else
     cat $testInputFile | eval "$boxesBinary $boxesArgs" >$testOutputFile 2>&1
 fi
 declare -ir actualReturnCode=$?
+
+declare -r testResultsDir=../out/test-results/${testCaseName}
+if [ $measureCoverage == true ]; then
+    mkdir -p ${testResultsDir}
+    cp ../out/*.gc* ${testResultsDir}
+    lcov --capture --directory ${testResultsDir} --base-directory ../src --test-name ${testCaseName} --quiet \
+        --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc lcov_branch_coverage=1 \
+        --output-file ${testResultsDir}/coverage.info
+    echo -n "    Coverage: "
+    lcov --summary ${testResultsDir}/coverage.info 2>&1 | grep 'lines...' | grep -oP '\d+\.\d*%'
+fi
+
 cat $testOutputFile | tr -d '\r' | sed -E -f $testFilterFile | diff - $testExpectationFile
 if [ $? -ne 0 ]; then
     >&2 echo "Error in test case: $testCaseFile (top: actual; bottom: expected)"

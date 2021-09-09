@@ -37,7 +37,7 @@ ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
 ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 
 
-.PHONY: check_dir clean build debug package flags_unix flags_win32 flags_
+.PHONY: check_dir clean build cov debug package flags_unix flags_win32 flags_
 
 .NOTPARALLEL:
 
@@ -51,12 +51,18 @@ $(OUT_DIR):
 	mkdir $(OUT_DIR)
 
 build: flags_$(BOXES_PLATFORM) | $(OUT_DIR)
-	$(MAKE) -C $(OUT_DIR) -f $(SRC_DIR)/Makefile BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" \
-	    CFLAGS_ADDTL="-O $(CFLAGS_ADDTL)" STRIP=true flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
+	$(MAKE) -C $(OUT_DIR) -f $(SRC_DIR)/Makefile BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" STRIP=true \
+	    CFLAGS_ADDTL="-O $(CFLAGS_ADDTL)" flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
+
+cov: flags_$(BOXES_PLATFORM) | $(OUT_DIR)
+	$(MAKE) -C $(OUT_DIR) -f $(SRC_DIR)/Makefile BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" STRIP=false \
+	    CFLAGS_ADDTL="-g --coverage $(CFLAGS_ADDTL)" \
+	    LDFLAGS_ADDTL="--coverage $(LDFLAGS_ADDTL)" \
+	    flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
 
 debug: flags_$(BOXES_PLATFORM) | $(OUT_DIR)
-	$(MAKE) -C $(OUT_DIR) -f $(SRC_DIR)/Makefile BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" \
-	    CFLAGS_ADDTL="-g $(CFLAGS_ADDTL)" STRIP=false flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
+	$(MAKE) -C $(OUT_DIR) -f $(SRC_DIR)/Makefile BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" STRIP=false \
+	    CFLAGS_ADDTL="-g $(CFLAGS_ADDTL)" flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
 
 boxes: $(ALL_OBJ) | check_dir
 	$(CC) $(LDFLAGS) $^ -o $@ -lunistring -lpcre2-32
@@ -107,9 +113,11 @@ shape.o:     shape.c shape.h boxes.h tools.h config.h | check_dir
 tools.o:     tools.c tools.h boxes.h shape.h unicode.h config.h | check_dir
 unicode.o:   unicode.c unicode.h boxes.h tools.h config.h | check_dir
 
+
 package: $(BOXES_EXECUTABLE_NAME)
 	if [ -z "$(PKG_NAME)" ] ; then exit 1 ; fi
 	cp -a $(BOXES_EXECUTABLE_NAME) $(PKG_NAME)/
+
 
 clean:
 	rm -rf $(OUT_DIR)
