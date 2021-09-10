@@ -14,181 +14,284 @@
 # Test runner for the black-box tests.
 # _____________________________________________________________________________________________________________________
 
-measureCoverage=false
-if [ $# -lt 1 -o $# -gt 2 ]; then
-    echo 'Usage: testrunner.sh [--coverage] {--suite | <testCaseFile>}'
+set -uo pipefail
+
+# Global constants
+declare -r SRC_DIR=../src
+declare -r OUT_DIR=../out
+declare -r BASELINE_FILE=${OUT_DIR}/lcov-baseline.info
+declare -r COVERAGE_FILE=${OUT_DIR}/lcov-blackbox.info
+
+# Command Line Options
+declare opt_coverage=false
+declare opt_suite=false
+declare opt_testCase=""
+
+
+function print_usage()
+{
+    echo 'Usage: testrunner.sh [--coverage] {--suite | <opt_testCase>}'
     echo '       Returns 0 for success, else non-zero'
-    exit 2
-elif [ $# -eq 1 ]; then
-    if [ "$1" == "--coverage" ]; then
-        echo 'Usage: testrunner.sh [--coverage] {--suite | <testCaseFile>}'
-        echo '       Returns 0 for success, else non-zero'
+}
+
+
+function parse_arguments()
+{
+    if [ $# -eq 0 ]; then
+        print_usage
         exit 2
     fi
-elif [ $# -eq 2 ]; then
-    if [ "$1" != "--coverage" -a "$2" != "--coverage" ]; then
-        echo 'Usage: testrunner.sh [--coverage] {--suite | <testCaseFile>}'
-        echo '       Returns 0 for success, else non-zero'
+
+    for i in "$@"; do
+        case ${i} in
+            --coverage)
+                opt_coverage=true
+                shift
+                ;;
+            --suite)
+                opt_suite=true
+                shift
+                ;;
+            -h | --help)
+                print_usage
+                exit 0
+                ;;
+            *)
+                if [ -z ${opt_testCase} ]; then
+                    opt_testCase=${i}
+                else
+                    print_usage
+                    exit 2
+                fi
+                ;;
+        esac
+    done
+
+    if [[ ${opt_testCase} == "" && ${opt_suite} != "true" ]]; then
+        print_usage
         exit 2
-    else
-        measureCoverage=true
     fi
-fi
+}
 
-if [ ${PWD##*/} != "test" ]; then
-    >&2 echo "Please run this script from the test folder."
-    exit 2
-fi
-if [ ! -d ../out ]; then
-    >&2 echo "Please run 'make' from the project root to build the executable before running the tests."
-    exit 2
-fi
 
-if [ $measureCoverage == true ]; then
-    if [ $(ls ../out/*.gcno 2>/dev/null | wc -l) -lt 1 ]; then
+function check_prereqs()
+{
+    if [ ${PWD##*/} != "test" ]; then
+        >&2 echo "Please run this script from the test folder."
+        exit 2
+    fi
+    if [ ! -d ${OUT_DIR} ]; then
+        >&2 echo "Please run 'make' from the project root to build an executable before running tests."
+        exit 2
+    fi
+    if [[ ${opt_coverage} == true && $(ls ${OUT_DIR}/*.gcno 2>/dev/null | wc -l) -lt 1 ]]; then
         >&2 echo "Binaries not instrumented. Run 'make cov' from the project root."
         exit 5
     fi
-    if [ "$1" == "--suite" -o "$2" == "--suite" ]; then
-        rm -f ../out/lcov-baseline.info
+    if [ ! -f ${opt_testCase} ]; then
+        >&2 echo "Test Case '${opt_testCase}' not found."
+        exit 3
     fi
-    if [ ! -f ../out/lcov-baseline.info ]; then
-        echo "Creating coverage baseline ..."
-        lcov --capture --initial --no-recursion --directory ../out --base-directory ../src \
-            --exclude '*/lex.yy.c' --exclude '*/parser.c' --output-file ../out/lcov-baseline.info
-        echo -e "Coverage baseline created in ../out/lcov-baseline.info\n"
-    fi
-fi
+}
 
-# Execute the entire test suite
-if [ "$1" == "--suite" -o "$2" == "--suite" ]; then
-    declare -i overallResult=0
-    declare -i countExecuted=0
-    declare -i countFailed=0
-    declare tc
+
+function cov_baseline()
+{
+    if [ ${opt_coverage} == true ]; then
+        if [ ${opt_suite} == true ]; then
+            rm -f ${BASELINE_FILE}
+        fi
+        if [ ! -f ${BASELINE_FILE} ]; then
+            echo "Creating coverage baseline ..."
+            lcov --capture --initial --no-recursion --directory ${OUT_DIR} --base-directory ${SRC_DIR} \
+                --exclude '*/lex.yy.c' --exclude '*/parser.c' --output-file ${BASELINE_FILE}
+            echo -e "Coverage baseline created in ${BASELINE_FILE}\n"
+        fi
+    fi
+}
+
+
+function execute_suite()
+{
+    local countExecuted=0
+    local countFailed=0
+    local tc
     for tc in *.txt; do
-        if [ $measureCoverage == true ]; then
-            $0 --coverage $tc
+        if [ ${opt_coverage} == true ]; then
+            $0 --coverage ${tc}
         else
-            $0 $tc
+            $0 ${tc}
         fi
         if [ $? -ne 0 ]; then
             overallResult=1
-            ((countFailed++))
+            countFailed=$((countFailed + 1))
         fi
-        ((countExecuted++))
+        countExecuted=$((countExecuted + 1))
     done
-    echo "$countExecuted tests executed, $(($countExecuted-$countFailed)) successful, $countFailed failed."
+    echo "${countExecuted} tests executed, $(($countExecuted - $countFailed)) successful, ${countFailed} failed."
+}
 
-    if [ $measureCoverage == true ]; then
-        echo -e "\nConsolidating test coverage ..."
-        pushd ../out/test-results
-        find . -name *.info | xargs printf -- '--add-tracefile %s\n' | xargs --exit \
-            lcov --rc lcov_branch_coverage=1 --exclude '*/lex.yy.c' --exclude '*/parser.c' \
-                 --output-file ../lcov-blackbox.info --add-tracefile ../lcov-baseline.info
-        popd
-        echo ""
 
-        declare -r testReportDir=../out/coverage
-        mkdir -p ${testReportDir}
-        genhtml --title "Boxes / black-box tests" --branch-coverage --legend \
-            --output-directory ${testReportDir} ../out/lcov-blackbox.info
-        echo -e "\nTest coverage report created in ${testReportDir}/index.html"
+function measure_coverage()
+{
+    local testResultsDir=${OUT_DIR}/test-results/${tcBaseName}
+    if [ ${opt_coverage} == true ]; then
+        mkdir -p ${testResultsDir}
+        cp ${OUT_DIR}/*.gc* ${testResultsDir}
+        lcov --capture --directory ${testResultsDir} --base-directory ${SRC_DIR} --test-name ${tcBaseName} --quiet \
+            --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc lcov_branch_coverage=1 \
+            --output-file ${testResultsDir}/coverage.info
+        echo -n "    Coverage: "
+        lcov --summary ${testResultsDir}/coverage.info 2>&1 | grep 'lines...' | grep -oP '\d+\.\d*%'
     fi
-    exit $overallResult
+}
+
+
+function consolidate_coverage()
+{
+    echo -e "\nConsolidating test coverage ..."
+    pushd ${OUT_DIR}/test-results
+    find . -name *.info | xargs printf -- '--add-tracefile %s\n' | xargs --exit \
+        lcov --rc lcov_branch_coverage=1 --exclude '*/lex.yy.c' --exclude '*/parser.c' \
+             --output-file ../${COVERAGE_FILE} --add-tracefile ../${BASELINE_FILE}
+    popd
+    echo ""
+}
+
+
+function report_coverage()
+{
+    local testReportDir=${OUT_DIR}/coverage
+    mkdir -p ${testReportDir}
+    genhtml --title "Boxes / Black-box tests" --branch-coverage --legend \
+        --output-directory ${testReportDir} ${COVERAGE_FILE}
+    echo -e "\nTest coverage report available at ${testReportDir}/index.html"
+}
+
+
+function clear_gcda_traces()
+{
+    if [ ${opt_coverage} == true ]; then
+        rm -f ${OUT_DIR}/*.gcda
+    fi
+}
+
+
+function check_mandatory_sections()
+{
+    local sectionName
+    for sectionName in :ARGS :INPUT :OUTPUT-FILTER :EXPECTED :EOF; do
+        if [ $(grep -c ^$sectionName $opt_testCase) -ne 1 ]; then
+            >&2 echo "Missing section $sectionName in test case '$opt_testCase'."
+            exit 4
+        fi
+    done
+}
+
+
+function arrange_environment()
+{
+    local boxesEnv=""
+    if [ $(grep -c "^:ENV" ${opt_testCase}) -eq 1 ]; then
+        boxesEnv=$(cat ${opt_testCase} | sed -n '/^:ENV/,/^:ARGS/p;' | sed '1d;$d' | tr -d '\r')
+    fi
+    if [ ! -z "$boxesEnv" ]; then
+        echo $boxesEnv | sed -e 's/export/\n    export/g' | sed '1d'
+        unset BOXES
+        eval $boxesEnv
+    else
+        export BOXES=../boxes-config
+    fi
+}
+
+
+function arrange_test_fixtures()
+{
+    if [ $(grep -c "^:EXPECTED-ERROR " ${opt_testCase}) -eq 1 ]; then
+        expectedReturnCode=$(grep "^:EXPECTED-ERROR " ${opt_testCase} | sed -e 's/:EXPECTED-ERROR //')
+    fi
+
+    cat ${opt_testCase} | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d '\r' > ${testInputFile}
+    cat ${opt_testCase} | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > ${testFilterFile}
+    cat ${opt_testCase} | sed -n '/^:EXPECTED/,/^:EOF/p;' | sed '1d;$d' | tr -d '\r' > ${testExpectationFile}
+}
+
+
+function run_boxes()
+{
+    local boxesBinary=${OUT_DIR}/boxes.exe
+    if [ ! -x $boxesBinary ]; then
+        boxesBinary=${OUT_DIR}/boxes
+    fi
+
+    echo "    Invoking: $(basename $boxesBinary) $boxesArgs"
+    if [ -z "${BOXES_TEST_XXD:-}" ]; then
+        cat $testInputFile | eval "$boxesBinary $boxesArgs" >$testOutputFile 2>&1
+    else
+        cat $testInputFile | eval "$boxesBinary $boxesArgs" | xxd >$testOutputFile 2>&1
+    fi
+    actualReturnCode=$?
+}
+
+
+function assert_outcome()
+{
+    cat ${testOutputFile} | tr -d '\r' | sed -E -f ${testFilterFile} | diff - ${testExpectationFile}
+    if [ $? -ne 0 ]; then
+        >&2 echo "Error in test case: ${opt_testCase} (top: actual; bottom: expected)"
+        exit 5
+    fi
+    if [ ${actualReturnCode} -ne ${expectedReturnCode} ]; then
+        >&2 echo -n "Error in test case: ${opt_testCase}"
+        >&2 echo " (error code was ${actualReturnCode}, but expected ${expectedReturnCode})"
+        exit 5
+    fi
+}
+
+
+parse_arguments "$@"
+check_prereqs
+cov_baseline
+
+# Execute the entire test suite
+if [ ${opt_suite} == true ]; then
+    declare -i overallResult=0
+    execute_suite
+
+    if [ ${opt_coverage} == true ]; then
+        consolidate_coverage
+        report_coverage
+    fi
+    exit ${overallResult}
 fi
 
 # Execute only a single test
-declare testCaseFile="$1"
-if [ "$1" == "--coverage" ]; then
-    testCaseFile="$2"
-fi
-if [ ! -f $testCaseFile ]; then
-    >&2 echo "Test Case '$testCaseFile' not found."
-    exit 3
-fi
+echo "Running test case: ${opt_testCase}"
+declare -r tcBaseName=${opt_testCase:0:-4}
+clear_gcda_traces
 
-echo "Running test case: $testCaseFile"
-
-declare -r testCaseName=${testCaseFile:0:-4}
-if [ $measureCoverage == true ]; then
-    rm -f ../out/*.gcda    # remove any left-over coverage data files
-fi
-
-declare sectionName
-for sectionName in :ARGS :INPUT :OUTPUT-FILTER :EXPECTED :EOF; do
-    if [ $(grep -c ^$sectionName $testCaseFile) -ne 1 ]; then
-        >&2 echo "Missing section $sectionName in test case '$testCaseFile'."
-        exit 4
-    fi
-done
-
-declare boxesEnv=""
-if [ $(grep -c "^:ENV" $testCaseFile) -eq 1 ]; then
-    boxesEnv=$(cat $testCaseFile | sed -n '/^:ENV/,/^:ARGS/p;' | sed '1d;$d' | tr -d '\r')
-fi
+check_mandatory_sections
 
 declare -i expectedReturnCode=0
-if [ $(grep -c "^:EXPECTED-ERROR " $testCaseFile) -eq 1 ]; then
-    expectedReturnCode=$(grep "^:EXPECTED-ERROR " $testCaseFile | sed -e 's/:EXPECTED-ERROR //')
-fi
+declare -r testInputFile=${opt_testCase/%.txt/.input.tmp}
+declare -r testExpectationFile=${opt_testCase/%.txt/.expected.tmp}
+declare -r testFilterFile=${opt_testCase/%.txt/.sed.tmp}
+declare -r testOutputFile=${opt_testCase/%.txt/.out.tmp}
+declare -r boxesArgs=$(cat ${opt_testCase} | sed -n '/^:ARGS/,+1p' | grep -v ^:INPUT | sed '1d' | tr -d '\r')
 
-declare -r testInputFile=${testCaseFile/%.txt/.input.tmp}
-declare -r testExpectationFile=${testCaseFile/%.txt/.expected.tmp}
-declare -r testFilterFile=${testCaseFile/%.txt/.sed.tmp}
-declare -r testOutputFile=${testCaseFile/%.txt/.out.tmp}
-declare -r boxesArgs=$(cat $testCaseFile | sed -n '/^:ARGS/,+1p' | grep -v ^:INPUT | sed '1d' | tr -d '\r')
+arrange_environment
+arrange_test_fixtures
 
-cat $testCaseFile | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d '\r' > $testInputFile
-cat $testCaseFile | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > $testFilterFile
-cat $testCaseFile | sed -n '/^:EXPECTED/,/^:EOF/p;' | sed '1d;$d' | tr -d '\r' > $testExpectationFile
+declare -i actualReturnCode=100
+run_boxes
+measure_coverage
 
-declare boxesBinary=../out/boxes.exe
-if [ ! -x $boxesBinary ]; then
-    boxesBinary=../out/boxes
-fi
+assert_outcome
 
-if [ ! -z "$boxesEnv" ]; then
-    echo $boxesEnv | sed -e 's/export/\n    export/g' | sed '1d'
-    unset BOXES
-    eval $boxesEnv
-else
-    export BOXES=../boxes-config
-fi
-
-echo "    Invoking: $(basename $boxesBinary) $boxesArgs"
-if [ ! -z "$BOXES_TEST_XXD" ]; then
-    cat $testInputFile | eval "$boxesBinary $boxesArgs" | xxd >$testOutputFile 2>&1
-else
-    cat $testInputFile | eval "$boxesBinary $boxesArgs" >$testOutputFile 2>&1
-fi
-declare -ir actualReturnCode=$?
-
-declare -r testResultsDir=../out/test-results/${testCaseName}
-if [ $measureCoverage == true ]; then
-    mkdir -p ${testResultsDir}
-    cp ../out/*.gc* ${testResultsDir}
-    lcov --capture --directory ${testResultsDir} --base-directory ../src --test-name ${testCaseName} --quiet \
-        --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc lcov_branch_coverage=1 \
-        --output-file ${testResultsDir}/coverage.info
-    echo -n "    Coverage: "
-    lcov --summary ${testResultsDir}/coverage.info 2>&1 | grep 'lines...' | grep -oP '\d+\.\d*%'
-fi
-
-cat $testOutputFile | tr -d '\r' | sed -E -f $testFilterFile | diff - $testExpectationFile
-if [ $? -ne 0 ]; then
-    >&2 echo "Error in test case: $testCaseFile (top: actual; bottom: expected)"
-    exit 5
-fi
-if [ $actualReturnCode -ne $expectedReturnCode ]; then
-    >&2 echo "Error in test case: $testCaseFile (error code was $actualReturnCode, but expected $expectedReturnCode)"
-    exit 5
-fi
-
-rm $testInputFile
-rm $testFilterFile
-rm $testExpectationFile
-rm $testOutputFile
+rm ${testInputFile}
+rm ${testFilterFile}
+rm ${testExpectationFile}
+rm ${testOutputFile}
 
 echo "    OK"
 exit 0
