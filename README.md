@@ -1,4 +1,5 @@
 [![Build Status](https://github.com/ascii-boxes/boxes/actions/workflows/boxes.yml/badge.svg)](https://github.com/ascii-boxes/boxes/actions/workflows/boxes.yml)
+[![Coverage](https://coveralls.io/repos/github/ascii-boxes/boxes/badge.svg?branch=master)](https://coveralls.io/github/ascii-boxes/boxes?branch=master)
 [![Latest Version](https://img.shields.io/github/v/release/ascii-boxes/boxes?label=latest)](https://boxes.thomasjensen.com/releases.html)
 
 # boxes
