@@ -5,7 +5,7 @@ redirect_from:
   - /docs/faq.html
   - /docs/faq.shtml
 created_at: 1999-04-06
-last_modified_at: 2021-08-14 14:30:00 +0200
+last_modified_at: 2021-10-05 21:44:00 +0200
 ---
 
 # FAQ
@@ -68,14 +68,12 @@ Detailed information on how to build *boxes* from source is collected on the
 
 In addition to that, the following issues have occurred:
 
-- Warnings from flex or bison:\\
-  If you get warnings from flex or bison, do a `make clean ; make` from the top level directory. The following warning
-  is harmless:
+- Custom library locations\\
+  If you have manually provided some of the libraries that *boxes* uses for building, such as pcre2 or libunistring,
+  you may need to tell our build where to find them. For this, use the `CFLAGS_ADDTL` and `LDFLAGS_ADDTL`
+  environment variables. They can be used to add options to the compiler and linker calls. For example:
 
-      lexer.l:1309: warning: `yy_flex_realloc' defined but not used
-
-  It's a known bug in flex, and has no impact on *boxes*. You can safely ignore this warning. Recent versions of flex
-  no longer produce this warning, so today, you probably won't see it anymore.
+      make CFLAGS_ADDTL=-I/Users/USER/local/include LDFLAGS_ADDTL=-L/Users/USER/local/lib
 
 - `Bad address` on *boxes* execution after compiling on a 64bit system:
   This may happen when the system you are compiling on is 64bit. Boxes is only a 32bit program, so the compiler may
