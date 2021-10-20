@@ -20,7 +20,7 @@ set -uo pipefail
 declare -r SRC_DIR=../src
 declare -r OUT_DIR=../out
 declare -r BASELINE_FILE=${OUT_DIR}/lcov-baseline.info
-declare -r COVERAGE_FILE=${OUT_DIR}/lcov-blackbox.info
+declare -r COVERAGE_FILE=${OUT_DIR}/lcov-total.info
 
 # Command Line Options
 declare opt_coverage=false
@@ -161,9 +161,9 @@ function consolidate_coverage()
 
 function report_coverage()
 {
-    local testReportDir=${OUT_DIR}/coverage
+    local testReportDir=${OUT_DIR}/report
     mkdir -p ${testReportDir}
-    genhtml --title "Boxes / Black-box tests" --branch-coverage --legend \
+    genhtml --title "Boxes / All Tests" --branch-coverage --legend \
         --output-directory ${testReportDir} ${COVERAGE_FILE}
     echo -e "\nTest coverage report available at ${testReportDir}/index.html"
 }

@@ -32,9 +32,11 @@ WIN_PCRE2_VERSION      = 10.36
 WIN_PCRE2_DIR          = pcre2-$(WIN_PCRE2_VERSION)
 WIN_FLEX_BISON_VERSION = 2.5.24
 WIN_FLEX_BISON_DIR     = flex_bison_$(WIN_FLEX_BISON_VERSION)
+WIN_CMOCKA_VERSION     = 1.1.0
+WIN_CMOCKA_DIR         = cmocka-$(WIN_CMOCKA_VERSION)
 
 .PHONY: clean build cov win32 debug win32.debug win32.pcre infomsg replaceinfos test covtest \
-        package win32.package package_common
+        package win32.package package_common utest win32.utest
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -56,9 +58,11 @@ win32.prereq:
 	# download components
 	curl -LO https://ftp.pcre.org/pub/pcre/pcre2-$(WIN_PCRE2_VERSION).tar.gz
 	curl -LO https://downloads.sourceforge.net/project/winflexbison/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip
+	curl -LO https://cmocka.org/files/$(WIN_CMOCKA_VERSION:%.0=%)/cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip
 	# unpack components
 	tar xfz $(WIN_PCRE2_DIR).tar.gz
 	unzip win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip -d $(WIN_FLEX_BISON_DIR)
+	unzip cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip
 	# build the pcre2 dependency (only needed on Windows MinGW)
 	cd $(WIN_PCRE2_DIR) ; \
 	./configure --disable-pcre2-8 --disable-pcre2-16 --enable-pcre2-32 --disable-shared \
@@ -67,6 +71,7 @@ win32.prereq:
 	# remove downloaded archives
 	rm pcre2-$(WIN_PCRE2_VERSION).tar.gz
 	rm win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip
+	rm cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -153,6 +158,13 @@ test:
 covtest:
 	cd test; ./testrunner.sh --suite --coverage
 
+utest:
+	$(MAKE) -C utest BOXES_PLATFORM=unix utest
+
+win32.utest:
+	cp $(WIN_CMOCKA_DIR)/bin/cmocka.dll $(OUT_DIR)/
+	$(MAKE) -C utest BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(WIN_PCRE2_DIR)/src:../$(WIN_CMOCKA_DIR)/include \
+	    LDFLAGS="-L../$(WIN_PCRE2_DIR)/.libs -L../$(WIN_CMOCKA_DIR)/lib" utest
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #    Cleanup

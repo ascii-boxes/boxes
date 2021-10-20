@@ -17,6 +17,7 @@
 /doc/boxes.1.html
 /pcre2-*/
 /flex_bison_*/
+/cmocka-*/
 /out/
 *.o
 *.a

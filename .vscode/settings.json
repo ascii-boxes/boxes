@@ -6,7 +6,10 @@
         "**/_support": true,
         "**/cmake-build-debug": true,
         "**/coverage": true,
-        "**/out": true
+        "**/out": true,
+        "**/flex_bison_*": true,
+        "**/pcre2-*": true,
+        "**/cmocka-*": true
     },
     "editor.autoClosingBrackets": "never",
     "editor.dragAndDrop": false,
@@ -31,7 +34,8 @@
         "**/_site/**",
         "**/_support/**",
         "**/flex_bison_*/**",
-        "**/pcre2-*/**"
+        "**/pcre2-*/**",
+        "**/cmocka-*/**"
     ],
     "todo-tree.general.statusBar": "total",
     "todo-tree.general.tags": ["TODO", "FIXME", "CHECK"],

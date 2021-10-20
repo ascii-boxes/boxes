@@ -11,16 +11,19 @@ jobs:
             - name: add-packages
               run: |
                   sudo apt-get update -y
-                  sudo apt-get install -y git flex bison libunistring-dev libpcre2-dev diffutils vim-common lcov
+                  sudo apt-get install -y git flex bison libunistring-dev libpcre2-dev diffutils vim-common lcov libcmocka-dev
 
             - name: make cov
               run: make cov
 
-            - name: make covtest
+            - name: Run white-box tests
+              run: make utest
+
+            - name: Run black-box tests
               run: make covtest
 
             - name: Coveralls
               uses: coverallsapp/github-action@master
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
-                  path-to-lcov: out/lcov-blackbox.info
+                  path-to-lcov: out/lcov-total.info

@@ -44,7 +44,7 @@ ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 check_dir:
 	@if [ "$(shell pwd | sed -e 's/^.*\///')" != "out" ] ; then \
 	    echo ERROR: Please call make from the top level directory. ; \
-		exit 1 ; \
+	    exit 1 ; \
 	fi
 
 $(OUT_DIR):
@@ -75,15 +75,17 @@ boxes.exe: $(ALL_OBJ) | check_dir
 
 flags_unix:
 	$(eval CFLAGS := -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := $(LDFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS) $(LDFLAGS_ADDTL))
 	$(eval BOXES_EXECUTABLE_NAME := boxes)
 	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
+	echo $(filter-out boxes.o,$(ALL_OBJ)) > $(OUT_DIR)/modules.txt
 
 flags_win32:
 	$(eval CFLAGS := -Os -s -m32 -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := -s -m32)
+	$(eval LDFLAGS := $(LDFLAGS) -s -m32)
 	$(eval BOXES_EXECUTABLE_NAME := boxes.exe)
 	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o) getopt.o)
+	echo $(filter-out boxes.o,$(ALL_OBJ)) > $(OUT_DIR)/modules.txt
 
 flags_:
 	@echo Please call make from the top level directory.

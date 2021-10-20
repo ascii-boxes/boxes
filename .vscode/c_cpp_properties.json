@@ -6,7 +6,8 @@
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/src/misc",
                 "${workspaceFolder}/out",
-                "${workspaceFolder}/pcre2-10.36/src"
+                "${workspaceFolder}/pcre2-10.36/src",
+                "${workspaceFolder}/cmocka-1.1.0/include"
             ],
             "defines": [
                 "_DEBUG",
