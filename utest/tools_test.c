@@ -60,11 +60,45 @@ static void test_strisyes_false()
 }
 
 
+static void test_strisno_true()
+{
+    assert_int_equal(1, strisno("off"));
+    assert_int_equal(1, strisno("Off"));
+    assert_int_equal(1, strisno("no"));
+    assert_int_equal(1, strisno("NO"));
+    assert_int_equal(1, strisno("false"));
+    assert_int_equal(1, strisno("False"));
+    assert_int_equal(1, strisno("0"));
+    assert_int_equal(1, strisno("f"));
+    assert_int_equal(1, strisno("F"));
+}
+
+
+static void test_strisno_false()
+{
+    assert_int_equal(0, strisno(NULL));
+    assert_int_equal(0, strisno(""));
+    assert_int_equal(0, strisno(" "));
+    assert_int_equal(0, strisno("on"));
+    assert_int_equal(0, strisno("true"));
+    assert_int_equal(0, strisno("yes"));
+    assert_int_equal(0, strisno("1"));
+    assert_int_equal(0, strisno("t"));
+    assert_int_equal(0, strisno("T"));
+    assert_int_equal(0, strisno("fal"));
+    assert_int_equal(0, strisno("no sir"));
+    assert_int_equal(0, strisno("00"));
+}
+
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_strisyes_true),
-        cmocka_unit_test(test_strisyes_false)};
+        cmocka_unit_test(test_strisyes_false),
+        cmocka_unit_test(test_strisno_true),
+        cmocka_unit_test(test_strisno_false)
+    };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
