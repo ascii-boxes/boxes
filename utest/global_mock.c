@@ -22,8 +22,15 @@
  * Mocks of boxes' global variables.
  */
 
+#include "config.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+#include <locale.h>
+#include <uniconv.h>
 #include "boxes.h"
-
+#include "unicode.h"
+#include "tools.h"
 
 design_t *designs = NULL;
 
@@ -32,3 +39,73 @@ int num_designs = 0;
 opt_t opt;
 
 input_t input;
+
+char **collect_out = NULL;
+int collect_out_size = 0;
+
+char **collect_err = NULL;
+int collect_err_size = 0;
+
+
+void collect_reset()
+{
+    for (int i = 0; i < collect_out_size; i++) {
+        BFREE(collect_out[i]);
+    }
+    BFREE(collect_out);
+
+    for (int i = 0; i < collect_err_size; i++) {
+        BFREE(collect_err[i]);
+    }
+    BFREE(collect_err);
+
+    collect_out_size = 0;
+    collect_err_size = 0;
+}
+
+
+/**
+ * Mock of the `fprintf()` function which records its output instead of printing it. Assumes that no output string will
+ * be longer than 512 characters.
+ * @param __stream `stdout` or `stderr`
+ * @param __format the format string, followed by the arguments
+ */
+void __wrap_fprintf(FILE *__stream, const char *__format, ...)
+{
+    char **collect = __stream == stdout ? collect_out : collect_err;
+    int collect_size = __stream == stdout ? collect_out_size : collect_err_size;
+    collect = (char **) realloc(collect, ++collect_size * sizeof(char *));
+
+    char *s = (char *) malloc(512);
+    va_list va;
+    va_start(va, __format);
+    vsprintf(s, __format, va);
+    va_end(va);
+    collect[collect_size - 1] = s;
+
+    if (__stream == stdout) {
+        collect_out = collect;
+        collect_out_size = collect_size;
+    }
+    else {
+        collect_err = collect;
+        collect_err_size = collect_size;
+    }
+}
+
+
+void setup_mocks()
+{
+    setlocale(LC_ALL, "");
+    encoding = check_encoding("UTF-8", locale_charset());
+    collect_reset();
+}
+
+
+void teardown()
+{
+    collect_reset();
+}
+
+
+/*EOF*/                                          /* vim: set cindent sw=4: */

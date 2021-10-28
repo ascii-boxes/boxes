@@ -24,7 +24,8 @@ SRC_DIR    = ../src
 UTEST_DIR  = ../utest
 VPATH      = $(SRC_DIR):$(SRC_DIR)/misc:$(UTEST_DIR)
 
-UTEST_NORM = global_mock.c tools_test.c
+UTEST_NORM = global_mock.c tools_test.c regulex_test.o main.o
+MOCKS = fprintf
 
 .PHONY: check_dir flags_unix flags_win32 flags_ utest
 
@@ -41,13 +42,13 @@ $(OUT_DIR):
 
 flags_unix:
 	$(eval CFLAGS := -I. -I$(SRC_DIR) -O -Wall -W $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := $(LDFLAGS) --coverage $(LDFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS) $(foreach MOCK,$(MOCKS),-Wl,--wrap=$(MOCK)) --coverage $(LDFLAGS_ADDTL))
 	$(eval UTEST_EXECUTABLE_NAME := unittest)
 	$(eval UTEST_OBJ := $(UTEST_NORM:.c=.o))
 
 flags_win32:
 	$(eval CFLAGS := -Os -s -m32 -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := $(LDFLAGS) --coverage -s -m32 $(LDFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS) $(foreach MOCK,$(MOCKS),-Wl,--wrap=$(MOCK)) --coverage -s -m32 $(LDFLAGS_ADDTL))
 	$(eval UTEST_EXECUTABLE_NAME := unittest.exe)
 	$(eval UTEST_OBJ := $(UTEST_NORM:.c=.o))
 
@@ -70,5 +71,7 @@ unittest.exe: $(UTEST_OBJ) | check_dir
 	    -lkernel32 -l:libunistring.a -l:libpcre2-32.a -l:libiconv.a -l:libcmocka.dll.a
 
 
-global_mock.o: global_mock.c boxes.h
-tools_test.o: tools_test.c tools.h
+global_mock.o:  global_mock.c global_mock.h boxes.h unicode.h config.h | check_dir
+tools_test.o:   tools_test.c tools_test.h tools.h config.h | check_dir
+regulex_test.o: regulex_test.c regulex_test.h global_mock.h regulex.h config.h | check_dir
+main.o:         main.c global_mock.h tools_test.h regulex_test.h config.h | check_dir

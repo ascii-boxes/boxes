@@ -22,15 +22,19 @@
  * Unit tests of the 'tools' module
  */
 
+#include "config.h"
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
 #include "tools.h"
+#include "tools_test.h"
 
 
-static void test_strisyes_true()
+void test_strisyes_true(void **state)
 {
+    (void) state;  /* unused */
+
     assert_int_equal(1, strisyes("On"));
     assert_int_equal(1, strisyes("on"));
     assert_int_equal(1, strisyes("yes"));
@@ -43,8 +47,10 @@ static void test_strisyes_true()
 }
 
 
-static void test_strisyes_false()
+void test_strisyes_false(void **state)
 {
+    (void) state;  /* unused */
+
     assert_int_equal(0, strisyes(NULL));
     assert_int_equal(0, strisyes(""));
     assert_int_equal(0, strisyes(" "));
@@ -60,8 +66,10 @@ static void test_strisyes_false()
 }
 
 
-static void test_strisno_true()
+void test_strisno_true(void **state)
 {
+    (void) state;  /* unused */
+
     assert_int_equal(1, strisno("off"));
     assert_int_equal(1, strisno("Off"));
     assert_int_equal(1, strisno("no"));
@@ -74,8 +82,10 @@ static void test_strisno_true()
 }
 
 
-static void test_strisno_false()
+void test_strisno_false(void **state)
 {
+    (void) state;  /* unused */
+
     assert_int_equal(0, strisno(NULL));
     assert_int_equal(0, strisno(""));
     assert_int_equal(0, strisno(" "));
@@ -91,14 +101,4 @@ static void test_strisno_false()
 }
 
 
-int main(void)
-{
-    const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_strisyes_true),
-        cmocka_unit_test(test_strisyes_false),
-        cmocka_unit_test(test_strisno_true),
-        cmocka_unit_test(test_strisno_false)
-    };
-
-    return cmocka_run_group_tests(tests, NULL, NULL);
-}
+/*EOF*/                                          /* vim: set cindent sw=4: */

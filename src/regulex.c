@@ -55,7 +55,7 @@ pcre2_code *compile_pattern(char *pattern)
     if (re == NULL) {
         PCRE2_UCHAR buffer[256];
         pcre2_get_error_message(errornumber, buffer, sizeof(buffer));
-        fprintf(stderr, "Regular expression pattern \"%s\" failed to compile at offset %d: %s\n",
+        fprintf(stderr, "Regular expression pattern \"%s\" failed to compile at position %d: %s\n",
                 pattern, (int) erroroffset, u32_strconv_to_output(buffer));
     }
     return re;
