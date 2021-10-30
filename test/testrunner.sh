@@ -267,7 +267,7 @@ fi
 
 # Execute only a single test
 echo "Running test case: ${opt_testCase}"
-declare -r tcBaseName=${opt_testCase:0:-4}
+declare -r tcBaseName=${opt_testCase%.txt}
 clear_gcda_traces
 
 check_mandatory_sections
