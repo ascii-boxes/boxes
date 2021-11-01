@@ -22,6 +22,7 @@
 *.o
 *.a
 /test/*.tmp
+/vendor/
 
 # Legacy locations of generated files (no longer in use)
 /src/boxes

@@ -9,7 +9,8 @@
         "**/out": true,
         "**/flex_bison_*": true,
         "**/pcre2-*": true,
-        "**/cmocka-*": true
+        "**/cmocka-*": true,
+        "**/vendor": true
     },
     "editor.autoClosingBrackets": "never",
     "editor.dragAndDrop": false,

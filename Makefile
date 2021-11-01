@@ -29,11 +29,11 @@ PKG_NAME   = boxes-$(BVERSION)
 OUT_DIR    = out
 
 WIN_PCRE2_VERSION      = 10.36
-WIN_PCRE2_DIR          = pcre2-$(WIN_PCRE2_VERSION)
+WIN_PCRE2_DIR          = vendor/pcre2-$(WIN_PCRE2_VERSION)
 WIN_FLEX_BISON_VERSION = 2.5.24
-WIN_FLEX_BISON_DIR     = flex_bison_$(WIN_FLEX_BISON_VERSION)
+WIN_FLEX_BISON_DIR     = vendor/flex_bison_$(WIN_FLEX_BISON_VERSION)
 WIN_CMOCKA_VERSION     = 1.1.0
-WIN_CMOCKA_DIR         = cmocka-$(WIN_CMOCKA_VERSION)
+WIN_CMOCKA_DIR         = vendor/cmocka-$(WIN_CMOCKA_VERSION)
 
 .PHONY: clean build cov win32 debug win32.debug win32.pcre infomsg replaceinfos test covtest \
         package win32.package package_common utest win32.utest
@@ -60,9 +60,10 @@ win32.prereq:
 	curl -LO https://downloads.sourceforge.net/project/winflexbison/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip
 	curl -LO https://cmocka.org/files/$(WIN_CMOCKA_VERSION:%.0=%)/cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip
 	# unpack components
-	tar xfz $(WIN_PCRE2_DIR).tar.gz
+	mkdir -p vendor
 	unzip win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip -d $(WIN_FLEX_BISON_DIR)
-	unzip cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip
+	tar -C vendor -xzf pcre2-$(WIN_PCRE2_VERSION).tar.gz
+	unzip cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip -d vendor
 	# build the pcre2 dependency (only needed on Windows MinGW)
 	cd $(WIN_PCRE2_DIR) ; \
 	./configure --disable-pcre2-8 --disable-pcre2-16 --enable-pcre2-32 --disable-shared \
@@ -161,10 +162,10 @@ covtest:
 utest:
 	$(MAKE) -C utest BOXES_PLATFORM=unix utest
 
-win32.utest:
+win32.utest: $(OUT_DIR)
 	cp $(WIN_CMOCKA_DIR)/bin/cmocka.dll $(OUT_DIR)/
 	$(MAKE) -C utest BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(WIN_PCRE2_DIR)/src:../$(WIN_CMOCKA_DIR)/include \
-	    LDFLAGS="-L../$(WIN_PCRE2_DIR)/.libs -L../$(WIN_CMOCKA_DIR)/lib" utest
+	    LDFLAGS_ADDTL="-L../$(WIN_PCRE2_DIR)/.libs -L../$(WIN_CMOCKA_DIR)/lib" utest
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #    Cleanup
