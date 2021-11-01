@@ -29,6 +29,10 @@
 void test_compile_pattern_empty(void **state);
 void test_compile_pattern_error(void **state);
 
+void test_regex_replace_invalid_utf(void **state);
+void test_regex_replace_buffer_resize(void **state);
+void test_regex_replace_error(void **state);
+
 
 #endif
 

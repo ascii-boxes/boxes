@@ -67,7 +67,7 @@ uint32_t *regex_replace(pcre2_code *search, char *replace, uint32_t *input, cons
 {
     PCRE2_SPTR replacement = u32_strconv_from_arg(replace, config_encoding);
     if (replacement == NULL) {
-        fprintf(stderr, "Failed to convert replacement string to UTF-32 - \"%s\"\n", replace);
+        bx_fprintf(stderr, "Failed to convert replacement string to UTF-32 - \"%s\"\n", replace);
         return NULL;
     }
 
@@ -112,7 +112,7 @@ uint32_t *regex_replace(pcre2_code *search, char *replace, uint32_t *input, cons
         PCRE2_UCHAR buffer[256];
         pcre2_get_error_message(pcre2_rc, buffer, sizeof(buffer));
         /* buffer will normally contain "invalid replacement string" */
-        fprintf(stderr, "Error substituting \"%s\": %s\n", replace, u32_strconv_to_output(buffer));
+        bx_fprintf(stderr, "Error substituting \"%s\": %s\n", replace, u32_strconv_to_output(buffer));
         BFREE(output);
         return NULL;
     }

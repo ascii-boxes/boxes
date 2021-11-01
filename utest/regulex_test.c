@@ -27,8 +27,11 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include <uniconv.h>
+#include <string.h>
 #include "global_mock.h"
 #include "regulex.h"
+
 
 
 void test_compile_pattern_empty(void **state)
@@ -38,6 +41,7 @@ void test_compile_pattern_empty(void **state)
     assert_null(compile_pattern(NULL));
     assert_non_null(compile_pattern(""));
 }
+
 
 
 void test_compile_pattern_error(void **state)
@@ -54,6 +58,56 @@ void test_compile_pattern_error(void **state)
     assert_int_equal(1, collect_err_size);
     assert_string_equal("Regular expression pattern \"incomplete\\\" failed to compile at position 11: "
         "\\ at end of pattern\n", collect_err[0]);
+}
+
+
+
+void test_regex_replace_invalid_utf(void **state)
+{
+    (void) state;  /* unused */
+
+    const char *input = "input";
+    assert_null(regex_replace(compile_pattern("search"), NULL, /* NULL is an invalid replacement string*/
+        u32_strconv_from_encoding(input, "ASCII", iconveh_question_mark), strlen(input), 0));
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("Failed to convert replacement string to UTF-32 - \"(null)\"\n", collect_err[0]);
+}
+
+
+
+void test_regex_replace_buffer_resize(void **state)
+{
+    (void) state;  /* unused */
+
+    const char *input = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    uint32_t *actual = regex_replace(compile_pattern("x"), "long_replacement_string_",
+        u32_strconv_from_encoding(input, "ASCII", iconveh_question_mark), strlen(input), 1);
+    char *actual_str = u32_strconv_to_encoding(actual, "ASCII", iconveh_question_mark);
+
+    const char *expected = "long_replacement_string_long_replacement_string_long_replacement_string_"
+        "long_replacement_string_long_replacement_string_long_replacement_string_long_replacement_string_"
+        "long_replacement_string_long_replacement_string_long_replacement_string_long_replacement_string_"
+        "long_replacement_string_long_replacement_string_long_replacement_string_long_replacement_string_"
+        "long_replacement_string_long_replacement_string_long_replacement_string_long_replacement_string_"
+        "long_replacement_string_long_replacement_string_long_replacement_string_long_replacement_string_"
+        "long_replacement_string_long_replacement_string_long_replacement_string_long_replacement_string_"
+        "long_replacement_string_long_replacement_string_long_replacement_string_long_replacement_string_"
+        "long_replacement_string_long_replacement_string_long_replacement_string_long_replacement_string_"
+        "long_replacement_string_long_replacement_string_long_replacement_string_long_replacement_string_";
+    assert_string_equal(expected, actual_str);
+}
+
+
+void test_regex_replace_error(void **state)
+{
+    (void) state;  /* unused */
+
+    const char *input = "xxx";
+    uint32_t *actual = regex_replace(compile_pattern("x"), "INVALID $2",
+        u32_strconv_from_encoding(input, "ASCII", iconveh_question_mark), strlen(input), 0);
+    assert_null(actual);
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("Error substituting \"INVALID $2\": unknown substring\n", collect_err[0]);
 }
 
 

@@ -33,6 +33,15 @@
 #include "regulex_test.h"
 
 
+static int beforeTest(void** state) {
+    (void) state;  /* unused */
+
+    collect_reset();
+    return 0;
+}
+
+
+
 int main(void)
 {
     setup_mocks();
@@ -45,8 +54,11 @@ int main(void)
     };
 
     const struct CMUnitTest regulex_tests[] = {
-        cmocka_unit_test(test_compile_pattern_error),
-        cmocka_unit_test(test_compile_pattern_empty)
+        cmocka_unit_test_setup(test_compile_pattern_error, beforeTest),
+        cmocka_unit_test_setup(test_compile_pattern_empty, beforeTest),
+        cmocka_unit_test_setup(test_regex_replace_invalid_utf, beforeTest),
+        cmocka_unit_test_setup(test_regex_replace_buffer_resize, beforeTest),
+        cmocka_unit_test_setup(test_regex_replace_error, beforeTest)
     };
 
     int num_failed = 0;
