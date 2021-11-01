@@ -65,25 +65,25 @@ void collect_reset()
 
 
 /**
- * Mock of the `fprintf()` function which records its output instead of printing it. Assumes that no output string will
- * be longer than 512 characters.
- * @param __stream `stdout` or `stderr`
- * @param __format the format string, followed by the arguments
+ * Mock of the `bx_fprintf()` function which records its output instead of printing it. Assumes that no output string
+ * will be longer than 512 characters.
+ * @param stream `stdout` or `stderr`
+ * @param format the format string, followed by the arguments
  */
-void __wrap_fprintf(FILE *__stream, const char *__format, ...)
+void __wrap_bx_fprintf(FILE *stream, const char *format, ...)
 {
-    char **collect = __stream == stdout ? collect_out : collect_err;
-    int collect_size = __stream == stdout ? collect_out_size : collect_err_size;
+    char **collect = stream == stdout ? collect_out : collect_err;
+    int collect_size = stream == stdout ? collect_out_size : collect_err_size;
     collect = (char **) realloc(collect, ++collect_size * sizeof(char *));
 
     char *s = (char *) malloc(512);
     va_list va;
-    va_start(va, __format);
-    vsprintf(s, __format, va);
+    va_start(va, format);
+    vsprintf(s, format, va);
     va_end(va);
     collect[collect_size - 1] = s;
 
-    if (__stream == stdout) {
+    if (stream == stdout) {
         collect_out = collect;
         collect_out_size = collect_size;
     }

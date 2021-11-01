@@ -126,6 +126,14 @@ int tag_is_valid(char *tag);
 char *bx_strndup(const char *s, size_t n);
 
 
+/**
+ * Just calls `fprintf()` internally, but this function can be mocked in unit tests. So, it's a "mockable `fprintf()`".
+ * @param stream Where to print, for example `stderr`
+ * @param format the format string, followed by the arguments of the format string
+ */
+void bx_fprintf(FILE *stream, const char *format, ...);
+
+
 #endif
 
 /*EOF*/                                          /* vim: set cindent sw=4: */
