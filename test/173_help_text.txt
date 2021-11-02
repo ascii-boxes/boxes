@@ -1,0 +1,29 @@
+:ARGS
+--help
+:INPUT
+:OUTPUT-FILTER
+s/^(.+?-e eol.+?default: )\w+]/\1EOL_DEFAULT]/
+s/^(.+?-f file.+?default: ).*/\1GLOBAL_CONFIG]/
+s/^(.+?-n enc.+?default: ).*/\1CHARSET_DEFAULT]/
+:EXPECTED
+boxes - draws any kind of box around your text (or removes it)
+        Website: https://boxes.thomasjensen.com/
+Usage:  boxes [options] [infile [outfile]]
+        -a fmt   alignment/positioning of text inside box [default: hlvt]
+        -c str   use single shape box design where str is the W shape
+        -d name  box design [default: first one in file]
+        -e eol   Override line break type (experimental) [default: EOL_DEFAULT]
+        -f file  configuration file [default: GLOBAL_CONFIG]
+        -h       print usage information
+        -i mode  indentation mode [default: box]
+        -k bool  leading/trailing blank line retention on removal
+        -l       list available box designs w/ samples
+        -m       mend box, i.e. remove it and redraw it afterwards
+        -n enc   Character encoding of input and output [default: CHARSET_DEFAULT]
+        -p fmt   padding [default: none]
+        -q qry   query the list of designs by tag
+        -r       remove box
+        -s wxh   box size (width w and/or height h)
+        -t str   tab stop distance and expansion [default: 8e]
+        -v       print version information
+:EOF
