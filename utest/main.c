@@ -29,6 +29,7 @@
 #include <cmocka.h>
 
 #include "global_mock.h"
+#include "cmdline_test.h"
 #include "tools_test.h"
 #include "regulex_test.h"
 
@@ -46,11 +47,12 @@ int main(void)
 {
     setup_mocks();
 
-    const struct CMUnitTest tools_tests[] = {
-        cmocka_unit_test(test_strisyes_true),
-        cmocka_unit_test(test_strisyes_false),
-        cmocka_unit_test(test_strisno_true),
-        cmocka_unit_test(test_strisno_false)
+    const struct CMUnitTest cmdline_tests[] = {
+        cmocka_unit_test_setup(test_indentmode_none, beforeTest),
+        cmocka_unit_test_setup(test_indentmode_invalid_long, beforeTest),
+        cmocka_unit_test_setup(test_indentmode_invalid_short, beforeTest),
+        cmocka_unit_test_setup(test_indentmode_box, beforeTest),
+        cmocka_unit_test_setup(test_indentmode_text, beforeTest)
     };
 
     const struct CMUnitTest regulex_tests[] = {
@@ -61,9 +63,17 @@ int main(void)
         cmocka_unit_test_setup(test_regex_replace_error, beforeTest)
     };
 
+    const struct CMUnitTest tools_tests[] = {
+        cmocka_unit_test(test_strisyes_true),
+        cmocka_unit_test(test_strisyes_false),
+        cmocka_unit_test(test_strisno_true),
+        cmocka_unit_test(test_strisno_false)
+    };
+
     int num_failed = 0;
-    num_failed += cmocka_run_group_tests(tools_tests, NULL, NULL);
+    num_failed += cmocka_run_group_tests(cmdline_tests, NULL, NULL);
     num_failed += cmocka_run_group_tests(regulex_tests, NULL, NULL);
+    num_failed += cmocka_run_group_tests(tools_tests, NULL, NULL);
 
     teardown();
     return num_failed;

@@ -303,7 +303,7 @@ static int indentation_mode(opt_t *result, char *optarg)
         result->indentmode = 'n';
     }
     else {
-        fprintf(stderr, "%s: invalid indentation mode\n", PROJECT);
+        bx_fprintf(stderr, "%s: invalid indentation mode\n", PROJECT);
         return 1;
     }
     return 0;
@@ -611,7 +611,17 @@ static void print_debug_info(opt_t *result)
 
 opt_t *process_commandline(int argc, char *argv[])
 {
+    #ifdef DEBUG
+        fprintf(stderr, "argc = %d\n", argc);
+        fprintf(stderr, "argv = [");
+        for(int i=0; i<=argc; i++) {
+            fprintf(stderr, "%s%s", argv[i], i < argc ? ", " : "");
+        }
+        fprintf(stderr, "]\n");
+    #endif
+
     opt_t *result = create_new_opt();
+    optind = 1;   /* ensure that getopt() will process all arguments, even in unit test situations */
 
     /* Intercept '--help' and '-?' cases first, as they are not supported by getopt() */
     if (argc >= 2 && argv[1] != NULL && (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-?") == 0)) {

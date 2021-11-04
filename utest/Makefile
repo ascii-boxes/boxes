@@ -24,7 +24,7 @@ SRC_DIR    = ../src
 UTEST_DIR  = ../utest
 VPATH      = $(SRC_DIR):$(SRC_DIR)/misc:$(UTEST_DIR)
 
-UTEST_NORM = global_mock.c tools_test.c regulex_test.o main.o
+UTEST_NORM = global_mock.c cmdline_test.c tools_test.c regulex_test.o main.o
 MOCKS = bx_fprintf
 
 .PHONY: check_dir flags_unix flags_win32 flags_ utest
@@ -72,6 +72,7 @@ unittest.exe: $(UTEST_OBJ) | check_dir
 
 
 global_mock.o:  global_mock.c global_mock.h boxes.h unicode.h config.h | check_dir
+cmdline_test.o: cmdline_test.c cmdline_test.h global_mock.h boxes.h cmdline.h config.h | check_dir
 tools_test.o:   tools_test.c tools_test.h tools.h config.h | check_dir
 regulex_test.o: regulex_test.c regulex_test.h global_mock.h regulex.h config.h | check_dir
 main.o:         main.c global_mock.h tools_test.h regulex_test.h config.h | check_dir
