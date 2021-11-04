@@ -52,7 +52,11 @@ int main(void)
         cmocka_unit_test_setup(test_indentmode_invalid_long, beforeTest),
         cmocka_unit_test_setup(test_indentmode_invalid_short, beforeTest),
         cmocka_unit_test_setup(test_indentmode_box, beforeTest),
-        cmocka_unit_test_setup(test_indentmode_text, beforeTest)
+        cmocka_unit_test_setup(test_indentmode_text, beforeTest),
+        cmocka_unit_test_setup(test_killblank_true, beforeTest),
+        cmocka_unit_test_setup(test_killblank_false, beforeTest),
+        cmocka_unit_test_setup(test_killblank_invalid, beforeTest),
+        cmocka_unit_test_setup(test_killblank_multiple, beforeTest)
     };
 
     const struct CMUnitTest regulex_tests[] = {

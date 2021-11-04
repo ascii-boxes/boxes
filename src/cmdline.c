@@ -327,7 +327,7 @@ static int killblank(opt_t *result, char *optarg)
             result->killblank = 0;
         }
         else {
-            fprintf(stderr, "%s: -k: invalid parameter\n", PROJECT);
+            bx_fprintf(stderr, "%s: -k: invalid parameter\n", PROJECT);
             return 1;
         }
     }

@@ -118,4 +118,49 @@ void test_indentmode_text(void **state)
 }
 
 
+void test_killblank_true(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-k", "true");
+
+    assert_non_null(actual);
+    assert_int_equal(1, (int) actual->killblank);
+}
+
+
+void test_killblank_false(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-k", "false");
+
+    assert_non_null(actual);
+    assert_int_equal(0, (int) actual->killblank);
+}
+
+
+void test_killblank_invalid(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-k", "INVALID");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: -k: invalid parameter\n", collect_err[0]);
+}
+
+
+void test_killblank_multiple(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(4, "-k", "true", "-k", "false");    // first one wins
+
+    assert_non_null(actual);
+    assert_int_equal(1, (int) actual->killblank);
+}
+
+
 /*EOF*/                                          /* vim: set cindent sw=4: */

@@ -32,6 +32,11 @@ void test_indentmode_invalid_short(void **state);
 void test_indentmode_box(void **state);
 void test_indentmode_text(void **state);
 
+void test_killblank_true(void **state);
+void test_killblank_false(void **state);
+void test_killblank_invalid(void **state);
+void test_killblank_multiple(void **state);
+
 
 #endif
 
