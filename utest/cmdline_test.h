@@ -63,6 +63,11 @@ void test_inputfiles_stdin(void **state);
 void test_inputfiles_input_nonexistent(void **state);
 void test_inputfiles_actual_success(void **state);
 
+void test_command_line_design_empty(void **state);
+
+void test_help(void **state);
+void test_version_requested(void **state);
+
 
 #endif
 

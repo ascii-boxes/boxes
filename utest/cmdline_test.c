@@ -429,4 +429,40 @@ void test_inputfiles_actual_success(void **state)
 }
 
 
+void test_command_line_design_empty(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-c", "");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: empty command line design definition\n", collect_err[0]);
+}
+
+
+void test_help(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(1, "-h");
+
+    assert_non_null(actual);
+    assert_int_equal(1, actual->help);
+    assert_int_equal(0, actual->version_requested);
+}
+
+
+void test_version_requested(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(1, "-v");
+
+    assert_non_null(actual);
+    assert_int_equal(0, actual->help);
+    assert_int_equal(1, actual->version_requested);
+}
+
+
 /*EOF*/                                          /* vim: set cindent sw=4: */

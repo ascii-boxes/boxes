@@ -78,7 +78,10 @@ int main(void)
         cmocka_unit_test_setup(test_inputfiles_stdin_stdout, beforeTest),
         cmocka_unit_test_setup(test_inputfiles_stdin, beforeTest),
         cmocka_unit_test_setup(test_inputfiles_input_nonexistent, beforeTest),
-        cmocka_unit_test_setup(test_inputfiles_actual_success, beforeTest)
+        cmocka_unit_test_setup(test_inputfiles_actual_success, beforeTest),
+        cmocka_unit_test_setup(test_command_line_design_empty, beforeTest),
+        cmocka_unit_test_setup(test_help, beforeTest),
+        cmocka_unit_test_setup(test_version_requested, beforeTest)
     };
 
     const struct CMUnitTest regulex_tests[] = {

@@ -227,6 +227,10 @@ static int alignment(opt_t *result, char *optarg)
  */
 static int command_line_design(opt_t *result, char *optarg)
 {
+    if (strlen(optarg) == 0) {
+        bx_fprintf(stderr, "%s: empty command line design definition\n", PROJECT);
+        return 2;
+    }
     result->cld = (char *) strdup(optarg);
     if (result->cld == NULL) {
         perror(PROJECT);
