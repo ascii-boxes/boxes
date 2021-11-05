@@ -45,8 +45,8 @@ static opt_t *act(const int num_args, ...)
     if (num_args > 0) {
         va_list va;
         va_start(va, num_args);
-        char *arg;
-        while ((arg = va_arg(va, char *))) {
+        for (int i=0; i<num_args; i++) {
+            char *arg = va_arg(va, char *);
             ++argc;
             argv = (char **) realloc(argv, (argc + 1) * sizeof(char *));
             argv[argc - 1] = arg;
@@ -364,6 +364,68 @@ void test_alignment_incomplete(void **state)
     assert_null(actual);   // invalid option, so we would need to exit with error
     assert_int_equal(1, collect_err_size);
     assert_string_equal("boxes: Illegal text format -- v\n", collect_err[0]);
+}
+
+
+void test_inputfiles_illegal_third_file(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(3, "file1", "file2", "file3_ILLEGAL");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(3, collect_err_size);
+    assert_string_equal("boxes: illegal parameter -- file3_ILLEGAL\n", collect_err[0]);
+    assert_string_equal("Usage: boxes [options] [infile [outfile]]\n", collect_err[1]);
+    assert_string_equal("Try `boxes -h' for more information.\n", collect_err[2]);
+}
+
+
+void test_inputfiles_stdin_stdout(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-", "-");
+
+    assert_non_null(actual);
+    assert_ptr_equal(stdin, actual->infile);
+    assert_ptr_equal(stdout, actual->outfile);
+}
+
+
+void test_inputfiles_stdin(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(1, "-");
+
+    assert_non_null(actual);
+    assert_ptr_equal(stdin, actual->infile);
+    assert_ptr_equal(stdout, actual->outfile);
+}
+
+
+void test_inputfiles_input_nonexistent(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(1, "NON-EXISTENT");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: Can\'t open input file -- NON-EXISTENT\n", collect_err[0]);
+}
+
+
+void test_inputfiles_actual_success(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "../utest/dummy_in.txt", "dummy_out.txt");
+
+    assert_non_null(actual);
+    assert_non_null(actual->infile);
+    assert_non_null(actual->outfile);
 }
 
 

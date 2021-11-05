@@ -69,8 +69,8 @@ extern int optind;     /* for getopt() */
  */
 static void usage_short(FILE *st)
 {
-    fprintf(st, "Usage: %s [options] [infile [outfile]]\n", PROJECT);
-    fprintf(st, "Try `%s -h' for more information.\n", PROJECT);
+    bx_fprintf(st, "Usage: %s [options] [infile [outfile]]\n", PROJECT);
+    bx_fprintf(st, "Try `%s -h' for more information.\n", PROJECT);
 }
 
 

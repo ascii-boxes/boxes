@@ -57,6 +57,12 @@ void test_alignment_invalid_jX(void **state);
 void test_alignment_notset(void **state);
 void test_alignment_incomplete(void **state);
 
+void test_inputfiles_illegal_third_file(void **state);
+void test_inputfiles_stdin_stdout(void **state);
+void test_inputfiles_stdin(void **state);
+void test_inputfiles_input_nonexistent(void **state);
+void test_inputfiles_actual_success(void **state);
+
 
 #endif
 
