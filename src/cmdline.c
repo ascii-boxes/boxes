@@ -344,10 +344,11 @@ static int killblank(opt_t *result, char *optarg)
  */
 static int padding(opt_t *result, char *optarg)
 {
-    int errfl = 0;
+    int errfl = 1;
     char *p = optarg;
 
     while (*p) {
+        errfl = 0;
         if (p[1] == '\0') {
             errfl = 1;
             break;
@@ -395,7 +396,7 @@ static int padding(opt_t *result, char *optarg)
         }
     }
     if (errfl) {
-        fprintf(stderr, "%s: invalid padding specification - %s\n", PROJECT, optarg);
+        bx_fprintf(stderr, "%s: invalid padding specification - %s\n", PROJECT, optarg);
         return 1;
     }
     return 0;
