@@ -125,7 +125,7 @@ void test_killblank_true(void **state)
     opt_t *actual = act(2, "-k", "true");
 
     assert_non_null(actual);
-    assert_int_equal(1, (int) actual->killblank);
+    assert_int_equal(1, actual->killblank);
 }
 
 
@@ -136,7 +136,7 @@ void test_killblank_false(void **state)
     opt_t *actual = act(2, "-k", "false");
 
     assert_non_null(actual);
-    assert_int_equal(0, (int) actual->killblank);
+    assert_int_equal(0, actual->killblank);
 }
 
 
@@ -159,7 +159,79 @@ void test_killblank_multiple(void **state)
     opt_t *actual = act(4, "-k", "true", "-k", "false");    // first one wins
 
     assert_non_null(actual);
-    assert_int_equal(1, (int) actual->killblank);
+    assert_int_equal(1, actual->killblank);
+}
+
+
+void test_padding_top_bottom(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-p", "t2b10");
+
+    assert_non_null(actual);
+    assert_int_equal(2, actual->padding[BTOP]);
+    assert_int_equal(10, actual->padding[BBOT]);
+}
+
+
+void test_padding_invalid(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-p", "INVALID");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: invalid padding specification - INVALID\n", collect_err[0]);
+}
+
+
+void test_padding_negative(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-p", "a-1");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: invalid padding specification - a-1\n", collect_err[0]);
+}
+
+
+void test_padding_notset(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-p", "");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: invalid padding specification - \n", collect_err[0]);
+}
+
+
+void test_padding_invalid_value(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-p", "l2rX");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: invalid padding specification - l2rX\n", collect_err[0]);
+}
+
+
+void test_padding_novalue(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-p", "a");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: invalid padding specification - a\n", collect_err[0]);
 }
 
 

@@ -37,6 +37,13 @@ void test_killblank_false(void **state);
 void test_killblank_invalid(void **state);
 void test_killblank_multiple(void **state);
 
+void test_padding_top_bottom(void **state);
+void test_padding_invalid(void **state);
+void test_padding_negative(void **state);
+void test_padding_notset(void **state);
+void test_padding_invalid_value(void **state);
+void test_padding_novalue(void **state);
+
 
 #endif
 
