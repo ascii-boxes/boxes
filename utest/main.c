@@ -62,7 +62,13 @@ int main(void)
         cmocka_unit_test_setup(test_padding_negative, beforeTest),
         cmocka_unit_test_setup(test_padding_notset, beforeTest),
         cmocka_unit_test_setup(test_padding_invalid_value, beforeTest),
-        cmocka_unit_test_setup(test_padding_novalue, beforeTest)
+        cmocka_unit_test_setup(test_padding_novalue, beforeTest),
+        cmocka_unit_test_setup(test_tabstops_zero, beforeTest),
+        cmocka_unit_test_setup(test_tabstops_500, beforeTest),
+        cmocka_unit_test_setup(test_tabstops_4X, beforeTest),
+        cmocka_unit_test_setup(test_tabstops_4e, beforeTest),
+        cmocka_unit_test_setup(test_tabstops_4ex, beforeTest),
+        cmocka_unit_test_setup(test_tabstops_7, beforeTest)
     };
 
     const struct CMUnitTest regulex_tests[] = {

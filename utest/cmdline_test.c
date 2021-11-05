@@ -235,4 +235,76 @@ void test_padding_novalue(void **state)
 }
 
 
+void test_tabstops_zero(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-t", "0");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: invalid tab stop distance -- 0\n", collect_err[0]);
+}
+
+
+void test_tabstops_500(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-t", "500");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: invalid tab stop distance -- 500\n", collect_err[0]);
+}
+
+
+void test_tabstops_4X(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-t", "4X");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: invalid tab handling specification - 4X\n", collect_err[0]);
+}
+
+
+void test_tabstops_4e(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-t", "4e");
+
+    assert_non_null(actual);
+    assert_int_equal(4, actual->tabstop);
+    assert_int_equal((int) 'e', (int) actual->tabexp);
+}
+
+
+void test_tabstops_4ex(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-t", "4ex");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: invalid tab handling specification - 4ex\n", collect_err[0]);
+}
+
+
+void test_tabstops_7(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-t", "7");
+
+    assert_non_null(actual);
+    assert_int_equal(7, actual->tabstop);
+    assert_int_equal((int) 'e', (int) actual->tabexp);
+}
+
+
 /*EOF*/                                          /* vim: set cindent sw=4: */

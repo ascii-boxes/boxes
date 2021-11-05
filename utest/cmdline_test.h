@@ -44,6 +44,13 @@ void test_padding_notset(void **state);
 void test_padding_invalid_value(void **state);
 void test_padding_novalue(void **state);
 
+void test_tabstops_zero(void **state);
+void test_tabstops_500(void **state);
+void test_tabstops_4X(void **state);
+void test_tabstops_4e(void **state);
+void test_tabstops_4ex(void **state);
+void test_tabstops_7(void **state);
+
 
 #endif
 

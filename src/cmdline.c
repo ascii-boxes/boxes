@@ -462,7 +462,7 @@ static int tab_handling(opt_t *result, char *optarg)
     char *p;
     int width = (int) strtol(optarg, &p, 10);
     if (width < 1 || width > MAX_TABSTOP) {
-        fprintf(stderr, "%s: invalid tab stop distance -- %d\n", PROJECT, width);
+        bx_fprintf(stderr, "%s: invalid tab stop distance -- %d\n", PROJECT, width);
         return 1;
     }
     result->tabstop = width;
@@ -490,7 +490,7 @@ static int tab_handling(opt_t *result, char *optarg)
         }
     }
     if (errfl) {
-        fprintf(stderr, "%s: invalid tab handling specification - %s\n", PROJECT, optarg);
+        bx_fprintf(stderr, "%s: invalid tab handling specification - %s\n", PROJECT, optarg);
         return 1;
     }
     return 0;
