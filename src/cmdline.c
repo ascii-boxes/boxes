@@ -139,10 +139,11 @@ static opt_t *create_new_opt()
  */
 static int alignment(opt_t *result, char *optarg)
 {
-    int errfl = 0;
+    int errfl = 1;
     char *p = optarg;
 
     while (*p) {
+        errfl = 0;
         if (p[1] == '\0' && !strchr("lLcCrR", *p)) {
             errfl = 1;
             break;
@@ -210,7 +211,7 @@ static int alignment(opt_t *result, char *optarg)
     }
 
     if (errfl) {
-        fprintf(stderr, "%s: Illegal text format -- %s\n", PROJECT, optarg);
+        bx_fprintf(stderr, "%s: Illegal text format -- %s\n", PROJECT, optarg);
         return 1;
     }
     return 0;
@@ -276,7 +277,7 @@ static int eol_override(opt_t *result, char *optarg)
         result->eol = "\r";
     }
     else {
-        fprintf(stderr, "%s: invalid eol spec -- %s\n", PROJECT, optarg);
+        bx_fprintf(stderr, "%s: invalid eol spec -- %s\n", PROJECT, optarg);
         return 1;
     }
     return 0;
@@ -443,7 +444,7 @@ static int size_of_box(opt_t *result, char *optarg)
         *p = 'x';
     }
     if (errno || (result->reqwidth == 0 && result->reqheight == 0) || result->reqwidth < 0 || result->reqheight < 0) {
-        fprintf(stderr, "%s: invalid box size specification -- %s\n", PROJECT, optarg);
+        bx_fprintf(stderr, "%s: invalid box size specification -- %s\n", PROJECT, optarg);
         return 1;
     }
     return 0;
@@ -535,7 +536,7 @@ static int input_output_files(opt_t *result, char *argv[], int optind)
     }
 
     else if (argv[optind + 1] && argv[optind + 2]) {         /* illegal third file */
-        fprintf(stderr, "%s: illegal parameter -- %s\n", PROJECT, argv[optind + 2]);
+        bx_fprintf(stderr, "%s: illegal parameter -- %s\n", PROJECT, argv[optind + 2]);
         usage_short(stderr);
         return 1;
     }
@@ -547,7 +548,7 @@ static int input_output_files(opt_t *result, char *argv[], int optind)
         else {
             result->infile = fopen(argv[optind], "r");
             if (result->infile == NULL) {
-                fprintf(stderr, "%s: Can\'t open input file -- %s\n", PROJECT, argv[optind]);
+                bx_fprintf(stderr, "%s: Can\'t open input file -- %s\n", PROJECT, argv[optind]);
                 return 9;                                    /* can't read infile */
             }
         }
@@ -741,7 +742,7 @@ opt_t *process_commandline(int argc, char *argv[])
                 break;
 
             default:
-                fprintf(stderr, "%s: internal error\n", PROJECT);
+                bx_fprintf(stderr, "%s: internal error\n", PROJECT);
                 return NULL;
         }
     } while (oc != EOF);

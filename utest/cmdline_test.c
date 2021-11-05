@@ -307,4 +307,64 @@ void test_tabstops_7(void **state)
 }
 
 
+void test_alignment_invalid_hX(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-a", "hX");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: Illegal text format -- hX\n", collect_err[0]);
+}
+
+
+void test_alignment_invalid_vX(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-a", "vX");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: Illegal text format -- vX\n", collect_err[0]);
+}
+
+
+void test_alignment_invalid_jX(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-a", "jX");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: Illegal text format -- jX\n", collect_err[0]);
+}
+
+
+void test_alignment_notset(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-a", "");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: Illegal text format -- \n", collect_err[0]);
+}
+
+
+void test_alignment_incomplete(void **state)
+{
+    (void) state;  /* unused */
+
+    opt_t *actual = act(2, "-a", "v");
+
+    assert_null(actual);   // invalid option, so we would need to exit with error
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: Illegal text format -- v\n", collect_err[0]);
+}
+
+
 /*EOF*/                                          /* vim: set cindent sw=4: */

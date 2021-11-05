@@ -68,7 +68,12 @@ int main(void)
         cmocka_unit_test_setup(test_tabstops_4X, beforeTest),
         cmocka_unit_test_setup(test_tabstops_4e, beforeTest),
         cmocka_unit_test_setup(test_tabstops_4ex, beforeTest),
-        cmocka_unit_test_setup(test_tabstops_7, beforeTest)
+        cmocka_unit_test_setup(test_tabstops_7, beforeTest),
+        cmocka_unit_test_setup(test_alignment_invalid_hX, beforeTest),
+        cmocka_unit_test_setup(test_alignment_invalid_vX, beforeTest),
+        cmocka_unit_test_setup(test_alignment_invalid_jX, beforeTest),
+        cmocka_unit_test_setup(test_alignment_notset, beforeTest),
+        cmocka_unit_test_setup(test_alignment_incomplete, beforeTest)
     };
 
     const struct CMUnitTest regulex_tests[] = {

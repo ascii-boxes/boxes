@@ -51,6 +51,12 @@ void test_tabstops_4e(void **state);
 void test_tabstops_4ex(void **state);
 void test_tabstops_7(void **state);
 
+void test_alignment_invalid_hX(void **state);
+void test_alignment_invalid_vX(void **state);
+void test_alignment_invalid_jX(void **state);
+void test_alignment_notset(void **state);
+void test_alignment_incomplete(void **state);
+
 
 #endif
 
