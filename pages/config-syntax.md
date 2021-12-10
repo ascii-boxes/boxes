@@ -77,7 +77,7 @@ The `SAMPLE` block is a required entry in every box design definition.
 <i>`shape_name`</i> may be one of `nw`, `nnw`, `n`, `nne`, `ne`, `ene`, `e`, `ese`, `se`, `sse`, `s`, `ssw`, `sw`,
 `wsw`, `w`, or `wnw`, corresponding to the [figure shown earlier]({{ site.baseurl }}/config-general.html).
 The `string_list` represents the shape itself, line by line. Note that all lines must have equal length. Add extra
-spaces if necessary. Not also that double quotes (`"`) which appear as part of a string must be escaped by a preceding
+spaces if necessary. Note also that double quotes (`"`) which appear as part of a string must be escaped by a preceding
 backslash, so as not to terminate the string early. Consequently, all occurrences of backslashes must also be escaped
 by adding additional backslashes. The recommended process for creating a string is thus:
 
