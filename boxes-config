@@ -862,6 +862,49 @@ END girl
 # ============================================================================
 
 
+BOX heart
+
+author   "Amy Churchwell"
+designer "Sunny Sempai <https://cutekaomoji.com>"
+revision "1.0"
+revdate  "April 19, 2022"
+created  "April 19, 2022"
+tags     "simple, box"
+
+sample
+┌────────────── ∘°∘♡∘°∘ ──────────────┐
+
+
+
+└────────────── °∘∘♡∘∘° ──────────────┘
+ends
+
+shapes {
+    nw ("┌─")
+    nnw ("─")
+    n (" ", "∘°∘♡∘°∘", " ")
+    nne ("─")
+    ne ("─┐")
+    sw ("└─")
+    ssw ("─")
+    s (" ", "∘°∘♡∘°∘", " ")
+    sse ("─")
+    se ("─┘")
+}
+
+elastic (nnw,nne,ssw,sse)
+
+padding {
+    vertical 3
+    horiz 3
+}
+
+END heart
+
+
+# ============================================================================
+
+
 BOX xes
 
 author   "Thomas Jensen"
