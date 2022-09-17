@@ -61,7 +61,7 @@ void collect_reset()
 
 /**
  * Mock of the `bx_fprintf()` function which records its output instead of printing it. Assumes that no output string
- * will be longer than 512 characters.
+ * of our test cases will be longer than 512 characters.
  * @param stream `stdout` or `stderr`
  * @param format the format string, followed by the arguments
  */

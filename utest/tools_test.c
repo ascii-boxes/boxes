@@ -18,17 +18,21 @@
  */
 
 #include "config.h"
+
+#include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
-#include <setjmp.h>
+
 #include <cmocka.h>
+
 #include "tools.h"
 #include "tools_test.h"
+#include "unicode.h"
 
 
 void test_strisyes_true(void **state)
 {
-    (void) state;  /* unused */
+    (void) state; /* unused */
 
     assert_int_equal(1, strisyes("On"));
     assert_int_equal(1, strisyes("on"));
@@ -44,7 +48,7 @@ void test_strisyes_true(void **state)
 
 void test_strisyes_false(void **state)
 {
-    (void) state;  /* unused */
+    (void) state; /* unused */
 
     assert_int_equal(0, strisyes(NULL));
     assert_int_equal(0, strisyes(""));
@@ -63,7 +67,7 @@ void test_strisyes_false(void **state)
 
 void test_strisno_true(void **state)
 {
-    (void) state;  /* unused */
+    (void) state; /* unused */
 
     assert_int_equal(1, strisno("off"));
     assert_int_equal(1, strisno("Off"));
@@ -79,7 +83,7 @@ void test_strisno_true(void **state)
 
 void test_strisno_false(void **state)
 {
-    (void) state;  /* unused */
+    (void) state; /* unused */
 
     assert_int_equal(0, strisno(NULL));
     assert_int_equal(0, strisno(""));
@@ -96,4 +100,49 @@ void test_strisno_false(void **state)
 }
 
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+void test_my_strrspn_edge(void **state)
+{
+    (void) state; /* unused */
+
+    assert_int_equal(0, (int) my_strrspn(NULL, "abc"));
+    assert_int_equal(0, (int) my_strrspn("", "abc"));
+    assert_int_equal(0, (int) my_strrspn("abc", NULL));
+    assert_int_equal(0, (int) my_strrspn("abc", ""));
+    assert_int_equal(0, (int) my_strrspn(NULL, NULL));
+}
+
+
+void test_my_strrspn(void **state)
+{
+    (void) state; /* unused */
+
+    assert_int_equal(2, (int) my_strrspn("foo", "o"));
+    assert_int_equal(0, (int) my_strrspn("foo", "ABC"));
+    assert_int_equal(3, (int) my_strrspn("foo", "foobar"));
+    assert_int_equal(1, (int) my_strrspn("foo ", " "));
+    assert_int_equal(1, (int) my_strrspn("a", "a"));
+    assert_int_equal(0, (int) my_strrspn("a", "A"));
+    assert_int_equal(2, (int) my_strrspn("axxaa", "a"));
+}
+
+
+void test_is_csi_reset(void **state)
+{
+    (void) state; /* unused */
+
+    assert_int_equal(1, is_csi_reset(u32_strconv_from_arg("\x1b[0m", "ASCII")));
+    assert_int_equal(1, is_csi_reset(u32_strconv_from_arg("\x1b[m", "ASCII")));
+    assert_int_equal(1, is_csi_reset(u32_strconv_from_arg("\x1b(0m", "ASCII")));
+    assert_int_equal(1, is_csi_reset(u32_strconv_from_arg("\x1b(m", "ASCII")));
+    assert_int_equal(1, is_csi_reset(u32_strconv_from_arg("\x1b[0m foo", "ASCII")));
+
+    assert_int_equal(0, is_csi_reset(u32_strconv_from_arg("", "ASCII")));
+    assert_int_equal(0, is_csi_reset(u32_strconv_from_arg("normal", "ASCII")));
+    assert_int_equal(0, is_csi_reset(u32_strconv_from_arg("\x1b[", "ASCII")));
+    assert_int_equal(0, is_csi_reset(u32_strconv_from_arg("not yet \x1b[0m", "ASCII")));
+    assert_int_equal(0, is_csi_reset(u32_strconv_from_arg("\x1b[38;5;203m", "ASCII")));
+    assert_int_equal(0, is_csi_reset(u32_strconv_from_arg("\x1b_BROKEN", "ASCII")));
+}
+
+
+/* vim: set cindent sw=4: */

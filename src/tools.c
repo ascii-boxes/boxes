@@ -18,13 +18,13 @@
  */
 
 #include "config.h"
+
 #include <errno.h>
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
-
 #include <unictype.h>
 #include <unistr.h>
 #include <unitypes.h>
@@ -32,8 +32,8 @@
 
 #include "boxes.h"
 #include "shape.h"
-#include "unicode.h"
 #include "tools.h"
+#include "unicode.h"
 
 
 
@@ -55,15 +55,20 @@ int strisyes(const char *s)
 
     if (!strncasecmp("on", s, 3)) {
         return 1;
-    } else if (!strncasecmp("yes", s, 4)) {
+    }
+    else if (!strncasecmp("yes", s, 4)) {
         return 1;
-    } else if (!strncasecmp("true", s, 5)) {
+    }
+    else if (!strncasecmp("true", s, 5)) {
         return 1;
-    } else if (!strncmp("1", s, 2)) {
+    }
+    else if (!strncmp("1", s, 2)) {
         return 1;
-    } else if (!strncasecmp("t", s, 2)) {
+    }
+    else if (!strncasecmp("t", s, 2)) {
         return 1;
-    } else {
+    }
+    else {
         return 0;
     }
 }
@@ -88,15 +93,20 @@ int strisno(const char *s)
 
     if (!strncasecmp("off", s, 4)) {
         return 1;
-    } else if (!strncasecmp("no", s, 3)) {
+    }
+    else if (!strncasecmp("no", s, 3)) {
         return 1;
-    } else if (!strncasecmp("false", s, 6)) {
+    }
+    else if (!strncasecmp("false", s, 6)) {
         return 1;
-    } else if (!strncmp("0", s, 2)) {
+    }
+    else if (!strncmp("0", s, 2)) {
         return 1;
-    } else if (!strncasecmp("f", s, 2)) {
+    }
+    else if (!strncasecmp("f", s, 2)) {
         return 1;
-    } else {
+    }
+    else {
         return 0;
     }
 }
@@ -121,7 +131,7 @@ void concat_strings(char *dst, int max_len, int count, ...)
     va_list va;
     const char *src;
 
-    va_start (va, count);
+    va_start(va, count);
 
     /*
      *  Sanity check.
@@ -139,12 +149,11 @@ void concat_strings(char *dst, int max_len, int count, ...)
      *  Loop over all input strings.
      */
     while (count-- > 0 && max_len > 1) {
-
         /*
          * Grab an input string pointer.  If it's NULL, skip it (eg. treat
          * it as empty.
          */
-        src = va_arg (va, const char *);
+        src = va_arg(va, const char *);
 
         if (src == NULL) {
             continue;
@@ -159,7 +168,7 @@ void concat_strings(char *dst, int max_len, int count, ...)
         }
     }
 
-    va_end (va);
+    va_end(va);
 
     /*
      * Terminate the string with an ASCII NUL.
@@ -179,27 +188,27 @@ char *concat_strings_alloc(size_t count, ...)
     const char *src;
     va_list va;
 
-    va_start (va, count);
+    va_start(va, count);
     for (size_t i = 0; i < count; i++) {
-        src = va_arg (va, const char *);
+        src = va_arg(va, const char *);
         if (src != NULL) {
             total_len += strlen(src);
         }
     }
-    va_end (va);
+    va_end(va);
 
     char *result = malloc(total_len + 1);
     char *p = result;
 
-    va_start (va, count);
+    va_start(va, count);
     for (size_t i = 0; i < count; i++) {
-        src = va_arg (va, const char *);
+        src = va_arg(va, const char *);
         if (src != NULL && src[0] != '\0') {
             strcpy(p, src);
             p += strlen(src);
         }
     }
-    va_end (va);
+    va_end(va);
 
     *p = '\0';
     return result;
@@ -236,8 +245,8 @@ int empty_line(const line_t *line)
 
 
 
-size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_t **text,
-                        size_t **tabpos, size_t *tabpos_len)
+size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_t **text, size_t **tabpos,
+        size_t *tabpos_len)
 /*
  *  Expand tab chars in input_buffer and store result in text.
  *
@@ -257,9 +266,9 @@ size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 {
-    static uint32_t temp[LINE_MAX_BYTES + 100];  /* work string */
-    size_t io;         /* character position in work string */
-    size_t tabnum = 0; /* index of the current tab */
+    static uint32_t temp[LINE_MAX_BYTES + 100]; /* work string */
+    size_t io;                                  /* character position in work string */
+    size_t tabnum = 0;                          /* index of the current tab */
 
     *text = NULL;
     *tabpos = NULL;
@@ -281,7 +290,7 @@ size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_
     if (*tabpos_len > 0) {
         *tabpos = (size_t *) calloc((*tabpos_len) + 1, sizeof(size_t));
         if (*tabpos == NULL) {
-            return 0;       /* out of memory */
+            return 0; /* out of memory */
         }
     }
 
@@ -322,9 +331,7 @@ void btrim(char *text, size_t *len)
 {
     long idx = (long) (*len) - 1;
 
-    while (idx >= 0 && (text[idx] == '\n' || text[idx] == '\r'
-            || text[idx] == '\t' || text[idx] == ' ')) /**/
-    {
+    while (idx >= 0 && (text[idx] == '\n' || text[idx] == '\r' || text[idx] == '\t' || text[idx] == ' ')) {
         text[idx--] = '\0';
     }
 
@@ -415,7 +422,8 @@ char *my_strnrstr(const char *s1, const char *s2, const size_t s2_len, int skip)
         if (comp == 0) {
             if (skip--) {
                 --p;
-            } else {
+            }
+            else {
                 return p;
             }
         }
@@ -425,6 +433,26 @@ char *my_strnrstr(const char *s1, const char *s2, const size_t s2_len, int skip)
     }
 
     return NULL;
+}
+
+
+
+size_t my_strrspn(const char *s, const char *accept)
+{
+    if (!s || *s == '\0') {
+        return 0;
+    }
+    if (!accept || *accept == '\0') {
+        return 0;
+    }
+
+    for (int i = strlen(s) - 1; i >= 0; i--) {
+        size_t idx = (size_t) i;
+        if (strchr(accept, s[idx]) == NULL) {
+            return strlen(s) - (idx + 1);
+        }
+    }
+    return strlen(s);
 }
 
 
@@ -470,11 +498,9 @@ char *tabbify_indent(const size_t lineno, char *indentspc, const size_t indentsp
     result[indentspc_len] = '\0';
     result_len = indentspc_len;
 
-    for (i = 0; i < input.lines[lineno].tabpos_len
-            && input.lines[lineno].tabpos[i] < indentspc_len; ++i)  /**/
-    {
+    for (i = 0; i < input.lines[lineno].tabpos_len && input.lines[lineno].tabpos[i] < indentspc_len; ++i) {
         size_t tpos = input.lines[lineno].tabpos[i];
-        size_t nspc = opt.tabstop - (tpos % opt.tabstop);   /* no of spcs covered by tab */
+        size_t nspc = opt.tabstop - (tpos % opt.tabstop); /* no of spcs covered by tab */
         if (tpos + nspc > input.indent) {
             break;
         }
@@ -527,7 +553,8 @@ void print_input_lines(const char *heading)
                 fprintf(stderr, "%d%s", (int) input.lines[i].posmap[j], j == (input.lines[i].len - 1) ? "" : ", ");
             }
             fprintf(stderr, "]\n");
-        } else {
+        }
+        else {
             fprintf(stderr, "null\n");
         }
     }
@@ -551,10 +578,10 @@ void print_input_lines(const char *heading)
  * @param <posmap> pointer to the position map, which maps each position in <ascii> to a position in <s>
  * @returns the number of invisible characters in <s>
  */
-static size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, size_t **posmap)
+size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, size_t **posmap)
 {
-    size_t invis = 0;  /* counts invisible column positions */
-    *num_esc = 0;      /* counts the number of escape sequences found */
+    size_t invis = 0; /* counts invisible column positions */
+    *num_esc = 0;     /* counts the number of escape sequences found */
 
     if (is_empty(s)) {
         (*ascii) = (char *) strdup("");
@@ -565,8 +592,8 @@ static size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **a
     size_t buflen = (size_t) u32_strwidth(s, encoding) + 1;
     size_t map_size = BMAX((size_t) 5, buflen);
     size_t map_idx = 0;
-    size_t *map = (size_t *) calloc(map_size, sizeof(size_t));  /* might not be enough if many double-wide chars */
-    (*ascii) = (char *) calloc(buflen, sizeof(char));     /* maybe a little too much, but certainly enough */
+    size_t *map = (size_t *) calloc(map_size, sizeof(size_t)); /* might not be enough if many double-wide chars */
+    (*ascii) = (char *) calloc(buflen, sizeof(char));          /* maybe a little too much, but certainly enough */
     char *p = *ascii;
 
     size_t mb_idx = 0;
@@ -607,6 +634,41 @@ static size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **a
     *p = '\0';
     (*posmap) = map;
     return invis;
+}
+
+
+
+int is_csi_reset(const uint32_t *csi)
+{
+    ucs4_t puc = '\0';
+    const uint32_t *rest = csi;
+    size_t csi_pos = 0;
+    while ((rest = u32_next(&puc, rest))) {
+        switch(csi_pos) {
+            case 0:
+                if (puc != char_esc) {
+                    return 0;
+                }
+                break;
+            case 1:
+                if (puc != '[' && puc != '(') {
+                    return 0;
+                }
+                break;
+            case 2:
+                if (puc != '0') {
+                    if (puc >= 0x40 && puc <= 0x7e) {
+                        return 1;
+                    }
+                    return 0;
+                }
+                break;
+            default:
+                return (puc >= 0x40 && puc <= 0x7e) ? 1 : 0;
+        }
+        csi_pos++;
+    }
+    return 0;
 }
 
 
@@ -742,4 +804,4 @@ void bx_fprintf(FILE *stream, const char *format, ...)
 }
 
 
-/*EOF*/                                                  /* vim: set sw=4: */
+/* vim: set sw=4: */

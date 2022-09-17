@@ -33,10 +33,10 @@
 })
 
 #define BFREE(p) {                       /* free memory and clear pointer */ \
-    if (p) {              \
-        free((void *) p); \
-        (p) = NULL;       \
-    }                     \
+    if (p) {                \
+        free((void *) (p)); \
+        (p) = NULL;         \
+    }                       \
 }
 
 
@@ -49,8 +49,16 @@ void btrim(char *text, size_t *len);
 
 void btrim32(uint32_t *text, size_t *len);
 
-char *my_strnrstr(const char *s1, const char *s2, const size_t s2_len,
-                  int skip);
+char *my_strnrstr(const char *s1, const char *s2, const size_t s2_len, int skip);
+
+/**
+ * Calculates the length (in bytes) of the segment at the end of `s` which consists entirely of bytes in `accept`.
+ * This is like `strspn()`, but from the end of the string.
+ * @param <s> the string to search
+ * @param <accept> acceptable characters that form the trailing segment
+ * @return the number of bytes found as described above
+ */
+size_t my_strrspn(const char *s, const char *accept);
 
 int strisyes(const char *s);
 
@@ -74,6 +82,16 @@ char *nspaces(const size_t n);
 void print_input_lines(const char *heading);
 
 void analyze_line_ascii(input_t *input_ptr, line_t *line);
+
+size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, size_t **posmap);
+
+/**
+ * Determine whether the given sequence of characters is a CSI (also called "escape sequence") that resets all
+ * modifications, typically `ESC[0m`.
+ * @param csi a pointer into a zero-terminated UTF-32 string
+ * @returns 1 if true, 0 if false
+ */
+int is_csi_reset(const uint32_t *csi);
 
 int array_contains(char **array, const size_t array_len, const char *s);
 

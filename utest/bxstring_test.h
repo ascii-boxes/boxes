@@ -1,6 +1,6 @@
 /*
  * boxes - Command line filter to draw/remove ASCII boxes around text
- * Copyright (c) 1999-2023 Thomas Jensen and the boxes contributors
+ * Copyright (c) 1999-2021 Thomas Jensen and the boxes contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License, version 3, as published by the Free Software Foundation.
@@ -14,25 +14,19 @@
  */
 
 /*
- * Unit tests of the 'tools' module
+ * Unit tests of the 'cmdline' module
  */
 
-#ifndef TOOLS_TEST_H
-#define TOOLS_TEST_H
+#ifndef BXSTRING_TEST_H
+#define BXSTRING_TEST_H
 
 
-void test_strisyes_true(void **state);
-void test_strisyes_false(void **state);
-
-void test_strisno_true(void **state);
-void test_strisno_false(void **state);
-
-void test_my_strrspn_edge(void **state);
-void test_my_strrspn(void **state);
-
-void test_is_csi_reset(void **state);
+void test_ascii_simple(void **state);
+void test_ansi_unicode_book(void **state);
+void test_ansi_unicode_space_kinds(void **state);
+void test_ansi_unicode_chinese(void **state);
 
 
 #endif
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

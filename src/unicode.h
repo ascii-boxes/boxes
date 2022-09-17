@@ -28,7 +28,7 @@
  *  However, people might not conform to this, so we use ISO_8859-15 as a reasonable superset. */
 extern const char *config_encoding;
 
-/** the character encoding of input (and output) text */
+/* effective character encoding of input and output text */
 extern const char *encoding;
 
 /** ucs4_t character '\t' (tab)  */

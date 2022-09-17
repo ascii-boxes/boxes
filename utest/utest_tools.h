@@ -1,6 +1,6 @@
 /*
  * boxes - Command line filter to draw/remove ASCII boxes around text
- * Copyright (c) 1999-2023 Thomas Jensen and the boxes contributors
+ * Copyright (c) 1999-2021 Thomas Jensen and the boxes contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License, version 3, as published by the Free Software Foundation.
@@ -14,24 +14,30 @@
  */
 
 /*
- * Unit tests of the 'tools' module
+ * Helper functions for all the unit tests.
  */
 
-#ifndef TOOLS_TEST_H
-#define TOOLS_TEST_H
+#ifndef UTEST_TOOLS_H
+#define UTEST_TOOLS_H
 
 
-void test_strisyes_true(void **state);
-void test_strisyes_false(void **state);
+/**
+ * Assert that the two given arrays have the same contents.
+ * @param <p_expected> the expected array
+ * @param <p_actual> the actual array
+ * @param <p_len_expected> number of elements in `p_expected`
+ */
+void assert_array_equal(int p_expected[], size_t *p_actual, size_t p_len_expected);
 
-void test_strisno_true(void **state);
-void test_strisno_false(void **state);
 
-void test_my_strrspn_edge(void **state);
-void test_my_strrspn(void **state);
+/**
+ * Print the contents of the given array for debugging purposes.
+ * @param p_array the array to print
+ * @param p_len the number of elements in the array
+ */
+void print_array_i(int p_array[], size_t p_len);
 
-void test_is_csi_reset(void **state);
-
+void print_array_s(size_t p_array[], size_t p_len);
 
 #endif
 
