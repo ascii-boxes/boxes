@@ -67,8 +67,8 @@ and they may make it into the next release!
 
 ## License
 
-Boxes is free software under the GNU General Public License, version 2
-([GPLv2](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)).
+Boxes is free software under the GNU General Public License, version 3
+([GPLv3](https://www.gnu.org/licenses/gpl-3.0.html)).
 
 ```
  _________________________

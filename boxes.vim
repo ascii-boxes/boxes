@@ -1,12 +1,15 @@
-" boxes - command line ASCII boxes unlimited!
-" Copyright (C) 1999-2020 Thomas Jensen and the boxes contributors
 "
-" This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
-" License, version 2, as published by the Free Software Foundation.
+" boxes - Command line filter to draw/remove ASCII boxes around text
+" Copyright (c) 1999-2021 Thomas Jensen and the boxes contributors
+"
+" This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+" License, version 3, as published by the Free Software Foundation.
 " This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-" warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-" You should have received a copy of the GNU General Public License along with this program; if not, write to the Free
-" Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+" warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+" details.
+" You should have received a copy of the GNU General Public License along with this program.
+" If not, see <https://www.gnu.org/licenses/>.
+" ___________________________________________________________________________________________________________________
 "
 " Vim syntax file
 " ---------------
@@ -15,9 +18,8 @@
 " Status: Stable
 " Notes:  - Vim requires this file to have system-dependent line endings (CR/LF on Windows, just LF otherwise)
 "         - To activate, copy this file to $VIMRUNTIME/syntax/, for example /usr/share/vim/vim81/syntax/.
-" Known Issues:
-"         https://github.com/ascii-boxes/boxes/issues?q=is%3Aissue+is%3Aopen+Vim+Syntax
-" _____________________________________________________________________________________________________________________
+"
+"====================================================================================================================
 
 
 if exists("b:current_syntax")

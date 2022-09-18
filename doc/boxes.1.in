@@ -464,7 +464,7 @@ version --BVERSION--.
 .SH LICENSE
 .I boxes
 is free software under the terms of the GNU General Public License,
-version 2. Details in the LICENSE file:
+version 3. Details in the LICENSE file:
 <URL:https://raw.githubusercontent.com/ascii-boxes/boxes/v--BVERSION--/LICENSE>
 .\" =======================================================================
 .SH ENVIRONMENT
