@@ -68,7 +68,7 @@ Details on where boxes looks for configuration files can be found
         <licenseUrl>https://raw.githubusercontent.com/ascii-boxes/boxes/v2.2.0/LICENSE</licenseUrl>
         <language>en</language>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <releaseNotes>https://boxes.thomasjensen.com/202x/xx/boxes-v2.2.0-released.html</releaseNotes>
+        <releaseNotes>https://boxes.thomasjensen.com/2022/09/boxes-v2.2.0-released.html</releaseNotes>
         <projectSourceUrl>https://github.com/ascii-boxes/boxes</projectSourceUrl>
         <packageSourceUrl>https://github.com/ascii-boxes/boxes/blob/master/boxes.portable.nuspec</packageSourceUrl>
         <docsUrl>https://boxes.thomasjensen.com/</docsUrl>

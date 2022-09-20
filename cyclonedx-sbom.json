@@ -8,7 +8,7 @@
             "type": "application",
             "author": "Thomas Jensen and the boxes contributors",
             "name": "boxes",
-            "version": "2.1.1",
+            "version": "2.2.0",
             "description": "Command Line ASCII Boxes Unlimited!",
             "licenses": [
                 {
@@ -70,7 +70,7 @@
             "type": "library",
             "author": "Philip Hazel",
             "name": "PCRE2",
-            "version": "10.36",
+            "version": "10.40",
             "description": "PCRE2 - Perl-compatible regular expressions (revised API)",
             "licenses": [
                 {

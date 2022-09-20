@@ -16,14 +16,14 @@
 # The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/share/boxes
 GIT_STATUS = $(shell git describe --dirty --always 2>/dev/null || echo "n/a")
-BVERSION   = 2.1.1
+BVERSION   = 2.2.0
 
 ALL_FILES  = LICENSE README.md boxes-config
 DOC_FILES  = doc/boxes.1 doc/boxes.el
 PKG_NAME   = boxes-$(BVERSION)
 OUT_DIR    = out
 
-WIN_PCRE2_VERSION      = 10.36
+WIN_PCRE2_VERSION      = 10.40
 WIN_PCRE2_DIR          = vendor/pcre2-$(WIN_PCRE2_VERSION)
 WIN_FLEX_BISON_VERSION = 2.5.24
 WIN_FLEX_BISON_DIR     = vendor/flex_bison_$(WIN_FLEX_BISON_VERSION)
@@ -51,7 +51,7 @@ win32.debug: infomsg replaceinfos
 
 win32.prereq:
 	# download components
-	curl -LO https://ftp.pcre.org/pub/pcre/pcre2-$(WIN_PCRE2_VERSION).tar.gz
+	curl -LO https://github.com/PCRE2Project/pcre2/releases/download/pcre2-$(WIN_PCRE2_VERSION)/pcre2-$(WIN_PCRE2_VERSION).tar.gz
 	curl -LO https://downloads.sourceforge.net/project/winflexbison/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip
 	curl -LO https://cmocka.org/files/$(WIN_CMOCKA_VERSION:%.0=%)/cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip
 	# unpack components
