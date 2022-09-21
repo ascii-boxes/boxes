@@ -54,6 +54,7 @@
 /tools/README*.md
 /tools/LICENSE.txt
 /boxes.portable.*.nupkg
+*.nupkg.zip
 
 # Misc
 /vs
