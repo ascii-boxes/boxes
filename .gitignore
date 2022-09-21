@@ -14,8 +14,11 @@
 /pcre2-*/
 /flex_bison_*/
 /doc/
+/tools/
+/vendor/
 
 /vs
 /_support/
 /cmake-build-debug/
 *.tar.gz
+*.nupkg.zip
