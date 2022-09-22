@@ -1,17 +1,15 @@
 ---
 title: Manpage of boxes(1)
-permalink: /boxes-man-1.html
-redirect_from:
-  - /docs/boxes-man-1.html
+permalink: /v2.2.0/boxes-man-1.html
 longContent: true
+bxVersion: v2.2.0
 created_at: 1999-04-06
 last_modified_at: 2022-09-20 20:19:00 +0200
 ---
 
 <h1>boxes</h1>
 
-{% assign thisVersion = site.currentVersion | prepend: 'v' -%}
-{% include version-select.html currentVersion=thisVersion contentPiece="boxes-man-1" %}
+{% include version-select.html currentVersion=page.bxVersion contentPiece="boxes-man-1" %}
 
 <p>Section: User Commands  (1)<BR>Updated: September 20 2022</p>
 
@@ -431,7 +429,7 @@ maintainer&rsquo;s current email address.</p>
     text="VERSION" %}
 
 <p style="margin-left:11%; margin-top: 1em">This is
-<i>boxes</i> version {{ site.currentVersion }}.</p>
+<i>boxes</i> version 2.2.0.</p>
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
@@ -442,7 +440,7 @@ maintainer&rsquo;s current email address.</p>
 <p style="margin-left:11%; margin-top: 1em"><i>boxes</i> is
 free software under the terms of the GNU General Public
 License, version 3. Details in the LICENSE file:
-<a href="{{ site.link_license }}">{{ site.link_license }}</a></p>
+<a href="https://raw.githubusercontent.com/{{ site.github }}/v2.2.0/LICENSE">https://raw.githubusercontent.com/{{ site.github }}/v2.2.0/LICENSE</a></p>
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}

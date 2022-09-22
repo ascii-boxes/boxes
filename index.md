@@ -145,4 +145,4 @@ box is added or removed.
 New box designs of all sorts can easily be added and shared by appending to a free format configuration file. Be
 creative!
 
-*Boxes* is free software under the GNU General Public License, version 2 ([GPLv2]({{ site.link_license }})).
+*Boxes* is free software under the GNU General Public License, version 3 ([GPLv3]({{ site.link_license }})).
