@@ -32,7 +32,7 @@ ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
 ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 
 
-.PHONY: check_dir clean build cov debug package flags_unix flags_win32 flags_
+.PHONY: boxes.static check_dir clean build cov debug package static flags_unix flags_static flags_win32 flags_
 
 .NOTPARALLEL:
 
@@ -49,6 +49,10 @@ build: flags_$(BOXES_PLATFORM) | $(OUT_DIR)
 	$(MAKE) -C $(OUT_DIR) -f $(SRC_DIR)/Makefile BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" STRIP=true \
 	    CFLAGS_ADDTL="-O $(CFLAGS_ADDTL)" flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
 
+static: flags_$(BOXES_PLATFORM) | $(OUT_DIR)
+	$(MAKE) -C $(OUT_DIR) -f $(SRC_DIR)/Makefile BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" STRIP=true \
+	    CFLAGS_ADDTL="-O $(CFLAGS_ADDTL)" flags_$(BOXES_PLATFORM) boxes.static
+
 cov: flags_$(BOXES_PLATFORM) | $(OUT_DIR)
 	$(MAKE) -C $(OUT_DIR) -f $(SRC_DIR)/Makefile BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" STRIP=false \
 	    CFLAGS_ADDTL="-g --coverage $(CFLAGS_ADDTL)" \
@@ -63,6 +67,10 @@ boxes: $(ALL_OBJ) | check_dir
 	$(CC) $(LDFLAGS) $^ -o $@ -lunistring -lpcre2-32
 	if [ "$(STRIP)" = "true" ] ; then strip $@ ; fi
 
+boxes.static: $(ALL_OBJ) | check_dir
+	$(CC) $(LDFLAGS) $^ -o $(BOXES_EXECUTABLE_NAME) -l:libunistring.a -l:libpcre2-32.a
+	if [ "$(STRIP)" = "true" ] ; then strip $(BOXES_EXECUTABLE_NAME) ; fi
+
 boxes.exe: $(ALL_OBJ) | check_dir
 	$(CC) $(LDFLAGS) $^ -o $@ -lkernel32 -l:libunistring.a -l:libpcre2-32.a -l:libiconv.a
 	if [ "$(STRIP)" = "true" ] ; then strip $@ ; fi
@@ -71,6 +79,13 @@ boxes.exe: $(ALL_OBJ) | check_dir
 flags_unix:
 	$(eval CFLAGS := -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
 	$(eval LDFLAGS := $(LDFLAGS) $(LDFLAGS_ADDTL))
+	$(eval BOXES_EXECUTABLE_NAME := boxes)
+	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
+	echo $(filter-out boxes.o,$(ALL_OBJ)) > $(OUT_DIR)/modules.txt
+
+flags_static:
+	$(eval CFLAGS := -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS) -L../$(LIBUNISTRING_DIR)/lib/.libs -L../$(PCRE2_DIR)/.libs $(LDFLAGS_ADDTL))
 	$(eval BOXES_EXECUTABLE_NAME := boxes)
 	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
 	echo $(filter-out boxes.o,$(ALL_OBJ)) > $(OUT_DIR)/modules.txt

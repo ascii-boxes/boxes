@@ -6,7 +6,7 @@
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/src/misc",
                 "${workspaceFolder}/out",
-                "${workspaceFolder}/vendor/pcre2-10.36/src",
+                "${workspaceFolder}/vendor/pcre2-10.40/src",
                 "${workspaceFolder}/vendor/cmocka-1.1.0/include"
             ],
             "defines": [
