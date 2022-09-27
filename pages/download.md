@@ -28,10 +28,10 @@ The best way to get *boxes* is via your package manager. Here are some package m
     </tr>
   </thead>
   <tbody>
-    <tr><td>Linux</td>   <td>apt</td>   <td><code>apt-get install -y boxes</code></td></tr>
-    <tr><td>Linux</td>   <td>dnf</td>   <td><code>dnf install boxes</code></td></tr>
-    <tr><td>MacOS</td>   <td>brew</td>  <td><code>brew install boxes</code></td></tr>
-    <tr><td>Windows</td> <td>choco</td> <td><code>choco install boxes.portable</code></td></tr>
+    <tr><td>Linux (Debian, Ubuntu)</td> <td>apt</td>   <td><code>apt-get install -y boxes</code></td></tr>
+    <tr><td>Linux (Fedora)</td>         <td>dnf</td>   <td><code>dnf install boxes</code></td></tr>
+    <tr><td>MacOS</td>                  <td>brew</td>  <td><code>brew install boxes</code></td></tr>
+    <tr><td>Windows</td>                <td>choco</td> <td><code>choco install boxes.portable</code></td></tr>
   </tbody>
 </table>
 
