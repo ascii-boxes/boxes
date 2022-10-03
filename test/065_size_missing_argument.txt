@@ -3,7 +3,9 @@
 :INPUT
 foo
 :OUTPUT-FILTER
-1s/^.+?: /boxes: /
+1s/:\\/\\/
+1s/^[^:]+: /boxes: /
+1s/argument: s/argument -- s/
 1s/-- s$/-- 's'/
 :EXPECTED-ERROR 1
 boxes: option requires an argument -- 's'
