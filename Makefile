@@ -51,25 +51,26 @@ win32.debug: infomsg replaceinfos
 	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(PCRE2_DIR)/src LDFLAGS=-L../$(PCRE2_DIR)/.libs \
 	    LEX=../$(WIN_FLEX_BISON_DIR)/win_flex.exe YACC=../$(WIN_FLEX_BISON_DIR)/win_bison.exe debug
 
-win32.prereq:
-	# download components
-	curl -LO https://github.com/PCRE2Project/pcre2/releases/download/pcre2-$(PCRE2_VERSION)/pcre2-$(PCRE2_VERSION).tar.gz
-	curl -LO https://downloads.sourceforge.net/project/winflexbison/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip
-	curl -LO https://cmocka.org/files/$(WIN_CMOCKA_VERSION:%.0=%)/cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip
-	# unpack components
-	mkdir -p vendor
-	unzip win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip -d $(WIN_FLEX_BISON_DIR)
-	tar -C vendor -xzf pcre2-$(PCRE2_VERSION).tar.gz
-	unzip cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip -d vendor
-	# build the pcre2 dependency (only needed on Windows MinGW)
+win32.prereq: $(PCRE2_DIR)/.libs/libpcre2-32.a vendor/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip \
+              vendor/cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip
+	unzip -n vendor/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip -d $(WIN_FLEX_BISON_DIR)
+	unzip -n vendor/cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip -d vendor
+
+vendor/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip: | vendor
+	curl -L https://downloads.sourceforge.net/project/winflexbison/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip --output $@
+
+vendor/cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip: | vendor
+	curl -L https://cmocka.org/files/$(WIN_CMOCKA_VERSION:%.0=%)/cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip --output $@
+
+vendor/pcre2-$(PCRE2_VERSION).tar.gz: | vendor
+	curl -L https://github.com/PCRE2Project/pcre2/releases/download/pcre2-$(PCRE2_VERSION)/pcre2-$(PCRE2_VERSION).tar.gz --output $@
+
+$(PCRE2_DIR)/.libs/libpcre2-32.a: vendor/pcre2-$(PCRE2_VERSION).tar.gz
+	tar -xzf vendor/pcre2-$(PCRE2_VERSION).tar.gz -C vendor
 	cd $(PCRE2_DIR) ; \
-	./configure --disable-pcre2-8 --disable-pcre2-16 --enable-pcre2-32 --disable-shared \
-				--enable-never-backslash-C --enable-newline-is-anycrlf ; \
+	./configure --disable-pcre2-8 --disable-pcre2-16 --enable-pcre2-32 --enable-static --disable-shared \
+	            --enable-never-backslash-C --enable-newline-is-anycrlf ; \
 	$(MAKE)
-	# remove downloaded archives
-	rm pcre2-$(PCRE2_VERSION).tar.gz
-	rm win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip
-	rm cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -109,16 +110,6 @@ vendor/libunistring-$(LIBUNISTRING_VERSION).tar.gz: | vendor
 $(LIBUNISTRING_DIR)/lib/.libs/libunistring.a: vendor/libunistring-$(LIBUNISTRING_VERSION).tar.gz
 	tar -C vendor -xzf vendor/libunistring-$(LIBUNISTRING_VERSION).tar.gz
 	cd $(LIBUNISTRING_DIR) ; ./configure --enable-static ; $(MAKE)
-
-vendor/pcre2-$(PCRE2_VERSION).tar.gz: | vendor
-	curl -L https://github.com/PCRE2Project/pcre2/releases/download/pcre2-$(PCRE2_VERSION)/pcre2-$(PCRE2_VERSION).tar.gz --output $@
-
-$(PCRE2_DIR)/.libs/libpcre2-32.a: vendor/pcre2-$(PCRE2_VERSION).tar.gz
-	tar -C vendor -xzf vendor/pcre2-$(PCRE2_VERSION).tar.gz
-	cd $(PCRE2_DIR) ; \
-	./configure --disable-pcre2-8 --disable-pcre2-16 --enable-pcre2-32 --enable-static --disable-shared \
-				--enable-never-backslash-C --enable-newline-is-anycrlf ; \
-	$(MAKE)
 
 static: infomsg replaceinfos $(LIBUNISTRING_DIR)/lib/.libs/libunistring.a $(PCRE2_DIR)/.libs/libpcre2-32.a
 	$(MAKE) -C src BOXES_PLATFORM=static LEX=flex YACC=bison LIBUNISTRING_DIR=$(LIBUNISTRING_DIR) PCRE2_DIR=$(PCRE2_DIR) $@
@@ -199,6 +190,7 @@ win32.utest: $(OUT_DIR)
 clean:
 	rm -f $(OUT_DIR)/boxes.h tools/boxes.cfg tools/LICENSE.txt tools/boxes.exe tools/README*.md boxes.portable.*.nupkg
 	rm -f doc/boxes.1 doc/boxes.1.raw.html doc/boxes.1.html
+	rm -rf vendor
 	$(MAKE) -C src clean
 
 
