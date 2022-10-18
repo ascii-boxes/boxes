@@ -22,7 +22,7 @@
 
 
 int remove_box();
-void output_input();
+void output_input(const int trim_only);
 
 
 #endif /*REMOVE_H*/
