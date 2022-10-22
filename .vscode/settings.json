@@ -1,4 +1,18 @@
 {
+    "C_Cpp.loggingLevel": "Debug",
+
+    "editor.autoClosingBrackets": "never",
+    "editor.dragAndDrop": false,
+    "editor.formatOnSave": false,
+    "editor.renderWhitespace": "selection",
+    "editor.rulers": [120],
+    "editor.wordWrapColumn": 120,
+
+    "files.associations": {
+        "*.1.in": "troff",
+        "*.h": "c"
+    },
+    "files.encoding": "utf8",
     "files.exclude": {
         "**/.git": true,
         "**/.idea": true,
@@ -7,22 +21,8 @@
         "**/cmake-build-debug": true,
         "**/coverage": true,
         "**/out": true,
-        "**/flex_bison_*": true,
-        "**/pcre2-*": true,
-        "**/cmocka-*": true,
         "**/vendor": true
     },
-    "editor.autoClosingBrackets": "never",
-    "editor.dragAndDrop": false,
-    "editor.formatOnSave": false,
-    "editor.renderWhitespace": "selection",
-    "editor.rulers": [120],
-    "editor.wordWrapColumn": 120,
-    "files.associations": {
-        "*.1.in": "troff",
-        "*.h": "c"
-    },
-    "files.encoding": "utf8",
 
     "todo-tree.highlights.defaultHighlight": {
         "foreground": "#DD0000",
@@ -35,9 +35,7 @@
         "**/.github/**",
         "**/_site/**",
         "**/_support/**",
-        "**/flex_bison_*/**",
-        "**/pcre2-*/**",
-        "**/cmocka-*/**"
+        "**/vendor/**"
     ],
     "todo-tree.general.statusBar": "total",
     "todo-tree.general.tags": ["TODO", "FIXME", "CHECK"],
