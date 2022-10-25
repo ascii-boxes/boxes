@@ -58,7 +58,7 @@ function parse_arguments()
                 exit 0
                 ;;
             *)
-                if [ -z ${opt_testCase} ]; then
+                if [ -z "${opt_testCase}" ]; then
                     opt_testCase=${i}
                 else
                     print_usage
@@ -77,7 +77,7 @@ function parse_arguments()
 
 function check_prereqs()
 {
-    if [ ${PWD##*/} != "test" ]; then
+    if [ "${PWD##*/}" != "test" ]; then
         >&2 echo "Please run this script from the test folder."
         exit 2
     fi
@@ -85,7 +85,7 @@ function check_prereqs()
         >&2 echo "Please run 'make' from the project root to build an executable before running tests."
         exit 2
     fi
-    if [[ ${opt_coverage} == true && $(ls ${OUT_DIR}/*.gcno 2>/dev/null | wc -l) -lt 1 ]]; then
+    if [[ ${opt_coverage} == true && $(find ${OUT_DIR} -maxdepth 1 -name '*.gcno' 2>/dev/null | wc -l) -lt 1 ]]; then
         >&2 echo "Binaries not instrumented. Run 'make cov' from the project root."
         exit 5
     fi
@@ -119,9 +119,9 @@ function execute_suite()
     local tc
     for tc in *.txt; do
         if [ ${opt_coverage} == true ]; then
-            $0 --coverage ${tc}
+            $0 --coverage "${tc}"
         else
-            $0 ${tc}
+            $0 "${tc}"
         fi
         if [ $? -ne 0 ]; then
             overallResult=1
@@ -129,7 +129,7 @@ function execute_suite()
         fi
         countExecuted=$((countExecuted + 1))
     done
-    echo "${countExecuted} tests executed, $(($countExecuted - $countFailed)) successful, ${countFailed} failed."
+    echo "${countExecuted} tests executed, $((countExecuted - countFailed)) successful, ${countFailed} failed."
 }
 
 
@@ -137,13 +137,13 @@ function measure_coverage()
 {
     local testResultsDir=${OUT_DIR}/test-results/${tcBaseName}
     if [ ${opt_coverage} == true ]; then
-        mkdir -p ${testResultsDir}
-        cp ${OUT_DIR}/*.gc* ${testResultsDir}
-        lcov --capture --directory ${testResultsDir} --base-directory ${SRC_DIR} --test-name ${tcBaseName} --quiet \
+        mkdir -p "${testResultsDir}"
+        cp ${OUT_DIR}/*.gc* "${testResultsDir}"
+        lcov --capture --directory "${testResultsDir}" --base-directory ${SRC_DIR} --test-name "${tcBaseName}" --quiet \
             --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc lcov_branch_coverage=1 \
-            --output-file ${testResultsDir}/coverage.info
+            --output-file "${testResultsDir}/coverage.info"
         echo -n "    Coverage: "
-        lcov --summary ${testResultsDir}/coverage.info 2>&1 | grep 'lines...' | grep -oP '\d+\.\d*%'
+        lcov --summary "${testResultsDir}/coverage.info" 2>&1 | grep 'lines...' | grep -oP '\d+\.\d*%'
     fi
 }
 
@@ -151,11 +151,11 @@ function measure_coverage()
 function consolidate_coverage()
 {
     echo -e "\nConsolidating test coverage ..."
-    pushd ${OUT_DIR}/test-results
-    find . -name *.info | xargs printf -- '--add-tracefile %s\n' | xargs --exit \
+    pushd ${OUT_DIR}/test-results || exit 1
+    find . -name "*.info" | xargs printf -- '--add-tracefile %s\n' | xargs --exit \
         lcov --rc lcov_branch_coverage=1 --exclude '*/lex.yy.c' --exclude '*/parser.c' \
              --output-file ../${COVERAGE_FILE} --add-tracefile ../${BASELINE_FILE}
-    popd
+    popd || exit 1
     echo ""
 }
 
@@ -196,10 +196,10 @@ function arrange_environment()
     if [ $(grep -c "^:ENV" ${opt_testCase}) -eq 1 ]; then
         boxesEnv=$(cat ${opt_testCase} | sed -n '/^:ENV/,/^:ARGS/p;' | sed '1d;$d' | tr -d '\r')
     fi
-    if [ ! -z "$boxesEnv" ]; then
-        echo $boxesEnv | sed -e 's/export/\n    export/g' | sed '1d'
+    if [ -n "$boxesEnv" ]; then
+        echo "$boxesEnv" | sed -e 's/export/\n    export/g' | sed '1d'
         unset BOXES
-        eval $boxesEnv
+        eval "$boxesEnv"
     else
         export BOXES=../boxes-config
     fi
@@ -212,9 +212,9 @@ function arrange_test_fixtures()
         expectedReturnCode=$(grep "^:EXPECTED-ERROR " ${opt_testCase} | sed -e 's/:EXPECTED-ERROR //')
     fi
 
-    cat ${opt_testCase} | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d '\r' > ${testInputFile}
-    cat ${opt_testCase} | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > ${testFilterFile}
-    cat ${opt_testCase} | sed -n '/^:EXPECTED/,/^:EOF/p;' | sed '1d;$d' | tr -d '\r' > ${testExpectationFile}
+    cat ${opt_testCase} | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d '\r' > "${testInputFile}"
+    cat ${opt_testCase} | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > "${testFilterFile}"
+    cat ${opt_testCase} | sed -n '/^:EXPECTED/,/^:EOF/p;' | sed '1d;$d' | tr -d '\r' > "${testExpectationFile}"
 }
 
 
@@ -227,9 +227,9 @@ function run_boxes()
 
     echo "    Invoking: $(basename $boxesBinary) $boxesArgs"
     if [ -z "${BOXES_TEST_XXD:-}" ]; then
-        cat $testInputFile | eval "$boxesBinary $boxesArgs" >$testOutputFile 2>&1
+        eval "$boxesBinary $boxesArgs" < "$testInputFile" > "$testOutputFile" 2>&1
     else
-        cat $testInputFile | eval "$boxesBinary $boxesArgs" | xxd >$testOutputFile 2>&1
+        eval "$boxesBinary $boxesArgs" < "$testInputFile" | xxd > "$testOutputFile" 2>&1
     fi
     actualReturnCode=$?
 }
@@ -237,12 +237,12 @@ function run_boxes()
 
 function assert_outcome()
 {
-    cat ${testOutputFile} | tr -d '\r' | sed -E -f ${testFilterFile} | diff - ${testExpectationFile}
+    tr -d '\r' < "${testOutputFile}" | sed -E -f "${testFilterFile}" | diff - "${testExpectationFile}"
     if [ $? -ne 0 ]; then
         >&2 echo "Error in test case: ${opt_testCase} (top: actual; bottom: expected)"
         exit 5
     fi
-    if [ ${actualReturnCode} -ne ${expectedReturnCode} ]; then
+    if [ ${actualReturnCode} -ne "${expectedReturnCode}" ]; then
         >&2 echo -n "Error in test case: ${opt_testCase}"
         >&2 echo " (error code was ${actualReturnCode}, but expected ${expectedReturnCode})"
         exit 5
