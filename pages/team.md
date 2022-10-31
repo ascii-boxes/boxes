@@ -40,6 +40,7 @@ be much harder to enjoy running *boxes* everywhere.
     <tr><td>MacOS</td>   <td>MacOS</td>   <td>brew</td>        <td><span class="atmention"><a href="https://github.com/mathomp4">@mathomp4</a></span></td> <td><span class="atmention"><a href="https://github.com/fxcoudert">@fxcoudert</a></span></td></tr>
     <tr><td>Windows</td> <td>Windows</td> <td>choco</td>       <td><span class="atmention"><a href="https://github.com/tsjensen">@tsjensen</a></span></td> <td>&nbsp;</td></tr>
     <tr><td>Windows</td> <td>Windows</td> <td class="text-nowrap">stand-alone</td> <td><span class="atmention"><a href="https://github.com/tsjensen">@tsjensen</a></span></td> <td>Ron Aaron</td></tr>
+    <tr><td>Linux</td> <td>Gentoo</td> <td>portage</td> <td><span class="atmention"><a href="https://github.com/Schievel1">@Schievel1</a></span></td><td>&nbsp;</td></tr>
   </tbody>
 </table>
 
