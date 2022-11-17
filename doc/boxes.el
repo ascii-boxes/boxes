@@ -35,53 +35,50 @@
 ;;          (global-set-key "\C-cr" 'boxes-remove)
 
 ;;; Code:
-(eval-when-compile (require 'cl))
 
-;;;###autoload
-(defvar boxes-command "boxes"
-  "The boxes command.")
+(defgroup boxes nil
+  "ASCII boxes unlimited!"
+  :group 'convenience)
 
-(defvar boxes-types-alist
-  (let ((the-types (process-lines boxes-command "-q" "(all)"))
-        (the-alist (list)))
-    (dolist (el the-types the-alist)
-      (let ((no-alias (replace-regexp-in-string " *\(alias\) *$" "" el)))
-        (add-to-list 'the-alist 
-                     (cons no-alias no-alias)))))
-  "Association of types available to the current boxes implementation." )
-(make-variable-buffer-local 'boxes-types-alist)
+(defcustom boxes-command "boxes"
+  "The boxes command."
+  :type 'string
+  :group 'boxes)
 
-(defvar boxes-history nil)
+(defcustom boxes-args ""
+  "Additional arguments to the boxes command."
+  :type 'string
+  :group 'boxes)
 
-;;;###autoload
 (defcustom boxes-known-modes
   '((c-mode . "c-cmt2") (c++-mode . "c-cmt2") (java-mode . "java-cmt")
     (html-mode . "html-cmt") (sh-mode . "pound-cmt") (perl-mode . "pound-cmt")
     (python-mode . "pound-cmt") (ruby-mode . "pound-cmt")
     (emacs-lisp-mode . "lisp-cmt") (lisp-mode . "lisp-cmt"))
-  "The default comment type based on file names."
-:group 'customize
-)
+  "Default box type based on the major mode of the buffer."
+  :type '(alist :key-type symbol :value-type string)
+  :group 'boxes)
 
-;;;###autoload
-(defun boxes-set-default-type (mode)
-  "Set the default box mode according to the buffer's major mode."
-  (setq boxes-default-type (or (cdr (assoc mode boxes-known-modes)) "c-cmt2")))
+(defconst boxes-types-list
+  (let ((types (process-lines boxes-command "-q" "(all)")))
+    (mapcar (lambda(type) (replace-regexp-in-string " *\(alias\) *$" "" type)) types))
+  "List of types available to the current boxes implementation.")
 
-;;;###autoload
-(defvar boxes-default-type nil  "The default type of comment.")
-(make-variable-buffer-local 'boxes-default-type)
+(defvar boxes-history nil
+  "Boxes types history.")
 
-;;;###autoload
-(defvar boxes-args ""
-  "Arguments to the boxes command.")
-(make-variable-buffer-local 'boxes-args)
+(defvar-local boxes-default-type nil
+  "The default type of box.")
+
+(defun boxes-default-type (mode)
+  "Get the default box type for the given buffer major MODE."
+  (or (cdr (assoc mode boxes-known-modes)) "c-cmt2"))
+
 ;;;###autoload
 (defun boxes-create ()
   "Automagicly create a new box around the region based on the default type."
   (interactive "*")
   (boxes-command-on-region (region-beginning) (region-end) boxes-default-type))
-
 
 ;;;###autoload
 (defun boxes-remove ()
@@ -89,22 +86,21 @@
   (interactive "*")
   (boxes-command-on-region (region-beginning) (region-end) boxes-default-type 1))
 
-
 ;;;###autoload
 (defun boxes-command-on-region (start end type &optional remove)
-  "Create/Remove boxes from a region.  To create just select a region and M-x boxes-command-on-region
-then you will be prompted to enter a box type.  The type selection can use tab completion on the types available.
-To remove a box simply prefix a 1 to the callL M-1 M-x boxes-command-on-region will remove a box from a region."
+  "Create/Remove boxes from a region.
+To create just select a region and M-x boxes-command-on-region then you will be prompted to enter a box type.
+The type selection can use tab completion on the types available.
+To remove a box simply prefix a 1 to the call: M-1 M-x boxes-command-on-region will remove a box from a region."
   (interactive (let ((string
 		      (completing-read (format "Box type (%s): " boxes-default-type)
-				       boxes-types-alist nil t nil 'boxes-history boxes-default-type)))
+				       boxes-types-list nil t nil 'boxes-history boxes-default-type)))
 		(list (region-beginning) (region-end)
 		      string
 		      current-prefix-arg)))
-  (if type
-      (setq boxes-default-type type)
-    (setq boxes-default-type (boxes-set-default-type major-mode)
-          type boxes-default-type))
+  (when (or (null type) (string= type ""))
+    (setq type (boxes-default-type major-mode)))
+  (setq boxes-default-type type)
   (let ((command-string
 	 (concat boxes-command
 		 (if remove
