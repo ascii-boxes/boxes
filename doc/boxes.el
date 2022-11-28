@@ -1,13 +1,15 @@
-;;; boxes.el --- use boxes to comment regions
+;;; boxes.el --- ASCII boxes unlimited! -*- lexical-binding: t -*-
 
 ;; Copyright (C) 1999, 2001, 2006 Jason L. Shiffer
 
 ;; Author: Jason L. Shiffer <jshiffer@zerotao.com>
-;; Maintainer: jshiffer@zerotao.com
+;; Maintainer: Jason L. Shiffer <jshiffer@zerotao.com>
 ;; Keywords: extensions
+;; URL: https://boxes.thomasjensen.com
 ;; Created: 1999-10-30
 ;; Others:
 ;;   Vijay Lakshminarayanan: support for choosing boxes comment by current buffer mode.
+;;   Mike Woolley: Customise and packaging support.
 
 ;; boxes - Command line filter to draw/remove ASCII boxes around text
 ;; Copyright (c) 1999-2021 Thomas Jensen and the boxes contributors
@@ -25,14 +27,27 @@
 ;; This program provides an interface to the boxes application which can be found at
 ;; https://boxes.thomasjensen.com/
 
-;; To use this, put it somewhere in your load path and add the following
-;; lines to your .emacs:
+;; To use this, add the following lines to your startup file:
+;;
+;;          (global-set-key "\C-cb" 'boxes-command-on-region)
+;;          (global-set-key "\C-cq" 'boxes-create)
+;;          (global-set-key "\C-cr" 'boxes-remove)
+;;
+;; If you didn't install the package version then you will also need to put this file somewhere in your load path and
+;; add these lines to your startup file:
 ;;
 ;;          (autoload 'boxes-command-on-region "boxes" nil t)
 ;;          (autoload 'boxes-remove "boxes" nil t)
 ;;          (autoload 'boxes-create "boxes" nil t)
-;;          (global-set-key "\C-cq" 'boxes-create)
-;;          (global-set-key "\C-cr" 'boxes-remove)
+;;
+;; If `use-package' is installed you can automatically install the boxes binary and elisp package with:
+;;
+;;          (use-package boxes
+;;            :ensure t
+;;            :ensure-system-package boxes
+;;            :bind (("C-c b" . boxes-command-on-region)
+;; 	             ("C-c q" . boxes-create)
+;; 	             ("C-c r" . boxes-remove)))
 
 ;;; Code:
 
@@ -89,9 +104,10 @@
 ;;;###autoload
 (defun boxes-command-on-region (start end type &optional remove)
   "Create/Remove boxes from a region.
-To create just select a region and M-x boxes-command-on-region then you will be prompted to enter a box type.
-The type selection can use tab completion on the types available.
-To remove a box simply prefix a 1 to the call: M-1 M-x boxes-command-on-region will remove a box from a region."
+To create: select a region, M-x `boxes-command-on-region' & enter a box type.
+Box type selection can use tab completion on the supported types.
+To remove a box simply prefix a 1 to the call, eg
+M-1 M-x `boxes-command-on-region' will remove a box from a region."
   (interactive (let ((string
 		      (completing-read (format "Box type (%s): " boxes-default-type)
 				       boxes-types-list nil t nil 'boxes-history boxes-default-type)))
