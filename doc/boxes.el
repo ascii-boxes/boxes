@@ -46,8 +46,8 @@
 ;;            :ensure t
 ;;            :ensure-system-package boxes
 ;;            :bind (("C-c b" . boxes-command-on-region)
-;; 	             ("C-c q" . boxes-create)
-;; 	             ("C-c r" . boxes-remove)))
+;;                   ("C-c q" . boxes-create)
+;;                   ("C-c r" . boxes-remove)))
 
 ;;; Code:
 
@@ -103,11 +103,13 @@
 
 ;;;###autoload
 (defun boxes-command-on-region (start end type &optional remove)
-  "Create/Remove boxes from a region.
-To create: select a region, M-x `boxes-command-on-region' & enter a box type.
-Box type selection can use tab completion on the supported types.
+  "Create or Remove boxes from a region.
+To create a box select a region, hit \\[boxes-command-on-region] & enter a box type.
+Box type selection uses tab completion on the supported types.
 To remove a box simply prefix a 1 to the call, eg
-M-1 M-x `boxes-command-on-region' will remove a box from a region."
+M-1 \\[boxes-command-on-region] will remove a box from a region.
+When calling from Lisp, supply the region START & END and the box TYPE to
+create a box.  Specifying a non-nil value for REMOVE, removes the box."
   (interactive (let ((string
 		      (completing-read (format "Box type (%s): " boxes-default-type)
 				       boxes-types-list nil t nil 'boxes-history boxes-default-type)))
