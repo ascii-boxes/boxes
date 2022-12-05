@@ -4,6 +4,8 @@
 
 ;; Author: Jason L. Shiffer <jshiffer@zerotao.com>
 ;; Maintainer: Jason L. Shiffer <jshiffer@zerotao.com>
+;; Version: 0.0
+;; Package-Requires: ((emacs "24.3"))
 ;; Keywords: extensions
 ;; URL: https://boxes.thomasjensen.com
 ;; Created: 1999-10-30
@@ -53,6 +55,7 @@
 
 (defgroup boxes nil
   "ASCII boxes unlimited!"
+  :prefix "boxes-"
   :group 'convenience)
 
 (defcustom boxes-command "boxes"
@@ -74,16 +77,22 @@
   :type '(alist :key-type symbol :value-type string)
   :group 'boxes)
 
-(defconst boxes-types-list
-  (let ((types (process-lines boxes-command "-q" "(all)")))
-    (mapcar (lambda(type) (replace-regexp-in-string " *\(alias\) *$" "" type)) types))
-  "List of types available to the current boxes implementation.")
-
 (defvar boxes-history nil
   "Boxes types history.")
 
 (defvar-local boxes-default-type nil
   "The default type of box.")
+
+(defvar boxes-types-list nil
+  "List of types available to the current boxes implementation, nil if not set yet.")
+
+(defun boxes-types ()
+  "Return the list of types available to the current boxes implementation."
+  (or boxes-types-list
+      (setq boxes-types-list
+            (let ((types (process-lines boxes-command "-q" "(all)")))
+              (mapcar (lambda(type) (replace-regexp-in-string " *\(alias\) *$" "" type))
+                      types)))))
 
 (defun boxes-default-type (mode)
   "Get the default box type for the given buffer major MODE."
@@ -112,7 +121,7 @@ When calling from Lisp, supply the region START & END and the box TYPE to
 create a box.  Specifying a non-nil value for REMOVE, removes the box."
   (interactive (let ((string
 		      (completing-read (format "Box type (%s): " boxes-default-type)
-				       boxes-types-list nil t nil 'boxes-history boxes-default-type)))
+				       (boxes-types) nil t nil 'boxes-history boxes-default-type)))
 		(list (region-beginning) (region-end)
 		      string
 		      current-prefix-arg)))
