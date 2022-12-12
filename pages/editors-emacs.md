@@ -10,6 +10,18 @@ last_modified_at: 2022-12-12 17:34:00 +0000
 
 # Integration with Emacs
 
+## Install Boxes
+
+- [Install boxes]({{ site.baseurl }}/download.html) using your system package manager (`apt`, `brew` etc) or build and install it yourself.
+
+- Alternatively, adding the `use-package` form below to your startup file will instruct Emacs to automatically install
+  the `boxes` binary using the system package manager if it's not already installed.
+
+- Note that `boxes` v2.1.0 is required to run `boxes-command-on-region` interactively due to requiring support for "-q (all)". 
+The other boxes commands work on all versions.
+
+## Install Emacs Package
+
 [![MELPA](https://melpa.org/packages/boxes-badge.svg)](https://melpa.org/#/boxes)
 
 The easiest way is to install the `boxes` package from [MELPA](https://melpa.org/#/boxes), however it can also be installed manually if desired:
