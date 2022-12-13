@@ -80,9 +80,6 @@
 (defconst boxes-minimum-version "2.1.0"
   "Minimum required version of `boxes' to support querying the available box types.")
 
-(defconst boxes-version-regexp "\\([[:digit:]]+\\).\\([[:digit:]]+\\).\\([[:digit:]]+\\)"
-  "Regexp matching `boxes' version number.")
-
 (defvar boxes-history nil
   "Boxes types history.")
 
@@ -95,28 +92,13 @@
 (defun boxes-types ()
   "Return the list of types available to the current boxes implementation.
 Signal error if a supported version of `boxes' is not available."
-  (or boxes-types-list
-      (and (or (boxes-check-version)
-               (error "Please install Boxes %s or later to support querying the available box types" boxes-minimum-version))
-           (setq boxes-types-list
-                 (let ((types (process-lines boxes-command "-q" "(all)")))
-                   (mapcar (lambda(type) (replace-regexp-in-string " *\(alias\) *$" "" type))
-                           types))))))
-
-(defun boxes-check-version ()
-  "Return t if a supported version of `boxes' is available, nil otherwise."
-  (let* ((version-output (car (process-lines boxes-command "-v")))
-         (version (boxes-version-to-list version-output))
-         (min-version (boxes-version-to-list boxes-minimum-version)))
-    (version-list-< min-version version)))
-
-(defun boxes-version-to-list (version)
-  "Convert VERSION string into a list of integers or nil if no match."
-  (and version
-       (string-match boxes-version-regexp version)
-       (list (string-to-number (match-string 1 version))
-             (string-to-number (match-string 2 version))
-             (string-to-number (match-string 3 version)))))
+  (condition-case nil
+      (or boxes-types-list
+          (setq boxes-types-list
+                (let ((types (process-lines boxes-command "-q" "(all)")))
+                  (mapcar (lambda(type) (replace-regexp-in-string " *\(alias\) *$" "" type))
+                          types))))
+    (error (error "Please install Boxes %s or later" boxes-minimum-version))))
 
 (defun boxes-default-type (mode)
   "Get the default box type for the given buffer major MODE."
