@@ -43,7 +43,7 @@
             "type": "library",
             "author": "Ben Pfaff, Bruno Haible, and Daiki Ueno",
             "name": "libunistring",
-            "version": "0.9.10-4",
+            "version": "1.0",
             "description": "Functions for manipulating Unicode strings and for manipulating C strings according to the Unicode standard",
             "licenses": [
                 {
