@@ -301,7 +301,7 @@ h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover {
 
 
 /*
- * Paginaton
+ * Pagination
  */
 li.page-item.active > a {
     pointer-events: none;
@@ -359,4 +359,36 @@ div.card-text pre.highlight {
  */
 div.bxEmbedContainer {
     max-width: 400px;
+}
+
+
+/*
+ * Design Explorer
+ */
+.pagination {
+    margin-bottom: 0;
+    .page-item {
+        margin-bottom: 0;
+        &.active {
+            background-color: $primary;
+            border-radius: $border-radius;
+            a {
+                color: white;
+            }
+        }
+    }
+    .page-link:hover {
+        color: white;
+        background-color: $primary;
+    }
+    &:hover {
+        .page-item.active .page-link {
+            color: $link-color !important;
+            background-color: $input-bg !important;
+        }
+        .page-item.active:hover a.page-link, .page-item.active a.page-link:hover {
+            color: white !important;
+            background-color: $primary !important;
+        }
+    }
 }

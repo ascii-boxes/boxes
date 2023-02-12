@@ -8,7 +8,11 @@
         "**/coverage": true,
         "**/flex_bison_*": true,
         "**/out": true,
-        "**/pcre2-*": true
+        "**/pcre2-*": true,
+        "**/datagen/venv": true,
+        "**/datagen/**/__pycache__": true,
+        "**/datagen/**/*.egg-info": true,
+        "**/datagen/dist": true
     },
     "editor.autoClosingBrackets": "never",
     "editor.dragAndDrop": false,
@@ -32,7 +36,11 @@
         "**/flex_bison_*/**",
         "**/pcre2-*/**",
         "**/_sass/bootstrap-*/**",
-        "**/_sass/bootswatch-*/**"
+        "**/_sass/bootswatch-*/**",
+        "**/datagen/**/__pycache__/**",
+        "**/datagen/venv/**",
+        "**/datagen/**/*.egg-info/**",
+        "**/datagen/dist/**"
     ],
     "todo-tree.general.statusBar": "total",
     "todo-tree.general.tags": ["TODO", "FIXME", "CHECK"],

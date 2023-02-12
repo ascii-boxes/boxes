@@ -1,0 +1,137 @@
+---
+layout: default
+---
+
+<h1>Box Designs</h1>
+
+{% assign siteVersion = site.currentVersion | prepend: 'v' -%}
+{%- assign boxesVersion = page.bxVersion | default: siteVersion -%}
+{%- include version-select.html currentVersion=boxesVersion contentPiece="box-designs" compact=true %}
+
+{%- comment -%}<!-- ------------ Determine list of tags ------------ -->{%- endcomment -%}
+
+{%- assign tagList = "" | split: "," -%}
+{%- for p in site.pages -%}
+    {%- if p.designTag and p.bxVersion == boxesVersion -%}
+        {%- assign tagList = tagList | push: p.designTag -%}
+    {%- endif -%}
+{%- endfor - %}
+{%- assign tagList = tagList | sort | uniq -%}
+
+
+{%- comment -%}<!-- ------------ Load version-specific data file ------------ -->{%- endcomment -%}
+
+{% assign dataFile = 'designs-' | append: boxesVersion | replace: '.', '_' %}
+{% assign allDesigns = site.data[dataFile] %}
+
+
+{%- comment -%}<!-- ------------ Determine if designs are filtered ------------ -->{%- endcomment -%}
+
+{%- if tagList.size > 0 and page.designTag -%}
+    {%- assign filterActive = true -%}
+{%- else -%}
+    {%- assign filterActive = false -%}
+{%- endif -%}
+
+
+{%- comment -%}<!-- ------------ Count matching designs ------------ -->{%- endcomment -%}
+
+{%- assign numDesigns = 0 -%}
+{%- for record in allDesigns -%}
+    {%- if filterActive and record.tags -%}
+        {%- if record.tags contains page.designTag -%}
+            {%- assign numDesigns = numDesigns | plus: '1' -%}
+        {%- endif -%}
+    {%- elsif tagList.size == 0 or page.designTag == null -%}
+        {%- assign numDesigns = numDesigns | plus: '1' -%}
+    {%- endif -%}
+{%- endfor - %}
+
+
+{%- comment -%}<!-- ------------ Display tag filter ------------ -->{%- endcomment -%}
+
+{%- if tagList.size > 0 -%}
+<div class="form-group">
+    <label class="col-form-label" for="pagTagFilter">Tag:</label>
+    <ul class="pagination pagination-sm flex-wrap" id="pagTagFilter">
+        <li class="page-item {%- unless page.designTag %} active{%- endunless -%}">
+            <a class="page-link" href="{{ site.baseurl }}/{{ boxesVersion }}/box-designs.html">(all)</a>
+        </li>
+        {%- for tag in tagList %}
+        <li class="page-item {%- if page.designTag == tag %} active{%- endif -%}">
+            <a class="page-link" href="{{ site.baseurl }}/{{ boxesVersion }}/box-designs-{{ tag }}.html">{{ tag }}</a>
+        </li>
+        {%- endfor -%}
+    </ul>
+    <small class="form-text text-muted">{{ numDesigns }} matching designs</small>
+</div>
+{% if page.designTag -%}
+    <p>Designs tagged <code>{{ page.designTag }}</code>
+         {{ site.data.designs-tag-descriptions.tag_descriptions[page.designTag] }}</p>
+{%- endif -%}
+{%- else -%}
+    <p class="mt-4"><i>Boxes</i> {{ boxesVersion }} featured {{ numDesigns }} designs.</p>
+{%- endif -%}
+
+
+{%- comment -%}<!-- ------------ Loop over all designs ------------ -->{%- endcomment -%}
+
+{%- assign showCoderHint = false -%}
+
+{%- for record in allDesigns -%}
+
+    {%- if filterActive -%}
+        {%- unless record.tags and record.tags contains page.designTag -%}
+            {%- continue -%}
+        {%- endunless -%}
+    {%- endif -%}
+
+    {%- comment -%}<!-- --- Heading -->{%- endcomment -%}
+
+    {%- assign heading_text = record.name -%}
+    {% if record.alias and record.alias.size %}
+        {% capture heading_text %}{{ record.alias | join: ', ' | prepend: ' (' | prepend: record.name | append: ')' }}{% endcapture %}
+        {% for alias in record.alias -%}
+            <a name="{{ alias }}"></a>
+        {% endfor -%}
+    {% endif %}
+    {% include heading.html level=3 text=heading_text slug=record.name %}
+
+    {%- comment -%}<!-- --- Tags -->{%- endcomment -%}
+ 
+    {% if record.tags -%}<p>
+        {%- for tag in record.tags -%}
+        <a href="{{ site.baseurl }}/{{ boxesVersion }}/box-designs-{{ tag }}.html"><button type="button" class="btn btn-outline-primary btn-sm">{{ tag }}</button></a>
+        {% endfor -%}</p>
+    {% endif %}
+
+    {%- comment -%}<!-- --- Sample -->{%- endcomment -%}
+
+    <pre><code>{{ record.sample | escape }}</code></pre>
+
+    {%- comment -%}<!-- --- Attribution -->{%- endcomment -%}
+    <p>
+    {%- if record.designer == "(public domain)" -%}
+        Artwork is public domain
+        {%- unless record.coder == "Thomas Jensen" -%}
+            , coded for <i>boxes</i> by {{ record.coder | escape }}
+        {%- else -%}
+            {%- assign showCoderHint = true -%}
+        {%- endunless -%}
+    {%- elsif record.designer == record.coder -%}
+        Artwork and <i>boxes</i> config by {{ record.coder | escape }}
+    {%- else -%}
+        Artwork by {{ record.designer | escape }}
+        {%- unless record.coder == "Thomas Jensen" -%}
+            , coded for <i>boxes</i> by {{ record.coder | escape }}
+        {%- else -%}
+            {%- assign showCoderHint = true -%}
+        {%- endunless -%}
+    {%- endif %}</p>
+
+{%- endfor - %}
+
+{% if showCoderHint -%}
+    <small class="text-muted">Where the coder of the <i>boxes</i> config is not explicitly listed
+        it is "Thomas Jensen".</small>
+{% endif -%}

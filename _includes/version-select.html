@@ -5,6 +5,7 @@
     Parameters:
         - currentVersion: the version of the current page, e.g. 'v2.1.0'
         - contentPiece: the page to target, e.g. 'config-syntax'
+        - compact: `true` for no bottom margin, default is `false`
 
 {%- endcomment -%}
 
@@ -23,7 +24,7 @@
 {%- comment -%} ------------ Output the dopdown control ------------ {%- endcomment -%}
 
 <form>
-    <div class="form-group my-4 row">
+    <div class="form-group {% if include.compact -%}mt-4 mb-0{%- else -%}my-4{%- endif %} row">
         <div class="col-4 col-md-3 col-xl-2">
             <label for="bxVersionSelect" class="form-label"><i>Boxes</i> Version:</label>
         </div>

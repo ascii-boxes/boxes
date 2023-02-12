@@ -12,9 +12,12 @@
             {%- for entry in groupitem.subfolderitems -%}
                 {%- unless entry.divider -%}
                     {%- assign urlstart_editors = page.url | slice: 0, 9 -%}
-                    {%- assign urlstart_protocol = entry.url | slice: 0, 4 -%}
                     {%- if page.bxVersion -%}
                         {%- assign pgurl = page.url | remove_first: '/' | remove_first: page.bxVersion -%}
+                        {%- assign urlstart_designs = pgurl | slice: 0, 12 -%}
+                        {%- if urlstart_designs == "/box-designs" -%}
+                            {%- assign pgurl = "/box-designs.html" -%}
+                        {%- endif -%}
                     {%- elsif urlstart_editors == "/editors-" -%}
                         {%- assign pgurl = "/editors.html" -%}
                     {%- else %}

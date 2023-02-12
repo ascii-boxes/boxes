@@ -1,0 +1,13 @@
+# Complete the sentence "Designs tagged `tag` ..."
+tag_descriptions:
+    artwork: 'are the complex ASCII art boxes.'
+    box: 'go around the input text.'
+    comment: 'are regional comments in some programming language.'
+    large: 'are intended for large content, like figlet fonts, or just lots of text. They want to be big!'
+    programming: >
+        are valid comments in some programming language, including boxes which are valid comments.
+        Anything tagged <code>comment</code> would also be tagged <code>programming</code>.
+    scroll: 'look like a scroll or parchment.'
+    sign: 'depict an ASCII art figure holding or showing a sign which contains the input text.'
+    simple: 'are plain boxes, typically excluding <code>artwork</code>.'
+    speech: 'include a speech bubble.'

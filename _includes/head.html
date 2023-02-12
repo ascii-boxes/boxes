@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% if page.title | size > 0 %}{{ page.title }} - {{ site.name }}{% else %}{{ site.name }} - {{ site.description }}{% endif %}</title>
     <meta name="robots" content="index,follow" />
-    {% seo title=false -%}
+    {% seo title=false %}
     <link rel="stylesheet" href="{{ site.baseurl }}/css/boxes.css">
     {% if jekyll.environment == 'production' and site.plausible and site.plausible.data_domain -%}
         {%- include analytics.html -%}

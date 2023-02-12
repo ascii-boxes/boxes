@@ -11,32 +11,4 @@
 # If not, see <https://www.gnu.org/licenses/>.
 #
 
-.cproject
-.project
-/.idea/
-
-/.jekyll-metadata
-/.jekyll-cache/
-/_site/
-.sass-cache
-
-/src/
-/out/
-*.o
-*.a
-/pcre2-*/
-/flex_bison_*/
-/doc/
-/tools/
-/vendor/
-
-/datagen/dist/
-/datagen/venv/
-/datagen/*.egg-info/
-/datagen/**/__pycache__/
-
-/vs
-/_support/
-/cmake-build-debug/
-*.tar.gz
-*.nupkg.zip
+# nothing here yet
