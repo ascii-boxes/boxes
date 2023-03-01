@@ -28,7 +28,6 @@
   tags:
     - artwork
     - box
-    - large
     - sign
   sample: |2-
                          ,---.           ,---.
@@ -221,23 +220,6 @@
      | / |                 | \ |
      |___|                 |___|
     (_____)---------------(_____)
-- name: cowsay
-  designer: 'Tony Monroe'
-  coder: 'David Yang'
-  tags:
-    - artwork
-    - speech
-  sample: |2-
-     _____________________________
-    /                             \
-    |  Boxes can have the cow too |
-    \                             /
-     -----------------------------
-        \   ^__^
-         \  (oo)\_______
-            (__)\       )\/\
-                ||----w |
-                ||     ||
 - name: diamonds
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
@@ -312,7 +294,6 @@
   tags:
     - artwork
     - box
-    - large
   sample: |2-
      .--(0)    (0)--.
     (       \/       )
@@ -526,35 +507,6 @@
     \______________________________________/
                   ___)( )(___  jgs
                  (((__) (__)))
-- name: normand
-  designer: 'Normand Veilleux'
-  coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - large
-  sample: |2-
-            __,:,__               __,:,__               __,:,__    Normand    __,:,__
-         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,
-       ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba
-     ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b,
-    ,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,
-    :(["               ``":"''               ``":"''               ``":"''               "]):
-    `Y88ba,                                                                           ,ad88P'
-     `88888ba                                                                       ad88888'
-      `Y88888b,                                                                   ,d88888P'
-        `"Y888b,    Thank you for visiting https://asciiart.website/             ,d888P"'
-            "]):    This ASCII pic can be found at                               :(["
-         ,ad88P'    https://asciiart.website/?art=art%20and%20design/borders     `Y88ba,
-       ad88888'                                                                   `88888ba
-     ,d88888P'                                                                     `Y88888b,
-    ,d888P"'                                                                         `"Y888b,
-    :(["               __,:,__               __,:,__               __,:,__               "]):
-    `Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P'
-     `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888'
-      `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'
-        `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'
-            ``":"''               ``":"''               ``":"''   Veilleux    ``":"''
 - name: nuke
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
@@ -659,7 +611,6 @@
   tags:
     - artwork
     - box
-    - large
     - scroll
   sample: |2-
      / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \
@@ -828,34 +779,12 @@
     % regular TeX/LaTeX
     % comments
     %
-- name: tux
-  designer: 'Tony Monroe'
-  coder: 'David Yang'
-  tags:
-    - artwork
-    - speech
-  sample: |2-
-     _________________
-    /                 \
-    |  Tux talks too  |
-    \                 /
-     -----------------
-        \
-         \
-             .--.
-            |o_o |
-            |:_/ |
-           //   \ \
-          (|     | )
-         /'\_   _/`\
-         \___)=(___/
 - name: twisted
   designer: 'Michael Naylor'
   coder: 'Tristano Ajmone'
   tags:
     - artwork
     - box
-    - large
   sample: |-
     ._____. ._____. .________________________________________. ._____. ._____.
     | ._. | | ._. | | .____________________________________. | | ._. | | ._. |
@@ -949,33 +878,6 @@
     "
     " comments used in the vim editor's config file (.vimrc)
     "
-- name: weave
-  designer: 'dc'
-  coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - large
-  sample: |2-
-              _       _       _       _       _       _       _       _       _       _       _
-     .-"-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-,_,-'_`-,.
-    (  ,-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-~-} ;.
-     \ \.'_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-._~--. \ .
-     /\ \/ ,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._`./ \ \ .
-    dc(`/ /                                                                                `/ /.) ) .
-     \ \ / \                                                                               / / \ / .
-      \ \') )                                                                             ( (,\ \ .
-     / \ / /     Thank you for visiting https://asciiart.website/                          \ / \ \ .
-    ( (`/ /      This ASCII pic can be found at                                             / /.) ) .
-     \ \ / \     https://asciiart.website/index.php?art=art%20and%20design/borders         / / \ / .
-      \ \') )                                                                             ( (,\ \ .
-     / \ / /                                                                               \ / \ \ .
-    ( (`/ /                                                                                 / /.) ) .
-     \ \ / \       _       _       _       _       _       _       _       _       _       / / \ /.
-      \ `.\ `-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_/,\ \ .
-     ( `. `,~-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-=,' ,\ \ .
-      `. `'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,"-' ; .
-        `-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-.-' .
 - name: whirly
   designer: '(unknown artist)'
   coder: 'Thomas Jensen'

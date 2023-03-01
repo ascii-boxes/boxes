@@ -1,0 +1,442 @@
+- name: boy
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+                    .-"""-.
+                   / .===. \
+                   \/ 6 6 \/
+                   ( \___/ )
+      _________ooo__\_____/______________
+     /                                   \
+    |   joan stark   spunk1111@juno.com   |
+    |     VISIT MY ASCII ART GALLERY:     |
+    | http://www.geocities.com/SoHo/7373/ |
+     \_______________________ooo_________/  jgs
+                    |  |  |
+                    |_ | _|
+                    |  |  |
+                    |__|__|
+                    /-'Y'-\
+                   (__/ \__)
+- name: c
+  designer: '(public domain)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    /*************/
+    /*           */
+    /*           */
+    /*************/
+- name: c-cmt
+  designer: '(public domain)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    /*                               */
+    /*     regular C language        */
+    /*     comments                  */
+    /*                               */
+- name: c-cmt2
+  designer: '(public domain)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    /*
+     *  regular C language
+     *  comments
+     */
+- name: capgirl
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+                    .-"```"-.
+                   /_______; \
+                  (_________)\|
+                  / / a a \ \(_)
+                 / ( \___/ ) \
+      ________ooo\__\_____/__/___________
+     /                                   \
+    |   joan stark   spunk1111@juno.com   |
+    |     VISIT MY ASCII ART GALLERY:     |
+    |      http://www.ascii-art.com       |
+     \________________________ooo________/
+                 /           \   jgs
+                /:.:.:.:.:.:.:\
+                    |  |  |
+                    \==|==/
+                    /-'Y'-\
+                   (__/ \__)
+- name: cat
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+                  /\             /\
+                 |`\\_,--="=--,_//`|
+                 \ ."  :'. .':  ". /
+                ==)  _ :  '  : _  (==
+                  |>/O\   _   /O\<|
+                  | \-"~` _ `~"-/ |
+                 >|`===. \_/ .===`|<
+       jgs .-"-.   \==='  |  '===/   .-"-.
+    .-----{'. '`}---\,  .-'-.  ,/---{.'. '}-----.
+     )    `"---"`     `~-===-~`     `"---"`    (
+    (                 joan  stark               )
+     )           < spunk1111@juno.com >        (
+    (              ASCII ART GALLERY:           )
+     ) < http://www.geocities.com/SoHo/7373/ > (
+    '-------------------------------------------'
+- name: columns
+  designer: '(unknown artist)'
+  coder: 'Thomas Jensen'
+  sample: |2-
+     __^__                 __^__
+    ( ___ )---------------( ___ )
+     | / |                 | \ |
+     | / |                 | \ |
+     | / |                 | \ |
+     |___|                 |___|
+    (_____)---------------(_____)
+- name: diamonds
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+           /\          /\          /\          /\
+        /\//\\/\    /\//\\/\    /\//\\/\    /\//\\/\
+     /\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\
+    //\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\
+    \\//\/                                        \/\\//
+     \/                                              \/
+     /\                                              /\
+    //\\      joan stark   spunk1111@juno.com       //\\
+    \\//    http://www.geocities.com/SoHo/7373/     \\//
+     \/                                              \/
+     /\                                              /\
+    //\\/\                                        /\//\\
+    \\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\//
+     \/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/
+        \/\\//\/    \/\\//\/    \/\\//\/    \/\\//\/
+           \/          \/          \/          \/
+- name: dog
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+                __   _,--="=--,_   __
+               /  \."    .-.    "./  \
+              /  ,/  _   : :   _  \/` \
+              \  `| /o\  :_:  /o\ |\__/
+               `-'| :="~` _ `~"=: |
+                  \`     (_)     `/
+       jgs .-"-.   \      |      /   .-"-.
+    .-----{     }--|  /,.-'-.,\  |--{     }-----.
+     )    (_)_)_)  \_/`~-===-~`\_/  (_(_(_)    (
+    (                joan  stark                )
+     )          < spunk1111@juno.com >         (
+    (             ASCII ART GALLERY:            )
+     ) < http://www.geocities.com/SoHo/7373/ > (
+    '-------------------------------------------'
+- name: girl
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+                    .-"""-.
+                   / .===. \
+                  / / a a \ \
+                 / ( \___/ ) \
+      ________ooo\__\_____/__/___________
+     /                                   \
+    |   joan stark   spunk1111@juno.com   |
+    |     VISIT MY ASCII ART GALLERY:     |
+    | http://www.geocities.com/SoHo/7373/ |
+     \________________________ooo________/  jgs
+                 /           \
+                /:.:.:.:.:.:.:\
+                    |  |  |
+                    \==|==/
+                    /-'Y'-\
+                   (__/ \__)
+- name: headline
+  designer: '(public domain)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    /*************/
+    /*           */
+    /*           */
+    /*************/
+- name: html
+  designer: '(public domain)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    <!-- ------------------- -->
+    <!--                     -->
+    <!--                     -->
+    <!--                     -->
+    <!-- ------------------- -->
+- name: html-cmt
+  designer: '(public domain)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    <!--                                     -->
+    <!-- regular comments used in HTML files -->
+    <!--                                     -->
+- name: java-cmt
+  designer: '(public domain)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    //
+    // regular Java
+    // comments
+    //
+- name: mouse
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+                .--,       .--,
+               ( (  \.---./  ) )
+                '.__/o   o\__.'
+                   {=  ^  =}
+                    >  -  <
+     ___________.""`-------`"".____________
+    /                                      \
+    \ o          joan stark        O       /
+    /          spunk1111@juno.com          \
+    \          ascii art gallery           /
+    / http://www.geocities.com/SoHo/7373/  \
+    \______________________________________/
+                  ___)( )(___
+                 (((__) (__)))
+- name: netdata
+  designer: '(unknown artist)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    %{-----------------------------------------------------------------+
+     | IBM Net.Data Macro Sample - Perl and SQL Backends               |
+     | Thomas Jensen, February 17, 1998 (Tuesday, 16:40h)              |
+     +-----------------------------------------------------------------%}
+- name: nuke
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+                            _ ._  _ , _ ._
+                          (_ ' ( `  )_  .__)
+                        ( (  (    )   `)  ) _)
+                       (__ (_   (_ . _) _) ,__)
+                           `~~`\ ' . /`~~`
+                           ,::: ;   ; :::,
+                          ':::::::::::::::'
+     _________________jgs______/_ __ \________________________
+    |                                                         |
+    |                 BAD, BAD, BUG HERE :-)                  |
+    |_________________________________________________________|
+- name: parchment
+  designer: '(unknown artist)'
+  coder: 'Thomas Jensen'
+  sample: |2-
+     ________________________
+    /\                       \
+    \_|                       |
+      |                       |
+      |                       |
+      |   ____________________|_
+       \_/_____________________/
+- name: peek
+  designer: '(unknown artist)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    /*       _\|/_
+             (o o)
+     +----oOO-{_}-OOo---------------------+
+     |                                    |
+     | C function headers?                |
+     |                                    |
+     |                                    |
+     +-----------------------------------*/
+- name: pound-cmt
+  designer: '(public domain)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    #
+    #  regular comments used in Perl, Shell scripts, etc.
+    #
+- name: right
+  designer: '(public domain)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    This can be used for marking code changes with your initials
+    (I don't like it, but some people work this way):
+    for (j=0; j<blank_count; ++j)        /*@TJ@*/
+        fprintf (opt.outfile, "\n");     /*@TJ@*/
+    blank_count = 0;                     /*@TJ@*/
+- name: santa
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+                     .-"``"-.
+                    /______; \
+                   {_______}\|
+                   (/ a a \)(_)
+                   (.-.).-.)
+      _______ooo__(    ^    )____________
+     /             '-.___.-'             \
+    |             joan stark              |
+    |         spunk1111@juno.com          |
+    |         ASCII ART GALLERY:          |
+    |      http://www.ascii-art.com       |
+     \________________________ooo________/
+                   |_  |  _|  jgs
+                   \___|___/
+                   {___|___}
+                    |_ | _|
+                    /-'Y'-\
+                   (__/ \__)
+- name: scroll
+  designer: '(unknown artist)'
+  coder: 'Thomas Jensen'
+  sample: |2-
+     / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \
+    |  /~~\                                           /~~\  |
+    |\ \   |                                         |   / /|
+    | \   /|                                         |\   / |
+    |  ~~  |                                         |  ~~  |
+    |      |                                         |      |
+    |      |                                         |      |
+    |      |                                         |      |
+    |      |                                         |      |
+    |      |                                         |      |
+     \     |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|     /
+      \   /                                           \   /
+       ~~~                                             ~~~
+- name: shell
+  designer: '(public domain)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    #############
+    #           #
+    #           #
+    #############
+- name: simple
+  designer: '(public domain)'
+  coder: 'Thomas Jensen'
+  sample: |-
+    *************
+    *           *
+    *           *
+    *************
+- name: spring
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+          ,
+      /\^/`\
+     | \/   |
+     | |    |               SPRING IS IN THE AIR!              jgs
+     \ \    /                                                _ _
+      '\\//'                                               _{ ' }_
+        ||                      joan stark                { `.!.` }
+        ||                  <spunk1111@juno.com>          ',_/Y\_,'
+        ||  ,                                               {_,_}
+    |\  ||  |\                                                |
+    | | ||  | |              ASCII ART GALLERY:             (\|  /)
+    | | || / /      <http://www.geocities.com/SoHo/7373/>    \| //
+     \ \||/ /                                                 |//
+      `\\//`   \\   \./    \\ /     //    \\./   \\   //   \\ |/ /
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- name: stark1
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |-
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    ^   -,                ,-. .          .    ^
+    ^    | ,-. ,-. ;-.    `-, |- ,-. ;-. | '  ^
+    ^  , | | | ,-| | |    , ; |  ,-| |   |`.  ^
+    ^  `-' `-' `-^ ' ^    `-' `- `-^ '   ` `  ^
+    ^          Spunk1111@juno.com             ^
+    ^      ,-.             .   . . . .        ^
+    ^      `-, ;-. . . ;-. | ' | | | |        ^
+    ^      , ; | | | | | | |`. | | | |        ^
+    ^      `-' |-' `-^ ' ^ ` ` ` ` ` `        ^
+    ^          `                              ^
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+- name: stark2
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |-
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+    .:-@    ____        (_,      _,  _,  _,  _,                        @-:.
+    .:-@   (-(__`,_    ,_ |_,     |   |   |   |    Spunk1111@juno.com  @-:.
+    .:-@    ____)|_)|_|| || \__, _|_ _|_ _|_ _|_                       @-:.
+    .:-@   (    _|       |_,                                           @-:.
+    .:-@       (            ____,         ____        (_,              @-:.
+    .:-@                   (-| _  _ ,_   (-(__`_|_ _ ,_ |_,            @-:.
+    .:-@                  _  |(_)(_|| |   ____) | (_||  | \_,          @-:.
+    .:-@                 (__/            (      |_,                    @-:.
+    .:-@                                                               @-:.
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
+- name: sunset
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+                                .
+                           .    |    .
+                            \   |   /
+                        '.   \  '  /   .'
+                          '. .'```'. .'
+      <>.............:::::::`.......`:::::::................<>
+      <>:   ., .., . . .  . .  .  .  .  .  . joan stark    :<>
+      <>:  :,  :.' : : :`.: :.'  `: `: `: `:  spunk1111    :<>
+      <>:  ,.; :   `.' : `: : `.  :  :  :  :   @juno.com   :<>
+      <>:..................................................:<>
+      <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+    ~you can't hurt your eyesight by looking on the bright side~
+        ~but you can hurt them by looking at bad ascii art!~
+- name: tjc
+  designer: 'Thomas Jensen'
+  coder: 'Thomas Jensen'
+  sample: |-
+    static char *foo (const int a, const int b)
+    /*
+     *  Do the foo on the bar and around again.
+     *
+     *      a     number of doodlefrobs
+     *      b     barfoo mode (0 == off)
+     *
+     *  Memory will be allocated for the result.
+     *
+     *  RETURNS:  Success: Pointer to result line
+     *            Error:   0       (e.g. out of memory)
+     *
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     */
+    {
+        static char temp ....
+        int ii;          ....
+- name: vim-cmt
+  designer: 'Bram Moolenaar'
+  coder: 'Thomas Jensen'
+  sample: |-
+    "
+    " comments used in the vim editor's config file (.vimrc)
+    "
+- name: whirly
+  designer: '(unknown artist)'
+  coder: 'Thomas Jensen'
+  sample: |2-
+     .+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.
+    (                                                             )
+     )                                                           (
+    (                                                             )
+     "+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"
+- name: xes
+  designer: 'Joan G. Stark'
+  coder: 'Thomas Jensen'
+  sample: |2-
+            <\/><\/><\/>
+        <\/></\></\></\><\/>
+        </\>            </\>
+     <\/>                  <\/>
+     </\>                  </\>
+    <\/>                    <\/>
+    </\>                    </\>
+     <\/>                  <\/>
+     </\>                  </\>
+        <\/>            <\/>
+        </\><\/><\/><\/></\>
+    jgs     </\></\></\>

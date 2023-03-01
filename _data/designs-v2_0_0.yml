@@ -4,7 +4,6 @@
   tags:
     - box
     - programming
-    - simple
   sample: |-
     ---------------
     --           --
@@ -16,7 +15,6 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     --
     -- regular Ada
@@ -28,7 +26,6 @@
   tags:
     - artwork
     - box
-    - large
     - sign
   sample: |2-
                          ,---.           ,---.
@@ -66,7 +63,6 @@
   coder: 'Christian Molls'
   tags:
     - artwork
-    - simple
   sample: |-
     ,----[ mp3-wav ]
     | #!/bin/sh
@@ -105,7 +101,6 @@
   tags:
     - box
     - programming
-    - simple
   sample: |-
     /*************/
     /*           */
@@ -117,7 +112,6 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     /*                               */
     /*     regular C language        */
@@ -129,7 +123,6 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     /*
      *  regular C language
@@ -141,7 +134,6 @@
   tags:
     - artwork
     - box
-    - simple
   sample: |-
     (*************)
     (*           *)
@@ -201,7 +193,6 @@
   tags:
     - box
     - programming
-    - simple
   sample: |-
     /****************
      *              *
@@ -221,23 +212,6 @@
      | / |                 | \ |
      |___|                 |___|
     (_____)---------------(_____)
-- name: cowsay
-  designer: 'Tony Monroe'
-  coder: 'David Yang'
-  tags:
-    - artwork
-    - speech
-  sample: |2-
-     _____________________________
-    /                             \
-    |  Boxes can have the cow too |
-    \                             /
-     -----------------------------
-        \   ^__^
-         \  (oo)\_______
-            (__)\       )\/\
-                ||----w |
-                ||     ||
 - name: diamonds
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
@@ -289,7 +263,6 @@
   tags:
     - box
     - programming
-    - simple
   sample: |-
     !!!!!!!!!!!!!
     !           !
@@ -301,7 +274,6 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     !
     !  regular comments used in Fortran 90+
@@ -312,7 +284,6 @@
   tags:
     - artwork
     - box
-    - large
   sample: |2-
      .--(0)    (0)--.
     (       \/       )
@@ -375,7 +346,6 @@
   tags:
     - box
     - programming
-    - simple
   sample: |-
     <!-- - - - - - - - - - - -->
     <!--                     -->
@@ -388,7 +358,6 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     <!--                                     -->
     <!-- regular comments used in HTML files -->
@@ -464,7 +433,6 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     //
     // regular Java
@@ -476,7 +444,6 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     /**
      *  Javadoc Comments
@@ -488,7 +455,6 @@
   tags:
     - box
     - programming
-    - simple
   sample: |-
     /*----------------+
      | toast is yummy |
@@ -499,7 +465,6 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     ;;
     ;;  regular comments used in Lisp
@@ -526,35 +491,6 @@
     \______________________________________/
                   ___)( )(___  jgs
                  (((__) (__)))
-- name: normand
-  designer: 'Normand Veilleux'
-  coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - large
-  sample: |2-
-            __,:,__               __,:,__               __,:,__    Normand    __,:,__
-         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,
-       ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba
-     ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b,
-    ,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,
-    :(["               ``":"''               ``":"''               ``":"''               "]):
-    `Y88ba,                                                                           ,ad88P'
-     `88888ba                                                                       ad88888'
-      `Y88888b,                                                                   ,d88888P'
-        `"Y888b,    Thank you for visiting https://asciiart.website/             ,d888P"'
-            "]):    This ASCII pic can be found at                               :(["
-         ,ad88P'    https://asciiart.website/?art=art%20and%20design/borders     `Y88ba,
-       ad88888'                                                                   `88888ba
-     ,d88888P'                                                                     `Y88888b,
-    ,d888P"'                                                                         `"Y888b,
-    :(["               __,:,__               __,:,__               __,:,__               "]):
-    `Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P'
-     `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888'
-      `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'
-        `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'
-            ``":"''               ``":"''               ``":"''   Veilleux    ``":"''
 - name: nuke
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
@@ -609,7 +545,6 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     #
     #  regular comments used in Perl, Shell scripts, etc.
@@ -620,13 +555,12 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     This can be used for marking code changes with your initials
     (I don't like it, but some people work this way):
-    for (j=0; j<blank_count; ++j)        /* XX */
-        fprintf (opt.outfile, "\n");     /* XX */
-    blank_count = 0;                     /* XX */
+    for (j=0; j<blank_count; ++j)        /*@TJ@*/
+        fprintf (opt.outfile, "\n");     /*@TJ@*/
+    blank_count = 0;                     /*@TJ@*/
 - name: santa
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
@@ -659,7 +593,6 @@
   tags:
     - artwork
     - box
-    - large
     - scroll
   sample: |2-
      / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \
@@ -698,7 +631,6 @@
   tags:
     - box
     - programming
-    - simple
   sample: |-
     #############
     #           #
@@ -781,7 +713,6 @@
   tags:
     - artwork
     - box
-    - simple
   sample: |-
     +-------------+
     |    stone    |
@@ -810,7 +741,6 @@
   tags:
     - box
     - programming
-    - simple
   sample: |-
     %=============%
     % TeX is love %
@@ -822,40 +752,17 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     %
     % regular TeX/LaTeX
     % comments
     %
-- name: tux
-  designer: 'Tony Monroe'
-  coder: 'David Yang'
-  tags:
-    - artwork
-    - speech
-  sample: |2-
-     _________________
-    /                 \
-    |  Tux talks too  |
-    \                 /
-     -----------------
-        \
-         \
-             .--.
-            |o_o |
-            |:_/ |
-           //   \ \
-          (|     | )
-         /'\_   _/`\
-         \___)=(___/
 - name: twisted
   designer: 'Michael Naylor'
   coder: 'Tristano Ajmone'
   tags:
     - artwork
     - box
-    - large
   sample: |-
     ._____. ._____. .________________________________________. ._____. ._____.
     | ._. | | ._. | | .____________________________________. | | ._. | | ._. |
@@ -885,7 +792,6 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     // Bla, foo bar!
     // ~~~~~~~~~~~~~
@@ -933,7 +839,6 @@
   tags:
     - box
     - programming
-    - simple
   sample: |-
     """""""""""""""""""""""""""""""""""""""""""""""""""""""
     " Header seperator on your vim config's file (.vimrc) "
@@ -944,38 +849,10 @@
   tags:
     - comment
     - programming
-    - simple
   sample: |-
     "
     " comments used in the vim editor's config file (.vimrc)
     "
-- name: weave
-  designer: 'dc'
-  coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - large
-  sample: |2-
-              _       _       _       _       _       _       _       _       _       _       _
-     .-"-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-,_,-'_`-,.
-    (  ,-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-~-} ;.
-     \ \.'_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-._~--. \ .
-     /\ \/ ,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._`./ \ \ .
-    dc(`/ /                                                                                `/ /.) ) .
-     \ \ / \                                                                               / / \ / .
-      \ \') )                                                                             ( (,\ \ .
-     / \ / /     Thank you for visiting https://asciiart.website/                          \ / \ \ .
-    ( (`/ /      This ASCII pic can be found at                                             / /.) ) .
-     \ \ / \     https://asciiart.website/index.php?art=art%20and%20design/borders         / / \ / .
-      \ \') )                                                                             ( (,\ \ .
-     / \ / /                                                                               \ / \ \ .
-    ( (`/ /                                                                                 / /.) ) .
-     \ \ / \       _       _       _       _       _       _       _       _       _       / / \ /.
-      \ `.\ `-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_/,\ \ .
-     ( `. `,~-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-=,' ,\ \ .
-      `. `'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,"-' ; .
-        `-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-.-' .
 - name: whirly
   designer: '(unknown artist)'
   coder: 'Thomas Jensen'

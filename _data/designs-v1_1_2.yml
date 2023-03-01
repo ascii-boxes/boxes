@@ -1,10 +1,6 @@
 - name: ada-box
   designer: '(public domain)'
   coder: 'Neil Bird'
-  tags:
-    - box
-    - programming
-    - simple
   sample: |-
     ---------------
     --           --
@@ -13,60 +9,14 @@
 - name: ada-cmt
   designer: '(public domain)'
   coder: 'Neil Bird'
-  tags:
-    - comment
-    - programming
-    - simple
   sample: |-
     --
     -- regular Ada
     -- comments
     --
-- name: bear
-  designer: 'Hayley Jane Wakenshaw'
-  coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - large
-    - sign
-  sample: |2-
-                         ,---.           ,---.
-                        / /"`.\.--"""--./,'"\ \
-                        \ \    _       _    / /
-                         `./  / __   __ \  \,'
-                          /    /_O)_(_O\    \
-                          |  .-'  ___  `-.  |
-                       .--|       \_/       |--.
-                     ,'    \   \   |   /   /    `.
-                    /       `.  `--^--'  ,'       \
-                 .-"""""-.    `--.___.--'     .-"""""-.
-    .-----------/         \------------------/         \--------------.
-    | .---------\         /------------------\         /------------. |
-    | |          `-`--`--'                    `--'--'-'             | |
-    | |                                                             | |
-    | |                                                             | |
-    | |                                                             | |
-    | |                                                             | |
-    | |                                                             | |
-    | |                                                             | |
-    | |                                                             | |
-    | |                                                             | |
-    | |_____________________________________________________________| |
-    |_________________________________________________________________|
-                       )__________|__|__________(
-                      |            ||            |
-                      |____________||____________|
-                        ),-----.(      ),-----.(  hjw
-                      ,'   ==.   \    /  .==    `.
-                     /            )  (            \
-                     `==========='    `==========='
 - name: boxquote
   designer: 'Christian Molls'
   coder: 'Christian Molls'
-  tags:
-    - artwork
-    - simple
   sample: |-
     ,----[ mp3-wav ]
     | #!/bin/sh
@@ -78,10 +28,6 @@
 - name: boy
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - sign
   sample: |2-
                     .-"""-.
                    / .===. \
@@ -92,20 +38,16 @@
     |   joan stark   spunk1111@juno.com   |
     |     VISIT MY ASCII ART GALLERY:     |
     | http://www.geocities.com/SoHo/7373/ |
-     \_______________________ooo_________/
+     \_______________________ooo_________/  jgs
                     |  |  |
                     |_ | _|
                     |  |  |
-                    |__|__|  jgs
+                    |__|__|
                     /-'Y'-\
                    (__/ \__)
 - name: c
   designer: '(public domain)'
   coder: 'Thomas Jensen'
-  tags:
-    - box
-    - programming
-    - simple
   sample: |-
     /*************/
     /*           */
@@ -114,10 +56,6 @@
 - name: c-cmt
   designer: '(public domain)'
   coder: 'Thomas Jensen'
-  tags:
-    - comment
-    - programming
-    - simple
   sample: |-
     /*                               */
     /*     regular C language        */
@@ -126,22 +64,23 @@
 - name: c-cmt2
   designer: '(public domain)'
   coder: 'Thomas Jensen'
-  tags:
-    - comment
-    - programming
-    - simple
   sample: |-
     /*
      *  regular C language
      *  comments
      */
+- name: c-cmt3
+  designer: 'AlpT'
+  coder: 'AlpT'
+  sample: |-
+    /**
+     *
+     */
+    code(here); a++;
+    /**/
 - name: caml
   designer: 'Michael Tiernan'
   coder: 'Michael Tiernan'
-  tags:
-    - artwork
-    - box
-    - simple
   sample: |-
     (*************)
     (*           *)
@@ -150,10 +89,6 @@
 - name: capgirl
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - sign
   sample: |2-
                     .-"```"-.
                    /_______; \
@@ -166,28 +101,24 @@
     |     VISIT MY ASCII ART GALLERY:     |
     |      http://www.ascii-art.com       |
      \________________________ooo________/
-                 /           \
+                 /           \   jgs
                 /:.:.:.:.:.:.:\
                     |  |  |
-                    \==|==/  jgs
+                    \==|==/
                     /-'Y'-\
                    (__/ \__)
 - name: cat
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - sign
   sample: |2-
                   /\             /\
                  |`\\_,--="=--,_//`|
                  \ ."  :'. .':  ". /
                 ==)  _ :  '  : _  (==
                   |>/O\   _   /O\<|
-                  | \-"~` _ `~"-/ |   jgs
+                  | \-"~` _ `~"-/ |
                  >|`===. \_/ .===`|<
-           .-"-.   \==='  |  '===/   .-"-.
+       jgs .-"-.   \==='  |  '===/   .-"-.
     .-----{'. '`}---\,  .-'-.  ,/---{.'. '}-----.
      )    `"---"`     `~-===-~`     `"---"`    (
     (                 joan  stark               )
@@ -198,21 +129,22 @@
 - name: cc
   designer: '(public domain)'
   coder: 'Bas van Gils'
-  tags:
-    - box
-    - programming
-    - simple
   sample: |-
     /****************
      *              *
      *              *
      ****************/
+- name: ccel
+  designer: 'Elmar Loos'
+  coder: 'Elmar Loos'
+  sample: |-
+    ///////////////
+    text         //
+    here         //
+    ///////////////
 - name: columns
   designer: '(unknown artist)'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
   sample: |2-
      __^__                 __^__
     ( ___ )---------------( ___ )
@@ -221,29 +153,9 @@
      | / |                 | \ |
      |___|                 |___|
     (_____)---------------(_____)
-- name: cowsay
-  designer: 'Tony Monroe'
-  coder: 'David Yang'
-  tags:
-    - artwork
-    - speech
-  sample: |2-
-     _____________________________
-    /                             \
-    |  Boxes can have the cow too |
-    \                             /
-     -----------------------------
-        \   ^__^
-         \  (oo)\_______
-            (__)\       )\/\
-                ||----w |
-                ||     ||
 - name: diamonds
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
   sample: |2-
            /\          /\          /\          /\
         /\//\\/\    /\//\\/\    /\//\\/\    /\//\\/\
@@ -260,22 +172,18 @@
     \\///\\/\//\\\///\\/\//\\\///\\/\//\\\///\\/\//\\\//
      \/\\///\\\//\/\\///\\\//\/\\///\\\//\/\\///\\\//\/
         \/\\//\/    \/\\//\/    \/\\//\/    \/\\//\/
-           \/          \/          \/     jgs  \/
+           \/          \/          \/          \/
 - name: dog
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - sign
   sample: |2-
                 __   _,--="=--,_   __
                /  \."    .-.    "./  \
               /  ,/  _   : :   _  \/` \
               \  `| /o\  :_:  /o\ |\__/
                `-'| :="~` _ `~"=: |
-                  \`     (_)     `/ jgs
-           .-"-.   \      |      /   .-"-.
+                  \`     (_)     `/
+       jgs .-"-.   \      |      /   .-"-.
     .-----{     }--|  /,.-'-.,\  |--{     }-----.
      )    (_)_)_)  \_/`~-===-~`\_/  (_(_(_)    (
     (                joan  stark                )
@@ -283,64 +191,9 @@
     (             ASCII ART GALLERY:            )
      ) < http://www.geocities.com/SoHo/7373/ > (
     '-------------------------------------------'
-- name: f90-box
-  designer: '(public domain)'
-  coder: 'Matt Thompson'
-  tags:
-    - box
-    - programming
-    - simple
-  sample: |-
-    !!!!!!!!!!!!!
-    !           !
-    !           !
-    !!!!!!!!!!!!!
-- name: f90-cmt
-  designer: '(public domain)'
-  coder: 'Matt Thompson'
-  tags:
-    - comment
-    - programming
-    - simple
-  sample: |-
-    !
-    !  regular comments used in Fortran 90+
-    !
-- name: face
-  designer: 'Dmitry Bolshakov'
-  coder: 'Dmitry Bolshakov'
-  tags:
-    - artwork
-    - box
-    - large
-  sample: |2-
-     .--(0)    (0)--.
-    (       \/       )
-    (     \____/     )
-    (                )
-    ( face face face )
-    ( face face face )
-     '--------------'
-- name: fence
-  designer: 'Dmitry Bolshakov'
-  coder: 'Dmitry Bolshakov'
-  tags:
-    - artwork
-    - box
-  sample: |2-
-     /\ /\ /\ /\ /\
-    |__|__|__|__|__|
-    |  |  |  |  |  |
-    |  | fence  |  |
-    |__|__|__|__|__|
-    |__|__|__|__|__|
 - name: girl
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - sign
   sample: |2-
                     .-"""-.
                    / .===. \
@@ -351,19 +204,16 @@
     |   joan stark   spunk1111@juno.com   |
     |     VISIT MY ASCII ART GALLERY:     |
     | http://www.geocities.com/SoHo/7373/ |
-     \________________________ooo________/
+     \________________________ooo________/  jgs
                  /           \
                 /:.:.:.:.:.:.:\
                     |  |  |
-                    \==|==/  jgs
+                    \==|==/
                     /-'Y'-\
                    (__/ \__)
 - name: headline
-  designer: 'Thomas Jensen'
+  designer: '(public domain)'
   coder: 'Thomas Jensen'
-  tags:
-    - box
-    - programming
   sample: |-
     /*************/
     /*           */
@@ -372,10 +222,6 @@
 - name: html
   designer: '(public domain)'
   coder: 'Thomas Jensen'
-  tags:
-    - box
-    - programming
-    - simple
   sample: |-
     <!-- - - - - - - - - - - -->
     <!--                     -->
@@ -385,10 +231,6 @@
 - name: html-cmt
   designer: '(public domain)'
   coder: 'Thomas Jensen'
-  tags:
-    - comment
-    - programming
-    - simple
   sample: |-
     <!--                                     -->
     <!-- regular comments used in HTML files -->
@@ -396,10 +238,6 @@
 - name: ian_jones
   designer: '(unknown artist)'
   coder: 'Karl E. Jorgensen'
-  tags:
-    - artwork
-    - box
-    - sign
   sample: |2-
                                 \\\///
                                / _  _ \
@@ -416,55 +254,9 @@
                            \ (    (   )
                             \_)    ) /
                                   (_/
-- name: important
-  designer: 'Dmitry Bolshakov'
-  coder: 'Dmitry Bolshakov'
-  tags:
-    - artwork
-    - box
-  sample: |2-
-     /\ !!!!!!!!!!! /\
-    |! |           |! |
-    |! | important |! |
-    |__|           |__|
-    (__)!!!!!!!!!!!(__)
-- name: important2
-  designer: 'Dmitry Bolshakov'
-  coder: 'Dmitry Bolshakov'
-  tags:
-    - artwork
-    - box
-  sample: |2-
-     /\  /\ !!!!!!!!!!!! /\  /\
-    |! ||! |!!!!!!!!!!!!|! ||! |
-    |! ||! |            |! ||! |
-    |! ||! | important2 |! ||! |
-    |! ||! |            |! ||! |
-    |__||__|!!!!!!!!!!!!|__||__|
-    (__)(__)!!!!!!!!!!!!(__)(__)
-- name: important3
-  designer: 'Dmitry Bolshakov'
-  coder: 'Dmitry Bolshakov'
-  tags:
-    - artwork
-    - box
-  sample: |2-
-     /\  /\  /\ !!!!!!!!!!!! /\  /\  /\
-    |! ||! ||! |!!!!!!!!!!!!|! ||! ||! |
-    |! ||! ||! |!!!!!!!!!!!!|! ||! ||! |
-    |! ||! ||! |            |! ||! ||! |
-    |! ||! ||! | important3 |! ||! ||! |
-    |! ||! ||! |            |! ||! ||! |
-    |! ||! ||! |!!!!!!!!!!!!|! ||! ||! |
-    |__||__||__|!!!!!!!!!!!!|__||__||__|
-    (__)(__)(__)!!!!!!!!!!!!(__)(__)(__)
 - name: java-cmt
   designer: '(public domain)'
   coder: 'Thomas Jensen'
-  tags:
-    - comment
-    - programming
-    - simple
   sample: |-
     //
     // regular Java
@@ -473,33 +265,14 @@
 - name: javadoc
   designer: '(public domain)'
   coder: 'Ted Berg'
-  tags:
-    - comment
-    - programming
-    - simple
   sample: |-
     /**
      *  Javadoc Comments
      *
      */
-- name: jstone
-  designer: 'schallee_@_darkmist.net'
-  coder: 'Ed Schaller'
-  tags:
-    - box
-    - programming
-    - simple
-  sample: |-
-    /*----------------+
-     | toast is yummy |
-     +----------------*/
 - name: lisp-cmt
   designer: '(public domain)'
   coder: 'Vijay Lakshminarayanan'
-  tags:
-    - comment
-    - programming
-    - simple
   sample: |-
     ;;
     ;;  regular comments used in Lisp
@@ -507,10 +280,6 @@
 - name: mouse
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - sign
   sample: |2-
                 .--,       .--,
                ( (  \.---./  ) )
@@ -524,43 +293,19 @@
     \          ascii art gallery           /
     / http://www.geocities.com/SoHo/7373/  \
     \______________________________________/
-                  ___)( )(___  jgs
+                  ___)( )(___
                  (((__) (__)))
-- name: normand
-  designer: 'Normand Veilleux'
+- name: netdata
+  designer: '(unknown artist)'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - large
-  sample: |2-
-            __,:,__               __,:,__               __,:,__    Normand    __,:,__
-         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,
-       ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba
-     ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b,
-    ,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,
-    :(["               ``":"''               ``":"''               ``":"''               "]):
-    `Y88ba,                                                                           ,ad88P'
-     `88888ba                                                                       ad88888'
-      `Y88888b,                                                                   ,d88888P'
-        `"Y888b,    Thank you for visiting https://asciiart.website/             ,d888P"'
-            "]):    This ASCII pic can be found at                               :(["
-         ,ad88P'    https://asciiart.website/?art=art%20and%20design/borders     `Y88ba,
-       ad88888'                                                                   `88888ba
-     ,d88888P'                                                                     `Y88888b,
-    ,d888P"'                                                                         `"Y888b,
-    :(["               __,:,__               __,:,__               __,:,__               "]):
-    `Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P'
-     `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888'
-      `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'
-        `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'
-            ``":"''               ``":"''               ``":"''   Veilleux    ``":"''
+  sample: |-
+    %{-----------------------------------------------------------------+
+     | IBM Net.Data Macro Sample - Perl and SQL Backends               |
+     | Thomas Jensen, February 17, 1998 (Tuesday, 16:40h)              |
+     +-----------------------------------------------------------------%}
 - name: nuke
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
   sample: |2-
                             _ ._  _ , _ ._
                           (_ ' ( `  )_  .__)
@@ -576,10 +321,6 @@
 - name: parchment
   designer: '(unknown artist)'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - scroll
   sample: |2-
      ________________________
     /\                       \
@@ -591,9 +332,6 @@
 - name: peek
   designer: '(unknown artist)'
   coder: 'Thomas Jensen'
-  tags:
-    - box
-    - programming
   sample: |-
     /*       _\|/_
              (o o)
@@ -606,34 +344,22 @@
 - name: pound-cmt
   designer: '(public domain)'
   coder: 'Thomas Jensen'
-  tags:
-    - comment
-    - programming
-    - simple
   sample: |-
     #
     #  regular comments used in Perl, Shell scripts, etc.
     #
 - name: right
-  designer: 'Thomas Jensen'
+  designer: '(public domain)'
   coder: 'Thomas Jensen'
-  tags:
-    - comment
-    - programming
-    - simple
   sample: |-
     This can be used for marking code changes with your initials
     (I don't like it, but some people work this way):
-    for (j=0; j<blank_count; ++j)        /* XX */
-        fprintf (opt.outfile, "\n");     /* XX */
-    blank_count = 0;                     /* XX */
+    for (j=0; j<blank_count; ++j)        /*@TJ@*/
+        fprintf (opt.outfile, "\n");     /*@TJ@*/
+    blank_count = 0;                     /*@TJ@*/
 - name: santa
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - sign
   sample: |2-
                      .-"``"-.
                     /______; \
@@ -656,11 +382,6 @@
 - name: scroll
   designer: '(unknown artist)'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - large
-    - scroll
   sample: |2-
      / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \
     |  /~~\                                           /~~\  |
@@ -675,30 +396,9 @@
      \     |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|     /
       \   /                                           \   /
        ~~~                                             ~~~
-- name: scroll-akn
-  designer: 'akn'
-  coder: 'Tristano Ajmone'
-  tags:
-    - artwork
-    - box
-    - scroll
-  sample: |2-
-     /"\/\_..---------------------------------._/\/"\
-    (     _|| ||| Scroll-AKN...          ||| ||_     )
-     \_/\/ || ------------------------------ || \/\_/
-           || Original Design by "akn" (???) ||
-           || Implemented in boxes by:       ||
-           ||     -~{ Tristano Ajmone }~-    ||
-     /"\/\_|----------------------------------|_/\/"\
-    (     _|                                  |_     )
-     \_/\/ `----------------------------------' \/\_/
 - name: shell
   designer: '(public domain)'
   coder: 'Thomas Jensen'
-  tags:
-    - box
-    - programming
-    - simple
   sample: |-
     #############
     #           #
@@ -707,9 +407,6 @@
 - name: simple
   designer: '(public domain)'
   coder: 'Thomas Jensen'
-  tags:
-    - box
-    - simple
   sample: |-
     *************
     *           *
@@ -718,8 +415,6 @@
 - name: spring
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
   sample: |2-
           ,
       /\^/`\
@@ -739,9 +434,6 @@
 - name: stark1
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
   sample: |-
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     ^   -,                ,-. .          .    ^
@@ -754,13 +446,10 @@
     ^      , ; | | | | | | |`. | | | |        ^
     ^      `-' |-' `-^ ' ^ ` ` ` ` ` `        ^
     ^          `                              ^
-    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= jgs
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 - name: stark2
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
   sample: |-
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
@@ -773,15 +462,11 @@
     .:-@                  _  |(_)(_|| |   ____) | (_||  | \_,          @-:.
     .:-@                 (__/            (      |_,                    @-:.
     .:-@                                                               @-:.
-    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:. jgs
+    .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
 - name: stone
   designer: 'Fredrik Steen'
   coder: 'Fredrik Steen'
-  tags:
-    - artwork
-    - box
-    - simple
   sample: |-
     +-------------+
     |    stone    |
@@ -789,112 +474,50 @@
 - name: sunset
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
   sample: |2-
-                              .
-                         .    |    .
-                          \   |   /
-                      '.   \  '  /   .'
-                        '. .'```'. .'
-    <>.............:::::::`.......`:::::::................<>
-    <>:   ., .., . . .  . .  .  .  .  .  . joan stark    :<>
-    <>:  :,  :.' : : :`.: :.'  `: `: `: `:  spunk1111    :<>
-    <>:  ,.; :   `.' : `: : `.  :  :  :  :   @juno.com   :<>
-    <>:..................................................:<> jgs
-    <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-- name: tex-box
-  designer: '(public domain)'
-  coder: 'Nic H'
-  tags:
-    - box
-    - programming
-    - simple
+                                .
+                           .    |    .
+                            \   |   /
+                        '.   \  '  /   .'
+                          '. .'```'. .'
+      <>.............:::::::`.......`:::::::................<>
+      <>:   ., .., . . .  . .  .  .  .  .  . joan stark    :<>
+      <>:  :,  :.' : : :`.: :.'  `: `: `: `:  spunk1111    :<>
+      <>:  ,.; :   `.' : `: : `.  :  :  :  :   @juno.com   :<>
+      <>:..................................................:<>
+      <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+    ~you can't hurt your eyesight by looking on the bright side~
+        ~but you can hurt them by looking at bad ascii art!~
+- name: tjc
+  designer: 'Thomas Jensen'
+  coder: 'Thomas Jensen'
   sample: |-
-    %=============%
-    % TeX is love %
-    % Tex is life %
-    %=============%
-- name: tex-cmt
-  designer: '(public domain)'
-  coder: 'Nic H'
-  tags:
-    - comment
-    - programming
-    - simple
-  sample: |-
-    %
-    % regular TeX/LaTeX
-    % comments
-    %
-- name: tux
-  designer: 'Tony Monroe'
-  coder: 'David Yang'
-  tags:
-    - artwork
-    - speech
-  sample: |2-
-     _________________
-    /                 \
-    |  Tux talks too  |
-    \                 /
-     -----------------
-        \
-         \
-             .--.
-            |o_o |
-            |:_/ |
-           //   \ \
-          (|     | )
-         /'\_   _/`\
-         \___)=(___/
-- name: twisted
-  designer: 'Michael Naylor'
-  coder: 'Tristano Ajmone'
-  tags:
-    - artwork
-    - box
-    - large
-  sample: |-
-    ._____. ._____. .________________________________________. ._____. ._____.
-    | ._. | | ._. | | .____________________________________. | | ._. | | ._. |
-    | !_| |_|_|_! | | !____________________________________! | | !_| |_|_|_! |
-    !___| |_______! !________________________________________! !___| |_______!
-    .___|_|_| |____________________________________________________|_|_| |___.
-    | ._____| |________________________________________________________| |_. |
-    | !_! | | |                                                    | | ! !_! |
-    !_____! | | * * * * * * * * * * * TWISTED * * * * * * * * * *  | | !_____!
-    ._____. | | -----------------------|-------------------------  | | ._____.
-    | ._. | | | Just another cool ascii frame, brought to you by:  | | | ._. |
-    | | | | | |                                                    | | | | | |
-    | | | | | |              -~{ Tristano Ajmone }~-               | | | | | |
-    | !_! | | | -----------------------|-------------------------  | | ! !_! |
-    !_____! | | Derived from an ascii frame originally created by: | | !_____!
-    ._____. | |                                                    | | ._____.
-    | ._. | | |               -~{ Michael Naylor }~                | | | ._. |
-    | !_| |_|_|____________________________________________________| |_|_|_! |
-    !___| |________________________________________________________| |_______!
-    .___|_|_| |___. .________________________________________. .___|_|_| |___.
-    | ._____| |_. | | .____________________________________. | | ._____| |_. |
-    | !_! | | !_! | | !____________________________________! | | !_! | | !_! |
-    !_____! !_____! !________________________________________! !_____! !_____!
+    static char *foo (const int a, const int b)
+    /*
+     *  Do the foo on the bar and around again.
+     *
+     *      a     number of doodlefrobs
+     *      b     barfoo mode (0 == off)
+     *
+     *  Memory will be allocated for the result.
+     *
+     *  RETURNS:  Success: Pointer to result line
+     *            Error:   0       (e.g. out of memory)
+     *
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     */
+    {
+        static char temp ....
+        int ii;          ....
 - name: underline
   designer: 'Elmar Loos'
   coder: 'Elmar Loos'
-  tags:
-    - comment
-    - programming
-    - simple
   sample: |-
     // Bla, foo bar!
     // ~~~~~~~~~~~~~
 - name: unicornsay
   designer: '(unknown artist)'
   coder: 'Mike Meyer'
-  tags:
-    - artwork
-    - speech
   sample: |2-
      _________________________________
     /                                 \
@@ -911,9 +534,6 @@
 - name: unicornthink
   designer: '(unknown artist)'
   coder: 'Mike Meyer'
-  tags:
-    - artwork
-    - speech
   sample: |2-
      _________________________________
     /                                 \
@@ -927,61 +547,16 @@
                                      /    ) |
                                     '  _.'  |
                                     '-'/    \
-- name: vim-box
-  designer: '(public domain)'
-  coder: 'Ricky Anderson'
-  tags:
-    - box
-    - programming
-    - simple
-  sample: |-
-    """""""""""""""""""""""""""""""""""""""""""""""""""""""
-    " Header seperator on your vim config's file (.vimrc) "
-    """""""""""""""""""""""""""""""""""""""""""""""""""""""
 - name: vim-cmt
   designer: 'Bram Moolenaar'
   coder: 'Thomas Jensen'
-  tags:
-    - comment
-    - programming
-    - simple
   sample: |-
     "
     " comments used in the vim editor's config file (.vimrc)
     "
-- name: weave
-  designer: 'dc'
-  coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
-    - large
-  sample: |2-
-              _       _       _       _       _       _       _       _       _       _       _
-     .-"-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-,_,-'_`-,.
-    (  ,-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-<.>-'_,-~-} ;.
-     \ \.'_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-<_>-._`-._~--. \ .
-     /\ \/ ,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._`./ \ \ .
-    dc(`/ /                                                                                `/ /.) ) .
-     \ \ / \                                                                               / / \ / .
-      \ \') )                                                                             ( (,\ \ .
-     / \ / /     Thank you for visiting https://asciiart.website/                          \ / \ \ .
-    ( (`/ /      This ASCII pic can be found at                                             / /.) ) .
-     \ \ / \     https://asciiart.website/index.php?art=art%20and%20design/borders         / / \ / .
-      \ \') )                                                                             ( (,\ \ .
-     / \ / /                                                                               \ / \ \ .
-    ( (`/ /                                                                                 / /.) ) .
-     \ \ / \       _       _       _       _       _       _       _       _       _       / / \ /.
-      \ `.\ `-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_`-._,-'_/,\ \ .
-     ( `. `,~-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-<,>-._`-=,' ,\ \ .
-      `. `'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,-<_>-'_,"-' ; .
-        `-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-._,-' `-.-' .
 - name: whirly
   designer: '(unknown artist)'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
   sample: |2-
      .+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.
     (                                                             )
@@ -991,9 +566,6 @@
 - name: xes
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
-  tags:
-    - artwork
-    - box
   sample: |2-
             <\/><\/><\/>
         <\/></\></\></\><\/>
