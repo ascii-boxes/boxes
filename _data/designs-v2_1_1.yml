@@ -517,27 +517,27 @@
     - box
     - large
   sample: |2-
-            __,:,__               __,:,__               __,:,__               __,:,__    Normand    __,:,__
-         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,
-       ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba
-     ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b,
-    ,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,
-    :(["               ``":"''               ``":"''               ``":"''               ``":"''               "]):
-    `Y88ba,                                                                                                 ,ad88P'
-     `88888ba                                                                                             ad88888'
-      `Y88888b,                                                                                         ,d88888P'
-        `"Y888b,           Thank you for visiting https://asciiart.website/                            ,d888P"'
-            "]):           This ASCII pic can be found at                                              :(["
-         ,ad88P'           https://asciiart.website/index.php?art=art%20and%20design/borders           `Y88ba,
-       ad88888'                                                                                         `88888ba
-     ,d88888P'                                                                                           `Y88888b,
-    ,d888P"'                                                                                               `"Y888b,
-    :(["               __,:,__               __,:,__               __,:,__               __,:,__               "]):
-    `Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P'
-     `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888'
-      `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'
-        `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'
-            ``":"''               ``":"''               ``":"''               ``":"''   Veilleux    ``":"''
+            __,:,__               __,:,__               __,:,__    Normand    __,:,__
+         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,
+       ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba
+     ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b,
+    ,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,
+    :(["               ``":"''               ``":"''               ``":"''               "]):
+    `Y88ba,                                                                           ,ad88P'
+     `88888ba                                                                       ad88888'
+      `Y88888b,                                                                   ,d88888P'
+        `"Y888b,    Thank you for visiting https://asciiart.website/             ,d888P"'
+            "]):    This ASCII pic can be found at                               :(["
+         ,ad88P'    https://asciiart.website/?art=art%20and%20design/borders     `Y88ba,
+       ad88888'                                                                   `88888ba
+     ,d88888P'                                                                     `Y88888b,
+    ,d888P"'                                                                         `"Y888b,
+    :(["               __,:,__               __,:,__               __,:,__               "]):
+    `Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P'
+     `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888'
+      `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'
+        `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'
+            ``":"''               ``":"''               ``":"''   Veilleux    ``":"''
 - name: nuke
   designer: 'Joan G. Stark'
   coder: 'Thomas Jensen'
