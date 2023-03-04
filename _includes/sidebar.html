@@ -8,7 +8,7 @@
     {% for groupitem in site.data.navigation.toc %}
     <div class="row">
         <div class="sidebar-heading mr-lg-5">{{ groupitem.group }}</div>
-        <ul>
+        <ul class="mr-lg-5">
             {%- for entry in groupitem.subfolderitems -%}
                 {%- unless entry.divider -%}
                     {%- assign urlstart_editors = page.url | slice: 0, 9 -%}
