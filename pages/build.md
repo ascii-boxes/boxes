@@ -3,7 +3,7 @@ title: Building from Source
 permalink: /build.html
 longContent: true
 created_at: 2015-03-17 15:41:27 +0100
-last_modified_at: 2021-04-23 21:02:30 +0200
+last_modified_at: 2023-03-04 21:30:00 +0100
 ---
 
 # Building from Source
@@ -29,7 +29,7 @@ In order to build on Linux:
    The following command is for Debian (APT), but those packages have the same names across most distros.
 
        sudo apt-get update
-       sudo apt-get install -y build-essential diffutils flex bison libunistring-dev libpcre2-dev git vim-common
+       sudo apt-get install -y build-essential diffutils flex bison libunistring-dev libpcre2-dev libcmocka-dev git vim-common
 
    Of those, only [libunistring](https://www.gnu.org/software/libunistring/) and [PCRE2](http://www.pcre.org/) are
    libraries that are used at runtime. Everything else is just for building, including
@@ -42,7 +42,14 @@ In order to build on Linux:
    reside. Note that each user may have his/her own config file in *$HOME/.boxes* or other locations.  
    Also note that the value of `GLOBALCONF` is a full file name. It does **not** specify a directory into which to copy
    the config file.
-4. From the top level directory, type `make && make test`. Find the resulting binary in the *out* folder. In case of
+4. From the top level directory:
+
+       make
+       make utest
+       make test
+
+   This will build the project and execute the unit tests (`utest`) and the black-box tests (`test`).
+   Find the resulting binary in the *out* folder. In case of
    problems, check the [compilation faq]({{ site.baseurl }}/faq.html#q5).
 
 That should be all. *Boxes* is built so that this works almost everywhere.
@@ -51,7 +58,7 @@ That should be all. *Boxes* is built so that this works almost everywhere.
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
    level=3 slug="deployment-unix"
-   text="Deployment" %}
+   text="Deployment on Linux / UNIX" %}
 
 In order to deploy your newly created binary on Linux/UNIX, these steps are recommended:
 
@@ -69,24 +76,58 @@ Example (as root):
     cp boxes-config /usr/share/boxes
     cp out/boxes /usr/bin
 
+Optionally, install the Vim syntax file (make sure to find the right target directory for your system):
+
+    cp boxes.vim /usr/share/vim/vim90/syntax
+
 If you want to make your own changes to the config file, copy the system-wide config file
 into your home as *$HOME/.boxes*, then modify it. Boxes will use *$HOME/.boxes* if it exists.  
 Since *boxes* v2.1.0, you can also start your local config with `parent :global:`, which will inherit everything from
 the global file, and you can add or override box designs in your local file.
 
-<p></p>
 
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html level=3
+   text="Test Coverage" %}
+
+Full test coverage information can be produced by the build. In order to support that, additionally install:
+
+    sudo apt-get install -y lcov
+
+Then invoke these targets:
+
+    make clean cov
+    make utest
+    make covtest
+
+The results will be logged in the console and also recorded in *out/lcov-total.info*.
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html level=3
+   text="Static Binary" %}
+
+Sometimes, you may want to run *boxes* on a system where the required libunistring and pcre libraries are not
+available as shared libraries. In such cases, linking all the dependencies into the *boxes* binary can be
+helpful. This is achieved by
+
+    make clean static
+
+This will download and compile libunistring and PCRE, and then produce a static binary with everything on board.
+
+<p><br></p>
+<hr>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
    level=2 slug="windows"
    text="Building on Windows" %}
 
-Boxes was written for UNIX, but it can also run on Windows! Boxes is a 32bit application, but it works on 64bit systems,
-too. Here's how to build on Windows.
+*Boxes* was written for UNIX, but it can also run on Windows! *Boxes* is a 32bit application, but it works on 64bit
+systems, too. Here's how to build on Windows.
 
-> Special thanks go to Ron Aaron, who provided a specially crafted Makefile for win32 and also created the Windows
-> versions of boxes that have been around to this day.
+> Special thanks go to Ron Aaron, who provided a specially crafted Makefile for win32 and also created several of our
+> early Windows versions of boxes.
 
 In order to build *boxes* on Windows, the required win32 executable can be created like this:
 
@@ -120,8 +161,9 @@ Basically very simple, but there may be a few pitfalls, so we'll go through each
        mingw32-libiconv
        msys-diffutils
        msys-dos2unix
-       msys-zip
+       msys-vim
        msys-unzip
+       msys-zip
    
    PCRE2 is unfortunately not available here, so we must handle this in a later step. For each of the above components,
    choose all the items (bin, doc, lic, etc.). We also don't choose flex and bison.  
@@ -173,16 +215,22 @@ Basically very simple, but there may be a few pitfalls, so we'll go through each
        make win32.prereq
 
    In case this doesn't work, you must somehow get PCRE2 to compile on your own. The goal is to have
-   *pcre2-10.36/.libs/libpcre2-32.a* available.  We only need the static library for UTF-32. The version number of
+   *pcre2-10.40/.libs/libpcre2-32.a* available.  We only need the static library for UTF-32. The version number of
    PCRE may change in the future.
 
-4. Next,
+5. Next,
 
        make win32
 
    If you want to create an executable with debug information, call `make clean && make win32.debug` instead.
-3. boxes.exe is created in /boxes/out.
-4. Run `make test` to check that your executable is working OK.
+6. Run the tests:
+
+       make win32.utest
+       make test
+
+   Yes, the black-box tests don't need a `win32.` prefix, because they are run via a shell script.
+
+7. boxes.exe is created in /boxes/out.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
