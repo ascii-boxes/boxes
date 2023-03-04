@@ -256,23 +256,23 @@ h1 > a > svg {
 }
 h2 > a > svg {
     height: 0.75 * $h2-font-size;
-    width: 0.75 * $h1-font-size;
+    width: 0.75 * $h2-font-size;
 }
 h3 > a > svg {
     height: 0.75 * $h3-font-size;
-    width: 0.75 * $h1-font-size;
+    width: 0.75 * $h3-font-size;
 }
 h4 > a > svg {
     height: 0.75 * $h4-font-size;
-    width: 0.75 * $h1-font-size;
+    width: 0.75 * $h4-font-size;
 }
 h5 > a > svg {
     height: 0.75 * $h5-font-size;
-    width: 0.75 * $h1-font-size;
+    width: 0.75 * $h5-font-size;
 }
 h6 > a > svg {
     height: 0.75 * $h6-font-size;
-    width: 0.75 * $h1-font-size;
+    width: 0.75 * $h6-font-size;
 }
 h1 > a > svg, h2 > a > svg, h3 > a > svg, h4 > a > svg, h5 > a > svg, h6 > a > svg {
     position: relative;
