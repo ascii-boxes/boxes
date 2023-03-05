@@ -7,14 +7,14 @@
             <img src="{{ site.baseurl }}/images/boxes-bar.png" alt="boxes">
         {%- endif -%}
     </a>
-    <span class="navbar-text d-none d-sm-inline mr-auto">{{ site.tagline }}</span>
+    <span class="navbar-text d-none d-sm-inline me-auto">{{ site.tagline }}</span>
     <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#navbarColor02"
             aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarColor02">
-        <ul class="navbar-nav mr-auto">
+        <ul class="navbar-nav me-auto">
             <!-- The navigation is only shown on SM or smaller (else in sidebar): -->
             {%- for groupitem in site.data.navigation.toc %}
             <li class="nav-item dropdown d-inline d-md-none">
@@ -35,7 +35,7 @@
 
             {%- if jekyll.environment == 'development' %}
             <!-- Helper for development which always shows the active bootstrap size: -->
-            <li class="nav-item ml-4">
+            <li class="nav-item ms-4">
                 <div class="navbar-text text-white bg-dark px-2">
                     <span class="d-inline d-sm-none">XS</span>
                     <span class="d-none d-sm-inline d-md-none">SM</span>

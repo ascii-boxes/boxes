@@ -19,14 +19,15 @@ ASCII art boxes.<br><a href="#more">Learn more</a>,
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 
-<div id="boxesCarouselIndicators" class="carousel slide mx-xl-6" data-ride="carousel">
-  <ol class="carousel-indicators">
-    <li data-target="#boxesCarouselIndicators" data-slide-to="0" class="active"></li>
-    <li data-target="#boxesCarouselIndicators" data-slide-to="1"></li>
-    <li data-target="#boxesCarouselIndicators" data-slide-to="2"></li>
-    <li data-target="#boxesCarouselIndicators" data-slide-to="3"></li>
-    <li data-target="#boxesCarouselIndicators" data-slide-to="4"></li>
-  </ol>
+<div id="boxesCarouselIndicators" class="carousel slide mx-xl-6" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#boxesCarouselIndicators" data-bs-slide-to="0" aria-label="Slide 1"
+        class="active" aria-current="true"></button>
+    <button type="button" data-bs-target="#boxesCarouselIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#boxesCarouselIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    <button type="button" data-bs-target="#boxesCarouselIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
+    <button type="button" data-bs-target="#boxesCarouselIndicators" data-bs-slide-to="4" aria-label="Slide 5"></button>
+  </div>
   <div class="carousel-inner">
     <div class="carousel-item active">
       <img src="{{ site.baseurl }}/images/carousel-1.png" class="d-block w-100" alt="boxes-1">
@@ -52,14 +53,14 @@ ASCII art boxes.<br><a href="#more">Learn more</a>,
       <img src="{{ site.baseurl }}/images/carousel-5.png" class="d-block w-100" alt="boxes-5">
     </div>
   </div>
-  <a class="carousel-control-prev" href="#boxesCarouselIndicators" role="button" data-slide="prev">
+  <button class="carousel-control-prev" data-bs-target="#boxesCarouselIndicators" type="button" data-bs-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="sr-only">Previous</span>
-  </a>
-  <a class="carousel-control-next" href="#boxesCarouselIndicators" role="button" data-slide="next">
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" data-bs-target="#boxesCarouselIndicators" type="button" data-bs-slide="next">
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="sr-only">Next</span>
-  </a>
+    <span class="visually-hidden">Next</span>
+  </button>
 </div>
 
 
@@ -88,7 +89,7 @@ ASCII art boxes.<br><a href="#more">Learn more</a>,
         {%- endif -%}
     </div>
     <div class="card-body">
-        <p class="card-subtitle text-muted font-weight-light mb-2">{{ post.date | date: "%b %-d, %Y" }}</p>
+        <p class="card-subtitle text-muted fw-light mb-2">{{ post.date | date: "%b %-d, %Y" }}</p>
         {{- post.content | split:'<!--break-->' | first | markdownify | replace: '<p>', '<p class="card-text">' | replace: '</p>','' -}}
         {%- if post.content contains '<!--break-->' -%}
             <br/><a href="{{ site.baseurl }}{{ post.url }}">... read more</a></p>
@@ -111,7 +112,7 @@ ASCII art boxes.<br><a href="#more">Learn more</a>,
 <div class="card border-secondary h-100">
     <div class="card-header"><a href="{{ site.baseurl }}/blog/">&raquo; All Blog posts</a></div>
     <div class="card-body">
-        <p class="card-subtitle text-muted font-weight-light mb-2">{{ site.posts.first.date | date: "%b %-d, %Y" }}</p>
+        <p class="card-subtitle text-muted fw-light mb-2">{{ site.posts.first.date | date: "%b %-d, %Y" }}</p>
         <p class="card-text">The <a href="{{ site.baseurl }}/blog/">What's New</a> page has the comprehensive list
         of all blog posts.</p>
     </div>

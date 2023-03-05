@@ -19,43 +19,43 @@ Currently, we have concrete instructions on how to integrate *boxes* with the fo
 ### Emacs
 
 <a href="{{ site.baseurl }}/editors-emacs.html"><img src="{{ site.baseurl }}/images/emacs-logo.png"
-   class="img-fluid ml-lg-5" width="150" height="187" alt="Emacs" /></a>
+   class="img-fluid ms-lg-5" width="150" height="187" alt="Emacs" /></a>
 
 
 ### Geany
 
 <a href="{{ site.baseurl }}/editors-geany.html"><img src="{{ site.baseurl }}/images/geany-logo.png"
-   class="img-fluid ml-lg-5" width="120" height="120" alt="Geany" /></a>
+   class="img-fluid ms-lg-5" width="120" height="120" alt="Geany" /></a>
 
 
 ### JED
 
 <a href="{{ site.baseurl }}/editors-jed.html"><img src="{{ site.baseurl }}/images/jed-logo.png"
-   class="img-fluid ml-lg-5" width="183" height="100" alt="JED" /></a>
+   class="img-fluid ms-lg-5" width="183" height="100" alt="JED" /></a>
 
 
 ### Notepad++
 
 <a href="{{ site.baseurl }}/editors-notepadplusplus.html"><img src="{{ site.baseurl }}/images/notepadplusplus-logo.png"
-   class="img-fluid ml-lg-5" width="289" height="120" alt="Notepad++" /></a>
+   class="img-fluid ms-lg-5" width="289" height="120" alt="Notepad++" /></a>
 
 
 ### Sublime Text
 
 <a href="{{ site.baseurl }}/editors-sublime.html"><img src="{{ site.baseurl }}/images/sublimetext-logo.png"
-   class="img-fluid ml-lg-5" width="512" height="60" alt="Sublime Text" /></a>
+   class="img-fluid ms-lg-5" width="512" height="60" alt="Sublime Text" /></a>
 
 
 ### Vim
 
 <a href="{{ site.baseurl }}/editors-vim.html"><img src="{{ site.baseurl }}/images/vim-logo.png"
-   class="img-fluid ml-lg-5" width="110" height="110" alt="Vim" /></a>
+   class="img-fluid ms-lg-5" width="110" height="110" alt="Vim" /></a>
 
 
 ### Visual Studio Code
 
 <a href="{{ site.baseurl }}/editors-vscode.html"><img src="{{ site.baseurl }}/images/vscode-logo.png"
-   class="img-fluid ml-lg-5" width="100" height="100" alt="VSCode" /></a>
+   class="img-fluid ms-lg-5" width="100" height="100" alt="VSCode" /></a>
 
 
 Let us know if you have a recipe of how to do this for another text editor! You can add to this page via GitHub or just

@@ -324,14 +324,6 @@ div.card-text pre.highlight {
  * Title Page
  */
 .carousel {
-    .carousel-indicators {
-        li {
-            opacity: .4;
-        }
-        li.active {
-            opacity: 1;
-        }
-    }
     .carousel-inner {
         border-radius: $border-radius-sm;
     }

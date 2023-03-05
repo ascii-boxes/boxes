@@ -29,7 +29,7 @@ created_at: 1999-04-06
         {%- for post in posts -%}
         <div class="card mb-4">
           <div class="card-header"><a class="bx-post-link" href="{{ post.url | relative_url }}">{{-
-              post.date | date: "%b %-d, %Y" }} - <span class="font-weight-bold">{{ post.title | escape }}</span></a></div>
+              post.date | date: "%b %-d, %Y" }} - <span class="fw-bold">{{ post.title | escape }}</span></a></div>
           <div class="card-body">
             <div class="card-text">{{- post.content | split: '<!--break-->' | first | markdownify | remove: '<p>' | remove: '</p>' -}}
               {%- if post.content contains '<!--break-->' %} <a href="{{ post.url | relative_url }}"> &nbsp; ... read more</a>{% endif %}</div>

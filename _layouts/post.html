@@ -5,7 +5,7 @@ layout: default
 
   <header class="post-header">
     <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
-    <p class="post-meta text-muted font-weight-light">
+    <p class="post-meta text-muted fw-light">
       <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
         {{- page.date | date: "%b %-d, %Y" -}}
       </time>
@@ -20,7 +20,7 @@ layout: default
 
   <div class="mt-5 mb-4">
     {% if page.previous -%}
-      <a class="btn btn-outline-primary mr-4" href="{{ page.previous.url | relative_url }}" role="button">Previous Post</a>
+      <a class="btn btn-outline-primary me-4" href="{{ page.previous.url | relative_url }}" role="button">Previous Post</a>
     {%- endif -%}
     {% if page.next -%}
       <a class="btn btn-outline-primary" href="{{ page.next.url | relative_url }}" role="button">Next Post</a>
