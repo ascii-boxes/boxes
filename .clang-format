@@ -1,0 +1,54 @@
+#
+# boxes - Command line filter to draw/remove ASCII boxes around text
+# Copyright (c) 1999-2021 Thomas Jensen and the boxes contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+# License, version 3, as published by the Free Software Foundation.
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+# You should have received a copy of the GNU General Public License along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+#____________________________________________________________________________________________________________________
+#====================================================================================================================
+
+AlignAfterOpenBracket: DontAlign
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+BasedOnStyle: Google
+BinPackArguments: true
+BinPackParameters: true
+BraceWrapping:
+  AfterCaseLabel: false
+  AfterControlStatement: MultiLine
+  AfterExternBlock: true
+  AfterFunction: true
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeWhile: false
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyNamespace: true
+  SplitEmptyRecord: false
+BreakArrays: false
+BreakBeforeBinaryOperators: true
+BreakBeforeBraces: Custom
+ColumnLimit: 120
+ContinuationIndentWidth: 8
+IncludeBlocks: Preserve
+IndentCaseLabels: true
+IndentWidth: 4
+InsertBraces: true
+InsertNewlineAtEOF: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+LanguageKind: Cpp
+MaxEmptyLinesToKeep: 3
+ReflowComments: false
+SeparateDefinitionBlocks: Leave
+SpaceAfterCStyleCast: true
+SpaceAfterLogicalNot: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: false
+UseTab: Never

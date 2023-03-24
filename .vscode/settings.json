@@ -4,6 +4,7 @@
     "editor.autoClosingBrackets": "never",
     "editor.dragAndDrop": false,
     "editor.formatOnSave": false,
+    "editor.formatOnType": false,
     "editor.renderWhitespace": "selection",
     "editor.rulers": [120],
     "editor.wordWrapColumn": 120,
