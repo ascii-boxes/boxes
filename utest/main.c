@@ -100,9 +100,15 @@ int main(void)
 
     const struct CMUnitTest bxstring_tests[] = {
         cmocka_unit_test_setup(test_ascii_simple, beforeTest),
+        cmocka_unit_test_setup(test_ascii_tabs, beforeTest),
+        cmocka_unit_test_setup(test_ascii_null, beforeTest),
         cmocka_unit_test_setup(test_ansi_unicode_book, beforeTest),
         cmocka_unit_test_setup(test_ansi_unicode_space_kinds, beforeTest),
-        cmocka_unit_test_setup(test_ansi_unicode_chinese, beforeTest)
+        cmocka_unit_test_setup(test_ansi_unicode_chinese, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_empty, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_tabs, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_null, beforeTest),
+        cmocka_unit_test_setup(test_bxsfree_null, beforeTest)
     };
 
     int num_failed = 0;

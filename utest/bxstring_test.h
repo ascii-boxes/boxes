@@ -1,6 +1,6 @@
 /*
  * boxes - Command line filter to draw/remove ASCII boxes around text
- * Copyright (c) 1999-2021 Thomas Jensen and the boxes contributors
+ * Copyright (c) 1999-2023 Thomas Jensen and the boxes contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License, version 3, as published by the Free Software Foundation.
@@ -22,9 +22,17 @@
 
 
 void test_ascii_simple(void **state);
+void test_ascii_tabs(void **state);
+void test_ascii_null(void **state);
+
 void test_ansi_unicode_book(void **state);
 void test_ansi_unicode_space_kinds(void **state);
 void test_ansi_unicode_chinese(void **state);
+void test_ansi_unicode_empty(void **state);
+void test_ansi_unicode_tabs(void **state);
+void test_ansi_unicode_null(void **state);
+
+void test_bxsfree_null(void **state);
 
 
 #endif

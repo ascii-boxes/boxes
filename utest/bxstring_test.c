@@ -1,6 +1,6 @@
 /*
  * boxes - Command line filter to draw/remove ASCII boxes around text
- * Copyright (c) 1999-2021 Thomas Jensen and the boxes contributors
+ * Copyright (c) 1999-2023 Thomas Jensen and the boxes contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License, version 3, as published by the Free Software Foundation.
@@ -34,6 +34,22 @@
 
 
 
+void test_bxsfree_null(void **state)
+{
+    (void) state;  /* unused */
+
+    bxstr_t *bstr = (bxstr_t *) calloc(1, sizeof(bxstr_t));
+    bstr->ascii = NULL;
+    bstr->memory = NULL;
+    bstr->first_char = NULL;
+    bstr->visible_char = NULL;
+
+    bxs_free(bstr);
+    bxs_free(NULL);
+}
+
+
+
 void test_ascii_simple(void **state)
 {
     (void) state;  /* unused */
@@ -56,6 +72,32 @@ void test_ascii_simple(void **state)
     assert_int_equal(0, actual->offset_end);
 
     bxs_free(actual);
+}
+
+
+
+void test_ascii_tabs(void **state)
+{
+    (void) state;  /* unused */
+
+    bxstr_t *actual = bxs_from_ascii("illegal \t tab");
+
+    assert_null(actual);
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: internal error: from_ascii() called with tabs: \"illegal \t tab\"\n", collect_err[0]);
+}
+
+
+
+void test_ascii_null(void **state)
+{
+    (void) state;  /* unused */
+
+    bxstr_t *actual = bxs_from_ascii(NULL);
+
+    assert_null(actual);
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: internal error: from_ascii() called with NULL\n", collect_err[0]);
 }
 
 
@@ -152,6 +194,65 @@ void test_ansi_unicode_chinese(void **state)
 
     BFREE(ustr32);
     bxs_free(actual);
+}
+
+
+
+void test_ansi_unicode_empty(void **state)
+{
+    (void) state;  /* unused */
+
+    uint32_t *ustr32 = u32_strconv_from_arg("", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_string_equal("", actual->ascii);
+    assert_int_equal(0, (int) actual->indent);
+    assert_int_equal(0, (int) actual->num_columns);
+    assert_int_equal(0, (int) actual->num_chars);
+    assert_int_equal(0, (int) actual->num_chars_visible);
+    assert_int_equal(0, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+    int expected_firstchar_idx[] = {};
+    assert_array_equal(expected_firstchar_idx, actual->first_char, 0);
+    int expected_vischar_idx[] = {};
+    assert_array_equal(expected_vischar_idx, actual->visible_char, 0);
+    assert_int_equal(0, actual->offset_start);
+    assert_int_equal(0, actual->offset_end);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
+void test_ansi_unicode_tabs(void **state)
+{
+    (void) state;  /* unused */
+
+    uint32_t *ustr32 = u32_strconv_from_arg("illegal \t tab", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+    BFREE(ustr32);
+
+    assert_null(actual);
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: internal error: tab encountered in from_unicode()\n", collect_err[0]);
+}
+
+
+
+void test_ansi_unicode_null(void **state)
+{
+    (void) state;  /* unused */
+
+    bxstr_t *actual = bxs_from_unicode(NULL);
+
+    assert_null(actual);
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: internal error: from_unicode() called with NULL\n", collect_err[0]);
 }
 
 
