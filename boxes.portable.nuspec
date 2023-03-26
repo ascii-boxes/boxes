@@ -4,7 +4,7 @@
         <id>boxes.portable</id>
         <title>boxes (Portable)</title>
         <version>2.2.0</version>
-        <authors>The Boxes Contributors</authors>
+        <authors>Thomas Jensen and the boxes contributors</authors>
         <summary>Command Line ASCII Boxes Unlimited!</summary>
         <description><![CDATA[*Boxes* is a command line program that draws a box around its input text. It can remove
 and repair those boxes, too. You can easily make your own box designs if you wish, but many designs are
