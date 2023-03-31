@@ -33,8 +33,6 @@
 
 
 
-const char *config_encoding = "ISO_8859-15";
-
 /* effective character encoding of input and output text */
 const char *encoding;
 
@@ -58,14 +56,6 @@ const ucs4_t char_nul = 0x00000000;
 
 
 
-/**
- * Check whether the character at the given index has the given value.
- *
- * @param <text> the string to check
- * @param <idx> the index position of the character to check
- * @param <expected_char> the expected character value
- * @return flag indicating whether the character has the expected value
- */
 int is_char_at(const uint32_t *text, const size_t idx, const ucs4_t expected_char)
 {
     return text != NULL && u32_cmp(text + idx, &expected_char, 1) == 0;
@@ -73,13 +63,6 @@ int is_char_at(const uint32_t *text, const size_t idx, const ucs4_t expected_cha
 
 
 
-/**
- * Set the character at the given index to the given value.
- *
- * @param <text> the string to modify
- * @param <idx> the index position of the character to modify
- * @param <char_to_set> the new character value
- */
 void set_char_at(uint32_t *text, const size_t idx, const ucs4_t char_to_set)
 {
     u32_set(text + idx, char_to_set, 1);
@@ -87,13 +70,6 @@ void set_char_at(uint32_t *text, const size_t idx, const ucs4_t char_to_set)
 
 
 
-/**
- *  Determine if a string is NULL/empty or not.
- *
- *  @param <text> the string to check
- *  @return > 0: the string is empty or NULL
- *            0: the string contains at least 1 character
- */
 int is_empty(const uint32_t *text)
 {
     return text == NULL || is_char_at(text, 0, char_nul);
@@ -108,9 +84,64 @@ int is_ascii_printable(const ucs4_t c)
 
 
 
+int is_allowed_anywhere(const ucs4_t c)
+{
+    /* ESC, CR, LF, and TAB are control characters */
+    return !uc_is_cntrl(c) || c == char_tab || c == char_cr || c == char_newline || c == char_esc;
+}
+
+
+
+int is_allowed_in_shape(const ucs4_t c)
+{
+    return is_allowed_anywhere(c) && c != char_cr && c != char_newline;
+}
+
+
+
+int is_allowed_in_sample(const ucs4_t c)
+{
+    return is_allowed_anywhere(c);
+}
+
+
+
+int is_allowed_in_filename(const ucs4_t c)
+{
+    return is_allowed_anywhere(c) && c != char_cr && c != char_newline && c != char_esc;
+}
+
+
+
+int is_allowed_in_kv_string(const ucs4_t c)
+{
+    return is_allowed_anywhere(c) && c != char_cr && c != char_newline && c != char_esc;
+}
+
+
+
+int is_blank(const ucs4_t c)
+{
+    return c == char_tab || uc_is_blank(c);
+}
+
+
+
 uint32_t *new_empty_string32()
 {
     return (uint32_t *) calloc(1, sizeof(uint32_t));
+}
+
+
+
+ucs4_t to_utf32(char ascii)
+{
+    ucs4_t c = char_nul;
+    if (ascii >= 0x20 && ascii < 0x7f) {
+        char *bytes = (char *) (&c);
+        bytes[0] = ascii;
+    }
+    return c;
 }
 
 
@@ -263,6 +294,24 @@ const char *check_encoding(const char *manual_encoding, const char *system_encod
         fflush(stderr);
     }
     return system_encoding;
+}
+
+
+
+char *to_utf8(uint32_t *src)
+{
+    if (src == NULL) {
+        return NULL;
+    }
+    if (is_empty(src)) {
+        return (char *) strdup("");
+    }
+    char *result = u32_strconv_to_encoding(src, "UTF-8", iconveh_error);
+    if (result == NULL) {
+        bx_fprintf(stderr, "%s: failed to convert a string to UTF-8: %s\n", PROJECT, strerror(errno));
+        return NULL;
+    }
+    return result;
 }
 
 

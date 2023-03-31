@@ -19,8 +19,9 @@ SRC_DIR    = ../src
 UTEST_DIR  = ../utest
 VPATH      = $(SRC_DIR):$(SRC_DIR)/misc:$(UTEST_DIR)
 
-UTEST_NORM = global_mock.c bxstring_test.o cmdline_test.c tools_test.c regulex_test.o main.o utest_tools.o
-MOCKS = bx_fprintf
+UTEST_NORM = global_mock.c bxstring_test.o cmdline_test.c tools_test.c regulex_test.o main.o unicode_test.o \
+             utest_tools.o
+MOCKS      = bx_fprintf
 
 .PHONY: check_dir flags_unix flags_win32 flags_ utest
 
@@ -36,7 +37,7 @@ $(OUT_DIR):
 	mkdir $(OUT_DIR)
 
 flags_unix:
-	$(eval CFLAGS := -I. -I$(SRC_DIR) -O -Wall -W $(CFLAGS_ADDTL))
+	$(eval CFLAGS := -I. -I$(SRC_DIR) -O -Wall -W -Wno-stringop-overflow $(CFLAGS_ADDTL))
 	$(eval LDFLAGS := $(LDFLAGS) $(foreach MOCK,$(MOCKS),-Wl,--wrap=$(MOCK)) --coverage $(LDFLAGS_ADDTL))
 	$(eval UTEST_EXECUTABLE_NAME := unittest)
 	$(eval UTEST_OBJ := $(UTEST_NORM:.c=.o))
@@ -72,4 +73,5 @@ cmdline_test.o:  cmdline_test.c cmdline_test.h global_mock.h boxes.h cmdline.h c
 tools_test.o:    tools_test.c tools_test.h tools.h config.h | check_dir
 regulex_test.o:  regulex_test.c regulex_test.h global_mock.h regulex.h config.h | check_dir
 main.o:          main.c global_mock.h tools_test.h regulex_test.h config.h | check_dir
+unicode_test.o:  unicode_test.c unicode_test.h global_mock.h config.h | check_dir
 utest_tools.o:   utest_tools.c utest_tools.h config.h | check_dir

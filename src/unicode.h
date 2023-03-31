@@ -24,9 +24,8 @@
 
 
 
-/** The boxes config file is still encoded with a single-byte character set. Officially, it is ASCII!
- *  However, people might not conform to this, so we use ISO_8859-15 as a reasonable superset. */
-extern const char *config_encoding;
+/** Character encosing of the boxes configuration file */
+#define CONFIG_FILE_ENCODING "UTF-8"
 
 /* effective character encoding of input and output text */
 extern const char *encoding;
@@ -49,90 +48,174 @@ extern const ucs4_t char_esc;
 /** ucs4_t character '\0' (zero) */
 extern const ucs4_t char_nul;
 
+
+/**
+ * Check whether the character at the given index has the given value.
+ *
+ * @param text the string to check
+ * @param idx the index position of the character to check
+ * @param expected_char the expected character value
+ * @return flag indicating whether the character has the expected value
+ */
 int is_char_at(const uint32_t *text, const size_t idx, const ucs4_t expected_char);
 
+
+/**
+ * Set the character at the given index to the given value.
+ *
+ * @param text the string to modify
+ * @param idx the index position of the character to modify
+ * @param char_to_set the new character value
+ */
 void set_char_at(uint32_t *text, const size_t idx, const ucs4_t char_to_set);
 
+
+/**
+ *  Determine if a string is NULL/empty or not.
+ *
+ *  @param text the string to check
+ *  @return > 0: the string is empty or NULL;
+ *         == 0: the string contains at least 1 character
+ */
 int is_empty(const uint32_t *text);
+
 
 int is_ascii_printable(const ucs4_t c);
 
-/** Return a freshly allocated empty UTF-32 string. */
-uint32_t *new_empty_string32();
 
 /**
- * Return the next position in <s> in accordance with escape sequences. The result can be the next normal character,
+ * Determine if the character can occur in a boxes string under at least one condition. This will return false for
+ * characters which can really never occur anywhere.
+ * @param c the character to check
+ * @return 0 for `false` or non-zero for `true`
+ */
+int is_allowed_anywhere(const ucs4_t c);
+
+
+int is_allowed_in_shape(const ucs4_t c);
+
+
+int is_allowed_in_sample(const ucs4_t c);
+
+
+int is_allowed_in_filename(const ucs4_t c);
+
+
+int is_allowed_in_kv_string(const ucs4_t c);
+
+
+/**
+ * Determine if the given character represents a blank or something else that is rendered thusly (like a tab). This
+ * would be variations of space, including Unicode (for example em-space), plus tab. CR and LF are *not* blanks.
+ * @param c a Unicode character
+ * @return 1 if it's a blank, 0 otherwise
+ */
+int is_blank(const ucs4_t c);
+
+
+/**
+ * Return a freshly allocated empty UTF-32 string.
+ * @return a new empty string
+ */
+uint32_t *new_empty_string32();
+
+
+/**
+ * Convert an ASCII character into a Unicode character.
+ * @param ascii a printable ASCII character in the range 0x20 - 0x7E
+ * @return the corresponding Unicode character, or NUL if `ascii` out of range
+ */
+ucs4_t to_utf32(char ascii);
+
+
+/**
+ * Return the next position in `s` in accordance with escape sequences. The result can be the next normal character,
  * or again an escape sequence, if it directly follows the first.
  *
- * @param <s> The pointer to the start position. Is assumed to point either at the ESC at the start of an escape
+ * @param s The pointer to the start position. Is assumed to point either at the ESC at the start of an escape
  *      sequence, or to be positioned outside an escape sequence.
- * @param <invis> Will contain the number of invisible characters skipped in order to get to the new position.
- *      This will be 0 unless <s> pointed to an ESC char, in which case it contains the length in characters of that
+ * @param invis Will contain the number of invisible characters skipped in order to get to the new position.
+ *      This will be 0 unless `s` pointed to an ESC char, in which case it contains the length in characters of that
  *      escape sequence.
  * @return The next position, or 0 if the end of the string was reached
  */
 uint32_t *advance_next32(const uint32_t *s, size_t *invis);
+
 
 /**
  * Determine a new position in the given string s with the given offset of visible characters.
  * If the character right in front of the target character is invisible, then the pointer is moved to the start of
  * that invisible sequence. The purpose is to catch any escape sequences which would for example color the character.
  *
- * @param <s> The pointer to the start position. Is assumed to point either at the ESC at the start of an escape
+ * @param s The pointer to the start position. Is assumed to point either at the ESC at the start of an escape
  *      sequence, or to be positioned outside an escape sequence.
- * @param <offset> the number of visible character positions to advance the pointer
+ * @param offset the number of visible character positions to advance the pointer
  * @return a pointer to the new position in s, or 0 if the end of the string was reached
  */
 uint32_t *advance32(uint32_t *s, const size_t offset);
+
 
 /**
  * Convert a string from the input/output encoding (`encoding` in this .h file) to UTF-32 internal representation.
  * Memory will be allocated for the converted string.
  *
- * @param <src> string to convert, zero-terminated
+ * @param src string to convert, zero-terminated
  * @return UTF-32 string, or NULL in case of error (then an error message was already printed on stderr)
  */
 uint32_t *u32_strconv_from_input(const char *src);
+
 
 /**
  * Convert a string from the given source encoding to UTF-32 internal representation.
  * Memory will be allocated for the converted string.
  *
- * @param <src> string to convert, zero-terminated
- * @param <sourceEncoding> the character encoding of <src>
+ * @param src string to convert, zero-terminated
+ * @param sourceEncoding the character encoding of `src`
  * @return UTF-32 string, or NULL in case of error (then an error message was already printed on stderr)
  */
 uint32_t *u32_strconv_from_arg(const char *src, const char *sourceEncoding);
+
 
 /**
  * Convert a string from UTF-32 internal representation to input/output encoding (`encoding` in this .h file).
  * Memory will be allocated for the converted string.
  *
- * @param <src> UTF-32 string to convert, zero-terminated
+ * @param src UTF-32 string to convert, zero-terminated
  * @return string in input/output encoding, or NULL on error (then an error message was already printed on stderr)
  */
 char *u32_strconv_to_output(const uint32_t *src);
+
 
 /**
  * Convert a string from UTF-32 internal representation to the given target encoding.
  * Memory will be allocated for the converted string.
  *
- * @param <src> UTF-32 string to convert, zero-terminated
- * @param <targetEncoding> the character encoding of the result
+ * @param src UTF-32 string to convert, zero-terminated
+ * @param targetEncoding the character encoding of the result
  * @return string in target encoding, or NULL in case of error (then an error message was already printed on stderr)
  */
 char *u32_strconv_to_arg(const uint32_t *src, const char *targetEncoding);
 
+
 /**
- * Check if the given <manual_encoding> can be used to covert anything. This should reveal invalid encoding names that
- * have been specified on the command line. If no <manual_encoding> was specified, or if an invalid encoding is
+ * Check if the given `manual_encoding` can be used to covert anything. This should reveal invalid encoding names that
+ * have been specified on the command line. If no `manual_encoding` was specified, or if an invalid encoding is
  * detected, we fall back to the system encoding. No new memory is allocated.
  *
- * @param <manual_encoding> the encoding set on the command line, may be NULL
- * @param <system_encoding> the system encoding
- * @return <manual_encoding> if it is set to a valid value, <system_encoding> otherwise
+ * @param manual_encoding the encoding set on the command line, may be NULL
+ * @param system_encoding the system encoding
+ * @return `manual_encoding` if it is set to a valid value, `system_encoding` otherwise
  */
 const char *check_encoding(const char *manual_encoding, const char *system_encoding);
+
+
+/**
+ * Convert the given UTF-32 string into UTF-8 as `char *` byte sequence. The conversion must be fully successful, or
+ * an error will be returned (no question marks will be generated in the output).
+ * @param src the UTF-32 string
+ * @return a byte sequence in UTF-8 encoding
+ */
+char *to_utf8(uint32_t *src);
 
 
 #endif
