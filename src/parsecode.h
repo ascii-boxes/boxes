@@ -71,7 +71,7 @@ int action_start_parsing_design(pass_to_bison *bison_args, char *design_name);
  * @return 0: success;
  *         1: YYERROR must be invoked
  */
-int action_parent_config(pass_to_bison *bison_args, char *filepath);
+int action_parent_config(pass_to_bison *bison_args, bxstr_t *filepath);
 
 
 /**
@@ -80,11 +80,12 @@ int action_parent_config(pass_to_bison *bison_args, char *filepath);
  * @param design_primary_name the primary name of the design as specified at BOX statement
  * @param name_at_end the primary name of the design as specified at END statement
  * @return 0: success;
- *         1: YYERROR must be invoked
- *         2: YYABORT must be invoked
+ *         1: YYERROR must be invoked;
+ *         2: YYABORT must be invoked;
  *         3: YYACCEPT must be invoked
  */
 int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char *name_at_end);
+
 
 /**
  * Rule action called when a keyword entry is encountered in a box design.
@@ -95,7 +96,7 @@ int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char
  *         1: YYERROR must be invoked
  *         2: YYABORT must be invoked
  */
-int action_record_keyword(pass_to_bison *bison_args, char *keyword, char *value);
+int action_record_keyword(pass_to_bison *bison_args, char *keyword, bxstr_t *value);
 
 
 /**
@@ -119,6 +120,23 @@ int action_add_alias(pass_to_bison *bison_args, char *alias_name);
 
 
 /**
+ * Rule action to add a `replace` or `reverse` rule to the current design definition.
+ * @param bison_args the parser state
+ * @param type the rule type (either `rep` or `rev`)
+ * @param rule_list pointer to the list to add to
+ * @param rule_list_len pointer to the number of elements in `rule_list`
+ * @param search the search pattern of the rule
+ * @param replace the replacement text of the rule
+ * @param mode the replacement mode (`g` or `o` for `global` or `once`)
+ * @return 0: success;
+ *         1: YYERROR must be invoked
+ *         2: YYABORT must be invoked
+ */
+int action_add_regex_rule(pass_to_bison *bison_args, char *type, reprule_t **rule_list, size_t *rule_list_len,
+    bxstr_t *search, bxstr_t *replace, char mode);
+
+
+/**
  * (shape-elastic check)
  */
 int perform_se_check(pass_to_bison *bison_args);
@@ -132,12 +150,12 @@ void recover(pass_to_bison *bison_args);
 
 
 /**
- * Add tag to list of current design's tag after validity checking.
+ * Add tag to list of current design's tags after validity checking.
  * @param bison_args the parser state
  * @param tag a single tag, or a comma-separated list of tags
  * @return error code, 0 on success, anything else on failure
  */
-int tag_record(pass_to_bison *bison_args, char *tag);
+int tag_record(pass_to_bison *bison_args, bxstr_t *tag);
 
 
 /**
@@ -148,7 +166,7 @@ int tag_record(pass_to_bison *bison_args, char *tag);
  *         1: YYERROR must be invoked
  *         2: YYABORT must be invoked
  */
-int action_sample_block(pass_to_bison *bison_args, char *sample);
+int action_sample_block(pass_to_bison *bison_args, bxstr_t *sample);
 
 
 #endif

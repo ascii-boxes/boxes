@@ -19,7 +19,7 @@
  */
 
 #include "config.h"
-
+#include "bxstring.h"
 
 typedef struct {
     int yyerrcnt;
@@ -33,8 +33,8 @@ typedef struct {
 
 
 /*
- *  Valid characters to be used as string delimiters. Note that the
- *  following list must correspond to the SDELIM definition below.
+ *  Valid characters to be used as string delimiters.
+ *  The following list must correspond to the SDELIM definition below.
  */
 #define LEX_SDELIM  "\"~'`!@%&*=:;<>?/|.\\"
 #define LEX_SDELIM_RECOMMENDED  "\"~'!|"
@@ -50,7 +50,7 @@ typedef struct {
  * @param yyscanner pointer to the scanner data block
  * @param configfile the path to the config file we are reading
  */
-void inflate_inbuf(void *yyscanner, const char *configfile);
+void inflate_inbuf(void *yyscanner, const bxstr_t *configfile);
 
 }
 
@@ -58,12 +58,14 @@ void inflate_inbuf(void *yyscanner, const char *configfile);
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <unitypes.h>
 
 #include "boxes.h"
 #include "shape.h"
 #include "tools.h"
 #include "parsing.h"
 #include "parser.h"
+#include "unicode.h"
 
 
 #define LEX_MAX_WARN 3                   /* number of lex errors per design */
@@ -99,8 +101,23 @@ static int change_string_delimiters(pass_to_flex *extra, char *delim_expr);
 %x DELIMSPEC
 %x PARENT
 
+/*
+ * The following paragraph contains patterns to recognize UTF-8 characters from a byte stream, based on
+ * - https://stackoverflow.com/a/10253320/1005481 by Zack Weinberg (under CC-BY-SA 3.0 license)
+ * - https://www.w3.org/2005/03/23-lex-U by Eric Prud'hommeaux, W3C (under the W3C Document License)
+ */
+PBOM      \xEF\xBB\xBF
+U2A       [\xC2-\xDF][\x80-\xBF]
+U2B       \xE0[\xA0-\xBF][\x80-\xBF]
+U3A       [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}
+U3B       \xED[\x80-\x9F][\x80-\xBF]
+U4A       \xF0[\x90-\xBF][\x80-\xBF]{2}
+U4B       [\xF1-\xF3][\x80-\xBF]{3}
+U4C       \xF4[\x80-\x8F][\x80-\xBF]{2}
+UTF_8     {U2A}|{U2B}|{U3A}|{U3B}|{U4A}|{U4B}|{U4C}
 
-PWORD     [a-zA-ZäöüÄÖÜ][a-zA-Z0-9\-_üäöÜÄÖß]*
+PWORD     (?:[a-zA-Z]|{UTF_8})(?:[a-zA-Z0-9_-]|{UTF_8})*
+PASCII_ID [a-zA-Z][a-zA-Z0-9_-]*
 PWHITE    [ \t\r\n]
 SDELIM    [\"~\'`!@\%\&\*=:;<>\?/|\.\\]
 PPARENT   parent
@@ -116,16 +133,17 @@ PFILENAME [^\r\n]+
      */
 
 
-<INITIAL,BOX,DELIMSPEC,ELASTIC,SHAPES>{PWHITE}  /* ignore whitespace */
+<INITIAL,BOX,DELIMSPEC,ELASTIC,SHAPES>{PWHITE}|{PBOM}  /* ignore whitespace and a byte order mark */
 
 <DELIMSPEC>[^ \t\r\n]+ {
     /*
      * String delimiter spec - like WORD, but allow any character
      */
-    yylval->s = (char *) strdup (yytext);
+    yylval->s = bxs_from_ascii("IGNORED");
+    char *str = (char *) strdup(yytext);
     BEGIN(BOX);
-    report_state("YDELIMS", yytext, "INITIAL");
-    if (change_string_delimiters(yyextra, yylval->s) != 0) {
+    report_state("YDELIMS", str, "INITIAL");
+    if (change_string_delimiters(yyextra, str) != 0) {
         return YUNREC;
     }
     return YDELIMSPEC;
@@ -137,7 +155,6 @@ PFILENAME [^\r\n]+
      * Strings  --  first match everything starting from a potential string delimiter until the end of the line. We
      * will give back what we don't need and also detect unterminated strings. Strings always end on the same line.
      */
-    char *p;
     int rest_len = yyleng - 1;           /* length of string pointed to by p */
     int qcnt = 0;                        /* esc char count in current string */
 
@@ -145,27 +162,33 @@ PFILENAME [^\r\n]+
         REJECT;                          /* that was not our delimiter */
     }
 
-    yylval->s = (char *) strdup (yytext + 1);
-    if (yylval->s == NULL) {
+    char *str = (char *) strdup(yytext + 1);
+    if (str == NULL) {
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
-    p = yylval->s;
+    char *p = str;
 
     while (*p) {
         if (*p == yyextra->sesc) {
             memmove (p, p+1, rest_len);     /* incl. '\0' */
             ++qcnt;
             --rest_len;
-            if (*p == '\0')
+            if (*p == '\0') {
                 break;
+            }
         }
         else if (*p == yyextra->sdel) {
             *p = '\0';
-            yyless ((p-yylval->s)+2+qcnt);   /* string plus quotes */
+            yyless ((p - str) + 2 + qcnt);   /* string plus quotes */
             #ifdef LEXER_DEBUG
-                fprintf (stderr, " STRING: \"%s\"\n", yylval->s);
+                fprintf (stderr, " STRING: \"%s\"\n", str);
             #endif
+
+            uint32_t *utf8 = u32_strconv_from_arg(str, CONFIG_FILE_ENCODING);
+            yylval->s = bxs_from_unicode(utf8);
+            BFREE(utf8);
+            BFREE(str);
             return STRING;
         }
         --rest_len;
@@ -174,6 +197,7 @@ PFILENAME [^\r\n]+
     if ((yyextra->yyerrcnt)++ < 5) {
         yyerror(NULL, "Unterminated String -- %s", yytext);
     }
+    BFREE(str);
     return YUNREC;
 }
 
@@ -185,17 +209,15 @@ PFILENAME [^\r\n]+
 }
 
 <PARENT>{PFILENAME} {
-    char *p = yytext;
-    while (*p == ' ' || *p == '\t') {
-        ++p;
-    }
-    yylval->s = (char *) strdup (p);
-    p = yylval->s + strlen(yylval->s) - 1;
-    while ((*p == ' ' || *p == '\t') && p >= yylval->s) {
-        *p-- = '\0';
-    }
+    uint32_t *utf8 = u32_strconv_from_arg(yytext, CONFIG_FILE_ENCODING);
+    bxstr_t *bxstr = bxs_from_unicode(utf8);
+    yylval->s = bxs_trim(bxstr);
+
+    BFREE(utf8);
+    bxs_free(bxstr);
+
     BEGIN(INITIAL);
-    report_state("FILENAM", yylval->s, "INITIAL");
+    report_state("FILENAM", bxs_to_output(yylval->s), "INITIAL");
     return FILENAME;
 }
 
@@ -225,27 +247,37 @@ PFILENAME [^\r\n]+
         --p;                             /* skip trailing whitespace */
     p -= 2;                              /* almost skip "ends" statement */
     *p = '\0';                           /* p now points to 'n' */
-    yylval->s = (char *) strdup (yytext);
-    if (yylval->s == NULL) {
+    char *sample = (char *) strdup(yytext);
+    if (sample == NULL) {
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
     *p-- = 'n';
 
     len = p - yytext;                    /* yyless(n): push back all but the first n */
-    yyless (len);                        /* allow him to return YENDSAMPLE */
+    yyless (len);                        /* allow the lexer to return YENDSAMPLE */
 
-    yylval->s[len] = '\n';               /* replace 'e' with newline */
-    btrim (yylval->s, &len);
+    sample[len] = '\n';                  /* replace 'e' with newline */
+    btrim(sample, &len);
     if (len > 0) {
-        strcat (yylval->s, "\n");        /* memory was allocated with strdup */
+        uint32_t *utf8 = u32_strconv_from_arg(sample, CONFIG_FILE_ENCODING);
+        uint32_t *nl = u32_strconv_from_arg("\n", CONFIG_FILE_ENCODING);
+        bxstr_t *bxstr = bxs_from_unicode(utf8);
+        bxstr_t *bxstr2 = bxs_rtrim(bxstr);
+        bxs_free(bxstr);
+        bxstr = bxs_strcat(bxstr2, nl);
+        BFREE(nl);
+        BFREE(utf8);
+        BFREE(sample);
+        bxs_free(bxstr2);
+        yylval->s = bxstr;
         return STRING;
     }
     else {
         if ((yyextra->yyerrcnt)++ < 5) {
             yyerror(NULL, "SAMPLE block must not be empty");
         }
-        BFREE (yylval->s);
+        BFREE(sample);
         return YUNREC;
     }
 }
@@ -339,8 +371,8 @@ PFILENAME [^\r\n]+
     #ifdef LEXER_DEBUG
         fprintf (stderr, "KEYWORD: %s\n", yytext);
     #endif
-    yylval->s = (char *) strdup (yytext);
-    if (yylval->s == NULL) {
+    yylval->ascii = strdup(yytext);
+    if (yylval->ascii == NULL) {
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
@@ -357,19 +389,35 @@ PFILENAME [^\r\n]+
     return YCHGDEL;
 }
 
+<INITIAL,BOX>{PASCII_ID} {
+    /*
+     * a free-floating word which is not a string, i.e. it does not have delimiting characters (ASCII version)
+     */
+    yylval->ascii = strdup(yytext);
+    if (yylval->ascii == NULL) {
+        perror (PROJECT);
+        exit (EXIT_FAILURE);
+    }
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "ASCIIID: %s\n", yylval->ascii);
+    #endif
+    return ASCII_ID;
+}
 
 <INITIAL,BOX>{PWORD} {
     /*
      * a free-floating word which is not a string, i.e. it does not have delimiting characters
      */
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, "   WORD: %s\n", yytext);
-    #endif
-    yylval->s = (char *) strdup (yytext);
+    uint32_t *utf8 = u32_strconv_from_arg(yytext, CONFIG_FILE_ENCODING);
+    yylval->s = bxs_from_unicode(utf8);
     if (yylval->s == NULL) {
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
+    #ifdef LEXER_DEBUG
+        fprintf (stderr, "   WORD: %s\n", u32_strconv_to_output(utf8));
+    #endif
+    BFREE(utf8);
     return WORD;
 }
 
@@ -411,14 +459,17 @@ PFILENAME [^\r\n]+
 %%
 
 
-void inflate_inbuf(void *yyscanner, const char *configfile)
+void inflate_inbuf(void *yyscanner, const bxstr_t *configfile)
 {
     struct stat sinf;
 
-    if (stat(configfile, &sinf)) {
+    char *utf8 = u32_strconv_to_arg(configfile->memory, "UTF-8");
+    if (stat(utf8, &sinf)) {
         perror (PROJECT);
+        BFREE(utf8);
         exit (EXIT_FAILURE);
     }
+    BFREE(utf8);
     struct yyguts_t *yyg = (struct yyguts_t *) yyscanner;
     yy_delete_buffer(YY_CURRENT_BUFFER, yyscanner);
     yy_switch_to_buffer (yy_create_buffer(yyin, sinf.st_size+10, yyscanner), yyscanner);

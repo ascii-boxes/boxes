@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include "boxes.h"
+#include "bxstring.h"
 
 
 /** all the arguments which we pass to the bison parser */
@@ -40,7 +41,7 @@ typedef struct {
     size_t num_child_configs;
 
     /** the path to the config file we are parsing */
-    char *config_file;
+    bxstr_t *config_file;
 
     int num_mandatory;
 
@@ -56,7 +57,7 @@ typedef struct {
     int speeding;
 
     /** names of config files specified via "parent" */
-    char **parent_configs;
+    bxstr_t **parent_configs;
 
     /** number of parent config files (size of parent_configs array) */
     size_t num_parent_configs;
@@ -72,6 +73,7 @@ typedef struct {
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unictype.h>
 
 #include "shape.h"
 #include "tools.h"
@@ -79,6 +81,7 @@ typedef struct {
 #include "parser.h"
 #include "lex.yy.h"
 #include "parsecode.h"
+#include "unicode.h"
 
 
 /** required for bison-flex bridge */
@@ -113,7 +116,8 @@ typedef struct {
 %parse-param {pass_to_bison *bison_args}
 
 %union {
-    char *s;
+    bxstr_t *s;
+    char *ascii;
     char c;
     shape_t shape;
     sentry_t sentry;
@@ -122,8 +126,9 @@ typedef struct {
 
 %token YPARENT YSHAPES YELASTIC YPADDING YSAMPLE YENDSAMPLE YBOX YEND YUNREC
 %token YREPLACE YREVERSE YTO YWITH YCHGDEL YTAGS
-%token <s> KEYWORD
+%token <ascii> KEYWORD
 %token <s> WORD
+%token <ascii> ASCII_ID
 %token <s> STRING
 %token <s> FILENAME
 %token <shape> SHAPE
@@ -166,7 +171,8 @@ config_file
             BFREE (bison_args->designs);
             bison_args->num_designs = 0;
             if (!opt.design_choice_by_user && bison_args->num_parent_configs == 0) {
-                fprintf (stderr, "%s: no valid data in config file -- %s\n", PROJECT, bison_args->config_file);
+                fprintf(stderr, "%s: no valid data in config file -- %s\n", PROJECT,
+                        bxs_to_output(bison_args->config_file));
                 YYABORT;
             }
             YYACCEPT;
@@ -209,22 +215,22 @@ design_or_error: design | error
     }
 
 
-alias: WORD
+alias: ASCII_ID
     {
         invoke_action(action_add_alias(bison_args, $1));
     }
 
 alias_list: alias | alias_list ',' alias;
 
-design_id: WORD | WORD ',' alias_list;
+design_id: ASCII_ID | ASCII_ID ',' alias_list;
 
 design: YBOX design_id
     {
-        invoke_action(action_start_parsing_design(bison_args, $<s>2));
+        invoke_action(action_start_parsing_design(bison_args, $<ascii>2));
     }
-layout YEND WORD
+layout YEND ASCII_ID
     {
-        invoke_action(action_add_design(bison_args, $<s>2, $6));
+        invoke_action(action_add_design(bison_args, $<ascii>2, $6));
     }
 ;
 
@@ -247,18 +253,17 @@ entry: KEYWORD STRING
 
 | YPARENT FILENAME
     {
-        char *filename = $2;
-        if (filename[0] != filename[strlen(filename) - 1]
-            || (filename[0] >= 'a' && filename[0] <= 'z')
-            || (filename[0] >= 'A' && filename[0] <= 'Z')
-            || (filename[0] >= '0' && filename[0] <= '9'))
-        {
-            yyerror(bison_args, "string expected", filename);
+        /*
+         * Called when PARENT appears as a key inside a box design. That's a user mistake, but not an error.
+         */
+        bxstr_t *filename = $2;
+        if (filename->memory[0] != filename->memory[filename->num_chars - 1] || uc_is_alnum(filename->memory[0])) {
+            yyerror(bison_args, "string expected");
             YYERROR;
         }
         else {
             #ifdef PARSER_DEBUG
-                fprintf (stderr, " Parser: Discarding entry [%s = %s].\n", "parent", filename);
+                fprintf (stderr, " Parser: Discarding entry [%s = %s].\n", "parent", bxs_to_output(filename));
             #endif
         }
     }
@@ -270,10 +275,10 @@ entry: KEYWORD STRING
 
 | YTAGS '(' tag_list ')' | YTAGS tag_entry
 
-| WORD STRING
+| WORD STRING | ASCII_ID STRING
     {
         #ifdef PARSER_DEBUG
-            fprintf (stderr, " Parser: Discarding entry [%s = %s].\n", $1, $2);
+            fprintf (stderr, " Parser: Discarding entry [%s = %s].\n", $1, bxs_to_output($2));
         #endif
     }
 ;
@@ -301,53 +306,12 @@ block: YSAMPLE STRING YENDSAMPLE
 
 | YREPLACE rflag STRING YWITH STRING
     {
-        int a = curdes.anz_reprules;
-
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Adding replacement rule: \"%s\" with \"%s\" (%c)\n",
-                    $3, $5, $2);
-        #endif
-
-        curdes.reprules = (reprule_t *) realloc (curdes.reprules, (a+1) * sizeof(reprule_t));
-        if (curdes.reprules == NULL) {
-            perror (PROJECT);
-            YYABORT;
-        }
-        memset (&(curdes.reprules[a]), 0, sizeof(reprule_t));
-        curdes.reprules[a].search = (char *) strdup ($3);
-        curdes.reprules[a].repstr = (char *) strdup ($5);
-        if (curdes.reprules[a].search == NULL || curdes.reprules[a].repstr == NULL) {
-            perror (PROJECT);
-            YYABORT;
-        }
-        curdes.reprules[a].line = yyget_lineno(scanner);
-        curdes.reprules[a].mode = $2;
-        curdes.anz_reprules = a + 1;
+        invoke_action(action_add_regex_rule(bison_args, "rep", &curdes.reprules, &curdes.anz_reprules, $3, $5, $2));
     }
 
 | YREVERSE rflag STRING YTO STRING
     {
-        int a = curdes.anz_revrules;
-
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Adding reversion rule: \"%s\" to \"%s\" (%c)\n", $3, $5, $2);
-        #endif
-
-        curdes.revrules = (reprule_t *) realloc (curdes.revrules, (a+1) * sizeof(reprule_t));
-        if (curdes.revrules == NULL) {
-            perror (PROJECT);
-            YYABORT;
-        }
-        memset (&(curdes.revrules[a]), 0, sizeof(reprule_t));
-        curdes.revrules[a].search = (char *) strdup ($3);
-        curdes.revrules[a].repstr = (char *) strdup ($5);
-        if (curdes.revrules[a].search == NULL || curdes.revrules[a].repstr == NULL) {
-            perror (PROJECT);
-            YYABORT;
-        }
-        curdes.revrules[a].line = yyget_lineno(scanner);
-        curdes.revrules[a].mode = $2;
-        curdes.anz_revrules = a + 1;
+        invoke_action(action_add_regex_rule(bison_args, "rev", &curdes.revrules, &curdes.anz_revrules, $3, $5, $2));
     }
 
 | YPADDING '{' wlist '}'
@@ -426,9 +390,8 @@ shape_def: '(' shape_lines ')'
 
 shape_lines: shape_lines ',' STRING
     {
-        sentry_t rval = $1;
-        size_t slen = strlen ($3);
-        char **tmp;
+        sentry_t rval = $1; // TODO move this to parsecode.c
+        size_t slen = $3->num_columns;
 
         #ifdef PARSER_DEBUG
             fprintf (stderr, "Extending a shape entry\n");
@@ -439,18 +402,38 @@ shape_lines: shape_lines ',' STRING
             YYERROR;
         }
 
+        size_t error_pos = 0;
+        if (!bxs_valid_in_shape($3, &error_pos)) {
+            yyerror(bison_args, "invalid character in shape line at position %d", (int) error_pos);
+            YYERROR;
+        }
+
         rval.height++;
-        tmp = (char **) realloc (rval.chars, rval.height*sizeof(char*));
+
+        char **tmp = (char **) realloc(rval.chars, rval.height * sizeof(char *));
         if (tmp == NULL) {
             perror (PROJECT": shape_lines11");
             YYABORT;
         }
         rval.chars = tmp;
-        rval.chars[rval.height-1] = (char *) strdup ($3);
+        rval.chars[rval.height - 1] = (char *) strdup ($3->ascii);
         if (rval.chars[rval.height-1] == NULL) {
             perror (PROJECT": shape_lines12");
             YYABORT;
         }
+
+        bxstr_t **mtmp = (bxstr_t **) realloc(rval.mbcs, rval.height * sizeof(bxstr_t *));
+        if (mtmp == NULL) {
+            perror (PROJECT": shape_lines13");
+            YYABORT;
+        }
+        rval.mbcs = mtmp;
+        rval.mbcs[rval.height - 1] = bxs_strdup($3);
+        if (rval.mbcs[rval.height - 1] == NULL) {
+            perror (PROJECT": shape_lines14");
+            YYABORT;
+        }
+
         $$ = rval;
     }
 
@@ -462,16 +445,34 @@ shape_lines: shape_lines ',' STRING
             fprintf (stderr, "Initializing a shape entry with first line\n");
         #endif
 
-        rval.width = strlen ($1);
+        size_t error_pos = 0;
+        if (!bxs_valid_in_shape($1, &error_pos)) {
+            yyerror(bison_args, "invalid character in shape line at position %d", (int) error_pos);
+            YYERROR;
+        }
+
+        rval.width = $1->num_columns;
         rval.height = 1;
+
         rval.chars = (char **) malloc (sizeof(char*));
         if (rval.chars == NULL) {
             perror (PROJECT": shape_lines21");
             YYABORT;
         }
-        rval.chars[0] = (char *) strdup ($1);
+        rval.chars[0] = (char *) strdup ($1->ascii);
         if (rval.chars[0] == NULL) {
             perror (PROJECT": shape_lines22");
+            YYABORT;
+        }
+
+        rval.mbcs = (bxstr_t **) malloc(sizeof(bxstr_t *));
+        if (rval.mbcs == NULL) {
+            perror (PROJECT": shape_lines23");
+            YYABORT;
+        }
+        rval.mbcs[0] = bxs_strdup($1);
+        if (rval.mbcs[0] == NULL) {
+            perror (PROJECT": shape_lines24");
             YYABORT;
         }
         $$ = rval;
@@ -481,7 +482,7 @@ shape_lines: shape_lines ',' STRING
 
 wlist: wlist wlist_entry | wlist_entry;
 
-wlist_entry: WORD YNUMBER
+wlist_entry: ASCII_ID YNUMBER
     {
         invoke_action(action_padding_entry(bison_args, $1, $2));
     }
