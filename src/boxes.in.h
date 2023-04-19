@@ -26,9 +26,10 @@
 /* #define LEXER_DEBUG 1 */
 /* #define DISCOVERY_DEBUG 1 */
 
-
 #include <stdio.h>
 #include <unitypes.h>
+
+#include "bxstring.h"
 #include "regulex.h"
 #include "shape.h"
 
@@ -56,6 +57,9 @@
 #define LINE_MAX_BYTES        16382
 #endif
 
+/* Macro to declare a function parameter as intentionally unused in order to avoid compiler warnings */
+#define UNUSED(variable) ((void)(variable))
+
 
 #define BTOP 0                       /* for use with sides */
 #define BRIG 1
@@ -64,8 +68,8 @@
 
 
 typedef struct {
-    char       *search;
-    char       *repstr;
+    bxstr_t    *search;
+    bxstr_t    *repstr;
     pcre2_code *prog;                /* compiled search pattern */
     int         line;                /* line of definition in config file */
     char        mode;                /* 'g' or 'o' */
@@ -75,12 +79,12 @@ typedef struct {
 typedef struct {
     char      *name;                 /* primary name of the box design */
     char     **aliases;              /* zero-terminated array of alias names of the design */
-    char      *author;               /* creator of the configuration file entry */
-    char      *designer;             /* creator of the original ASCII artwork */
-    char      *created;              /* date created, free format */
+    bxstr_t   *author;               /* creator of the configuration file entry */
+    bxstr_t   *designer;             /* creator of the original ASCII artwork */
+    bxstr_t   *created;              /* date created, free format */
     char      *revision;             /* revision number of design */
-    char      *revdate;              /* date of current revision */
-    char      *sample;               /* the complete sample block in one string */
+    bxstr_t   *revdate;              /* date of current revision */
+    bxstr_t   *sample;               /* the complete sample block in one string */
     char       indentmode;           /* 'b', 't', or 'n' */
     sentry_t   shape[NUM_SHAPES];
     size_t     maxshapeheight;       /* height of highest shape in design */
@@ -88,7 +92,7 @@ typedef struct {
     size_t     minheight;
     int        padding[NUM_SIDES];
     char     **tags;
-    char      *defined_in;           /* path to config file where this was defined */
+    bxstr_t   *defined_in;           /* path to config file where this was defined */
 
     reprule_t *current_rule;
     reprule_t *reprules;             /* applied when drawing a box */

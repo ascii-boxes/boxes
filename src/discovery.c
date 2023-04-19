@@ -18,6 +18,7 @@
  */
 
 #include "config.h"
+
 #include <errno.h>
 #include <dirent.h>
 #include <stdio.h>
@@ -32,46 +33,48 @@
 
 #include "boxes.h"
 #include "tools.h"
+#include "unicode.h"
 #include "discovery.h"
 
 
 
-static int can_read_file(const char *filename)
+static int can_read_file(char *filename_utf8)
 {
     #ifdef DISCOVERY_DEBUG
-        fprintf(stderr, "can_read_file(%s) - enter\n", filename);
+        fprintf(stderr, "can_read_file(%s) - enter\n", filename_utf8);
     #endif
 
     struct stat statbuf;
     int result = 1;
-    if (filename == NULL || filename[0] == '\0') {
+    if (filename_utf8 == NULL || filename_utf8[0] == '\0') {
         #ifdef DISCOVERY_DEBUG
             fprintf(stderr, "%s: can_read_file(): argument was NULL\n", PROJECT);
         #endif
         result = 0;
     }
     else {
-        FILE *f = fopen(filename, "r");
+        FILE *f = bx_fopen(filename_utf8, "r");
         if (f == NULL) {
             #ifdef DISCOVERY_DEBUG
                 fprintf(stderr, "%s: can_read_file(): File \"%s\" could not be opened for reading - %s\n",
-                    PROJECT, filename, strerror(errno));
+                    PROJECT, filename_utf8, strerror(errno));
             #endif
             result = 0;
         }
         else {
             fclose(f);
 
-            if (stat(filename, &statbuf) != 0) {
+            if (stat(filename_utf8, &statbuf) != 0) {
                 #ifdef DISCOVERY_DEBUG
                     fprintf(stderr, "%s: can_read_file(): File \"%s\" not statable - %s\n",
-                        PROJECT, filename, strerror(errno));
+                        PROJECT, filename_utf8, strerror(errno));
                 #endif
                 result = 0;
             }
             else if (S_ISDIR(statbuf.st_mode)) {
                 #ifdef DISCOVERY_DEBUG
-                    fprintf(stderr, "%s: can_read_file(): File \"%s\" is in fact a directory\n", PROJECT, filename);
+                    fprintf(stderr, "%s: can_read_file(): File \"%s\" is in fact a directory\n", PROJECT,
+                            filename_utf8);
                 #endif
                 result = 0;
             }
@@ -85,25 +88,25 @@ static int can_read_file(const char *filename)
 
 
 
-static int can_read_dir(const char *dirname)
+static int can_read_dir(const char *dirname_utf8)
 {
     #ifdef DISCOVERY_DEBUG
-        fprintf(stderr, "can_read_dir(%s) - enter\n", dirname);
+        fprintf(stderr, "can_read_dir(%s) - enter\n", dirname_utf8);
     #endif
 
     int result = 1;
-    if (dirname == NULL || dirname[0] == '\0') {
+    if (dirname_utf8 == NULL || dirname_utf8[0] == '\0') {
         #ifdef DISCOVERY_DEBUG
             fprintf(stderr, "%s: can_read_dir(): argument was NULL\n", PROJECT);
         #endif
         result = 0;
     }
     else {
-        DIR *dir = opendir(dirname);
+        DIR *dir = opendir(dirname_utf8);
         if (dir == NULL) {
             #ifdef DISCOVERY_DEBUG
                 fprintf(stderr, "%s: can_read_dir(): Directory \"%s\" could not be opened for reading - %s\n",
-                    PROJECT, dirname, strerror(errno));
+                    PROJECT, dirname_utf8, strerror(errno));
             #endif
             result = 0;
         }
@@ -119,19 +122,19 @@ static int can_read_dir(const char *dirname)
 
 
 
-static char *combine(const char *dirname, const char *filename)
+static char *combine(const char *dirname_utf8, const char *filename_utf8)
 {
-    const size_t dirname_len = strlen(dirname);
+    const size_t dirname_len = strlen(dirname_utf8);
 
-    if (dirname[dirname_len - 1] == '/') {
-        return concat_strings_alloc(2, dirname, filename);
+    if (dirname_utf8[dirname_len - 1] == '/') {
+        return concat_strings_alloc(2, dirname_utf8, filename_utf8);
     }
-    return concat_strings_alloc(3, dirname, "/", filename);
+    return concat_strings_alloc(3, dirname_utf8, "/", filename_utf8);
 }
 
 
 
-static char *locate_config_in_dir(const char *dirname)
+static char *locate_config_in_dir(const char *dirname_utf8)
 {
     #ifdef __MINGW32__
     static const char *filenames[] = {"boxes.cfg", "box-designs.cfg", "boxes-config"};
@@ -139,7 +142,7 @@ static char *locate_config_in_dir(const char *dirname)
     static const char *filenames[] = {".boxes", "box-designs", "boxes-config", "boxes"};
     #endif
     for (size_t i = 0; i < (sizeof(filenames) / sizeof(const char *)); i++) {
-        char *f = combine(dirname, filenames[i]);
+        char *f = combine(dirname_utf8, filenames[i]);
         if (can_read_file(f)) {
             return f;
         }
@@ -150,20 +153,20 @@ static char *locate_config_in_dir(const char *dirname)
 
 
 
-static char *locate_config_file_or_dir(const char *path, const char *ext_msg)
+static char *locate_config_file_or_dir(char *path_utf8, const char *ext_msg)
 {
     char *result = NULL;
-    if (can_read_file(path)) {
-        result = strdup(path);
+    if (can_read_file(path_utf8)) {
+        result = strdup(path_utf8);
     }
-    else if (can_read_dir(path)) {
-        result = locate_config_in_dir(path);
+    else if (can_read_dir(path_utf8)) {
+        result = locate_config_in_dir(path_utf8);
         if (result == NULL) {
-            fprintf(stderr, "%s: Couldn\'t find config file in directory \'%s\'%s\n", PROJECT, path, ext_msg);
+            fprintf(stderr, "%s: Couldn\'t find config file in directory \'%s\'%s\n", PROJECT, path_utf8, ext_msg);
         }
     }
     else {
-        fprintf(stderr, "%s: Couldn\'t find config file at \'%s\'%s\n", PROJECT, path, ext_msg);
+        fprintf(stderr, "%s: Couldn\'t find config file at \'%s\'%s\n", PROJECT, path_utf8, ext_msg);
     }
     return result;
 }
@@ -186,6 +189,10 @@ static char *from_env_var(const char *env_var, const char *postfix)
 
 static char *locate_config_common(int *error_printed)
 {
+    #ifdef DISCOVERY_DEBUG
+        fprintf(stderr, "locate_config_common() - enter\n");
+    #endif
+
     char *result = NULL;
     if (opt.f) {
         result = locate_config_file_or_dir(opt.f, "");
@@ -199,6 +206,10 @@ static char *locate_config_common(int *error_printed)
             *error_printed = 1;
         }
     }
+
+    #ifdef DISCOVERY_DEBUG
+        fprintf(stderr, "locate_config_common() - exit -> [%s]\n", result);
+    #endif
     return result;
 }
 
@@ -242,15 +253,31 @@ static char *exe_to_cfg()
 #endif
 
 
-char *discover_config_file(const int global_only)
+
+static bxstr_t *utf8_to_bxs(char *utf8)
+{
+    bxstr_t *result = NULL;
+    if (utf8 != NULL) {
+        uint32_t *utf32 = u32_strconv_from_arg(utf8, "UTF-8");
+        result = bxs_from_unicode(utf32);
+        BFREE(utf32);
+    }
+    return result;
+}
+
+
+
+bxstr_t *discover_config_file(const int global_only)
 {
     #ifdef DISCOVERY_DEBUG
         fprintf(stderr, "discover_config_file(%s) - enter\n", global_only ? "true" : "false");
     #endif
     int error_printed = 0;
-    char *result = NULL;
+    bxstr_t *result = NULL;
     if (!global_only) {
-        result = locate_config_common(&error_printed);
+        char *common_config = locate_config_common(&error_printed);
+        result = utf8_to_bxs(common_config);
+        BFREE(common_config);
     }
 
     if (result == NULL && !error_printed) {
@@ -279,19 +306,20 @@ char *discover_config_file(const int global_only)
                 #ifdef __MINGW32__
                     char *exepath = exe_to_cfg();
                     if (can_read_file(exepath)) {
-                        result = exepath;
+                        result = utf8_to_bxs(exepath);
                     } else {
                         fprintf(stderr, "%s: Couldn\'t find config file at \'%s\'\n", PROJECT, exepath);
                         error_printed = 1;
                     }
+                    BFREE(exepath);
                 #else
                     if (can_read_file(GLOBALCONF)) {
-                        result = strdup(GLOBALCONF);
+                        result = utf8_to_bxs(GLOBALCONF);
                     }
                 #endif
             }
             else if (can_read_dir(dir)) {
-                result = locate_config_in_dir(dir);
+                result = utf8_to_bxs(locate_config_in_dir(dir));
             }
             if (result != NULL) {
                 break;
@@ -303,7 +331,7 @@ char *discover_config_file(const int global_only)
         fprintf(stderr, "%s: Can't find config file.\n", PROJECT);
     }
     #ifdef DISCOVERY_DEBUG
-        fprintf(stderr, "discover_config_file() - exit -> [%s]\n", result);
+        fprintf(stderr, "discover_config_file() - exit -> [%s]\n", bxs_to_output(result));
     #endif
     return result;
 }

@@ -20,8 +20,10 @@
 #ifndef BOXES_DISCOVERY_H
 #define BOXES_DISCOVERY_H
 
+#include "bxstring.h"
 
-char *discover_config_file(const int global_only);
+
+bxstr_t *discover_config_file(const int global_only);
 
 
 #endif /* BOXES_DISCOVERY_H */

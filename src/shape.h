@@ -20,6 +20,8 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
+#include "bxstring.h"
+
 
 typedef enum {
     NW, NNW, N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW
@@ -42,17 +44,18 @@ extern shape_t *sides[NUM_SIDES];
 
 
 typedef struct {
-    char **chars;
-    size_t height;
-    size_t width;
-    int    elastic;          /* elastic is used only in original definition */
+    char    **chars;
+    bxstr_t **mbcs;
+    size_t    height;
+    size_t    width;
+    int       elastic;          /* elastic is used only in original definition */
 } sentry_t;
 
-#define SENTRY_INITIALIZER (sentry_t) {NULL, 0, 0, 0}
+#define SENTRY_INITIALIZER (sentry_t) {NULL, NULL, 0, 0, 0}
 
 
 
-int genshape (const size_t width, const size_t height, char ***chars);
+int genshape (const size_t width, const size_t height, char ***chars, bxstr_t ***mbcs);
 void freeshape (sentry_t *shape);
 
 shape_t findshape (const sentry_t *sarr, const int num);

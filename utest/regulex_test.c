@@ -18,12 +18,15 @@
  */
 
 #include "config.h"
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
 #include <uniconv.h>
 #include <string.h>
+
+#include "boxes.h"
 #include "global_mock.h"
 #include "regulex.h"
 
@@ -31,7 +34,7 @@
 
 void test_compile_pattern_empty(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     assert_null(compile_pattern(NULL));
     assert_non_null(compile_pattern(""));
@@ -41,7 +44,7 @@ void test_compile_pattern_empty(void **state)
 
 void test_compile_pattern_error(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     assert_null(compile_pattern("incomplete[x"));
     assert_int_equal(1, collect_err_size);
@@ -59,7 +62,7 @@ void test_compile_pattern_error(void **state)
 
 void test_regex_replace_invalid_utf(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     const char *input = "input";
     assert_null(regex_replace(compile_pattern("search"), NULL, /* NULL is an invalid replacement string*/
@@ -72,7 +75,7 @@ void test_regex_replace_invalid_utf(void **state)
 
 void test_regex_replace_buffer_resize(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     const char *input = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
     uint32_t *actual = regex_replace(compile_pattern("x"), "long_replacement_string_",
@@ -95,7 +98,7 @@ void test_regex_replace_buffer_resize(void **state)
 
 void test_regex_replace_error(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     const char *input = "xxx";
     uint32_t *actual = regex_replace(compile_pattern("x"), "INVALID $2",

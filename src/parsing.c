@@ -26,10 +26,13 @@
 #include <strings.h>
 
 #include "boxes.h"
+#include "bxstring.h"
 #include "parsing.h"
-#include "parser.h"
-#include "lex.yy.h"
 #include "tools.h"
+
+#include "parser.h"
+
+#include "lex.yy.h"
 
 
 /** file handle of the config file currently being parsed */
@@ -39,10 +42,10 @@ static FILE *current_config_handle = NULL;
 static pass_to_bison *current_bison_args = NULL;
 
 /** the name of the initially specified config file */
-static const char *first_config_file = NULL;
+static bxstr_t *first_config_file = NULL;
 
 /** all parent configs encountered across all parsed config files */
-static char **parent_configs = NULL;
+static bxstr_t **parent_configs = NULL;
 
 /** total number of parent configs (the size of the `parent_configs` array) */
 static size_t num_parent_configs = 0;
@@ -58,9 +61,10 @@ static size_t num_parent_configs = 0;
  */
 static int open_yy_config_file(pass_to_bison *bison_args)
 {
-    current_config_handle = fopen(bison_args->config_file, "r");
+    current_config_handle = bx_fopens(bison_args->config_file, "r");
     if (current_config_handle == NULL) {
-        fprintf(stderr, "%s: Couldn't open config file '%s' for input\n", PROJECT, bison_args->config_file);
+        fprintf(stderr, "%s: Couldn't open config file '%s' for input\n", PROJECT,
+                bxs_to_output(bison_args->config_file));
         return 1;
     }
     yyset_in(current_config_handle, bison_args->lexer_state);
@@ -83,15 +87,15 @@ void print_design_list_header()
         }
         fprintf(opt.outfile, "%s%s", opt.eol, opt.eol);
         fprintf(opt.outfile, "Configuration Files:%s", opt.eol);
-        fprintf(opt.outfile, "    - %s%s", first_config_file, opt.eol);
+        fprintf(opt.outfile, "    - %s%s", bxs_to_output(first_config_file), opt.eol);
         for (size_t i = 0; i < num_parent_configs; i++) {
-            fprintf(opt.outfile, "    - %s (parent)%s", parent_configs[i], opt.eol);
+            fprintf(opt.outfile, "    - %s (parent)%s", bxs_to_output(parent_configs[i]), opt.eol);
         }
     }
     else {
-        fprintf(opt.outfile, " in \"%s\":%s", first_config_file, opt.eol);
+        fprintf(opt.outfile, " in \"%s\":%s", bxs_to_output(first_config_file), opt.eol);
         fprintf(opt.outfile, "-----------------------%s", num_designs == 1 ? "" : "-");
-        for (int i = strlen(first_config_file) + strlen(buf); i > 0; --i) {
+        for (int i = first_config_file->num_columns + strlen(buf); i > 0; --i) {
             fprintf(opt.outfile, "-");
         }
     }
@@ -113,7 +117,7 @@ int yyerror(pass_to_bison *bison_args, const char *fmt, ...)
     va_start (ap, fmt);
 
     pass_to_bison *bargs = bison_args ? bison_args : current_bison_args;
-    fprintf(stderr, "%s: %s: line %d: ", PROJECT, bargs->config_file, yyget_lineno(bargs->lexer_state));
+    fprintf(stderr, "%s: %s: line %d: ", PROJECT, bxs_to_output(bargs->config_file), yyget_lineno(bargs->lexer_state));
     vfprintf(stderr, fmt, ap);
     fputc('\n', stderr);
 
@@ -124,13 +128,13 @@ int yyerror(pass_to_bison *bison_args, const char *fmt, ...)
 
 
 
-static pass_to_bison new_bison_args(const char *config_file)
+static pass_to_bison new_bison_args(bxstr_t *config_file)
 {
     pass_to_bison bison_args;
     bison_args.designs = NULL;
     bison_args.num_designs = 0;
     bison_args.design_idx = 0;
-    bison_args.config_file = (char *) config_file;
+    bison_args.config_file = config_file;
     bison_args.num_mandatory = 0;
     bison_args.time_for_se_check = 0;
     bison_args.num_shapespec = 0;
@@ -155,10 +159,10 @@ static pass_to_flex new_flex_extra_data()
 
 
 
-static pass_to_bison parse_config_file(const char *config_file, design_t *child_configs, size_t num_child_configs)
+static pass_to_bison parse_config_file(bxstr_t *config_file, design_t *child_configs, size_t num_child_configs)
 {
     #ifdef DEBUG
-        fprintf (stderr, "Parsing Config File %s ...\n", config_file);
+        fprintf (stderr, "Parsing Config File %s ...\n", bxs_to_output(config_file));
     #endif
 
     pass_to_bison bison_args = new_bison_args(config_file);
@@ -213,10 +217,10 @@ static int record_parent_config_files(pass_to_bison *bison_args)
 {
     if (bison_args->num_parent_configs > 0) {
         for (int parent_idx = bison_args->num_parent_configs - 1; parent_idx >= 0; parent_idx--) {
-            char *parent_file = bison_args->parent_configs[parent_idx];
-            int is_new = !array_contains(parent_configs, num_parent_configs, parent_file);
+            bxstr_t *parent_file = bison_args->parent_configs[parent_idx];
+            int is_new = !array_contains_bxs(parent_configs, num_parent_configs, parent_file);
             if (is_new) {
-                parent_configs = (char **) realloc(parent_configs, (num_parent_configs + 1) * sizeof(char *));
+                parent_configs = (bxstr_t **) realloc(parent_configs, (num_parent_configs + 1) * sizeof(bxstr_t *));
                 if (parent_configs == NULL) {
                     return 1;
                 }
@@ -258,7 +262,7 @@ static int copy_designs(pass_to_bison *bison_args, design_t **r_result, size_t *
 
 
 
-design_t *parse_config_files(const char *p_first_config_file, size_t *r_num_designs)
+design_t *parse_config_files(bxstr_t *p_first_config_file, size_t *r_num_designs)
 {
     size_t parents_parsed = -1;      /** how many parent config files have already been parsed */
 
@@ -266,7 +270,7 @@ design_t *parse_config_files(const char *p_first_config_file, size_t *r_num_desi
     *r_num_designs = 0;
 
     first_config_file = p_first_config_file;
-    const char *config_file = p_first_config_file;
+    bxstr_t *config_file = p_first_config_file;
     do {
         pass_to_bison bison_args = parse_config_file(config_file, result, *r_num_designs);
         ++parents_parsed;

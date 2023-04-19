@@ -18,10 +18,13 @@
  */
 
 #include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+
+#include "bxstring.h"
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
@@ -109,13 +112,14 @@ int on_side(const shape_t s, const int idx)
 
 
 
-int genshape(const size_t width, const size_t height, char ***chars)
+int genshape(const size_t width, const size_t height, char ***chars, bxstr_t ***mbcs)
 /*
  *  Generate a shape consisting of spaces only.
  *
  *      width   desired shape width
  *      height  desired shape height
  *      chars   pointer to the shape lines (should be NULL upon call)
+ *      mbcs    pointer to the shape lines, MBCS version (should be NULL upon call)
  *
  *  Memory is allocated for the shape lines which must be freed by the caller.
  *
@@ -138,15 +142,16 @@ int genshape(const size_t width, const size_t height, char ***chars)
         return 2;
     }
 
+    *mbcs = (bxstr_t **) calloc(height, sizeof(bxstr_t *));
+    if (*mbcs == NULL) {
+        BFREE(*chars);
+        perror(PROJECT);
+        return 4;
+    }
+
     for (j = 0; j < height; ++j) {
-        (*chars)[j] = (char *) calloc(width + 1, sizeof(char));
-        if ((*chars)[j] == NULL) {
-            perror(PROJECT);
-            for (/*empty*/; j > 0; --j) BFREE ((*chars)[j - 1]);
-            BFREE (*chars);
-            return 3;
-        }
-        memset((*chars)[j], ' ', width);
+        (*chars)[j] = nspaces(width);
+        (*mbcs)[j] = bxs_from_ascii((*chars)[j]);
     }
 
     return 0;
@@ -166,8 +171,10 @@ void freeshape(sentry_t *shape)
 
     for (j = 0; j < shape->height; ++j) {
         BFREE (shape->chars[j]);
+        bxs_free(shape->mbcs[j]);
     }
     BFREE (shape->chars);
+    BFREE (shape->mbcs);
 
     *shape = SENTRY_INITIALIZER;
 }

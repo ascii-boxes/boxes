@@ -76,7 +76,7 @@ static void usage_short(FILE *st)
  */
 void usage_long(FILE *st)
 {
-    char *config_file = discover_config_file(0);
+    bxstr_t *config_file = discover_config_file(0);
 
     fprintf(st, "%s - draws any kind of box around your text (or removes it)\n", PROJECT);
     fprintf(st, "        Website: https://boxes.thomasjensen.com/\n");
@@ -86,7 +86,8 @@ void usage_long(FILE *st)
     fprintf(st, "        -d name  box design [default: first one in file]\n");
     fprintf(st, "        -e eol   Override line break type (experimental) [default: %s]\n",
                                   strcmp(EOL_DEFAULT, "\r\n") == 0 ? "CRLF" : "LF");
-    fprintf(st, "        -f file  configuration file [default: %s]\n", config_file != NULL ? config_file : "none");
+    fprintf(st, "        -f file  configuration file [default: %s]\n",
+                                  config_file != NULL ? bxs_to_output(config_file) : "none");
     fprintf(st, "        -h       print usage information\n");
     fprintf(st, "        -i mode  indentation mode [default: box]\n");
     fprintf(st, "        -k bool  leading/trailing blank line retention on removal\n");
@@ -100,7 +101,7 @@ void usage_long(FILE *st)
     fprintf(st, "        -t str   tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
     fprintf(st, "        -v       print version information\n");
 
-    BFREE(config_file);
+    bxs_free(config_file);
 }
 
 

@@ -42,14 +42,19 @@
 
 int empty_line(const line_t *line);
 
+
 size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_t **text,
                         size_t **tabpos, size_t *tabpos_len);
 
+
 void btrim(char *text, size_t *len);
+
 
 void btrim32(uint32_t *text, size_t *len);
 
+
 char *my_strnrstr(const char *s1, const char *s2, const size_t s2_len, int skip);
+
 
 /**
  * Calculates the length (in bytes) of the segment at the end of `s` which consists entirely of bytes in `accept`.
@@ -60,9 +65,12 @@ char *my_strnrstr(const char *s1, const char *s2, const size_t s2_len, int skip)
  */
 size_t my_strrspn(const char *s, const char *accept);
 
+
 int strisyes(const char *s);
 
+
 int strisno(const char *s);
+
 
 /**
  * Concatenate variable number of strings into one. This would normally be achieved via snprintf(), but that's not
@@ -73,17 +81,24 @@ int strisno(const char *s);
  */
 char *concat_strings_alloc(size_t count, ...);
 
+
 void concat_strings(char *dst, int max_len, int count, ...);
+
 
 char *tabbify_indent(const size_t lineno, char *indentspc, const size_t indentspc_len);
 
+
 char *nspaces(const size_t n);
+
 
 void print_input_lines(const char *heading);
 
+
 void analyze_line_ascii(input_t *input_ptr, line_t *line);
 
+
 size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, size_t **posmap);
+
 
 /**
  * Determine whether the given sequence of characters is a CSI (also called "escape sequence") that resets all
@@ -93,7 +108,9 @@ size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, s
  */
 int is_csi_reset(const uint32_t *csi);
 
+
 int array_contains(char **array, const size_t array_len, const char *s);
+
 
 /**
  * Determine if the given `array` contains the given string (case-insensitive!).
@@ -103,12 +120,17 @@ int array_contains(char **array, const size_t array_len, const char *s);
  */
 int array_contains0(char **array, const char *s);
 
+
+int array_contains_bxs(bxstr_t **array, const size_t array_len, bxstr_t *s);
+
+
 /**
  * Count the number of elements in a zero-terminated array.
  * @param array a zero-terminated array of strings (can be NULL)
  * @returns the number of elements, excluding the zero terminator
  */
 size_t array_count0(char **array);
+
 
 /**
  * Trim leading and trailing whitespace from a string and return the result in a new string, for which memory is
@@ -118,6 +140,7 @@ size_t array_count0(char **array);
  * @returns a new string, which may be the empty string if the input was invalid or consisted only of whitespace
  */
 char *trimdup(char *s, char *e);
+
 
 /**
  * Determine if the given string is a valid tag. Valid tags are lower-case alphanumeric strings which may have
@@ -145,6 +168,42 @@ char *bx_strndup(const char *s, size_t n);
  * @param format the format string, followed by the arguments of the format string
  */
 void bx_fprintf(FILE *stream, const char *format, ...);
+
+
+/**
+ * Determine if the given string is an "ASCII ID", which means:
+ * - It consists only of the letters `abcdefghijklmnopqrstuvwxyz-0123456789`. If not in strict mode, upper case A-Z
+ *   and underscores are also allowed.
+ * - The first letter is a-z (lower case). If not in strict mode, upper case A-Z is also allowed.
+ * - The last character may not be a hyphen or underscore.
+ * - No two hyphens or underscores, or mixture thereof, may appear in sequence.
+ * - The entire string must not be the word `none`.
+ * - Minimum length is 1 character.
+ * @param s the string to check
+ * @param strict flag indicating whether "strict checks" should be applied (1) or not (0)
+ * @return flag (1 or 0)
+ */
+int is_ascii_id(bxstr_t *s, int strict);
+
+
+/**
+ * Open the file pointed to by `pathname` and associate a stream with it. Supports non-ASCII pathnames and encapsulates
+ * the logic for different operating systems.
+ * @param pathname the pathname of the file to open
+ * @param mode a mode sequence like for standard `fopen()`
+ * @return the file stream
+ */
+FILE *bx_fopens(bxstr_t *pathname, char *mode);
+
+
+/**
+ * Open the file pointed to by `pathname` and associate a stream with it. Supports non-ASCII pathnames and encapsulates
+ * the logic for different operating systems.
+ * @param pathname the pathname of the file to open, as a UTF-8 or ASCII (single byte) byte sequence
+ * @param mode a mode sequence like for standard `fopen()`
+ * @return the file stream
+ */
+FILE *bx_fopen(char *pathname, char *mode);
 
 
 #endif

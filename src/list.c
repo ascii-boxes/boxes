@@ -18,15 +18,18 @@
  */
 
 #include "config.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
 
 #include "boxes.h"
+#include "bxstring.h"
 #include "parsing.h"
 #include "query.h"
 #include "tools.h"
 #include "list.h"
+#include "unicode.h"
 
 
 
@@ -163,17 +166,23 @@ static void print_tags(tagstats_t *tagstats, size_t num_tags)
 
 
 
-static char *escape(const char *org, const int pLength)
+static bxstr_t *escape(const bxstr_t *org, const int pLength)
 {
-    char *result = (char *) calloc(1, 2 * strlen(org) + 1);
+    const ucs4_t char_backslash = to_utf32('\\');
+    const ucs4_t char_quote = to_utf32('"');
+
+    uint32_t *temp = (uint32_t *) calloc(2 * org->num_chars + 1, sizeof(uint32_t));
     int orgIdx, resultIdx;
     for (orgIdx = 0, resultIdx = 0; orgIdx < pLength; ++orgIdx, ++resultIdx) {
-        if (org[orgIdx] == '\\' || org[orgIdx] == '"') {
-            result[resultIdx++] = '\\';
+        if (is_char_at(org->memory, orgIdx, char_backslash) || is_char_at(org->memory, orgIdx, char_quote)) {
+            set_char_at(temp, resultIdx++, char_backslash);
         }
-        result[resultIdx] = org[orgIdx];
+        set_char_at(temp, resultIdx, org->memory[orgIdx]);
     }
-    result[resultIdx] = '\0';
+    set_char_at(temp, resultIdx, char_nul);
+
+    bxstr_t *result = bxs_from_unicode(temp);
+    BFREE(temp);
     return result;
 }
 
@@ -199,16 +208,19 @@ static void print_design_details(design_t *d)
     }
     fprintf(opt.outfile, "%s", opt.eol);
 
-    fprintf(opt.outfile, "Author:                 %s%s", d->author ? d->author : "(unknown author)", opt.eol);
-    fprintf(opt.outfile, "Original Designer:      %s%s", d->designer ? d->designer : "(unknown artist)", opt.eol);
-    fprintf(opt.outfile, "Creation Date:          %s%s", d->created ? d->created : "(unknown)", opt.eol);
+    fprintf(opt.outfile, "Author:                 %s%s",
+            d->author ? bxs_to_output(d->author) : "(unknown author)", opt.eol);
+    fprintf(opt.outfile, "Original Designer:      %s%s",
+            d->designer ? bxs_to_output(d->designer) : "(unknown artist)", opt.eol);
+    fprintf(opt.outfile, "Creation Date:          %s%s",
+            d->created ? bxs_to_output(d->created) : "(unknown)", opt.eol);
 
     fprintf(opt.outfile, "Current Revision:       %s%s%s%s",
             d->revision ? d->revision : "",
             d->revision && d->revdate ? " as of " : "",
-            d->revdate ? d->revdate : (d->revision ? "" : "(unknown)"), opt.eol);
+            d->revdate ? bxs_to_output(d->revdate) : (d->revision ? "" : "(unknown)"), opt.eol);
 
-    fprintf(opt.outfile, "Configuration File:     %s%s", d->defined_in, opt.eol);
+    fprintf(opt.outfile, "Configuration File:     %s%s", bxs_to_output(d->defined_in), opt.eol);
 
     fprintf(opt.outfile, "Indentation Mode:       ");
     switch (d->indentmode) {
@@ -228,7 +240,7 @@ static void print_design_details(design_t *d)
         for (int i = 0; i < (int) d->anz_reprules; ++i) {
             fprintf(opt.outfile, "%d. (%s) \"%s\" WITH \"%s\"%s", i + 1,
                     d->reprules[i].mode == 'g' ? "glob" : "once",
-                    d->reprules[i].search, d->reprules[i].repstr, opt.eol);
+                    bxs_to_output(d->reprules[i].search), bxs_to_output(d->reprules[i].repstr), opt.eol);
             if (i < (int) d->anz_reprules - 1) {
                 fprintf(opt.outfile, "                        ");
             }
@@ -242,7 +254,7 @@ static void print_design_details(design_t *d)
         for (int i = 0; i < (int) d->anz_revrules; ++i) {
             fprintf(opt.outfile, "%d. (%s) \"%s\" TO \"%s\"%s", i + 1,
                     d->revrules[i].mode == 'g' ? "glob" : "once",
-                    d->revrules[i].search, d->revrules[i].repstr, opt.eol);
+                    bxs_to_output(d->revrules[i].search), bxs_to_output(d->revrules[i].repstr), opt.eol);
             if (i < (int) d->anz_revrules - 1) {
                 fprintf(opt.outfile, "                        ");
             }
@@ -315,7 +327,7 @@ static void print_design_details(design_t *d)
      *  Display all shapes
      */
     if (query_is_undoc()) {
-        fprintf(opt.outfile, "Sample:%s%s%s", opt.eol, d->sample, opt.eol);
+        fprintf(opt.outfile, "Sample:%s%s%s", opt.eol, bxs_to_output(d->sample), opt.eol);
     }
     else {
         int first_shape = 1;
@@ -324,11 +336,11 @@ static void print_design_details(design_t *d)
                 continue;
             }
             for (size_t w = 0; w < d->shape[i].height; ++w) {
-                char *escaped_line = escape(d->shape[i].chars[w], d->shape[i].width);
+                bxstr_t *escaped_line = escape(d->shape[i].mbcs[w], d->shape[i].width);
                 fprintf(opt.outfile, "%-24s%3s%c \"%s\"%c%s",
                         (first_shape == 1 && w == 0 ? "Defined Shapes:" : ""),
                         (w == 0 ? shape_name[i] : ""), (w == 0 ? ':' : ' '),
-                        escaped_line,
+                        bxs_to_output(escaped_line),
                         (w < d->shape[i].height - 1 ? ',' : ' '),
                         opt.eol
                 );
@@ -358,24 +370,24 @@ int list_designs()
 
         for (int i = 0; i < num_designs; ++i) {
             char *all_names = names(list[i]);
-            if (list[i]->author && list[i]->designer && strcmp(list[i]->author, list[i]->designer) != 0) {
+            if (list[i]->author && list[i]->designer && bxs_strcmp(list[i]->author, list[i]->designer) != 0) {
                 fprintf(opt.outfile, "%s%s%s, coded by %s:%s%s%s%s%s", all_names, opt.eol,
-                        list[i]->designer, list[i]->author, opt.eol, opt.eol,
-                        list[i]->sample, opt.eol, opt.eol);
+                        bxs_to_output(list[i]->designer), bxs_to_output(list[i]->author), opt.eol, opt.eol,
+                        bxs_to_output(list[i]->sample), opt.eol, opt.eol);
             }
             else if (list[i]->designer) {
                 fprintf(opt.outfile, "%s%s%s:%s%s%s%s%s", all_names, opt.eol,
-                        list[i]->designer, opt.eol, opt.eol,
-                        list[i]->sample, opt.eol, opt.eol);
+                        bxs_to_output(list[i]->designer), opt.eol, opt.eol,
+                        bxs_to_output(list[i]->sample), opt.eol, opt.eol);
             }
             else if (list[i]->author) {
                 fprintf(opt.outfile, "%s%sunknown artist, coded by %s:%s%s%s%s%s", all_names, opt.eol,
-                        list[i]->author, opt.eol, opt.eol,
-                        list[i]->sample, opt.eol, opt.eol);
+                        bxs_to_output(list[i]->author), opt.eol, opt.eol,
+                        bxs_to_output(list[i]->sample), opt.eol, opt.eol);
             }
             else {
                 fprintf(opt.outfile, "%s:%s%s%s%s%s", all_names, opt.eol, opt.eol,
-                        list[i]->sample, opt.eol, opt.eol);
+                        bxs_to_output(list[i]->sample), opt.eol, opt.eol);
             }
             BFREE(all_names);
 

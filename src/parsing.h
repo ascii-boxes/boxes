@@ -21,6 +21,7 @@
 #define PARSING_H 1
 
 #include "parser.h"
+#include "bxstring.h"
 
 
 /**
@@ -45,7 +46,7 @@ int yyerror(pass_to_bison *bison_args, const char *fmt, ...);
  *              Will be set to 0 on error
  * @return the consolidated list of designs parsed, or `NULL` on error (then an error message was alread printed)
  */
-design_t *parse_config_files(const char *first_config_file, size_t *r_num_designs);
+design_t *parse_config_files(bxstr_t *first_config_file, size_t *r_num_designs);
 
 
 #endif

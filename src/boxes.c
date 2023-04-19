@@ -84,23 +84,29 @@ static int build_design(design_t **adesigns, const char *cld)
 
     dp->name = "<Command Line Definition>";
     dp->aliases = (char **) calloc(1, sizeof(char *));
-    dp->created = "now";
+    dp->created = bxs_from_ascii("now");
     dp->revision = "1.0";
-    dp->sample = "n/a";
+    dp->sample = bxs_from_ascii("n/a");
     dp->indentmode = DEF_INDENTMODE;
     dp->padding[BLEF] = 1;
-    dp->defined_in = "(command line)";
+    dp->defined_in = bxs_from_ascii("(command line)");
 
     dp->tags = (char **) calloc(2, sizeof(char *));
     dp->tags[0] = "transient";
 
+    uint32_t *cld_u32 = u32_strconv_from_arg(cld, "UTF-8");  /* CHECK wrong on Windows (UTF-16) or different IME */
+    bxstr_t *cldW = bxs_from_unicode(cld_u32);
+    BFREE(cld_u32);
+
     dp->shape[W].height = 1;
-    dp->shape[W].width = strlen(cld);
+    dp->shape[W].width = cldW->num_columns;
     dp->shape[W].elastic = 1;
-    rc = genshape(dp->shape[W].width, dp->shape[W].height, &(dp->shape[W].chars));
+    rc = genshape(dp->shape[W].width, dp->shape[W].height, &(dp->shape[W].chars), &(dp->shape[W].mbcs));
     if (rc) {
         return rc;
     }
+    bxs_free(dp->shape[W].mbcs[0]);
+    dp->shape[W].mbcs[0] = cldW;
     strcpy(dp->shape[W].chars[0], cld);
 
     for (i = 0; i < NUM_SHAPES; ++i) {
@@ -139,7 +145,7 @@ static int build_design(design_t **adesigns, const char *cld)
                 return 1;                /* never happens ;-) */
         }
 
-        rc = genshape(c->width, c->height, &(c->chars));
+        rc = genshape(c->width, c->height, &(c->chars), &(c->mbcs));
         if (rc) {
             return rc;
         }
@@ -185,7 +191,7 @@ static void handle_command_line(int argc, char *argv[])
  */
 static void handle_config_parsing()
 {
-    char *config_file = discover_config_file(0);
+    bxstr_t *config_file = discover_config_file(0);
     if (config_file == NULL) {
         exit(EXIT_FAILURE);
     }
@@ -397,10 +403,13 @@ int main(int argc, char *argv[])
         fprintf (stderr, "BOXES STARTING ...\n");
     #endif
 
+    /* Temporarily set the system encoding, for proper output of --help text etc. */
+    setlocale(LC_ALL, "");    /* switch from default "C" encoding to system encoding */
+    encoding = locale_charset();
+
     handle_command_line(argc, argv);
 
     /* Store system character encoding */
-    setlocale(LC_ALL, "");    /* switch from default "C" encoding to system encoding */
     encoding = check_encoding(opt.encoding, locale_charset());
     #ifdef DEBUG
         fprintf (stderr, "Character Encoding = %s\n", encoding);

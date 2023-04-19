@@ -32,6 +32,11 @@ void test_my_strrspn(void **state);
 
 void test_is_csi_reset(void **state);
 
+void test_is_ascii_id_valid(void **state);
+void test_is_ascii_id_invalid(void **state);
+void test_is_ascii_id_strict_valid(void **state);
+void test_is_ascii_id_strict_invalid(void **state);
+
 
 #endif
 

@@ -58,7 +58,7 @@ static opt_t *act(const int num_args, ...)
 
 void test_indentmode_none(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-i", "none");
 
@@ -69,7 +69,7 @@ void test_indentmode_none(void **state)
 
 void test_indentmode_invalid_long(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-i", "INVALID");
 
@@ -81,7 +81,7 @@ void test_indentmode_invalid_long(void **state)
 
 void test_indentmode_invalid_short(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-i", "X");
 
@@ -93,7 +93,7 @@ void test_indentmode_invalid_short(void **state)
 
 void test_indentmode_box(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-i", "BO");
 
@@ -104,7 +104,7 @@ void test_indentmode_box(void **state)
 
 void test_indentmode_text(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-i", "t");
 
@@ -115,7 +115,7 @@ void test_indentmode_text(void **state)
 
 void test_killblank_true(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-k", "true");
 
@@ -126,7 +126,7 @@ void test_killblank_true(void **state)
 
 void test_killblank_false(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-k", "false");
 
@@ -137,7 +137,7 @@ void test_killblank_false(void **state)
 
 void test_killblank_invalid(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-k", "INVALID");
 
@@ -149,7 +149,7 @@ void test_killblank_invalid(void **state)
 
 void test_killblank_multiple(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(4, "-k", "true", "-k", "false");    // first one wins
 
@@ -160,7 +160,7 @@ void test_killblank_multiple(void **state)
 
 void test_padding_top_bottom(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-p", "t2b10");
 
@@ -172,7 +172,7 @@ void test_padding_top_bottom(void **state)
 
 void test_padding_invalid(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-p", "INVALID");
 
@@ -184,7 +184,7 @@ void test_padding_invalid(void **state)
 
 void test_padding_negative(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-p", "a-1");
 
@@ -196,7 +196,7 @@ void test_padding_negative(void **state)
 
 void test_padding_notset(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-p", "");
 
@@ -208,7 +208,7 @@ void test_padding_notset(void **state)
 
 void test_padding_invalid_value(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-p", "l2rX");
 
@@ -220,7 +220,7 @@ void test_padding_invalid_value(void **state)
 
 void test_padding_novalue(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-p", "a");
 
@@ -232,7 +232,7 @@ void test_padding_novalue(void **state)
 
 void test_tabstops_zero(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-t", "0");
 
@@ -244,7 +244,7 @@ void test_tabstops_zero(void **state)
 
 void test_tabstops_500(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-t", "500");
 
@@ -256,7 +256,7 @@ void test_tabstops_500(void **state)
 
 void test_tabstops_4X(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-t", "4X");
 
@@ -268,7 +268,7 @@ void test_tabstops_4X(void **state)
 
 void test_tabstops_4e(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-t", "4e");
 
@@ -280,7 +280,7 @@ void test_tabstops_4e(void **state)
 
 void test_tabstops_4ex(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-t", "4ex");
 
@@ -292,7 +292,7 @@ void test_tabstops_4ex(void **state)
 
 void test_tabstops_7(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-t", "7");
 
@@ -304,7 +304,7 @@ void test_tabstops_7(void **state)
 
 void test_alignment_invalid_hX(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-a", "hX");
 
@@ -316,7 +316,7 @@ void test_alignment_invalid_hX(void **state)
 
 void test_alignment_invalid_vX(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-a", "vX");
 
@@ -328,7 +328,7 @@ void test_alignment_invalid_vX(void **state)
 
 void test_alignment_invalid_jX(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-a", "jX");
 
@@ -340,7 +340,7 @@ void test_alignment_invalid_jX(void **state)
 
 void test_alignment_notset(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-a", "");
 
@@ -352,7 +352,7 @@ void test_alignment_notset(void **state)
 
 void test_alignment_incomplete(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-a", "v");
 
@@ -364,7 +364,7 @@ void test_alignment_incomplete(void **state)
 
 void test_inputfiles_illegal_third_file(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(3, "file1", "file2", "file3_ILLEGAL");
 
@@ -378,7 +378,7 @@ void test_inputfiles_illegal_third_file(void **state)
 
 void test_inputfiles_stdin_stdout(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-", "-");
 
@@ -390,7 +390,7 @@ void test_inputfiles_stdin_stdout(void **state)
 
 void test_inputfiles_stdin(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(1, "-");
 
@@ -402,7 +402,7 @@ void test_inputfiles_stdin(void **state)
 
 void test_inputfiles_input_nonexistent(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(1, "NON-EXISTENT");
 
@@ -414,7 +414,7 @@ void test_inputfiles_input_nonexistent(void **state)
 
 void test_inputfiles_actual_success(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "../utest/dummy_in.txt", "dummy_out.txt");
 
@@ -426,7 +426,7 @@ void test_inputfiles_actual_success(void **state)
 
 void test_command_line_design_empty(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(2, "-c", "");
 
@@ -438,7 +438,7 @@ void test_command_line_design_empty(void **state)
 
 void test_help(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(1, "-h");
 
@@ -450,7 +450,7 @@ void test_help(void **state)
 
 void test_version_requested(void **state)
 {
-    (void) state;  /* unused */
+    UNUSED(state);
 
     opt_t *actual = act(1, "-v");
 

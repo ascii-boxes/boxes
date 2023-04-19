@@ -25,15 +25,41 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <uniconv.h>
 #include <unictype.h>
 #include <unistr.h>
 #include <unitypes.h>
 #include <uniwidth.h>
 
 #include "boxes.h"
+#include "regulex.h"
 #include "shape.h"
 #include "tools.h"
 #include "unicode.h"
+
+
+
+static pcre2_code *pattern_ascii_id = NULL;
+static pcre2_code *pattern_ascii_id_strict = NULL;
+
+
+static pcre2_code *get_pattern_ascii_id(int strict)
+{
+    pcre2_code *result = NULL;
+    if (strict) {
+        if (pattern_ascii_id_strict == NULL) {
+            pattern_ascii_id_strict = compile_pattern("^(?!.*?--|none)[a-z][a-z0-9-]*(?<!-)$");
+        }
+        result = pattern_ascii_id_strict;
+    }
+    else {
+        if (pattern_ascii_id == NULL) {
+            pattern_ascii_id = compile_pattern("^(?!.*?[-_]{2,}|none)[a-zA-Z][a-zA-Z0-9_-]*(?<![-_])$");
+        }
+        result = pattern_ascii_id;
+    }
+    return result;
+}
 
 
 
@@ -343,6 +369,7 @@ void btrim(char *text, size_t *len)
 void btrim32(uint32_t *text, size_t *len)
 /*
  *  Remove trailing whitespace from line (unicode and escape sequence enabled version).
+ *  TODO replace by bxs_rtrim() from bxstring module
  *
  *      text     string to trim
  *      len      pointer to the length of the string in characters
@@ -727,6 +754,22 @@ int array_contains0(char **array, const char *s)
 
 
 
+int array_contains_bxs(bxstr_t **array, const size_t array_len, bxstr_t *s)
+{
+    int result = 0;
+    if (array != NULL && array_len > 0) {
+        for (size_t i = 0; i < array_len; ++i) {
+            if (bxs_strcmp(array[i], s) == 0) {
+                result = 1;
+                break;
+            }
+        }
+    }
+    return result;
+}
+
+
+
 size_t array_count0(char **array)
 {
     size_t num_elems = 0;
@@ -740,7 +783,7 @@ size_t array_count0(char **array)
 
 
 
-char *trimdup(char *s, char *e)
+char *trimdup(char *s, char *e)  // TODO consider removing, as we have bxs_trimdup()
 {
     if (s > e || (s == e && *s == '\0')) {
         return strdup("");
@@ -756,7 +799,7 @@ char *trimdup(char *s, char *e)
 
 
 
-int tag_is_valid(char *tag)
+int tag_is_valid(char *tag)  // TODO replace with is_ascii_id(strict)
 {
     if (tag == NULL) {
         return 0;
@@ -769,6 +812,17 @@ int tag_is_valid(char *tag)
         && tag[len - 1] != '-'
         && strstr(tag, "--") == NULL
         && strcmp(tag, "none") != 0;
+}
+
+
+
+int is_ascii_id(bxstr_t *s, int strict)
+{
+    if (s == NULL || s->num_chars == 0) {
+        return 0;
+    }
+    pcre2_code *pattern = get_pattern_ascii_id(strict);
+    return u32_regex_match(pattern, s->memory);
 }
 
 
@@ -801,6 +855,26 @@ void bx_fprintf(FILE *stream, const char *format, ...)
     va_start(va, format);
     vfprintf(stream, format, va);
     va_end(va);
+}
+
+
+
+FILE *bx_fopens(bxstr_t *pathname, char *mode)
+{
+    return bx_fopen(to_utf8(pathname->memory), mode);
+}
+
+
+
+FILE *bx_fopen(char *pathname, char *mode)
+{
+    /*
+     * On Linux/UNIX and OS X (Mac), one can access files with non-ASCII file names by passing them to fopen() as UTF-8.
+     * On Windows, a different function must be called. (Info: https://stackoverflow.com/a/35065142/1005481)
+     */
+    FILE *f = fopen(pathname, mode);
+    // TODO Windows
+    return f;
 }
 
 

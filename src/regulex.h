@@ -39,22 +39,65 @@
 
 
 
-/*
+/**
  * Compile the given pattern into a PCRE2 regular expression.
+ * @param pattern the pattern to compile
+ * @return the compiled pattern
  */
 pcre2_code *compile_pattern(char *pattern);
 
-/*
+
+/**
+ * Compile the given pattern into a PCRE2 regular expression.
+ * @param pattern the pattern to compile
+ * @return the compiled pattern
+ */
+pcre2_code *u32_compile_pattern(uint32_t *pattern);
+
+
+/**
+ * Determine if the given `subject_string` matches the given `pattern`.
+ * @param pattern the compiled pattern
+ * @param subject_string the string to check
+ * @return flag indicating a match (0 == no match, otherwise: match)
+ */
+int regex_match(pcre2_code *pattern, char *subject_string);
+
+
+/**
+ * Determine if the given `subject_string` matches the given `pattern`.
+ * @param pattern the compiled pattern
+ * @param subject_string the string to check, in UTF-32
+ * @return flag indicating a match (0 == no match, otherwise: match)
+ */
+int u32_regex_match(pcre2_code *pattern, uint32_t *subject_string);
+
+
+/**
  * Perform a regex replacement on the given string.
  *
- *  @param <search> the compiled pattern to search for
- *  @param <replace> the replacement string
- *  @param <input> the string to which the replacements shall be applied
- *  @param <input_len> the length of <input> in characters, not bytes
- *  @param <global> flag indicating whether all occurrences shall be replaced (true) or just the first (false)
+ *  @param search the compiled pattern to search for
+ *  @param replace the replacement string
+ *  @param input the string to which the replacements shall be applied
+ *  @param input_len the length of <input> in characters, not bytes
+ *  @param global flag indicating whether all occurrences shall be replaced (true) or just the first (false)
  *  @return a new string which is a copy of output with the replacements applied, or NULL on error
  */
 uint32_t *regex_replace(pcre2_code *search, char *replace, uint32_t *input, const size_t input_len, const int global);
+
+
+/**
+ * Perform a regex replacement on the given string.
+ *
+ *  @param search the compiled pattern to search for
+ *  @param replace the replacement string
+ *  @param input the string to which the replacements shall be applied
+ *  @param input_len the length of <input> in characters, not bytes
+ *  @param global flag indicating whether all occurrences shall be replaced (true) or just the first (false)
+ *  @return a new string which is a copy of output with the replacements applied, or NULL on error
+ */
+uint32_t *u32_regex_replace(pcre2_code *search, uint32_t *replace, uint32_t *input, const size_t input_len,
+        const int global);
 
 
 #endif

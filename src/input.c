@@ -123,7 +123,7 @@ int apply_substitutions(input_t *result, const int mode)
     errno = 0;
     opt.design->current_rule = rules;
     for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
-        rules[j].prog = compile_pattern(rules[j].search);
+        rules[j].prog = u32_compile_pattern(rules[j].search->memory);
         if (rules[j].prog == NULL) {
             return 5;
         }
@@ -144,8 +144,8 @@ int apply_substitutions(input_t *result, const int mode)
                     rules[j].prog, rules[j].repstr, u32_strconv_to_output(result->lines[k].mbtext),
                     (int) result->lines[k].num_chars, rules[j].mode);
             #endif
-            uint32_t *newtext = regex_replace(rules[j].prog, rules[j].repstr,
-                                              result->lines[k].mbtext, result->lines[k].num_chars, rules[j].mode == 'g');
+            uint32_t *newtext = u32_regex_replace(rules[j].prog, rules[j].repstr->memory,
+                    result->lines[k].mbtext, result->lines[k].num_chars, rules[j].mode == 'g');
             #ifdef REGEXP_DEBUG
                 fprintf (stderr, "\"%s\"\n", newtext ? u32_strconv_to_output(newtext) : "NULL");
             #endif

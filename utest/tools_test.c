@@ -145,4 +145,120 @@ void test_is_csi_reset(void **state)
 }
 
 
+void test_is_ascii_id_valid(void **state)
+{
+    (void) state; /* unused */
+
+    bxstr_t *s = bxs_from_ascii("valid");
+    assert_int_equal(1, is_ascii_id(s, 0));
+    bxs_free(s);
+
+    s = bxs_from_ascii("also-valid");
+    assert_int_equal(1, is_ascii_id(s, 0));
+    bxs_free(s);
+
+    s = bxs_from_ascii("fine2");
+    assert_int_equal(1, is_ascii_id(s, 0));
+    bxs_free(s);
+
+    s = bxs_from_ascii("A");
+    assert_int_equal(1, is_ascii_id(s, 0));
+    bxs_free(s);
+
+    s = bxs_from_ascii("A_2");
+    assert_int_equal(1, is_ascii_id(s, 0));
+    bxs_free(s);
+}
+
+
+void test_is_ascii_id_invalid(void **state)
+{
+    (void) state; /* unused */
+
+    assert_int_equal(0, is_ascii_id(NULL, 0));
+
+    bxstr_t *s = bxs_from_ascii("");
+    assert_int_equal(0, is_ascii_id(s, 0));
+    bxs_free(s);
+
+    s = bxs_from_ascii("a--b");
+    assert_int_equal(0, is_ascii_id(s, 0));
+    bxs_free(s);
+
+    s = bxs_from_ascii("also-_invalid");
+    assert_int_equal(0, is_ascii_id(s, 0));
+    bxs_free(s);
+
+    s = bxs_from_ascii("invalid-");
+    assert_int_equal(0, is_ascii_id(s, 0));
+    bxs_free(s);
+
+    s = bxs_from_ascii("42");
+    assert_int_equal(0, is_ascii_id(s, 0));
+    bxs_free(s);
+
+    uint32_t *ustr32 = u32_strconv_from_arg(
+            "\xe5\x85\xac\xe7\x88\xb8\xe8\xa6\x81\xe9\x81\x93\xef\xbc\x81",  /* 公爸要道！ */
+            "UTF-8");
+    s = bxs_from_unicode(ustr32);
+    assert_int_equal(0, is_ascii_id(s, 0));
+    bxs_free(s);
+    BFREE(ustr32);
+}
+
+
+void test_is_ascii_id_strict_valid(void **state)
+{
+    (void) state; /* unused */
+
+    bxstr_t *s = bxs_from_ascii("valid");
+    assert_int_equal(1, is_ascii_id(s, 1));
+    bxs_free(s);
+
+    s = bxs_from_ascii("also-valid");
+    assert_int_equal(1, is_ascii_id(s, 1));
+    bxs_free(s);
+
+    s = bxs_from_ascii("fine2");
+    assert_int_equal(1, is_ascii_id(s, 1));
+    bxs_free(s);
+
+    s = bxs_from_ascii("a");
+    assert_int_equal(1, is_ascii_id(s, 1));
+    bxs_free(s);
+}
+
+
+void test_is_ascii_id_strict_invalid(void **state)
+{
+    (void) state; /* unused */
+
+    assert_int_equal(0, is_ascii_id(NULL, 1));
+
+    bxstr_t *s = bxs_from_ascii("");
+    assert_int_equal(0, is_ascii_id(s, 1));
+    bxs_free(s);
+
+    s = bxs_from_ascii("a--b");
+    assert_int_equal(0, is_ascii_id(s, 1));
+    bxs_free(s);
+
+    s = bxs_from_ascii("also-_invalid");
+    assert_int_equal(0, is_ascii_id(s, 1));
+    bxs_free(s);
+
+    s = bxs_from_ascii("invalid-");
+    assert_int_equal(0, is_ascii_id(s, 1));
+    bxs_free(s);
+
+    s = bxs_from_ascii("42");
+    assert_int_equal(0, is_ascii_id(s, 1));
+    bxs_free(s);
+
+    s = bxs_from_ascii("A_2");
+    assert_int_equal(0, is_ascii_id(s, 1));
+    bxs_free(s);
+}
+
+
 /* vim: set cindent sw=4: */
