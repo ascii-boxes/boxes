@@ -18,7 +18,7 @@ Usage:  boxes [options] [infile [outfile]]
         -i mode  indentation mode [default: box]
         -k bool  leading/trailing blank line retention on removal
         -l       list available box designs w/ samples
-        -m       mend box, i.e. remove it and redraw it afterwards
+        -m       mend (repair) box
         -n enc   Character encoding of input and output [default: CHARSET_DEFAULT]
         -p fmt   padding [default: none]
         -q qry   query the list of designs by tag

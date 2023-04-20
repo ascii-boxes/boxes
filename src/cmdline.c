@@ -92,7 +92,7 @@ void usage_long(FILE *st)
     fprintf(st, "        -i mode  indentation mode [default: box]\n");
     fprintf(st, "        -k bool  leading/trailing blank line retention on removal\n");
     fprintf(st, "        -l       list available box designs w/ samples\n");
-    fprintf(st, "        -m       mend box, i.e. remove it and redraw it afterwards\n");
+    fprintf(st, "        -m       mend (repair) box\n");
     fprintf(st, "        -n enc   Character encoding of input and output [default: %s]\n", locale_charset());
     fprintf(st, "        -p fmt   padding [default: none]\n");
     fprintf(st, "        -q qry   query the list of designs by tag\n"); /* with "(undoc)" as query, trigger undocumented webui stuff instead */
