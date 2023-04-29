@@ -37,7 +37,8 @@ jobs:
               run: make covtest
 
             - name: Coveralls
-              uses: coverallsapp/github-action@master
+              uses: coverallsapp/github-action@v2
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
-                  path-to-lcov: out/lcov-total.info
+                  file: out/lcov-total.info
+                  format: lcov
