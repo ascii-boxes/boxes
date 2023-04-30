@@ -1013,4 +1013,98 @@ int action_add_regex_rule(pass_to_bison *bison_args, char *type, reprule_t **rul
 }
 
 
+
+int action_first_shape_line(pass_to_bison *bison_args, bxstr_t *line, sentry_t *shape)
+{
+    sentry_t rval = SENTRY_INITIALIZER;
+
+    #ifdef PARSER_DEBUG
+        fprintf(stderr, "Initializing a shape entry with first line\n");
+    #endif
+
+    size_t error_pos = 0;
+    if (!bxs_valid_in_shape(line, &error_pos)) {
+        yyerror(bison_args, "invalid character in shape line at position %d", (int) error_pos);
+        return RC_ERROR;
+    }
+
+    rval.width = line->num_columns;
+    rval.height = 1;
+
+    rval.chars = (char **) malloc(sizeof(char *));
+    if (rval.chars == NULL) {
+        perror(PROJECT ": shape_lines21");
+        return RC_ABORT;
+    }
+    rval.chars[0] = (char *) strdup(line->ascii);
+    if (rval.chars[0] == NULL) {
+        perror(PROJECT ": shape_lines22");
+        return RC_ABORT;
+    }
+
+    rval.mbcs = (bxstr_t **) malloc(sizeof(bxstr_t *));
+    if (rval.mbcs == NULL) {
+        perror(PROJECT ": shape_lines23");
+        return RC_ABORT;
+    }
+    rval.mbcs[0] = bxs_strdup(line);
+    if (rval.mbcs[0] == NULL) {
+        perror(PROJECT ": shape_lines24");
+        return RC_ABORT;
+    }
+
+    memcpy(shape, &rval, sizeof(sentry_t));
+    return RC_SUCCESS;
+}
+
+
+
+int action_add_shape_line(pass_to_bison *bison_args, sentry_t *shape, bxstr_t *line)
+{
+    #ifdef PARSER_DEBUG
+        fprintf(stderr, "Extending a shape entry\n");
+    #endif
+
+    size_t slen = line->num_columns;
+    if (slen != shape->width) {
+        yyerror(bison_args, "all elements of a shape spec must be of equal length");
+        return RC_ERROR;
+    }
+
+    size_t error_pos = 0;
+    if (!bxs_valid_in_shape(line, &error_pos)) {
+        yyerror(bison_args, "invalid character in shape line at position %d", (int) error_pos);
+        return RC_ERROR;
+    }
+
+    shape->height++;
+
+    char **tmp = (char **) realloc(shape->chars, shape->height * sizeof(char *));
+    if (tmp == NULL) {
+        perror(PROJECT ": shape_lines11");
+        return RC_ABORT;
+    }
+    shape->chars = tmp;
+    shape->chars[shape->height - 1] = (char *) strdup(line->ascii);
+    if (shape->chars[shape->height - 1] == NULL) {
+        perror(PROJECT ": shape_lines12");
+        return RC_ABORT;
+    }
+
+    bxstr_t **mtmp = (bxstr_t **) realloc(shape->mbcs, shape->height * sizeof(bxstr_t *));
+    if (mtmp == NULL) {
+        perror(PROJECT ": shape_lines13");
+        return RC_ABORT;
+    }
+    shape->mbcs = mtmp;
+    shape->mbcs[shape->height - 1] = bxs_strdup(line);
+    if (shape->mbcs[shape->height - 1] == NULL) {
+        perror(PROJECT ": shape_lines14");
+        return RC_ABORT;
+    }
+
+    return RC_SUCCESS;
+}
+
+
 /* vim: set cindent sw=4: */

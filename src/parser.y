@@ -390,91 +390,15 @@ shape_def: '(' shape_lines ')'
 
 shape_lines: shape_lines ',' STRING
     {
-        sentry_t rval = $1; // TODO move this to parsecode.c
-        size_t slen = $3->num_columns;
-
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Extending a shape entry\n");
-        #endif
-
-        if (slen != rval.width) {
-            yyerror(bison_args, "all elements of a shape spec must be of equal length");
-            YYERROR;
-        }
-
-        size_t error_pos = 0;
-        if (!bxs_valid_in_shape($3, &error_pos)) {
-            yyerror(bison_args, "invalid character in shape line at position %d", (int) error_pos);
-            YYERROR;
-        }
-
-        rval.height++;
-
-        char **tmp = (char **) realloc(rval.chars, rval.height * sizeof(char *));
-        if (tmp == NULL) {
-            perror (PROJECT": shape_lines11");
-            YYABORT;
-        }
-        rval.chars = tmp;
-        rval.chars[rval.height - 1] = (char *) strdup ($3->ascii);
-        if (rval.chars[rval.height-1] == NULL) {
-            perror (PROJECT": shape_lines12");
-            YYABORT;
-        }
-
-        bxstr_t **mtmp = (bxstr_t **) realloc(rval.mbcs, rval.height * sizeof(bxstr_t *));
-        if (mtmp == NULL) {
-            perror (PROJECT": shape_lines13");
-            YYABORT;
-        }
-        rval.mbcs = mtmp;
-        rval.mbcs[rval.height - 1] = bxs_strdup($3);
-        if (rval.mbcs[rval.height - 1] == NULL) {
-            perror (PROJECT": shape_lines14");
-            YYABORT;
-        }
-
+        sentry_t rval = $1;
+        invoke_action(action_add_shape_line(bison_args, &rval, $3));
         $$ = rval;
     }
 
 | STRING
     {
-        sentry_t rval = SENTRY_INITIALIZER;
-
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Initializing a shape entry with first line\n");
-        #endif
-
-        size_t error_pos = 0;
-        if (!bxs_valid_in_shape($1, &error_pos)) {
-            yyerror(bison_args, "invalid character in shape line at position %d", (int) error_pos);
-            YYERROR;
-        }
-
-        rval.width = $1->num_columns;
-        rval.height = 1;
-
-        rval.chars = (char **) malloc (sizeof(char*));
-        if (rval.chars == NULL) {
-            perror (PROJECT": shape_lines21");
-            YYABORT;
-        }
-        rval.chars[0] = (char *) strdup ($1->ascii);
-        if (rval.chars[0] == NULL) {
-            perror (PROJECT": shape_lines22");
-            YYABORT;
-        }
-
-        rval.mbcs = (bxstr_t **) malloc(sizeof(bxstr_t *));
-        if (rval.mbcs == NULL) {
-            perror (PROJECT": shape_lines23");
-            YYABORT;
-        }
-        rval.mbcs[0] = bxs_strdup($1);
-        if (rval.mbcs[0] == NULL) {
-            perror (PROJECT": shape_lines24");
-            YYABORT;
-        }
+        sentry_t rval;
+        invoke_action(action_first_shape_line(bison_args, $1, &rval));
         $$ = rval;
     }
 ;

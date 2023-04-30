@@ -163,10 +163,34 @@ int tag_record(pass_to_bison *bison_args, bxstr_t *tag);
  * @param bison_args the parser state
  * @param sample the sample block content (non-empty when this is invoked)
  * @return 0: success;
- *         1: YYERROR must be invoked
+ *         1: YYERROR must be invoked;
  *         2: YYABORT must be invoked
  */
 int action_sample_block(pass_to_bison *bison_args, bxstr_t *sample);
+
+
+/**
+ * Start a new shape by adding its first line.
+ * @param bison_args the parser state
+ * @param line the first line of the new shape
+ * @param shape the address where the new shape shall be stored
+ * @return 0: success;
+ *         1: YYERROR must be invoked;
+ *         2: YYABORT must be invoked
+ */
+int action_first_shape_line(pass_to_bison *bison_args, bxstr_t *line, sentry_t *shape);
+
+
+/**
+ * Extend a shape by adding another line.
+ * @param bison_args the parser state
+ * @param shape the address of the shape to be extended
+ * @param line the new line
+ * @return 0: success;
+ *         1: YYERROR must be invoked;
+ *         2: YYABORT must be invoked
+ */
+int action_add_shape_line(pass_to_bison *bison_args, sentry_t *shape, bxstr_t *line);
 
 
 #endif
