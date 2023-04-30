@@ -41,6 +41,8 @@
 
 static pcre2_code *eol_pattern = NULL;
 
+static pcre2_code *semver_pattern = NULL;
+
 
 
 static int check_sizes(pass_to_bison *bison_args)
@@ -714,7 +716,7 @@ int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char
 
     p = design_primary_name;
     while (*p) {
-        if (*p < 32 || *p > 126) {  // CHECK this check may be unnecessary due to lexer's ASCII_ID
+        if (*p < 32 || *p > 126) {  /* CHECK this check may be unnecessary due to lexer's ASCII_ID */
             yyerror(bison_args, "box design name must consist of printable standard ASCII characters.");
             return RC_ERROR;
         }
@@ -752,11 +754,12 @@ int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char
 
 static int is_semantic_version(char *version)
 {
-    pcre2_code *version_pattern     /* CHECK cache compiled pattern to speed up config file parsing */
-            = compile_pattern("^(0|[1-9]\\d*)(?:\\.(0|[1-9]\\d*))?(?:\\.(0|[1-9]\\d*))?(?:[+-][a-zA-Z0-9\\.+-]+)?$");
-    int result = regex_match(version_pattern, version);
-    pcre2_code_free(version_pattern);
-    return result;
+    if (semver_pattern == NULL) {
+        /* Not a strict semver, "1" or "1.0" are accepted. */
+        semver_pattern = compile_pattern(
+            "^(0|[1-9]\\d*)(?:\\.(0|[1-9]\\d*))?(?:\\.(0|[1-9]\\d*))?(?:[+-][a-zA-Z0-9\\.+-]+)?$");
+    }
+    return regex_match(semver_pattern, version);
 }
 
 

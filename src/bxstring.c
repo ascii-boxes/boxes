@@ -110,7 +110,7 @@ bxstr_t *bxs_from_unicode(uint32_t *pInput)
             result->visible_char = (size_t *) realloc(result->visible_char, map_size * sizeof(size_t));
         }
 
-        if (!is_allowed_anywhere(c)) { /* CHECK currently used for config only, reconsider when using on input data */
+        if (!is_allowed_anywhere(c)) { /* currently used for config only, reconsider when using on input data */
             bx_fprintf(stderr, "%s: illegal character '%lc' (%#010x) encountered in string\n", PROJECT, c, (int) c);
             bxs_free(result);
             return NULL;

@@ -369,7 +369,7 @@ void btrim(char *text, size_t *len)
 void btrim32(uint32_t *text, size_t *len)
 /*
  *  Remove trailing whitespace from line (unicode and escape sequence enabled version).
- *  TODO replace by bxs_rtrim() from bxstring module
+ *  CHECK replace by bxs_rtrim() from bxstring module
  *
  *      text     string to trim
  *      len      pointer to the length of the string in characters
@@ -783,7 +783,7 @@ size_t array_count0(char **array)
 
 
 
-char *trimdup(char *s, char *e)  // TODO consider removing, as we have bxs_trimdup()
+char *trimdup(char *s, char *e)
 {
     if (s > e || (s == e && *s == '\0')) {
         return strdup("");
@@ -799,19 +799,10 @@ char *trimdup(char *s, char *e)  // TODO consider removing, as we have bxs_trimd
 
 
 
-int tag_is_valid(char *tag)  // TODO replace with is_ascii_id(strict)
+int tag_is_valid(char *tag)
 {
-    if (tag == NULL) {
-        return 0;
-    }
-
-    const size_t len = strlen(tag);
-    return len > 0
-        && strspn(tag, "abcdefghijklmnopqrstuvwxyz-0123456789") == len
-        && strchr("abcdefghijklmnopqrstuvwxyz", tag[0]) != NULL
-        && tag[len - 1] != '-'
-        && strstr(tag, "--") == NULL
-        && strcmp(tag, "none") != 0;
+    pcre2_code *pattern = get_pattern_ascii_id(1);
+    return regex_match(pattern, tag);
 }
 
 
