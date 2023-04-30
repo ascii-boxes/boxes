@@ -222,7 +222,14 @@ alias: ASCII_ID
 
 alias_list: alias | alias_list ',' alias;
 
-design_id: ASCII_ID | ASCII_ID ',' alias_list;
+design_id: ASCII_ID | ASCII_ID ',' alias_list
+
+| WORD
+    {
+        yyerror(bison_args, "box design name must consist of printable standard ASCII characters.");
+        YYERROR;
+    }
+;
 
 design: YBOX design_id
     {

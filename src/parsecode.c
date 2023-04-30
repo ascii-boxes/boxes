@@ -695,7 +695,6 @@ int action_parent_config(pass_to_bison *bison_args, bxstr_t *filepath)
 int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char *name_at_end)
 {
     design_t *tmp;
-    char *p;
 
     #ifdef PARSER_DEBUG
         fprintf(stderr, "--------- ADDING DESIGN \"%s\".\n", design_primary_name);
@@ -712,15 +711,6 @@ int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char
     if (design_name_exists(bison_args, design_primary_name)) {
         yyerror(bison_args, "duplicate box design name -- %s", design_primary_name);
         return RC_ERROR;
-    }
-
-    p = design_primary_name;
-    while (*p) {
-        if (*p < 32 || *p > 126) {  /* CHECK this check may be unnecessary due to lexer's ASCII_ID */
-            yyerror(bison_args, "box design name must consist of printable standard ASCII characters.");
-            return RC_ERROR;
-        }
-        ++p;
     }
 
     bison_args->num_mandatory = 0;

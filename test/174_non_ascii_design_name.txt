@@ -1,0 +1,11 @@
+:ARGS
+-f 174_non_ascii_design_name.cfg
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: 174_non_ascii_design_name.cfg: line 2: box design name must consist of printable standard ASCII characters.
+boxes: 174_non_ascii_design_name.cfg: line 2: skipping to next design
+boxes: no valid data in config file -- 174_non_ascii_design_name.cfg
+boxes: no valid designs found
+:EOF
