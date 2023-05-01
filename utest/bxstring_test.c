@@ -303,6 +303,44 @@ void test_ansi_unicode_tabs(void **state)
 
 
 
+void test_ansi_unicode_broken_escapes(void **state)
+{
+    UNUSED(state);
+
+    /* "\x1b[38;5;203 X" is the first escape sequence, followed by
+     * "X " (visible) and
+     * "\x1b[0m" (regular escape sequence) and
+     * "__" (visible)
+     * "\x1b[38;5;203m" (regular, invisible)
+     * "b" (visible)
+     * "\x1b[" (broken, counts as invisible, and belonging to the previous 'b')
+     */
+    uint32_t *ustr32 = u32_strconv_from_arg("\x1b[38;5;203 XX \x1b[0m__\x1b[38;5;203mb\x1b[", "ASCII");
+    fprintf(stderr, "BOO\n");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+    fprintf(stderr, "BAA\n");
+
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_string_equal("X __b", actual->ascii);
+    assert_int_equal(0, (int) actual->indent);
+    assert_int_equal(5, (int) actual->num_columns);
+    assert_int_equal(34, (int) actual->num_chars);
+    assert_int_equal(5, (int) actual->num_chars_visible);
+    assert_int_equal(29, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+    int expected_firstchar_idx[] = {0, 13, 18, 19, 20, 34};
+    assert_array_equal(expected_firstchar_idx, actual->first_char, 6);
+    int expected_vischar_idx[] = {12, 13, 18, 19, 31, 34};
+    assert_array_equal(expected_vischar_idx, actual->visible_char, 6);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
 void test_ansi_unicode_null(void **state)
 {
     UNUSED(state);
@@ -934,8 +972,6 @@ void test_bxs_valid_in_filename_error(void **state)
     bxs_free(bxstr_vis_invis);
 }
 
-
-// TODO test case for incomplete/broken escape sequences
 
 
 void test_bxs_free_null(void **state)

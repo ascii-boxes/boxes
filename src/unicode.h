@@ -137,7 +137,7 @@ ucs4_t to_utf32(char ascii);
  * @param invis Will contain the number of invisible characters skipped in order to get to the new position.
  *      This will be 0 unless `s` pointed to an ESC char, in which case it contains the length in characters of that
  *      escape sequence.
- * @return The next position, or 0 if the end of the string was reached
+ * @return The next position, or a pointer to the terminating 0 if the end of the string was reached
  */
 uint32_t *advance_next32(const uint32_t *s, size_t *invis);
 

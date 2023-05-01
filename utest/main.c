@@ -128,6 +128,7 @@ int main(void)
         cmocka_unit_test_setup(test_ansi_unicode_invisible_only, beforeTest),
         cmocka_unit_test_setup(test_ansi_unicode_illegalchar, beforeTest),
         cmocka_unit_test_setup(test_ansi_unicode_tabs, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_broken_escapes, beforeTest),
         cmocka_unit_test_setup(test_ansi_unicode_null, beforeTest),
         cmocka_unit_test_setup(test_bxs_strdup, beforeTest),
         cmocka_unit_test_setup(test_bxs_trimdup_null, beforeTest),

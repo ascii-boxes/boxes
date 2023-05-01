@@ -33,6 +33,7 @@ void test_ansi_unicode_blanks(void **state);
 void test_ansi_unicode_invisible_only(void **state);
 void test_ansi_unicode_illegalchar(void **state);
 void test_ansi_unicode_tabs(void **state);
+void test_ansi_unicode_broken_escapes(void **state);
 void test_ansi_unicode_null(void **state);
 
 void test_bxs_strdup(void **state);

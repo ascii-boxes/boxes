@@ -165,7 +165,7 @@ uint32_t *advance_next32(const uint32_t *s, size_t *invis)
             /* Found '[' char after ESC. A CSI sequence has started. */
             (*invis)++;
             ansipos++;
-        } else if (ansipos == 1 && c >= 0x40 && c <= 0x5f) {
+        } else if (ansipos == 1 && c >= 0x40 && c <= 0x5f) { /* between '@' and '_' (mostly uppercase letters) */
             /* Found a byte designating the end of a two-byte escape sequence */
             (*invis)++;
             ansipos = 0;
@@ -182,6 +182,9 @@ uint32_t *advance_next32(const uint32_t *s, size_t *invis)
         } else {
             break;
         }
+    }
+    if (rest == NULL) {
+        rest = s + u32_strlen(s);
     }
     return (uint32_t *) rest;
 }
