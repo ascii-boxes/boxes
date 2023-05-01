@@ -29,6 +29,7 @@
 #include "boxes.h"
 #include "global_mock.h"
 #include "regulex.h"
+#include "regulex_test.h"
 
 
 

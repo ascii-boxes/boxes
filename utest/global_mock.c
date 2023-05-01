@@ -18,14 +18,19 @@
  */
 
 #include "config.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <locale.h>
 #include <uniconv.h>
+
 #include "boxes.h"
 #include "unicode.h"
 #include "tools.h"
+#include "global_mock.h"
+
+
 
 design_t *designs = NULL;
 

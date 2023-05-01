@@ -18,10 +18,12 @@
  */
 
 #include "config.h"
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
+
 #include "boxes.h"
 #include "cmdline.h"
 #include "tools.h"
