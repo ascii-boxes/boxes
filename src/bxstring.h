@@ -157,6 +157,16 @@ int bxs_is_empty(bxstr_t *pString);
 
 
 /**
+ * Determine if the character at position `idx` in the given `pString` is a visible character. If `idx` is out of
+ * bounds, this function will return 0.
+ * @param pString the string to check (may be NULL, which means no visible characters)
+ * @param idx the index in `pString` of the character to check (zero-based)
+ * @return 1 for visible, 0 for not visible
+ */
+int bxs_is_visible_char(bxstr_t *pString, size_t idx);
+
+
+/**
  * Determine whether the given `pString` is a valid string under at least one condition. This will return `false` for
  * strings which should really never occur anywhere.
  * @param pString the string to check (may be NULL, which counts as invalid)

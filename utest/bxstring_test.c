@@ -906,6 +906,32 @@ void test_bxs_is_empty_null(void **state)
 
 
 
+void test_bxs_is_visible_char(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("\x1b[38;5;203mX\x1b[0m \x1b[38;5;203mY\x1b[0m", "ASCII");
+    assert_non_null(ustr32);
+    bxstr_t *input = bxs_from_unicode(ustr32);
+
+    assert_int_equal(0, bxs_is_visible_char(NULL, 4));
+    assert_int_equal(0, bxs_is_visible_char(input, 1000));
+    assert_int_equal(0, bxs_is_visible_char(input, 0));
+    assert_int_equal(0, bxs_is_visible_char(input, 1));
+    assert_int_equal(0, bxs_is_visible_char(input, 31));
+    assert_int_equal(0, bxs_is_visible_char(input, 32));
+    assert_int_equal(0, bxs_is_visible_char(input, 33));
+
+    assert_int_equal(1, bxs_is_visible_char(input, 11));
+    assert_int_equal(1, bxs_is_visible_char(input, 16));
+    assert_int_equal(1, bxs_is_visible_char(input, 28));
+
+    BFREE(ustr32);
+    bxs_free(input);
+}
+
+
+
 void test_bxs_strcmp(void **state)
 {
     UNUSED(state);

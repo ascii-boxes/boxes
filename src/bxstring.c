@@ -351,6 +351,25 @@ int bxs_is_empty(bxstr_t *pString)
 
 
 
+int bxs_is_visible_char(bxstr_t *pString, size_t idx)
+{
+    int result = 0;
+    if (pString != NULL) {
+        for (size_t i = 0; i <= idx && i < pString->num_chars_visible; i++) {
+            if (pString->visible_char[i] == idx) {
+                result = 1;
+                break;
+            }
+            else if (pString->visible_char[i] > idx) {
+                break;
+            }
+        }
+    }
+    return result;
+}
+
+
+
 int bxs_strcmp(bxstr_t *s1, bxstr_t *s2)
 {
     if (s1 == NULL) {

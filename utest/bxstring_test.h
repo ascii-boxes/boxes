@@ -67,6 +67,8 @@ void test_bxs_to_output(void **state);
 
 void test_bxs_is_empty_null(void **state);
 
+void test_bxs_is_visible_char(void **state);
+
 void test_bxs_strcmp(void **state);
 
 void test_bxs_valid_anywhere_error(void **state);
