@@ -550,6 +550,8 @@ char *nspaces(const size_t n)
 
 
 
+#if defined(DEBUG) || 0
+
 /**
  *  Debugging Code: Display contents of input structure
  */
@@ -589,6 +591,8 @@ void print_input_lines(const char *heading)
     fprintf(stderr, "  Indentation: %2d spaces\n", (int) input.indent);
     fprintf(stderr, "Final newline: %s\n", input.final_newline ? "yes" : "no");
 }
+
+#endif
 
 
 
