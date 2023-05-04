@@ -208,7 +208,7 @@ static char *locate_config_common(int *error_printed)
     }
 
     #ifdef DISCOVERY_DEBUG
-        fprintf(stderr, "locate_config_common() - exit -> [%s]\n", result);
+        fprintf(stderr, "locate_config_common() - exit -> [%s]\n", result != NULL ? result : "(null)");
     #endif
     return result;
 }

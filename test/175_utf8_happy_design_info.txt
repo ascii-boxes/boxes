@@ -1,0 +1,33 @@
+:ARGS
+-f 175_utf8_happy_design_info.cfg -d designA -l
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+Complete Design Information for "designA":
+------------------------------------------
+Alias Names:            none
+Author:                 沐宸
+Original Designer:      John Doe
+Creation Date:          (unknown)
+Current Revision:       (unknown)
+Configuration File:     175_utf8_happy_design_info.cfg
+Indentation Mode:       box (indent box)
+Replacement Rules:      1. (glob) "ä" WITH "ö"
+Reversion Rules:        1. (glob) "ö" TO "ä"
+Minimum Box Dimensions: 15 x 4  (width x height)
+Default Padding:        left 1, right 1
+Default Killblank:      yes
+Tags:                   none
+Elastic Shapes:         NNW, NNE, E, S, W
+Defined Shapes:          NW: "┏" 
+                        NNW: "━" 
+                          N: " [38;5;154m沐[0m[38;5;184m宸[0m[38;5;184m [0m[38;5;184m若[0m[38;5;214m汐[0m " 
+                        NNE: "━" 
+                         NE: "┓" 
+                          E: "┃" 
+                         SE: "┗" 
+                          S: "━" 
+                         SW: "┛" 
+                          W: "⧹",
+                             "╱" 
+:EOF

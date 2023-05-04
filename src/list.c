@@ -166,15 +166,17 @@ static void print_tags(tagstats_t *tagstats, size_t num_tags)
 
 
 
-static bxstr_t *escape(const bxstr_t *org, const int pLength)
+static bxstr_t *escape(bxstr_t *org)
 {
     const ucs4_t char_backslash = to_utf32('\\');
     const ucs4_t char_quote = to_utf32('"');
 
     uint32_t *temp = (uint32_t *) calloc(2 * org->num_chars + 1, sizeof(uint32_t));
-    int orgIdx, resultIdx;
-    for (orgIdx = 0, resultIdx = 0; orgIdx < pLength; ++orgIdx, ++resultIdx) {
-        if (is_char_at(org->memory, orgIdx, char_backslash) || is_char_at(org->memory, orgIdx, char_quote)) {
+    size_t orgIdx, resultIdx;
+    for (orgIdx = 0, resultIdx = 0; orgIdx < org->num_chars; ++orgIdx, ++resultIdx) {
+        if ((is_char_at(org->memory, orgIdx, char_backslash) || is_char_at(org->memory, orgIdx, char_quote))
+                && bxs_is_visible_char(org, orgIdx))
+        {
             set_char_at(temp, resultIdx++, char_backslash);
         }
         set_char_at(temp, resultIdx, org->memory[orgIdx]);
@@ -336,7 +338,7 @@ static void print_design_details(design_t *d)
                 continue;
             }
             for (size_t w = 0; w < d->shape[i].height; ++w) {
-                bxstr_t *escaped_line = escape(d->shape[i].mbcs[w], d->shape[i].width);
+                bxstr_t *escaped_line = escape(d->shape[i].mbcs[w]);
                 fprintf(opt.outfile, "%-24s%3s%c \"%s\"%c%s",
                         (first_shape == 1 && w == 0 ? "Defined Shapes:" : ""),
                         (w == 0 ? shape_name[i] : ""), (w == 0 ? ':' : ' '),
