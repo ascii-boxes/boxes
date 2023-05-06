@@ -160,6 +160,22 @@ void test_killblank_multiple(void **state)
 }
 
 
+void test_killblank_long(void **state)
+{
+    UNUSED(state);
+
+    opt_t *actual = act(2, "--kill-blank", "--remove");
+
+    assert_non_null(actual);
+    assert_int_equal(1, actual->killblank);
+
+    actual = act(2, "--no-kill-blank", "--remove");
+
+    assert_non_null(actual);
+    assert_int_equal(0, actual->killblank);
+}
+
+
 void test_padding_top_bottom(void **state)
 {
     UNUSED(state);

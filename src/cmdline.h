@@ -20,6 +20,18 @@
 #ifndef CMDLINE_H
 #define CMDLINE_H
 
+#include <stdio.h>
+
+#include "boxes.h"
+
+
+
+/*
+ * Some ints that define return values for getopt_long() to indicate certain long options.
+ */
+#define OPT_KILLBLANK 1003
+#define OPT_NO_KILLBLANK 1004
+
 
 /**
  * Print usage information on stream `st`, including a header text.

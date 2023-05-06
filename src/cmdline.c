@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include <errno.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
@@ -81,25 +82,27 @@ void usage_long(FILE *st)
     fprintf(st, "%s - draws any kind of box around your text (or removes it)\n", PROJECT);
     fprintf(st, "        Website: https://boxes.thomasjensen.com/\n");
     fprintf(st, "Usage:  %s [options] [infile [outfile]]\n", PROJECT);
-    fprintf(st, "        -a fmt   alignment/positioning of text inside box [default: hlvt]\n");
-    fprintf(st, "        -c str   use single shape box design where str is the W shape\n");
-    fprintf(st, "        -d name  box design [default: first one in file]\n");
-    fprintf(st, "        -e eol   Override line break type (experimental) [default: %s]\n",
-                                  strcmp(EOL_DEFAULT, "\r\n") == 0 ? "CRLF" : "LF");
-    fprintf(st, "        -f file  configuration file [default: %s]\n",
-                                  config_file != NULL ? bxs_to_output(config_file) : "none");
-    fprintf(st, "        -h       print usage information\n");
-    fprintf(st, "        -i mode  indentation mode [default: box]\n");
-    fprintf(st, "        -k bool  leading/trailing blank line retention on removal\n");
-    fprintf(st, "        -l       list available box designs w/ samples\n");
-    fprintf(st, "        -m       mend (repair) box\n");
-    fprintf(st, "        -n enc   Character encoding of input and output [default: %s]\n", locale_charset());
-    fprintf(st, "        -p fmt   padding [default: none]\n");
-    fprintf(st, "        -q qry   query the list of designs by tag\n"); /* with "(undoc)" as query, trigger undocumented webui stuff instead */
-    fprintf(st, "        -r       remove box\n");
-    fprintf(st, "        -s wxh   box size (width w and/or height h)\n");
-    fprintf(st, "        -t str   tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
-    fprintf(st, "        -v       print version information\n");
+    fprintf(st, "  -a, --align <fmt>     Alignment/positioning of text inside box [default: hlvt]\n");
+    fprintf(st, "  -c, --create <str>    Use single shape box design where str is the W shape\n");
+    fprintf(st, "  -d, --design <name>   Box design [default: first one in file]\n");
+    fprintf(st, "  -e, --eol <eol>       Override line break type (experimental) [default: %s]\n",
+                                         strcmp(EOL_DEFAULT, "\r\n") == 0 ? "CRLF" : "LF");
+    fprintf(st, "  -f, --config <file>   Configuration file [default: %s]\n",
+                                         config_file != NULL ? bxs_to_output(config_file) : "none");
+    fprintf(st, "  -h, --help            Print usage information\n");
+    fprintf(st, "  -i, --indent <mode>   Indentation mode [default: box]\n");
+    fprintf(st, "  -k <bool>             Leading/trailing blank line retention on removal\n");
+    fprintf(st, "      --kill-blank      Kill leading/trailing blank lines on removal (like -k true)\n");
+    fprintf(st, "      --no-kill-blank   Retain leading/trailing blank lines on removal (like -k false)\n");
+    fprintf(st, "  -l, --list            List available box designs w/ samples\n");
+    fprintf(st, "  -m, --mend            Mend (repair) box\n");
+    fprintf(st, "  -n, --encoding <enc>  Character encoding of input and output [default: %s]\n", locale_charset());
+    fprintf(st, "  -p, --padding <fmt>   Padding [default: none]\n");
+    fprintf(st, "  -q, --tag-query <qry> Query the list of designs by tag\n"); /* with "(undoc)" as query, trigger undocumented webui stuff instead */
+    fprintf(st, "  -r, --remove          Remove box\n");
+    fprintf(st, "  -s, --size <wxh>      Box size (width w and/or height h)\n");
+    fprintf(st, "  -t, --tabs <str>      Tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
+    fprintf(st, "  -v, --version         Print version information\n");
 
     bxs_free(config_file);
 }
@@ -110,7 +113,8 @@ static opt_t *create_new_opt()
 {
     opt_t *result = (opt_t *) calloc(1, sizeof(opt_t));
     if (result != NULL) {
-        /* all valued initialized with 0 or NULL */
+        /* all values initialized with 0 or NULL */
+        result->color = color_from_terminal;
         result->tabstop = DEF_TABSTOP;
         result->eol = "\n";      /* we must default to "\n" instead of EOL_DEFAULT as long as stdout is in text mode */
         result->tabexp = 'e';
@@ -623,17 +627,41 @@ opt_t *process_commandline(int argc, char *argv[])
     #endif
 
     opt_t *result = create_new_opt();
-    optind = 1;   /* ensure that getopt() will process all arguments, even in unit test situations */
 
-    /* Intercept '--help' and '-?' cases first, as they are not supported by getopt() */
-    if (argc >= 2 && argv[1] != NULL && (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-?") == 0)) {
+    /* Intercept '-?' case first, as it is not supported by getopt_long() */
+    if (argc >= 2 && argv[1] != NULL && strcmp(argv[1], "-?") == 0) {
         result->help = 1;
         return result;
     }
 
+    optind = 1;   /* ensure that getopt() will process all arguments, even in unit test situations */
+    int option_index = 0;
+    const struct option long_options[] = {
+        { "align",         required_argument, NULL, 'a' },
+        { "create",        required_argument, NULL, 'c' },
+        { "design",        required_argument, NULL, 'd' },
+        { "eol",           required_argument, NULL, 'e' },
+        { "config",        required_argument, NULL, 'f' },
+        { "help",          no_argument,       NULL, 'h' },
+        { "indent",        required_argument, NULL, 'i' },
+        { "kill-blank",    no_argument,       NULL, OPT_KILLBLANK },
+        { "no-kill-blank", no_argument,       NULL, OPT_NO_KILLBLANK },
+        { "list",          no_argument,       NULL, 'l' },
+        { "mend",          no_argument,       NULL, 'm' },
+        { "encoding",      required_argument, NULL, 'n' },
+        { "padding",       required_argument, NULL, 'p' },
+        { "tag-query",     required_argument, NULL, 'q' },
+        { "remove",        no_argument,       NULL, 'r' },
+        { "size",          required_argument, NULL, 's' },
+        { "tabs",          required_argument, NULL, 't' },
+        { "version",       no_argument,       NULL, 'v' },
+        { NULL,            0,                 NULL,  0  }
+    };
+    const char *short_options = "a:c:d:e:f:hi:k:lmn:p:q:rs:t:v";
+
     int oc;   /* option character */
     do {
-        oc = getopt(argc, argv, "a:c:d:e:f:hi:k:lmn:p:q:rs:t:v");
+        oc = getopt_long(argc, argv, short_options, long_options, &option_index);
 
         switch (oc) {
 
@@ -648,7 +676,7 @@ opt_t *process_commandline(int argc, char *argv[])
                     return NULL;
                 }
                 break;
-
+            
             case 'd':
                 if (design_choice(result, optarg) != 0) {
                     return NULL;
@@ -678,6 +706,18 @@ opt_t *process_commandline(int argc, char *argv[])
             case 'k':
                 if (killblank(result, optarg) != 0) {
                     return NULL;
+                }
+                break;
+            
+            case OPT_KILLBLANK:
+                if (result->killblank == -1) {
+                    result->killblank = 1;
+                }
+                break;
+
+            case OPT_NO_KILLBLANK:
+                if (result->killblank == -1) {
+                    result->killblank = 0;
                 }
                 break;
 

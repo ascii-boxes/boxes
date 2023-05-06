@@ -58,6 +58,7 @@ int main(void)
         cmocka_unit_test_setup(test_killblank_false, beforeTest),
         cmocka_unit_test_setup(test_killblank_invalid, beforeTest),
         cmocka_unit_test_setup(test_killblank_multiple, beforeTest),
+        cmocka_unit_test_setup(test_killblank_long, beforeTest),
         cmocka_unit_test_setup(test_padding_top_bottom, beforeTest),
         cmocka_unit_test_setup(test_padding_invalid, beforeTest),
         cmocka_unit_test_setup(test_padding_negative, beforeTest),

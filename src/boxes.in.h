@@ -110,6 +110,7 @@ typedef struct {                     /* Command line options: */
     char      halign;                /** `-a`: ( h[lcr]v[tcb] )         */
     char      justify;               /** `-a`: 'l', 'c', 'r', or '\0' */
     char     *cld;                   /** `-c`: commandline design definition */
+    int       color;                 /** `--color` or `--no-color`: `force_monochrome`, `color_from_terminal`, or `force_ansi_color` */
     design_t *design;                /** `-d`: currently used box design */
     int       design_choice_by_user; /** `-d`, `-c`: true if design was chosen by user */
     char     *eol;                   /** `-e`: line break to use. Never NULL, default to "\n". */
@@ -134,6 +135,11 @@ typedef struct {                     /* Command line options: */
 } opt_t;
 
 extern opt_t opt;
+
+/* The possible values of the `color` field from `opt_t`: */
+#define force_monochrome 0
+#define color_from_terminal 1
+#define force_ansi_color 2
 
 
 typedef struct {

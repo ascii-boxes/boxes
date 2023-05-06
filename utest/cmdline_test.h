@@ -31,6 +31,7 @@ void test_killblank_true(void **state);
 void test_killblank_false(void **state);
 void test_killblank_invalid(void **state);
 void test_killblank_multiple(void **state);
+void test_killblank_long(void **state);
 
 void test_padding_top_bottom(void **state);
 void test_padding_invalid(void **state);

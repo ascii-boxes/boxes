@@ -33,7 +33,7 @@ Options offered by
 .I boxes
 are the following:
 .TP 0.6i
-.B \-a \fIstring\fP
+\fB\-a\fP \fIstring\fP, \fB\-\-align\fP=\fIstring\fP
 Alignment/positioning of text inside box. This option takes a format string
 argument which is read from left to right. The format string may not
 contain whitespace and must consist of one or more of the following
@@ -41,8 +41,8 @@ components:
 .br
 
 .I h\fPx
-\- horizontal alignment of the input text block inside a potentially larger
-box. Possible values for
+\- horizontal alignment of the input text block inside a box. Possible values
+for
 .I x
 are
 .I l
@@ -56,8 +56,8 @@ input text block (use the
 argument instead).
 .br
 .I v\fPx
-\- vertical alignment of the input text block inside a potentially larger
-box. Possible values for
+\- vertical alignment of the input text block inside a box. Possible values
+for
 .I x
 are
 .I t
@@ -99,13 +99,13 @@ Short hand notations (can be combined with the above arguments):
 .I h\fPr\fIv\fPc\fIj\fPr
 .br
 
-The factory default setting for
+The default for
 .B \-a
 is
 .I h\fPl\fIv\fPt.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-c \fIstring\fP
+\fB\-c\fP \fIstring\fP, \fB\-\-create\fP=\fIstring\fP
 Command line design definition for simple cases. The argument of this
 option is the definition for the "west" (W) shape. The defined shape must
 consist of exactly one line, i.e. no multi\-line shapes are allowed. The
@@ -127,12 +127,12 @@ may of course be used in conjunction with any of the other options. By default,
 is not specified.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-d \fIstring\fP
+\fB\-d\fP \fIstring\fP, \fB\-\-design\fP=\fIstring\fP
 Design selection. The one argument of this option is the name of the design to
 use, which may either be a design's primary name or any of its alias names.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-e \fIeol\fP
+\fB\-e\fP \fIeol\fP, \fB\-\-eol\fP=\fIeol\fP
 Override line terminator.
 .I eol
 can be
@@ -151,7 +151,7 @@ Let us know in <URL:https://github.com/ascii-boxes/boxes/issues/60> if you
 think we should keep it.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-f \fIstring\fP
+\fB\-f\fP \fIstring\fP, \fB\-\-config\fP=\fIstring\fP
 Use alternate config file. The one argument of this option is the name of a
 valid
 .I boxes
@@ -161,13 +161,11 @@ can also be a directory which contains a configuration file. More information
 on this topic below in the CONFIGURATION FILE section.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-\-help
-.TQ
-.B \-h
+\fB\-h\fP, \fB\-\-help\fP
 Print usage information.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-i \fIstring\fP
+\fB\-i\fP \fIstring\fP, \fB\-\-indent\fP=\fIstring\fP
 Indentation mode. Possible arguments are
 .I text
 (indent text inside of box),
@@ -178,7 +176,7 @@ Indentation mode. Possible arguments are
 .I box\fP.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-k \fIbool\fP
+\fB\-k\fP \fIbool\fP, \fB\-\-kill\-blank\fP, \fB\-\-no\-kill\-blank\fP
 Kill leading/trailing blank lines on removal. The value of
 .I bool
 is either
@@ -201,15 +199,16 @@ part, the default is
 .I true\fP.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-l
-(ell) List designs. Produces a listing of all available box designs in the
+\fB\-l\fP, \fB\-\-list\fP
+List designs. Produces a listing of all available box designs in the
 config file, along with a sample box and information about its creator.
-Also checks the syntax of the entire config file. If used together with
+Also checks the syntax of the entire config file. If used in conjunction
+with
 .B \-d\fP,
 displays detailed information about the specified design.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-m
+\fB\-m\fP, \fB\-\-mend\fP
 Mend box. This removes a (potentially broken) box as with
 .B \-r\fP,
 and redraws it afterwards. The mended box is drawn according to the
@@ -219,7 +218,7 @@ padding, indentation, etc. for the mended box. Implies
 .I false\fP.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-n \fIencoding\fP
+\fB\-n\fP \fIencoding\fP, \fB\-\-encoding\fP=\fIencoding\fP
 Character encoding. Overrides the character encoding of the input and output
 text. Choose from the list shown by \fIiconv -l\fP. If an invalid character
 encoding is specified here, \fIUTF-8\fP is used as a fallback. The default
@@ -227,12 +226,13 @@ is to use the system encoding, which is normally the best course of action.
 So don't specify this option unless you have to.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-p \fIstring\fP
+\fB\-p\fP \fIstring\fP, \fB\-\-padding\fP=\fIstring\fP
 Padding. Specify padding in spaces around the input text block for all
 sides of the box. The argument string may not contain whitespace and must
 consist of a combination of the following characters, each followed by a
 number indicating the padding in spaces:
 .br
+
 .I a
 \- (all) give padding for all sides at once
 .br
@@ -254,6 +254,7 @@ number indicating the padding in spaces:
 .I r
 \- (right) give padding for right (east) side
 .br
+
 Example:
 .B \-p
 .I a\fP4\fIt\fP2
@@ -261,11 +262,11 @@ would define the padding to be 4 characters on all sides, except for the
 top of the box, where the input text block will be only 2 lines away from
 the box.
 .br
-By default, unless specified otherwise in the config file, no padding is
-used.
+The default for this option is determined by the box design used. If the
+design does not specify anything, no default padding is used.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-q \fIquery\fP
+\fB\-q\fP \fIquery\fP, \fB\-\-tag\-query\fP=\fIquery\fP
 Query designs by tag. In contrast to
 .B \-l\fP,
 this will only print the matching design names. This option is normally used
@@ -278,7 +279,9 @@ in order to match. A tag may optionally be prefixed with
 in order to require that it be present, or with
 .I \-
 in order to exclude designs which have that tag. Each tag can only occur once
-per query.
+per query. The special query
+.I (all)
+matches all box designs, even if they don't have any tags.
 .br
 This option is intended for use by scripts. Alias names are printed below
 their primary design name, and postfixed with
@@ -288,15 +291,15 @@ Example:
 .I boxes -q programming,-comment
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-r
+\fB\-r\fP, \fB--remove\fP
 Remove an existing box. Which design to use is detected automatically. In
 order to save time or in case the detection does not decide correctly, combine
 with
 .B \-d
-to specify the design. The default is to draw a new box.
+to specify the design.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-s \fIwidth\fBx\fIheight
+\fB\-s\fP \fIwidth\fP\fBx\fP\fIheight\fP, \fB\-\-size\fP=\fIwidth\fP\fBx\fP\fIheight\fP
 Box size. This option specifies the desired box size in units of columns
 (for width) and lines (for height).
 If only a single number is given as argument, this number specifies the
@@ -309,20 +312,17 @@ influence the box size (such as
 By default, the smallest possible box is created around the text.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-t \fIstring\fP
+\fB\-t\fP \fIstring\fP, \fB\-\-tabs\fP=\fIstring\fP
 Tab handling. This option controls how tab characters in the input text are
-handled. The option string must always begin with a
-.I uint
-number indicating the distance between tab stops. It is important that this
-value be set correctly, or tabulator characters will upset your input text.
-The correct tab distance value depends on the settings used for the text
-you are processing. A common value is 8.
+handled. The option string must always begin with a positive integer number
+indicating the distance between tab stops, sometimes called "spaces per tab".
 .br
 Immediately following the tab distance, an optional character can be appended,
 telling
 .I boxes
 how to treat the leading tabs. The following options are available:
 .br
+
 .B e
 \- expand tabs into spaces
 .br
@@ -335,13 +335,12 @@ how to treat the leading tabs. The following options are available:
 turn as many spaces as possible into tabs.
 .br
 
-In order to maintain backwards compatibility, the
+The
 .B \-t
 .I string
 can be just a number. In that case,
 .B e
-is assumed for tab handling, which removes all tabs and replaces them with
-spaces. The factory default for the
+is assumed for tab handling. The factory default for the
 .B \-t
 option is simply 8, which is just such a case.
 .br
@@ -351,7 +350,7 @@ in order to have your leading tabs unexpanded. In the box content, tabs are
 always converted into spaces. The tab distance in this example is 4.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-.B \-v
+\fB\-v\fP, \fB\-\-version\fP
 Print out current version number.
 .\" =======================================================================
 .SH CONFIGURATION FILE
