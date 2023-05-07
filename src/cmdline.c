@@ -84,6 +84,8 @@ void usage_long(FILE *st)
     fprintf(st, "Usage:  %s [options] [infile [outfile]]\n", PROJECT);
     fprintf(st, "  -a, --align <fmt>     Alignment/positioning of text inside box [default: hlvt]\n");
     fprintf(st, "  -c, --create <str>    Use single shape box design where str is the W shape\n");
+    fprintf(st, "      --color           Force output of ANSI sequences if present\n");
+    fprintf(st, "      --no-color        Force monochrome output (no ANSI sequences)\n");
     fprintf(st, "  -d, --design <name>   Box design [default: first one in file]\n");
     fprintf(st, "  -e, --eol <eol>       Override line break type (experimental) [default: %s]\n",
                                          strcmp(EOL_DEFAULT, "\r\n") == 0 ? "CRLF" : "LF");
@@ -588,6 +590,7 @@ static void print_debug_info(opt_t *result)
                     result->halign ? result->halign : '?', result->valign ? result->valign : '?');
             fprintf (stderr, "- Line justification (-a): \'%c\'\n", result->justify ? result->justify : '?');
             fprintf (stderr, "- Design Definition W shape (-c): %s\n", result->cld ? result->cld : "n/a");
+            fprintf (stderr, "- Color mode: %d\n", result->color);
             fprintf (stderr, "- Line terminator used (-e): %s\n",
                 strcmp(result->eol, "\r\n") == 0 ? "CRLF" : (strcmp(result->eol, "\r") == 0 ? "CR" : "LF"));
             fprintf (stderr, "- Explicit config file (-f): %s\n", result->f ? result->f : "no");
@@ -639,6 +642,8 @@ opt_t *process_commandline(int argc, char *argv[])
     const struct option long_options[] = {
         { "align",         required_argument, NULL, 'a' },
         { "create",        required_argument, NULL, 'c' },
+        { "color",         no_argument,       NULL, OPT_COLOR },
+        { "no-color",      no_argument,       NULL, OPT_NO_COLOR },
         { "design",        required_argument, NULL, 'd' },
         { "eol",           required_argument, NULL, 'e' },
         { "config",        required_argument, NULL, 'f' },
@@ -677,6 +682,14 @@ opt_t *process_commandline(int argc, char *argv[])
                 }
                 break;
             
+            case OPT_COLOR:
+                result->color = force_ansi_color;
+                break;
+
+            case OPT_NO_COLOR:
+                result->color = force_monochrome;
+                break;
+
             case 'd':
                 if (design_choice(result, optarg) != 0) {
                     return NULL;

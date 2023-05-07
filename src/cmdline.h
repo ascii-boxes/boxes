@@ -29,6 +29,8 @@
 /*
  * Some ints that define return values for getopt_long() to indicate certain long options.
  */
+#define OPT_COLOR 1001
+#define OPT_NO_COLOR 1002
 #define OPT_KILLBLANK 1003
 #define OPT_NO_KILLBLANK 1004
 

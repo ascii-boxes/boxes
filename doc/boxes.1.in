@@ -6,9 +6,7 @@
 boxes \- text mode box and comment drawing filter
 .SH SYNOPSIS
 .B boxes
-[\-hlmrv] [\-a\ format] [\-d\ design] [\-e\ eol] [\-f\ file] [\-i\ indent]
-[\-k\ bool] [\-n\ encoding] [\-p\ pad] [\-q query] [\-s\ size] [\-t\ tabopts]
-[infile [outfile]]
+[options] [infile [outfile]]
 .SH DESCRIPTION
 .I Boxes
 is a text filter which can draw any kind of box around its input text. Box
@@ -33,7 +31,7 @@ Options offered by
 .I boxes
 are the following:
 .TP 0.6i
-\fB\-a\fP \fIstring\fP, \fB\-\-align\fP=\fIstring\fP
+\fB\-a\fP \fIformat\fP, \fB\-\-align\fP=\fIformat\fP
 Alignment/positioning of text inside box. This option takes a format string
 argument which is read from left to right. The format string may not
 contain whitespace and must consist of one or more of the following
@@ -125,6 +123,30 @@ and does not access the config file.
 may of course be used in conjunction with any of the other options. By default,
 .B \-c
 is not specified.
+.\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.TP 0.6i
+\fB\-\-color\fP, \fB\-\-no\-color\fP
+Printing of color codes. Box designs and the text inside a box may contain ANSI
+color codes, sometimes called "escape sequences". In this way, boxes and text
+can be colored.
+.br
+Whether these escape sequences are printed by
+.I boxes
+is normally determined by the terminal capabilities (default). Using
+\fB\-\-color\fP,
+.I boxes
+can be told to always output escape sequences even if it thinks the terminal
+may not understand them. Using \fB\-\-no\-color\fP, escape sequences will
+never be printed.
+
+Of course, even with
+.B \-\-color\fP,
+a box will only appear colored if it is already defined with colors. In case
+you want to auto-color some text that isn't yet, take a look at
+.I lolcat\fP.
+.br
+These options consider all escape sequences to be color codes. Any other
+escape sequences present will be printed or removed along with the color codes.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 \fB\-d\fP \fIstring\fP, \fB\-\-design\fP=\fIstring\fP
@@ -312,10 +334,12 @@ influence the box size (such as
 By default, the smallest possible box is created around the text.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
-\fB\-t\fP \fIstring\fP, \fB\-\-tabs\fP=\fIstring\fP
+\fB\-t\fP \fItabopts\fP, \fB\-\-tabs\fP=\fItabopts\fP
 Tab handling. This option controls how tab characters in the input text are
-handled. The option string must always begin with a positive integer number
-indicating the distance between tab stops, sometimes called "spaces per tab".
+handled. The
+.I tabopts
+must always begin with a positive integer number indicating the distance
+between tab stops, sometimes called "spaces per tab".
 .br
 Immediately following the tab distance, an optional character can be appended,
 telling
