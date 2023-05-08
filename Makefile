@@ -27,6 +27,8 @@ PCRE2_VERSION          = 10.40
 PCRE2_DIR              = vendor/pcre2-$(PCRE2_VERSION)
 LIBUNISTRING_VERSION   = 1.0
 LIBUNISTRING_DIR       = vendor/libunistring-$(LIBUNISTRING_VERSION)
+LIBNCURSES_VERSION     = 6.4
+LIBNCURSES_DIR         = vendor/ncurses-$(LIBNCURSES_VERSION)
 WIN_FLEX_BISON_VERSION = 2.5.24
 WIN_FLEX_BISON_DIR     = vendor/flex_bison_$(WIN_FLEX_BISON_VERSION)
 WIN_CMOCKA_VERSION     = 1.1.0
@@ -111,8 +113,15 @@ $(LIBUNISTRING_DIR)/lib/.libs/libunistring.a: vendor/libunistring-$(LIBUNISTRING
 	tar -C vendor -xzf vendor/libunistring-$(LIBUNISTRING_VERSION).tar.gz
 	cd $(LIBUNISTRING_DIR) ; ./configure --enable-static ; $(MAKE)
 
-static: infomsg replaceinfos $(LIBUNISTRING_DIR)/lib/.libs/libunistring.a $(PCRE2_DIR)/.libs/libpcre2-32.a
-	$(MAKE) -C src BOXES_PLATFORM=static LEX=flex YACC=bison LIBUNISTRING_DIR=$(LIBUNISTRING_DIR) PCRE2_DIR=$(PCRE2_DIR) $@
+vendor/libncurses-$(LIBNCURSES_VERSION).tar.gz: | vendor
+	curl -L http://invisible-mirror.net/archives/ncurses/ncurses-$(LIBNCURSES_VERSION).tar.gz --output $@
+
+$(LIBNCURSES_DIR)/lib/libncurses.a: vendor/libncurses-$(LIBNCURSES_VERSION).tar.gz
+	tar -C vendor -xzf vendor/libncurses-$(LIBNCURSES_VERSION).tar.gz
+	cd $(LIBNCURSES_DIR) ; ./configure --enable-static ; $(MAKE)
+
+static: infomsg replaceinfos $(LIBUNISTRING_DIR)/lib/.libs/libunistring.a $(PCRE2_DIR)/.libs/libpcre2-32.a $(LIBNCURSES_DIR)/lib/libncurses.a
+	$(MAKE) -C src BOXES_PLATFORM=static LEX=flex YACC=bison LIBUNISTRING_DIR=$(LIBUNISTRING_DIR) PCRE2_DIR=$(PCRE2_DIR) LIBNCURSES_DIR=$(LIBNCURSES_DIR) $@
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

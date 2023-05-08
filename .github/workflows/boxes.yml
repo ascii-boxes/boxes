@@ -25,7 +25,7 @@ jobs:
             - name: add-packages
               run: |
                   sudo apt-get update -y
-                  sudo apt-get install -y git flex bison libunistring-dev libpcre2-dev diffutils vim-common lcov libcmocka-dev
+                  sudo apt-get install -y git flex bison libunistring-dev libpcre2-dev libncurses-dev diffutils vim-common lcov libcmocka-dev
 
             - name: make cov
               run: make cov

@@ -15,10 +15,13 @@
 
 #include "config.h"
 
+#include <ncurses.h>
 #include <locale.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <uniconv.h>
+#include <unistd.h>
 
 #include "boxes.h"
 #include "cmdline.h"
@@ -46,6 +49,9 @@ int num_designs = 0;                 /* number of designs after parsing */
 opt_t opt;                           /* command line options */
 
 input_t input;                       /* input lines */
+
+int color_output_enabled;            /* Flag indicating if ANSI color codes should be printed (1) or not (0) */
+
 
 
 /*       _\|/_
@@ -388,6 +394,45 @@ static void handle_remove_box()
 
 
 
+/* These two functions are actually declared in term.h, but for some reason, that can't be included. */
+extern NCURSES_EXPORT(int) setupterm (NCURSES_CONST char *, int, int *);
+extern NCURSES_EXPORT(int) tigetnum (NCURSES_CONST char *);
+
+static int terminal_has_colors()
+{
+    int result = 0;
+    char *termtype = getenv("TERM");
+    if (termtype != NULL && setupterm(termtype, STDOUT_FILENO, NULL) == OK && tigetnum("colors") >= 8) {
+        result = 1;
+    }
+    #if defined(DEBUG)
+        int num_colors = result ? tigetnum("colors") : 0;
+        fprintf(stderr, "Terminal \"%s\" %s colors (number of colors = %d).\n", termtype != NULL ? termtype : "(null)",
+                result ? "has" : "does NOT have", num_colors);
+    #endif
+    return result;
+}
+
+
+
+static int check_color_support(int opt_color)
+{
+    int result = 0;
+    if (opt_color == force_ansi_color) {
+        result = 1;
+    }
+    else if (opt_color == color_from_terminal) {
+        result = terminal_has_colors();
+    }
+
+    #if defined(DEBUG)
+        fprintf(stderr, "%s: Color support %sabled\n", PROJECT, result ? "\x1b[92mEN\x1b[0m" : "DIS");
+    #endif
+    return result;
+}
+
+
+
 /*       _\|/_
          (o o)
  +----oOO-{_}-OOo------------------------------------------------------------+
@@ -415,6 +460,8 @@ int main(int argc, char *argv[])
     #ifdef DEBUG
         fprintf (stderr, "Character Encoding = %s\n", encoding);
     #endif
+
+    color_output_enabled = check_color_support(opt.color);
 
     handle_config_parsing();
 

@@ -89,6 +89,34 @@
                     "value": "C"
                 }
             ]
+        },
+        {
+            "type": "library",
+            "author": "the ncurses contributors",
+            "name": "libncurses",
+            "version": "6.4",
+            "description": "The ncurses library routines are a terminal-independent method of updating character screens with reasonable optimization.",
+            "licenses": [
+                {
+                    "license": {
+                        "name": "MIT with advertising clause",
+                        "url": "http://ncurses.scripts.mit.edu/?p=ncurses.git;a=blob_plain;f=COPYING;hb=79b9071f2be20a24c7be031655a5638f6032f29f"
+                    }
+                }
+            ],
+            "copyright": "Copyright 2018-2020,2021 Thomas E. Dickey\nCopyright 1998-2017,2018 Free Software Foundation, Inc.",
+            "externalReferences": [
+                {
+                    "type": "website",
+                    "url": "https://invisible-island.net/ncurses/"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "primaryLanguage",
+                    "value": "C"
+                }
+            ]
         }
     ]
 }

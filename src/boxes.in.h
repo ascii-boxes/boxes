@@ -141,6 +141,9 @@ extern opt_t opt;
 #define color_from_terminal 1
 #define force_ansi_color 2
 
+/** Flag indicating if ANSI color codes should be printed (1) or not (0) */
+extern int color_output_enabled;
+
 
 typedef struct {
     size_t    len;                   /* length of visible text in columns (visible character positions in a text terminal), which is the same as the length of the 'text' field */

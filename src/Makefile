@@ -64,15 +64,15 @@ debug: flags_$(BOXES_PLATFORM) | $(OUT_DIR)
 	    CFLAGS_ADDTL="-g $(CFLAGS_ADDTL)" flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
 
 boxes: $(ALL_OBJ) | check_dir
-	$(CC) $(LDFLAGS) $^ -o $@ -lunistring -lpcre2-32
+	$(CC) $(LDFLAGS) $^ -o $@ -lunistring -lpcre2-32 -lncurses
 	if [ "$(STRIP)" = "true" ] ; then strip $@ ; fi
 
 boxes.static: $(ALL_OBJ) | check_dir
-	$(CC) $(LDFLAGS) $^ -o $(BOXES_EXECUTABLE_NAME) -l:libunistring.a -l:libpcre2-32.a
+	$(CC) $(LDFLAGS) $^ -o $(BOXES_EXECUTABLE_NAME) -l:libunistring.a -l:libpcre2-32.a -l:libncurses.a
 	if [ "$(STRIP)" = "true" ] ; then strip $(BOXES_EXECUTABLE_NAME) ; fi
 
 boxes.exe: $(ALL_OBJ) | check_dir
-	$(CC) $(LDFLAGS) $^ -o $@ -lkernel32 -l:libunistring.a -l:libpcre2-32.a -l:libiconv.a
+	$(CC) $(LDFLAGS) $^ -o $@ -lkernel32 -l:libunistring.a -l:libpcre2-32.a -l:libiconv.a -l:libncurses.a
 	if [ "$(STRIP)" = "true" ] ; then strip $@ ; fi
 
 
@@ -85,7 +85,7 @@ flags_unix:
 
 flags_static:
 	$(eval CFLAGS := -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := $(LDFLAGS) -L../$(LIBUNISTRING_DIR)/lib/.libs -L../$(PCRE2_DIR)/.libs $(LDFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS) -L../$(LIBUNISTRING_DIR)/lib/.libs -L../$(PCRE2_DIR)/.libs -L../$(LIBNCURSES_DIR)/lib $(LDFLAGS_ADDTL))
 	$(eval BOXES_EXECUTABLE_NAME := boxes)
 	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
 	echo $(filter-out boxes.o,$(ALL_OBJ)) > $(OUT_DIR)/modules.txt

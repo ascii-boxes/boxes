@@ -40,6 +40,8 @@ opt_t opt;
 
 input_t input;
 
+int color_output_enabled = 1;
+
 char **collect_out = NULL;
 int collect_out_size = 0;
 
