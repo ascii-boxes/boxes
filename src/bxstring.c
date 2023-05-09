@@ -336,7 +336,15 @@ char *bxs_to_output(bxstr_t *pString)
     if (pString == NULL) {
         return strdup("NULL");
     }
-    return u32_strconv_to_output(pString->memory);
+
+    if (color_output_enabled) {
+        return u32_strconv_to_output(pString->memory);
+    }
+
+    uint32_t *vis = bxs_filter_visible(pString);
+    char *result = u32_strconv_to_output(vis);
+    BFREE(vis);
+    return result;
 }
 
 
@@ -363,6 +371,26 @@ int bxs_is_visible_char(bxstr_t *pString, size_t idx)
             else if (pString->visible_char[i] > idx) {
                 break;
             }
+        }
+    }
+    return result;
+}
+
+
+
+uint32_t *bxs_filter_visible(bxstr_t *pString)
+{
+    uint32_t *result = NULL;
+    if (pString != NULL) {
+        if (pString->num_chars_invisible == 0) {
+            result = u32_strdup(pString->memory);
+        }
+        else {
+            result = (uint32_t *) calloc(pString->num_chars_visible + 1, sizeof(uint32_t));
+            for (size_t i = 0; i < pString->num_chars_visible; i++) {
+                set_char_at(result, i, pString->memory[pString->visible_char[i]]);
+            }
+            set_char_at(result, pString->num_chars_visible, char_nul);
         }
     }
     return result;

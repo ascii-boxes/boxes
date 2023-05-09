@@ -155,6 +155,9 @@ int main(void)
         cmocka_unit_test_setup(test_bxs_to_output, beforeTest),
         cmocka_unit_test_setup(test_bxs_is_empty_null, beforeTest),
         cmocka_unit_test_setup(test_bxs_is_visible_char, beforeTest),
+        cmocka_unit_test_setup(test_bxs_filter_visible, beforeTest),
+        cmocka_unit_test_setup(test_bxs_filter_visible_none, beforeTest),
+
         cmocka_unit_test_setup(test_bxs_strcmp, beforeTest),
         cmocka_unit_test_setup(test_bxs_valid_anywhere_error, beforeTest),
         cmocka_unit_test_setup(test_bxs_valid_in_filename_error, beforeTest),

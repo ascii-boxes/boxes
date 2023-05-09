@@ -143,7 +143,7 @@ bxstr_t *bxs_rtrim(bxstr_t *pString);
 /**
  * Convert the string into boxes' output encoding for proper printing on stdout.
  * @param pString the string to convert
- * @return the same string in the target (output) encoding
+ * @return the same string in the target (output) encoding, for which new memory has been allocated
  */
 char *bxs_to_output(bxstr_t *pString);
 
@@ -164,6 +164,15 @@ int bxs_is_empty(bxstr_t *pString);
  * @return 1 for visible, 0 for not visible
  */
 int bxs_is_visible_char(bxstr_t *pString, size_t idx);
+
+
+/**
+ * Filter the given string so that only the visible characters are returned.
+ * @param pString the string to filter (may be NULL, in which case NULL is returned)
+ * @return a new UTF-32 string which contains only the visible characters from the given string, or NULL when the
+ *      given string was NULL
+ */
+uint32_t *bxs_filter_visible(bxstr_t *pString);
 
 
 /**

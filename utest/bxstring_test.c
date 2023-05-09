@@ -22,6 +22,7 @@
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
+#include <unistr.h>
 
 #include <cmocka.h>
 #include <string.h>
@@ -926,6 +927,49 @@ void test_bxs_is_visible_char(void **state)
     assert_int_equal(1, bxs_is_visible_char(input, 16));
     assert_int_equal(1, bxs_is_visible_char(input, 28));
 
+    BFREE(ustr32);
+    bxs_free(input);
+}
+
+
+
+void test_bxs_filter_visible(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("\x1b[38;5;203mX\x1b[0m \x1b[38;5;203mY\x1b[0m", "ASCII");
+    assert_non_null(ustr32);
+    bxstr_t *input = bxs_from_unicode(ustr32);
+    uint32_t *expected = u32_strconv_from_arg("X Y", "ASCII");
+
+    uint32_t *actual = bxs_filter_visible(input);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+
+    actual = bxs_filter_visible(NULL);
+    assert_null(actual);
+
+    BFREE(actual);
+    BFREE(expected);
+    BFREE(ustr32);
+    bxs_free(input);
+}
+
+
+
+void test_bxs_filter_visible_none(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("plain", "ASCII");
+    assert_non_null(ustr32);
+    bxstr_t *input = bxs_from_unicode(ustr32);
+    uint32_t *expected = u32_strconv_from_arg("plain", "ASCII");
+
+    uint32_t *actual = bxs_filter_visible(input);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+
+    BFREE(actual);
+    BFREE(expected);
     BFREE(ustr32);
     bxs_free(input);
 }
