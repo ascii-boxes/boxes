@@ -1,5 +1,5 @@
 :ARGS
--f 175_utf8_happy_design_info.cfg -d designA -l
+-f 175_utf8_happy_design_info.cfg --color -d designA -l
 :INPUT
 :OUTPUT-FILTER
 :EXPECTED
