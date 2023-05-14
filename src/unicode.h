@@ -146,6 +146,7 @@ uint32_t *advance_next32(const uint32_t *s, size_t *invis);
  * Determine a new position in the given string s with the given offset of visible characters.
  * If the character right in front of the target character is invisible, then the pointer is moved to the start of
  * that invisible sequence. The purpose is to catch any escape sequences which would for example color the character.
+ * CHECK This is redundant, bxstrings can do this better.
  *
  * @param s The pointer to the start position. Is assumed to point either at the ESC at the start of an escape
  *      sequence, or to be positioned outside an escape sequence.
@@ -216,6 +217,14 @@ const char *check_encoding(const char *manual_encoding, const char *system_encod
  * @return a byte sequence in UTF-8 encoding
  */
 char *to_utf8(uint32_t *src);
+
+
+/**
+ * Create a new string of `n` spaces.
+ * @param n number of spaces
+ * @return a new string of length `n`, for which new memory was allocated
+ */
+uint32_t *u32_nspaces(const size_t n);
 
 
 #endif

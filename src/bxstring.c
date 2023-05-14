@@ -19,8 +19,10 @@
 
 #include "config.h"
 
+#include <stdarg.h>
 #include <string.h>
 #include <unictype.h>
+#include <unistdio.h>
 #include <unistr.h>
 #include <uniwidth.h>
 
@@ -266,6 +268,42 @@ bxstr_t *bxs_strcat(bxstr_t *pString, uint32_t *pToAppend)
 
     bxstr_t *result = bxs_from_unicode(s);
     BFREE(s);
+    return result;
+}
+
+
+
+bxstr_t *bxs_concat(size_t count, ...)
+{
+    if (count < 1) {
+        return bxs_from_ascii("");
+    }
+
+    size_t total_len = 0;
+    uint32_t *src;
+    va_list va;
+
+    va_start(va, count);
+    for (size_t i = 0; i < count; i++) {
+        src = va_arg(va, uint32_t *);
+        if (src != NULL) {
+            total_len += u32_strlen(src);
+        } else {
+            total_len += 6;  /* strlen("(NULL)") == 6 */
+        }
+    }
+    va_end(va);
+
+    uint32_t *utf32 = (uint32_t *) malloc((total_len + 1) * sizeof(uint32_t));
+    char *format = repeat("%llU", count);   /* "%llU" stands for a UTF-32 string */
+
+    va_start(va, count);
+    u32_vsnprintf(utf32, total_len + 1, format, va);
+    va_end(va);
+
+    bxstr_t *result = bxs_from_unicode(utf32);
+    BFREE(format);
+    BFREE(utf32);
     return result;
 }
 

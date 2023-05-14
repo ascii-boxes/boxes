@@ -79,6 +79,9 @@ void test_bxs_valid_in_filename_error(void **state);
 
 void test_bxs_free_null(void **state);
 
+void test_bxs_concat(void **state);
+void test_bxs_concat_nullarg(void **state);
+
 
 #endif
 

@@ -112,6 +112,16 @@ bxstr_t *bxs_strcat(bxstr_t *pString, uint32_t *pToAppend);
 
 
 /**
+ * Concatenate all given strings into a new string.
+ * @param count number of strings given in the following
+ * @param <...> the strings, all of them `uint32_t *`. NULL is discouraged as an argument, but will probably be
+ *      printed as "(NULL)". (That's what libunistring did in our tests, but they promise nothing in their docs.)
+ * @return a new string, for which new memory was allocated, might be empty, but never NULL
+ */
+bxstr_t *bxs_concat(size_t count, ...);
+
+
+/**
  * Return a pointer to the first visible occurrence of the character `c` in the string `pString`.
  * Invisible characters are ignored.
  * @param pString the string to search

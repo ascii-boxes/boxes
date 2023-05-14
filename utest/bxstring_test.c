@@ -317,10 +317,8 @@ void test_ansi_unicode_broken_escapes(void **state)
      * "\x1b[" (broken, counts as invisible, and belonging to the previous 'b')
      */
     uint32_t *ustr32 = u32_strconv_from_arg("\x1b[38;5;203 XX \x1b[0m__\x1b[38;5;203mb\x1b[", "ASCII");
-    fprintf(stderr, "BOO\n");
     assert_non_null(ustr32);
     bxstr_t *actual = bxs_from_unicode(ustr32);
-    fprintf(stderr, "BAA\n");
 
     assert_non_null(actual);
     assert_non_null(actual->memory);
@@ -1056,6 +1054,65 @@ void test_bxs_free_null(void **state)
 
     bxs_free(bstr);
     bxs_free(NULL);
+}
+
+
+
+void test_bxs_concat(void **state)
+{
+    UNUSED(state);
+
+    bxstr_t *actual = bxs_concat(0);
+    assert_non_null(actual);
+    assert_string_equal("", actual->ascii);
+    assert_int_equal(0, actual->num_chars);
+
+    uint32_t *s1 = u32_strconv_from_arg("\x1b[38;5;203mX\x1b[0m", "ASCII");
+    uint32_t *s2 = u32_strconv_from_arg("---", "ASCII");
+    uint32_t *s3 = u32_strconv_from_arg("ÄÖÜ\x1b[38;5;203m!\x1b[0m", "UTF-8");
+    uint32_t *s4 = u32_strconv_from_arg("  ", "ASCII");
+    actual = bxs_concat(5, s1, s2, s3, s4, s4);
+
+    assert_non_null(actual);
+    assert_string_equal("X---xxx!    ", actual->ascii);
+    assert_int_equal(12, actual->num_chars_visible);
+    assert_int_equal(30, actual->num_chars_invisible);
+    assert_int_equal(42, actual->num_chars);
+    assert_int_equal(4, actual->trailing);
+    assert_int_equal(0, actual->indent);
+    assert_int_equal(12, actual->num_columns);
+
+    BFREE(s1);
+    BFREE(s2);
+    BFREE(s3);
+    BFREE(s4);
+    bxs_free(actual);
+}
+
+
+
+void test_bxs_concat_nullarg(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *s1 = u32_strconv_from_arg("\x1b[38;5;203mAB", "ASCII");
+    uint32_t *s2 = u32_strconv_from_arg("-CD-", "ASCII");
+    uint32_t *s3 = u32_strconv_from_arg("-EF\x1b[0m", "ASCII");
+    bxstr_t *actual = bxs_concat(4, s1, s2, NULL, s3);
+
+    assert_non_null(actual);
+    assert_string_equal("AB-CD-(NULL)-EF", actual->ascii);
+    assert_int_equal(15, actual->num_chars_visible);
+    assert_int_equal(15, actual->num_chars_invisible);
+    assert_int_equal(30, actual->num_chars);
+    assert_int_equal(0, actual->trailing);
+    assert_int_equal(0, actual->indent);
+    assert_int_equal(15, actual->num_columns);
+
+    BFREE(s1);
+    BFREE(s2);
+    BFREE(s3);
+    bxs_free(actual);
 }
 
 

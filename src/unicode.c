@@ -318,4 +318,20 @@ char *to_utf8(uint32_t *src)
 }
 
 
-/*EOF*/                                                  /* vim: set sw=4: */
+
+uint32_t *u32_nspaces(const size_t n)
+{
+    uint32_t *result = (uint32_t *) malloc((n + 1) * sizeof(uint32_t));
+    if (result == NULL) {
+        perror(PROJECT);
+        return NULL;
+    }
+    if (n > 0) {
+        u32_set(result, char_space, n);
+    }
+    set_char_at(result, n, char_nul);
+    return result;
+}
+
+
+/* vim: set cindent sw=4: */

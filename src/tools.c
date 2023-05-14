@@ -242,6 +242,27 @@ char *concat_strings_alloc(size_t count, ...)
 
 
 
+char *repeat(char *s, size_t count)
+{
+    if (s == NULL) {
+        return NULL;
+    }
+
+    size_t len = strlen(s);
+    char *result = (char *) malloc(count * len + 1);
+    if (result != NULL) {
+        char *dest = result;
+        for (size_t i = 0; i < count; i++) {
+            strcpy(dest, s);
+            dest += len;
+        }
+        *dest = '\0';
+    }
+    return result;
+}
+
+
+
 int empty_line(const line_t *line)
 /*
  *  Return true if line is empty.
@@ -484,26 +505,10 @@ size_t my_strrspn(const char *s, const char *accept)
 
 
 
-char *tabbify_indent(const size_t lineno, char *indentspc, const size_t indentspc_len)
-/*
- *  Checks if tab expansion mode is "keep", and if so, calculates a new
- *  indentation string based on the one given. The new string contains
- *  tabs in their original positions.
- *
- *    lineno         index of the input line we are referring to
- *    indentspc      previously calculated "space-only" indentation string
- *                   (may be NULL). This is only used when opt.tabexp != 'k',
- *                   in which case it will be used as the function result.
- *    indentspc_len  desired result length, measured in spaces only
- *
- *  RETURNS:  if successful and opt.tabexp == 'k': new string
- *            on error (invalid input or out of memory): NULL
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
+uint32_t *tabbify_indent(const size_t lineno, uint32_t *indentspc, const size_t indentspc_len)
 {
     size_t i;
-    char *result;
+    uint32_t *result;
     size_t result_len;
 
     if (opt.tabexp != 'k') {
@@ -513,16 +518,16 @@ char *tabbify_indent(const size_t lineno, char *indentspc, const size_t indentsp
         return NULL;
     }
     if (indentspc_len == 0) {
-        return (char *) strdup("");
+        return new_empty_string32();
     }
 
-    result = (char *) malloc(indentspc_len + 1);
+    result = (uint32_t *) malloc((indentspc_len + 1) * sizeof(uint32_t));
     if (result == NULL) {
         perror(PROJECT);
         return NULL;
     }
-    memset(result, (int) ' ', indentspc_len);
-    result[indentspc_len] = '\0';
+    u32_set(result, char_space, indentspc_len);
+    set_char_at(result, indentspc_len, char_nul);
     result_len = indentspc_len;
 
     for (i = 0; i < input.lines[lineno].tabpos_len && input.lines[lineno].tabpos[i] < indentspc_len; ++i) {
@@ -531,9 +536,9 @@ char *tabbify_indent(const size_t lineno, char *indentspc, const size_t indentsp
         if (tpos + nspc > input.indent) {
             break;
         }
-        result[tpos] = '\t';
+        set_char_at(result, tpos, char_tab);
         result_len -= nspc - 1;
-        result[result_len] = '\0';
+        set_char_at(result, result_len, char_nul);
     }
 
     return result;

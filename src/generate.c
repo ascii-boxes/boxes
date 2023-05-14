@@ -408,10 +408,55 @@ static int vert_precalc(const sentry_t *sarr,
 
 
 
+/**
+ * Calculate the maximum number of characters in a line of a horizontal side (top or bottom). This excludes corners,
+ * which always belong to the vertical sides. This is needed for allocating space for the assembled sides, which will
+ * include shapes multiple times, and also include invisible characters.
+ * @param sarr all shapes of the current design
+ * @param side the side to calculate (`north_side` or `south_side`)
+ * @param iltf the numbers of times that a shape shall appear (array of *three* values)
+ * @param target_width the number of columns we must reach
+ * @param target_height the number of lines of the side
+ * @return the number of characters(!), visible plus invisible, that suffice to store every line of that side
+ */
+static size_t horiz_chars_required(const sentry_t *sarr, const shape_t *side, size_t *iltf, size_t target_width,
+    size_t target_height)
+{
+    size_t *lens = (size_t *) calloc(target_height, sizeof(size_t));
+    size_t *iltf_copy = (size_t *) malloc(3 * sizeof(size_t));
+    memcpy(iltf_copy, iltf, 3 * sizeof(size_t));
+
+    int cshape = (side == north_side) ? 0 : 2;
+    for (size_t j = 0; j < target_width; j += sarr[side[cshape + 1]].width) {
+        while (iltf_copy[cshape] == 0) {
+            cshape += (side == north_side) ? 1 : -1;
+        }
+        for (size_t line = 0; line < target_height; ++line) {
+            lens[line] += sarr[side[cshape + 1]].mbcs[line]->num_chars;
+        }
+        iltf_copy[cshape] -= sarr[side[cshape + 1]].width;
+    }
+
+    size_t result = 0;
+    for (size_t i = 0; i < target_height; i++) {
+        if (lens[i] > result) {
+            result = lens[i];
+        }
+    }
+
+    BFREE(lens);
+    BFREE(iltf_copy);
+    #ifdef DEBUG
+        fprintf (stderr, "%s side required characters: %d\n", (side == north_side) ? "Top": "Bottom", (int) result);
+    #endif
+    return result;
+}
+
+
+
 static int vert_assemble(const sentry_t *sarr, const shape_t *seite,
                          size_t *iltf, sentry_t *result)
 /*
- *
  *  RETURNS:  == 0   on success  (result values are set)
  *            != 0   on error
  *
@@ -422,17 +467,23 @@ static int vert_assemble(const sentry_t *sarr, const shape_t *seite,
     size_t line;
     int cshape;                      /* current shape (idx to iltf) */
 
+    size_t max_chars = horiz_chars_required(sarr, seite, iltf, result->width, result->height);
+    uint32_t **mbcs_tmp = (uint32_t **) calloc(result->height, sizeof(uint32_t *));
+
     for (line = 0; line < result->height; ++line) {
         result->chars[line] = (char *) calloc(1, result->width + 1);
         if (result->chars[line] == NULL) {
             perror(PROJECT);
             if ((long) --line >= 0) {
                 do {
+                    BFREE (mbcs_tmp[line]);
                     BFREE (result->chars[line--]);
                 } while ((long) line >= 0);
             }
+            BFREE(mbcs_tmp);
             return 1;                    /* out of memory */
         }
+        mbcs_tmp[line] = (uint32_t *) calloc(max_chars + 1, sizeof(uint32_t));
     }
 
     cshape = (seite == north_side) ? 0 : 2;
@@ -443,10 +494,16 @@ static int vert_assemble(const sentry_t *sarr, const shape_t *seite,
         }
         for (line = 0; line < result->height; ++line) {
             strcat(result->chars[line], sarr[seite[cshape + 1]].chars[line]);
+            u32_strcat(mbcs_tmp[line], sarr[seite[cshape + 1]].mbcs[line]->memory);
         }
         iltf[cshape] -= sarr[seite[cshape + 1]].width;
     }
 
+    for (line = 0; line < result->height; ++line) {
+        result->mbcs[line] = bxs_from_unicode(mbcs_tmp[line]);
+    }
+
+    BFREE(mbcs_tmp);
     return 0;                            /* all clear */
 }
 
@@ -473,10 +530,11 @@ static void horiz_assemble(const sentry_t *sarr, const shape_t *seite,
 
     for (j = 0; j < sarr[ctop].height; ++j) {
         result->chars[j] = sarr[ctop].chars[j];
+        result->mbcs[j] = sarr[ctop].mbcs[j];
     }
     for (j = 0; j < sarr[cbottom].height; ++j) {
-        result->chars[result->height - sarr[cbottom].height + j] =
-                sarr[cbottom].chars[j];
+        result->chars[result->height - sarr[cbottom].height + j] = sarr[cbottom].chars[j];
+        result->mbcs[result->height - sarr[cbottom].height + j] = sarr[cbottom].mbcs[j];
     }
 
     sc = 0;
@@ -493,6 +551,7 @@ static void horiz_assemble(const sentry_t *sarr, const shape_t *seite,
             sc = 0;
         }
         result->chars[j] = sarr[seite[cshape + 1]].chars[sc];
+        result->mbcs[j] = sarr[seite[cshape + 1]].mbcs[sc];
         ++sc;
         iltf[cshape] -= 1;
     }
@@ -525,23 +584,25 @@ static int horiz_generate(sentry_t *tresult, sentry_t *bresult)
     }
     bresult->width = tresult->width;
 
-#ifdef DEBUG
-    fprintf (stderr, "Top side box rect width %d, height %d.\n",
-             (int) tresult->width, (int) tresult->height);
-    fprintf (stderr, "Top columns to fill: %s %d, %s %d, %s %d.\n",
-            shape_name[north_side[1]], (int) tiltf[0],
-            shape_name[north_side[2]], (int) tiltf[1],
-            shape_name[north_side[3]], (int) tiltf[2]);
-    fprintf (stderr, "Bottom side box rect width %d, height %d.\n",
-             (int) bresult->width, (int) bresult->height);
-    fprintf (stderr, "Bottom columns to fill: %s %d, %s %d, %s %d.\n",
-            shape_name[south_side[1]], (int) biltf[0],
-            shape_name[south_side[2]], (int) biltf[1],
-            shape_name[south_side[3]], (int) biltf[2]);
-#endif
+    #ifdef DEBUG
+        fprintf (stderr, "Top side box rect width %d, height %d.\n",
+                (int) tresult->width, (int) tresult->height);
+        fprintf (stderr, "Top columns to fill: %s %d, %s %d, %s %d.\n",
+                shape_name[north_side[1]], (int) tiltf[0],
+                shape_name[north_side[2]], (int) tiltf[1],
+                shape_name[north_side[3]], (int) tiltf[2]);
+        fprintf (stderr, "Bottom side box rect width %d, height %d.\n",
+                (int) bresult->width, (int) bresult->height);
+        fprintf (stderr, "Bottom columns to fill: %s %d, %s %d, %s %d.\n",
+                shape_name[south_side[1]], (int) biltf[0],
+                shape_name[south_side[2]], (int) biltf[1],
+                shape_name[south_side[3]], (int) biltf[2]);
+    #endif
 
     tresult->chars = (char **) calloc(tresult->height, sizeof(char *));
+    tresult->mbcs = (bxstr_t **) calloc(tresult->height, sizeof(bxstr_t *));
     bresult->chars = (char **) calloc(bresult->height, sizeof(char *));
+    bresult->mbcs = (bxstr_t **) calloc(bresult->height, sizeof(bxstr_t *));
     if (tresult->chars == NULL || bresult->chars == NULL) {
         return 1;
     }
@@ -555,7 +616,7 @@ static int horiz_generate(sentry_t *tresult, sentry_t *bresult)
         return rc;
     }
 
-#ifdef DEBUG
+    #ifdef DEBUG
     {
         /*
          *  Debugging code - Output horizontal sides of box
@@ -563,16 +624,16 @@ static int horiz_generate(sentry_t *tresult, sentry_t *bresult)
         size_t j;
         fprintf(stderr, "TOP SIDE:\n");
         for (j = 0; j < tresult->height; ++j) {
-            fprintf(stderr, "  %2d: \'%s\'\n", (int) j,
-                    tresult->chars[j] ? tresult->chars[j] : "(null)");
+            fprintf(stderr, "  %2d: \'%s\' - \'%s\'\n", (int) j,
+                            bxs_to_output(tresult->mbcs[j]), tresult->chars[j]);
         }
         fprintf(stderr, "BOTTOM SIDE:\n");
         for (j = 0; j < bresult->height; ++j) {
-            fprintf(stderr, "  %2d: \'%s\'\n", (int) j,
-                    bresult->chars[j] ? bresult->chars[j] : "(null)");
+            fprintf(stderr, "  %2d: \'%s\' - '%s'\n", (int) j,
+                            bxs_to_output(bresult->mbcs[j]), bresult->chars[j]);
         }
     }
-#endif
+    #endif
 
     return 0;                            /* all clear */
 }
@@ -609,51 +670,59 @@ static int vert_generate(sentry_t *lresult, sentry_t *rresult)
     rresult->height = vspace +
             opt.design->shape[NE].height + opt.design->shape[SE].height;
 
-#ifdef DEBUG
-    fprintf(stderr, "Left side box rect width %d, height %d, vspace %d.\n",
-            (int) lresult->width, (int) lresult->height, (int) vspace);
-    fprintf(stderr, "Left lines to fill: %s %d, %s %d, %s %d.\n",
-            shape_name[west_side[1]], (int) leftiltf[0],
-            shape_name[west_side[2]], (int) leftiltf[1],
-            shape_name[west_side[3]], (int) leftiltf[2]);
-    fprintf(stderr, "Right side box rect width %d, height %d, vspace %d.\n",
-            (int) rresult->width, (int) rresult->height, (int) vspace);
-    fprintf(stderr, "Right lines to fill: %s %d, %s %d, %s %d.\n",
-            shape_name[east_side[1]], (int) rightiltf[0],
-            shape_name[east_side[2]], (int) rightiltf[1],
-            shape_name[east_side[3]], (int) rightiltf[2]);
-#endif
+    #ifdef DEBUG
+        fprintf(stderr, "Left side box rect width %d, height %d, vspace %d.\n",
+                (int) lresult->width, (int) lresult->height, (int) vspace);
+        fprintf(stderr, "Left lines to fill: %s %d, %s %d, %s %d.\n",
+                shape_name[west_side[1]], (int) leftiltf[0],
+                shape_name[west_side[2]], (int) leftiltf[1],
+                shape_name[west_side[3]], (int) leftiltf[2]);
+        fprintf(stderr, "Right side box rect width %d, height %d, vspace %d.\n",
+                (int) rresult->width, (int) rresult->height, (int) vspace);
+        fprintf(stderr, "Right lines to fill: %s %d, %s %d, %s %d.\n",
+                shape_name[east_side[1]], (int) rightiltf[0],
+                shape_name[east_side[2]], (int) rightiltf[1],
+                shape_name[east_side[3]], (int) rightiltf[2]);
+    #endif
 
     lresult->chars = (char **) calloc(lresult->height, sizeof(char *));
     if (lresult->chars == NULL) {
+        return 1;
+    }
+    lresult->mbcs = (bxstr_t **) calloc(lresult->height, sizeof(bxstr_t *));
+    if (lresult->mbcs == NULL) {
         return 1;
     }
     rresult->chars = (char **) calloc(rresult->height, sizeof(char *));
     if (rresult->chars == NULL) {
         return 1;
     }
+    rresult->mbcs = (bxstr_t **) calloc(rresult->height, sizeof(bxstr_t *));
+    if (rresult->mbcs == NULL) {
+        return 1;
+    }
 
     horiz_assemble(opt.design->shape, west_side, leftiltf, lresult);
     horiz_assemble(opt.design->shape, east_side, rightiltf, rresult);
 
-#if defined(DEBUG) && 1
-    {
-        /*
-         *  Debugging code - Output left and right side of box
-         */
-        size_t j;
-        fprintf(stderr, "LEFT SIDE:\n");
-        for (j = 0; j < lresult->height; ++j) {
-            fprintf(stderr, "  %2d: \'%s\'\n", (int) j,
-                    lresult->chars[j] ? lresult->chars[j] : "(null)");
+    #if defined(DEBUG) && 1
+        {
+            /*
+            *  Debugging code - Output left and right side of box
+            */
+            size_t j;
+            fprintf(stderr, "LEFT SIDE:\n");
+            for (j = 0; j < lresult->height; ++j) {
+                fprintf(stderr, "  %2d: \'%s\' - \'%s\'\n", (int) j,
+                                bxs_to_output(lresult->mbcs[j]), lresult->chars[j]);
+            }
+            fprintf(stderr, "RIGHT SIDE:\n");
+            for (j = 0; j < rresult->height; ++j) {
+                fprintf(stderr, "  %2d: \'%s\' - \'%s\'\n", (int) j,
+                                bxs_to_output(rresult->mbcs[j]), rresult->chars[j]);
+            }
         }
-        fprintf(stderr, "RIGHT SIDE:\n");
-        for (j = 0; j < rresult->height; ++j) {
-            fprintf(stderr, "  %2d: \'%s\'\n", (int) j,
-                    rresult->chars[j] ? rresult->chars[j] : "(null)");
-        }
-    }
-#endif
+    #endif
 
     return 0;                            /* all clear */
 }
@@ -793,31 +862,27 @@ int output_box(const sentry_t *thebox)
 {
     size_t j;
     size_t nol = thebox[BRIG].height;   /* number of output lines */
-    char *indentspc;
-    int indentspclen;
     size_t vfill, vfill1, vfill2;       /* empty lines/columns in box */
     size_t hfill;
-    char *hfill1, *hfill2;              /* space before/after text */
+    uint32_t *hfill1, *hfill2;          /* space before/after text */
     size_t hpl, hpr;
-    char obuf[LINE_MAX_BYTES + 1];      /* final output buffer */
-    size_t obuf_len;                    /* length of content of obuf */
     size_t skip_start;                  /* lines to skip for box top */
     size_t skip_end;                    /* lines to skip for box bottom */
     size_t skip_left;                   /* true if left box part is to be skipped */
-    int ntabs, nspcs;                   /* needed for unexpand of tabs */
-    char *restored_indent;
+    size_t ntabs, nspcs;                /* needed for unexpand of tabs */
 
-#ifdef DEBUG
-    fprintf (stderr, "Padding used: left %d, top %d, right %d, bottom %d\n",
-            opt.design->padding[BLEF], opt.design->padding[BTOP],
-            opt.design->padding[BRIG], opt.design->padding[BBOT]);
-#endif
+    #ifdef DEBUG
+        fprintf (stderr, "Padding used: left %d, top %d, right %d, bottom %d\n",
+                opt.design->padding[BLEF], opt.design->padding[BTOP],
+                opt.design->padding[BRIG], opt.design->padding[BBOT]);
+    #endif
 
     /*
      *  Create string of spaces for indentation
      */
-    indentspc = NULL;
-    ntabs = nspcs = indentspclen = 0;
+    uint32_t *indentspc = NULL;
+    size_t indentspclen = 0;
+    ntabs = nspcs = 0;
     if (opt.design->indentmode == 'b') {
         if (opt.tabexp == 'u') {
             ntabs = input.indent / opt.tabstop;
@@ -827,23 +892,24 @@ int output_box(const sentry_t *thebox)
         else {
             indentspclen = input.indent;
         }
-        indentspc = (char *) malloc(indentspclen + 1);
+
+        indentspc = (uint32_t *) malloc((indentspclen + 1) * sizeof(uint32_t));
         if (indentspc == NULL) {
             perror(PROJECT);
             return 1;
         }
 
         if (opt.tabexp == 'u') {
-            memset(indentspc, (int) '\t', ntabs);
-            memset(indentspc + ntabs, (int) ' ', nspcs);
+            u32_set(indentspc, char_tab, ntabs);
+            u32_set(indentspc + ntabs, char_space, nspcs);
         }
         else {
-            memset(indentspc, (int) ' ', indentspclen);
+            u32_set(indentspc, char_space, indentspclen);
         }
-        indentspc[indentspclen] = '\0';
+        set_char_at(indentspc, indentspclen, char_nul);
     }
     else {
-        indentspc = (char *) strdup("");
+        indentspc = new_empty_string32();
         if (indentspc == NULL) {
             perror(PROJECT);
             return 1;
@@ -875,16 +941,16 @@ int output_box(const sentry_t *thebox)
      *  Provide strings for horizontal text alignment.
      */
     hfill = thebox[BTOP].width - input.maxline;
-    hfill1 = (char *) malloc(hfill + 1);
-    hfill2 = (char *) malloc(hfill + 1);
+    hfill1 = (uint32_t *) malloc((hfill + 1) * sizeof(uint32_t));
+    hfill2 = (uint32_t *) malloc((hfill + 1) * sizeof(uint32_t));
     if (!hfill1 || !hfill2) {
         perror(PROJECT);
         return 1;
     }
-    memset(hfill1, (int) ' ', hfill + 1);
-    memset(hfill2, (int) ' ', hfill + 1);
-    hfill1[hfill] = '\0';
-    hfill2[hfill] = '\0';
+    u32_set(hfill1, char_space, hfill);
+    u32_set(hfill2, char_space, hfill);
+    set_char_at(hfill1, hfill, char_nul);
+    set_char_at(hfill2, hfill, char_nul);
     hpl = 0;
     hpr = 0;
     if (hfill == 1) {
@@ -914,15 +980,15 @@ int output_box(const sentry_t *thebox)
         }
         hfill += opt.design->padding[BLEF] + opt.design->padding[BRIG];
     }
-    hfill1[hpl] = '\0';
-    hfill2[hpr] = '\0';
+    set_char_at(hfill1, hpl, char_nul);
+    set_char_at(hfill2, hpr, char_nul);
 
-#if defined(DEBUG)
-    fprintf(stderr, "Alignment: hfill %d hpl %d hpr %d, vfill %d vfill1 %d vfill2 %d.\n",
-            (int) hfill, (int) hpl, (int) hpr, (int) vfill, (int) vfill1, (int) vfill2);
-    fprintf(stderr, "           hfill1 = \"%s\";  hfill2 = \"%s\";  indentspc = \"%s\";\n",
-            hfill1, hfill2, indentspc);
-#endif
+    #if defined(DEBUG)
+        fprintf(stderr, "Alignment: hfill %d hpl %d hpr %d, vfill %d vfill1 %d vfill2 %d.\n",
+                (int) hfill, (int) hpl, (int) hpr, (int) vfill, (int) vfill1, (int) vfill2);
+        fprintf(stderr, "           hfill1 = \"%s\";  hfill2 = \"%s\";  indentspc = \"%s\";\n",
+                u32_strconv_to_output(hfill1), u32_strconv_to_output(hfill2), u32_strconv_to_output(indentspc));
+    #endif
 
     /*
      *  Find out if and how many leading or trailing blank lines must be
@@ -948,21 +1014,28 @@ int output_box(const sentry_t *thebox)
     /*
      *  Generate actual output
      */
+    bxstr_t *obuf = NULL;           /* final output string */
+    uint32_t *restored_indent;
+    uint32_t *empty_string = new_empty_string32();
     for (j = skip_start; j < nol - skip_end; ++j) {
 
         if (j < thebox[BTOP].height) {   /* box top */
             restored_indent = tabbify_indent(0, indentspc, indentspclen);
-            concat_strings(obuf, LINE_MAX_BYTES + 1, 4, restored_indent,
-                           skip_left ? "" : thebox[BLEF].chars[j], thebox[BTOP].chars[j],
-                           thebox[BRIG].chars[j]);
+            obuf = bxs_concat(4, restored_indent, 
+                            skip_left ? empty_string : thebox[BLEF].mbcs[j]->memory,
+                            thebox[BTOP].mbcs[j]->memory,
+                            thebox[BRIG].mbcs[j]->memory);
         }
 
         else if (vfill1) {               /* top vfill */
             restored_indent = tabbify_indent(0, indentspc, indentspclen);
-            concat_strings(obuf, LINE_MAX_BYTES + 1, 4, restored_indent,
-                           skip_left ? "" : thebox[BLEF].chars[j], nspaces(thebox[BTOP].width),
-                           thebox[BRIG].chars[j]);
+            uint32_t *wspc = u32_nspaces(thebox[BTOP].width);
+            obuf = bxs_concat(4, restored_indent,
+                            skip_left ? empty_string : thebox[BLEF].mbcs[j]->memory,
+                            wspc,
+                            thebox[BRIG].mbcs[j]->memory);
             --vfill1;
+            BFREE(wspc);
         }
 
         else if (j < nol - thebox[BBOT].height) {
@@ -971,46 +1044,52 @@ int output_box(const sentry_t *thebox)
                 int shift = justify_line(input.lines + ti, hpr - hpl);
                 restored_indent = tabbify_indent(ti, indentspc, indentspclen);
                 uint32_t *mbtext_shifted = advance32(input.lines[ti].mbtext, shift < 0 ? (size_t) (-shift) : 0);
-                concat_strings(obuf, LINE_MAX_BYTES + 1, 8, restored_indent,
-                               skip_left ? "" : thebox[BLEF].chars[j], hfill1,
-                               ti >= 0 && shift > 0 ? nspaces(shift) : "",
-                               ti >= 0 ? u32_strconv_to_output(mbtext_shifted) : "",
-                               hfill2, nspaces(input.maxline - input.lines[ti].len - shift),
-                               thebox[BRIG].chars[j]);
+                uint32_t *spc1 = empty_string;
+                if (ti >= 0 && shift > 0) {
+                    spc1 = u32_nspaces(shift);
+                }
+                uint32_t *spc2 = u32_nspaces(input.maxline - input.lines[ti].len - shift);
+                obuf = bxs_concat(8, restored_indent,
+                                skip_left ? empty_string : thebox[BLEF].mbcs[j]->memory, hfill1, spc1,
+                                ti >= 0 ? mbtext_shifted : empty_string, hfill2, spc2,
+                                thebox[BRIG].mbcs[j]->memory);
+                if (spc1 != empty_string) {
+                    BFREE(spc1);
+                }
+                BFREE(spc2);
             }
             else {                       /* bottom vfill */
                 restored_indent = tabbify_indent(input.num_lines - 1, indentspc, indentspclen);
-                concat_strings(obuf, LINE_MAX_BYTES + 1, 4, restored_indent,
-                               skip_left ? "" : thebox[BLEF].chars[j], nspaces(thebox[BTOP].width),
-                               thebox[BRIG].chars[j]);
+                uint32_t *spc = u32_nspaces(thebox[BTOP].width);
+                obuf = bxs_concat(4, restored_indent,
+                                skip_left ? empty_string : thebox[BLEF].mbcs[j]->memory,
+                                spc,
+                                thebox[BRIG].mbcs[j]->memory);
+                BFREE(spc);
             }
         }
 
         else {                           /* box bottom */
             restored_indent = tabbify_indent(input.num_lines - 1, indentspc, indentspclen);
-            concat_strings(obuf, LINE_MAX_BYTES + 1, 4, restored_indent,
-                           skip_left ? "" : thebox[BLEF].chars[j],
-                           thebox[BBOT].chars[j - (nol - thebox[BBOT].height)],
-                           thebox[BRIG].chars[j]);
+            obuf = bxs_concat(4, restored_indent,
+                            skip_left ? empty_string : thebox[BLEF].mbcs[j]->memory,
+                            thebox[BBOT].mbcs[j - (nol - thebox[BBOT].height)]->memory,
+                            thebox[BRIG].mbcs[j]->memory);
         }
 
-        obuf_len = strlen(obuf);
+        bxstr_t *obuf_trimmed = bxs_rtrim(obuf);
+        fprintf(opt.outfile, "%s%s", bxs_to_output(obuf_trimmed),
+                    (input.final_newline || j < nol - skip_end - 1 ? opt.eol : ""));
 
-        if (obuf_len > LINE_MAX_BYTES) {
-            size_t newlen = LINE_MAX_BYTES;
-            btrim(obuf, &newlen);
-        }
-        else {
-            btrim(obuf, &obuf_len);
-        }
+        bxs_free(obuf);
+        bxs_free(obuf_trimmed);
         if (opt.tabexp == 'k') {
-            BFREE (restored_indent);
+            BFREE(restored_indent);
         }
-
-        fprintf(opt.outfile, "%s%s", obuf, (input.final_newline || j < nol - skip_end - 1 ? opt.eol : ""));
     }
 
     BFREE (indentspc);
+    BFREE (empty_string);
     BFREE (hfill1);
     BFREE (hfill2);
     return 0;                            /* all clear */
@@ -1018,4 +1097,4 @@ int output_box(const sentry_t *thebox)
 
 
 
-/*EOF*/                                                 /* vim: set sw=4: */
+/* vim: set cindent sw=4: */

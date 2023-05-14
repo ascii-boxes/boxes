@@ -105,7 +105,8 @@ int main(void)
         cmocka_unit_test(test_is_ascii_id_valid),
         cmocka_unit_test(test_is_ascii_id_invalid),
         cmocka_unit_test(test_is_ascii_id_strict_valid),
-        cmocka_unit_test(test_is_ascii_id_strict_invalid)
+        cmocka_unit_test(test_is_ascii_id_strict_invalid),
+        cmocka_unit_test(test_repeat)
     };
 
     const struct CMUnitTest unicode_tests[] = {
@@ -157,11 +158,12 @@ int main(void)
         cmocka_unit_test_setup(test_bxs_is_visible_char, beforeTest),
         cmocka_unit_test_setup(test_bxs_filter_visible, beforeTest),
         cmocka_unit_test_setup(test_bxs_filter_visible_none, beforeTest),
-
         cmocka_unit_test_setup(test_bxs_strcmp, beforeTest),
         cmocka_unit_test_setup(test_bxs_valid_anywhere_error, beforeTest),
         cmocka_unit_test_setup(test_bxs_valid_in_filename_error, beforeTest),
-        cmocka_unit_test_setup(test_bxs_free_null, beforeTest)
+        cmocka_unit_test_setup(test_bxs_free_null, beforeTest),
+        cmocka_unit_test_setup(test_bxs_concat, beforeTest),
+        cmocka_unit_test_setup(test_bxs_concat_nullarg, beforeTest)
     };
 
     int num_failed = 0;

@@ -59,8 +59,8 @@ char *my_strnrstr(const char *s1, const char *s2, const size_t s2_len, int skip)
 /**
  * Calculates the length (in bytes) of the segment at the end of `s` which consists entirely of bytes in `accept`.
  * This is like `strspn()`, but from the end of the string.
- * @param <s> the string to search
- * @param <accept> acceptable characters that form the trailing segment
+ * @param s the string to search
+ * @param accept acceptable characters that form the trailing segment
  * @return the number of bytes found as described above
  */
 size_t my_strrspn(const char *s, const char *accept);
@@ -75,9 +75,9 @@ int strisno(const char *s);
 /**
  * Concatenate variable number of strings into one. This would normally be achieved via snprintf(), but that's not
  * available on all platforms where boxes is compiled.
- * @param <count> number of strings given in the following
+ * @param count number of strings given in the following
  * @param <...> the strings
- * @returns a new string, for which new memory was allocated
+ * @return a new string, for which new memory was allocated
  */
 char *concat_strings_alloc(size_t count, ...);
 
@@ -85,7 +85,27 @@ char *concat_strings_alloc(size_t count, ...);
 void concat_strings(char *dst, int max_len, int count, ...);
 
 
-char *tabbify_indent(const size_t lineno, char *indentspc, const size_t indentspc_len);
+/**
+ * Repeat the string `s` `count` times.
+ * @param s the string to repeat
+ * @param count the number of times the string should be repeated
+ * @return a new string, for which new memory was allocated, or NULL if `s` was NULL or out of memory
+ */
+char *repeat(char *s, size_t count);
+
+
+/**
+ * Checks if tab expansion mode is "keep", and if so, calculates a new indentation string based on the one given.
+ * The new string contains tabs in their original positions.
+ *
+ * @param lineno index of the input line we are referring to
+ * @param indentspc previously calculated "space-only" indentation string (may be NULL). This is only used when
+ *                  opt.tabexp != 'k', in which case it will be used as the function result.
+ * @param indentspc_len desired result length, measured in spaces only
+ * @return if successful and opt.tabexp == 'k': new string;
+ *         on error (invalid input or out of memory): NULL
+ */
+uint32_t *tabbify_indent(const size_t lineno, uint32_t *indentspc, const size_t indentspc_len);
 
 
 char *nspaces(const size_t n);
@@ -208,4 +228,4 @@ FILE *bx_fopen(char *pathname, char *mode);
 
 #endif
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

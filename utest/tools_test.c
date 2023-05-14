@@ -261,4 +261,25 @@ void test_is_ascii_id_strict_invalid(void **state)
 }
 
 
+void test_repeat(void **state)
+{
+    (void) state; /* unused */
+
+    char *actual = repeat(NULL, 1);
+    assert_null(actual);
+
+    actual = repeat("x", 0);
+    assert_string_equal("", actual);
+    BFREE(actual);
+
+    actual = repeat("x", 3);
+    assert_string_equal("xxx", actual);
+    BFREE(actual);
+
+    actual = repeat("abc", 3);
+    assert_string_equal("abcabcabc", actual);
+    BFREE(actual);
+}
+
+
 /* vim: set cindent sw=4: */

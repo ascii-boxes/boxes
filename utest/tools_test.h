@@ -14,7 +14,7 @@
  */
 
 /*
- * Unit tests of the 'tools' module
+ * Unit tests of the 'tools' module.
  */
 
 #ifndef TOOLS_TEST_H
@@ -37,7 +37,9 @@ void test_is_ascii_id_invalid(void **state);
 void test_is_ascii_id_strict_valid(void **state);
 void test_is_ascii_id_strict_invalid(void **state);
 
+void test_repeat(void **state);
+
 
 #endif
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */
