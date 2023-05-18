@@ -1,5 +1,3 @@
-:ENV
-export TERM="xterm-color"
 :ARGS
 -f 177_utf8_generate_box.cfg -s 21x8 -ac
 :INPUT

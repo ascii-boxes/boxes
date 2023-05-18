@@ -16,6 +16,9 @@ name: build
 
 on: [push, pull_request, workflow_dispatch]
 
+env:
+    TERM: xterm-color
+
 jobs:
     build:
         runs-on: ubuntu-latest

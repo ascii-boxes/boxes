@@ -1,5 +1,3 @@
-:ENV
-export TERM="xterm-color"
 :ARGS
 -f 176_utf8_design_list.cfg -l
 :INPUT
