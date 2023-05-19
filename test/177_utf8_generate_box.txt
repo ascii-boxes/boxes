@@ -1,0 +1,17 @@
+:ENV
+export TERM="xterm-color"
+:ARGS
+-f 177_utf8_generate_box.cfg -s 21x8 -ac
+:INPUT
+fäo
+:OUTPUT-FILTER
+:EXPECTED
+┏━┳━━━ [38;5;154m沐[0m[38;5;184m宸[0m[38;5;184m [0m[38;5;184m若[0m[38;5;214m汐[0m ━━━┓
+┃ ┃                 ┋
+┃ ┃                 ┃
+┃ ┃       föo       ┋
+┃ ┃                 ┃
+┃ ┃                 ┋
+┣━╋━━━━━━━━━━━━━━━━━┫
+┗━┻━━━━━━━━━━━━━━━━━┛
+:EOF
