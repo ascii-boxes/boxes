@@ -18,6 +18,7 @@
  */
 
 #include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -155,8 +156,10 @@ static int best_match(const line_t *line,
                 cs = opt.design->shape + east_side[++w];
             }
             #ifdef DEBUG
-                fprintf(stderr, "\nj %d, k %d, w %d, cs->chars[k] = \"%s\"\n",
-                        (int) j, (int) k, w, cs->chars[k] ? cs->chars[k] : "(null)");
+                char *mbcs_temp = bxs_to_output(cs->mbcs[k]);
+                fprintf(stderr, "\nj %d, k %d, w %d, cs->chars[k] = \"%s\", cs->mbcs[k] = \"%s\"\n",
+                        (int) j, (int) k, w, cs->chars[k] ? cs->chars[k] : "(null)", mbcs_temp);
+                BFREE(mbcs_temp);
             #endif
 
             chkline.text = cs->chars[k];
@@ -528,8 +531,7 @@ static design_t *detect_design()
 
     for (dcnt = 0; dcnt < num_designs; ++dcnt, ++d) {
         #ifdef DEBUG
-        fprintf (stderr, "CONSIDERING DESIGN ---- \"%s\" ---------------\n",
-                d->name);
+            fprintf(stderr, "CONSIDERING DESIGN ---- \"%s\" ---------------\n", d->name);
         #endif
         hits = 0;
 
@@ -537,7 +539,7 @@ static design_t *detect_design()
             empty[j] = empty_side(d->shape, j);
         }
         #ifdef DEBUG
-        fprintf (stderr, "Empty sides: TOP %d, LEFT %d, BOTTOM %d, RIGHT %d\n",
+            fprintf (stderr, "Empty sides: TOP %d, LEFT %d, BOTTOM %d, RIGHT %d\n",
                 empty[BTOP], empty[BLEF], empty[BBOT], empty[BRIG]);
         #endif
 
@@ -556,7 +558,7 @@ static design_t *detect_design()
                         break;
                     }
                     for (j = 0; j < d->shape[scnt].height; ++j) {
-                        shpln.text = d->shape[scnt].chars[j];
+                        shpln.text = d->shape[scnt].chars[j];   // TODO HERE
                         shpln.len = d->shape[scnt].width;
                         if (empty_line(&shpln)) {
                             continue;
@@ -578,9 +580,9 @@ static design_t *detect_design()
                             }
                         }
                     }
-#ifdef DEBUG
-                    fprintf (stderr, "After %s corner check:\t%ld hits.\n", shape_name[scnt], hits);
-#endif
+                    #ifdef DEBUG
+                        fprintf(stderr, "After %s corner check:\t%ld hits.\n", shape_name[scnt], hits);
+                    #endif
                     break;
 
                 case NE:
@@ -1089,7 +1091,9 @@ void output_input(const int trim_only)
             indentspc[ntabs + nspcs] = '\0';
         }
         else if (opt.tabexp == 'k') {
-            indentspc = tabbify_indent(j, NULL, input.indent);
+            uint32_t *indent32 = tabbify_indent(j, NULL, input.indent);
+            indentspc = u32_strconv_to_output(indent32);
+            BFREE(indent32);
             indent = input.indent;
         }
         else {
@@ -1104,5 +1108,4 @@ void output_input(const int trim_only)
 }
 
 
-
-/*EOF*/                                                 /* vim: set sw=4: */
+/* vim: set sw=4: */
