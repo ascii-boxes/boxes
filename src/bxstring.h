@@ -84,6 +84,13 @@ bxstr_t *bxs_from_unicode(uint32_t *pInput);
 
 
 /**
+ * Return a freshly allocated empty string.
+ * @return a new empty string
+ */
+bxstr_t *bxs_new_empty_string();
+
+
+/**
  * Create an exact copy of a string.
  * @param pString the string to copy
  * @return the copied string, for which new memory was allocated
@@ -135,6 +142,26 @@ uint32_t *bxs_strchr(bxstr_t *pString, ucs4_t c, int *cursor);
 
 
 /**
+ * Remove the first `n` visible characters from the given string. Invisible characters are additionally removed where
+ * they are associated with the removed visible characters.
+ * @param pString the string to shorten
+ * @param n the number of visible characters to cut from the front of the string. If this is greater than the total
+ *          number of visible characters in the string, will lead to an empty string being produced
+ * @return a new, shortened string, or NULL only if `pString` was NULL
+ */
+bxstr_t *bxs_cut_front(bxstr_t *pString, size_t n);
+
+
+/**
+ * Return the first character of the visible character with index `n` in the given string's `memory`.
+ * @param pString the string to use
+ * @param n the index of the visible character (zero-based)
+ * @return a pointer into existing memory
+ */
+uint32_t *bxs_first_char_ptr(bxstr_t *pString, size_t n);
+
+
+/**
  * Create a new string from which all leading and trailing whitespace have been removed.
  * @param pString the string to trim, which will not be modified
  * @return a new, trimmed string
@@ -151,6 +178,14 @@ bxstr_t *bxs_rtrim(bxstr_t *pString);
 
 
 /**
+ * Append `n` spaces to the end of the given string. The given string is *modified* accordingly.
+ * @param pString the string to modify
+ * @param n the number of spaces to add
+ */
+void bxs_append_spaces(bxstr_t *pString, size_t n);
+
+
+/**
  * Convert the string into boxes' output encoding for proper printing on stdout.
  * @param pString the string to convert
  * @return the same string in the target (output) encoding, for which new memory has been allocated
@@ -159,11 +194,20 @@ char *bxs_to_output(bxstr_t *pString);
 
 
 /**
- * Determine if the given string is empty.
+ * Determine if the given string is empty, which means it does not contain any characters at all (neither visible nor
+ * invisible).
  * @param pString the string to check (may be NULL, which counts as empty)
  * @return 1 for empty, 0 for not empty
  */
 int bxs_is_empty(bxstr_t *pString);
+
+
+/**
+ * Determine if the line is either empty or its visible characters are all whitespace.
+ * @param pString the string to check (may be NULL, which counts as blank)
+ * @return 1 for blank, 0 for not blank
+ */
+int bxs_is_blank(bxstr_t *pString);
 
 
 /**

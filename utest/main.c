@@ -115,7 +115,8 @@ int main(void)
         cmocka_unit_test(test_is_allowed_in_sample),
         cmocka_unit_test(test_is_allowed_in_shape),
         cmocka_unit_test(test_is_allowed_in_filename),
-        cmocka_unit_test(test_is_allowed_in_kv_string)
+        cmocka_unit_test(test_is_allowed_in_kv_string),
+        cmocka_unit_test(test_u32_strnrstr)
     };
 
     const struct CMUnitTest bxstring_tests[] = {
@@ -132,7 +133,11 @@ int main(void)
         cmocka_unit_test_setup(test_ansi_unicode_tabs, beforeTest),
         cmocka_unit_test_setup(test_ansi_unicode_broken_escapes, beforeTest),
         cmocka_unit_test_setup(test_ansi_unicode_null, beforeTest),
+        cmocka_unit_test_setup(test_bxs_new_empty_string, beforeTest),
+        cmocka_unit_test_setup(test_bxs_is_blank, beforeTest),
         cmocka_unit_test_setup(test_bxs_strdup, beforeTest),
+        cmocka_unit_test_setup(test_bxs_cut_front, beforeTest),
+        cmocka_unit_test_setup(test_bxs_cut_front_zero, beforeTest),
         cmocka_unit_test_setup(test_bxs_trimdup_null, beforeTest),
         cmocka_unit_test_setup(test_bxs_trimdup_invalid_startidx, beforeTest),
         cmocka_unit_test_setup(test_bxs_trimdup_invalid_endidx, beforeTest),
@@ -153,6 +158,7 @@ int main(void)
         cmocka_unit_test_setup(test_bxs_trim_none, beforeTest),
         cmocka_unit_test_setup(test_bxs_rtrim, beforeTest),
         cmocka_unit_test_setup(test_bxs_rtrim_empty, beforeTest),
+        cmocka_unit_test_setup(test_bxs_append_spaces, beforeTest),
         cmocka_unit_test_setup(test_bxs_to_output, beforeTest),
         cmocka_unit_test_setup(test_bxs_is_empty_null, beforeTest),
         cmocka_unit_test_setup(test_bxs_is_visible_char, beforeTest),

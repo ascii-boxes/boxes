@@ -36,7 +36,14 @@ void test_ansi_unicode_tabs(void **state);
 void test_ansi_unicode_broken_escapes(void **state);
 void test_ansi_unicode_null(void **state);
 
+void test_bxs_new_empty_string(void **state);
+
+void test_bxs_is_blank(void **state);
+
 void test_bxs_strdup(void **state);
+
+void test_bxs_cut_front(void **state);
+void test_bxs_cut_front_zero(void **state);
 
 void test_bxs_trimdup_null(void **state);
 void test_bxs_trimdup_invalid_startidx(void **state);
@@ -62,6 +69,8 @@ void test_bxs_trim_none(void **state);
 
 void test_bxs_rtrim(void **state);
 void test_bxs_rtrim_empty(void **state);
+
+void test_bxs_append_spaces(void **state);
 
 void test_bxs_to_output(void **state);
 

@@ -72,5 +72,5 @@ cmdline_test.o:  cmdline_test.c cmdline_test.h boxes.h cmdline.h global_mock.h t
 tools_test.o:    tools_test.c tools_test.h tools.h unicode.h config.h | check_dir
 regulex_test.o:  regulex_test.c regulex_test.h boxes.h global_mock.h regulex.h config.h | check_dir
 main.o:          main.c bxstring_test.h cmdline_test.h global_mock.h tools_test.h regulex_test.h unicode_test.h config.h | check_dir
-unicode_test.o:  unicode_test.c unicode_test.h boxes.h unicode.h config.h | check_dir
+unicode_test.o:  unicode_test.c unicode_test.h boxes.h tools.h unicode.h config.h | check_dir
 utest_tools.o:   utest_tools.c utest_tools.h config.h | check_dir

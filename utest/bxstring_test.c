@@ -353,6 +353,32 @@ void test_ansi_unicode_null(void **state)
 
 
 
+void test_bxs_new_empty_string(void **state)
+{
+    UNUSED(state);
+
+    bxstr_t *actual = bxs_new_empty_string();
+
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_int_equal(1, is_char_at(actual->memory, 0, char_nul));
+    assert_string_equal("", actual->ascii);
+    assert_int_equal(0, (int) actual->indent);
+    assert_int_equal(0, (int) actual->num_columns);
+    assert_int_equal(0, (int) actual->num_chars);
+    assert_int_equal(0, (int) actual->num_chars_visible);
+    assert_int_equal(0, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+    int expected_firstchar_idx[] = {0};
+    assert_array_equal(expected_firstchar_idx, actual->first_char, 1);
+    int expected_vischar_idx[] = {0};
+    assert_array_equal(expected_vischar_idx, actual->visible_char, 1);
+
+    bxs_free(actual);
+}
+
+
+
 void test_bxs_strdup(void **state)
 {
     UNUSED(state);
@@ -382,6 +408,81 @@ void test_bxs_strdup(void **state)
     BFREE(ustr32);
     bxs_free(actual);
     bxs_free(bxstr);
+}
+
+
+
+void test_bxs_cut_front(void **state)
+{
+    UNUSED(state);
+
+    bxstr_t *actual = bxs_cut_front(NULL, 1);
+    assert_null(actual);
+
+    uint32_t *ustr32 = u32_strconv_from_arg(" x\x1b[38;5;203mx\x1b[0m\x1b[38;5;198mf\x1b[0moo", "ASCII");
+    assert_non_null(ustr32);
+    bxstr_t *input = bxs_from_unicode(ustr32);
+    actual = bxs_cut_front(input, 3);
+
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_string_equal("foo", actual->ascii);
+    assert_int_equal(0, (int) actual->indent);
+    assert_int_equal(3, (int) actual->num_columns);
+    assert_int_equal(18, (int) actual->num_chars);
+    assert_int_equal(3, (int) actual->num_chars_visible);
+    assert_int_equal(15, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+    int expected_firstchar_idx[] = {0, 16, 17, 18};
+    assert_array_equal(expected_firstchar_idx, actual->first_char, 4);
+    int expected_vischar_idx[] = {11, 16, 17, 18};
+    assert_array_equal(expected_vischar_idx, actual->visible_char, 4);
+    bxs_free(actual);
+
+    actual = bxs_cut_front(input, 1000);
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_string_equal("", actual->ascii);
+    assert_int_equal(0, (int) actual->indent);
+    assert_int_equal(0, (int) actual->num_columns);
+    assert_int_equal(0, (int) actual->num_chars);
+    assert_int_equal(0, (int) actual->num_chars_visible);
+    assert_int_equal(0, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+    bxs_free(actual);
+
+    BFREE(ustr32);
+    bxs_free(input);
+}
+
+
+
+void test_bxs_cut_front_zero(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg(" x\x1b[38;5;203mx\x1b[0m\x1b[38;5;198mf\x1b[0moo", "ASCII");
+    assert_non_null(ustr32);
+    bxstr_t *input = bxs_from_unicode(ustr32);
+
+    bxstr_t *actual = actual = bxs_cut_front(input, 0);
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_string_equal(" xxfoo", actual->ascii);
+    assert_int_equal(1, (int) actual->indent);
+    assert_int_equal(6, (int) actual->num_columns);
+    assert_int_equal(36, (int) actual->num_chars);
+    assert_int_equal(6, (int) actual->num_chars_visible);
+    assert_int_equal(30, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+    int expected_firstchar_idx[] = {0, 1, 2, 18, 34, 35, 36};
+    assert_array_equal(expected_firstchar_idx, actual->first_char, 7);
+    int expected_vischar_idx[] = {0, 1, 13, 29, 34, 35, 36};
+    assert_array_equal(expected_vischar_idx, actual->visible_char, 7);
+
+    bxs_free(actual);
+    BFREE(ustr32);
+    bxs_free(input);
 }
 
 
@@ -876,6 +977,37 @@ void test_bxs_rtrim_empty(void **state)
 
 
 
+void test_bxs_append_spaces(void **state)
+{
+    UNUSED(state);
+
+    bxs_append_spaces(NULL, 2);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("X\x1b[38;5;203mY\x1b[0mZ", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *bxstr = bxs_from_unicode(ustr32);
+    bxs_append_spaces(bxstr, 0);
+
+    bxs_append_spaces(bxstr, 3);
+    assert_non_null(bxstr->memory);
+    assert_string_equal("XYZ   ", bxstr->ascii);
+    assert_int_equal(0, (int) bxstr->indent);
+    assert_int_equal(6, (int) bxstr->num_columns);
+    assert_int_equal(21, (int) bxstr->num_chars);
+    assert_int_equal(6, (int) bxstr->num_chars_visible);
+    assert_int_equal(15, (int) bxstr->num_chars_invisible);
+    assert_int_equal(3, (int) bxstr->trailing);
+    int expected_firstchar_idx[] = {0, 1, 17, 18, 19, 20, 21};
+    assert_array_equal(expected_firstchar_idx, bxstr->first_char, 7);
+    int expected_vischar_idx[] = {0, 12, 17, 18, 19, 20, 21};
+    assert_array_equal(expected_vischar_idx, bxstr->visible_char, 7);
+
+    BFREE(ustr32);
+    bxs_free(bxstr);
+}
+
+
+
 void test_bxs_to_output(void **state)
 {
     UNUSED(state);
@@ -901,6 +1033,40 @@ void test_bxs_is_empty_null(void **state)
 
     int actual = bxs_is_empty(NULL);
     assert_int_equal(1, actual);
+}
+
+
+
+void test_bxs_is_blank(void **state)
+{
+    UNUSED(state);
+
+    assert_int_equal(1, bxs_is_blank(NULL));
+
+    bxstr_t *bxstr = bxs_new_empty_string();
+    assert_int_equal(1, bxs_is_blank(bxstr));
+    bxs_free(bxstr);
+
+    uint32_t *ustr32 = u32_strconv_from_arg(" \x1b[38;5;203m \x1b[0m \x1b[38;5;203m\x1b[0m", "ASCII");
+    assert_non_null(ustr32);
+    bxstr = bxs_from_unicode(ustr32);
+    assert_int_equal(1, bxs_is_blank(bxstr));
+    BFREE(ustr32);
+    bxs_free(bxstr);
+
+    ustr32 = u32_strconv_from_arg("\x1b[38;5;203m\x1b[0m", "ASCII");
+    assert_non_null(ustr32);
+    bxstr = bxs_from_unicode(ustr32);
+    assert_int_equal(1, bxs_is_blank(bxstr));
+    BFREE(ustr32);
+    bxs_free(bxstr);
+
+    ustr32 = u32_strconv_from_arg("x", "ASCII");
+    assert_non_null(ustr32);
+    bxstr = bxs_from_unicode(ustr32);
+    assert_int_equal(0, bxs_is_blank(bxstr));
+    BFREE(ustr32);
+    bxs_free(bxstr);
 }
 
 

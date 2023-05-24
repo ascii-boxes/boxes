@@ -334,4 +334,41 @@ uint32_t *u32_nspaces(const size_t n)
 }
 
 
+
+uint32_t *u32_strnrstr(const uint32_t *s1, const uint32_t *s2, const size_t s2_len, int skip)
+{
+    if (is_empty(s2)) {
+        return (uint32_t *) s1;
+    }
+    if (is_empty(s1)) {
+        return NULL;
+    }
+    if (skip < 0) {
+        skip = 0;
+    }
+
+    uint32_t *p = u32_strrchr(s1, s2[0]);
+    if (!p) {
+        return NULL;
+    }
+
+    while (p >= s1) {
+        int comp = u32_strncmp(p, s2, s2_len);
+        if (comp == 0) {
+            if (skip--) {
+                --p;
+            }
+            else {
+                return p;
+            }
+        }
+        else {
+            --p;
+        }
+    }
+
+    return NULL;
+}
+
+
 /* vim: set cindent sw=4: */

@@ -20,7 +20,7 @@
 #ifndef BOXES_H
 #define BOXES_H
 
-#define DEBUG 1
+/* #define DEBUG 1 */
 /* #define REGEXP_DEBUG 1 */
 /* #define PARSER_DEBUG 1 */
 /* #define LEXER_DEBUG 1 */
@@ -146,24 +146,16 @@ extern int color_output_enabled;
 
 
 typedef struct {
-    size_t    len;                   /* length of visible text in columns (visible character positions in a text terminal), which is the same as the length of the 'text' field */
-    char     *text;                  /* ASCII line content, tabs expanded, ansi escapes removed, multi-byte chars replaced with one or more 'x' */
-    size_t    invis;                 /* number of invisble columns/characters (part of an ansi sequence) */
-
-    uint32_t *mbtext;                /* multi-byte (original) line content, tabs expanded. We use UTF-32 in order to enable pointer arithmetic. */
-    size_t    num_chars;             /* total number of characters in mbtext, visible + invisible */
-    uint32_t *mbtext_org;            /* mbtext as originally allocated, so that we can free it again */
-
+    bxstr_t  *text;                  /* text content of the line as a boxes string */
     size_t   *tabpos;                /* tab positions in expanded work strings, or NULL if not needed */
     size_t    tabpos_len;            /* number of tabs in a line */
-    size_t   *posmap;                /* for each character in `text`, position of corresponding char in `mbtext`. Needed for box removal. */
 } line_t;
 
 typedef struct {
     line_t *lines;
     size_t  num_lines;               /* number of entries in input */
-    size_t  maxline;                 /* length of longest input line */
-    size_t  indent;                  /* number of leading spaces found */
+    size_t  maxline;                 /* length in columns of longest input line */
+    size_t  indent;                  /* common number of leading spaces found in all input lines */
     int     final_newline;           /* true if the last line of input ends with newline */
 } input_t;
 
@@ -172,4 +164,4 @@ extern input_t input;
 
 #endif /* BOXES_H */
 
-/*EOF*/                                  /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

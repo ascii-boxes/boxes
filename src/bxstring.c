@@ -181,6 +181,13 @@ bxstr_t *bxs_from_unicode(uint32_t *pInput)
 
 
 
+bxstr_t *bxs_new_empty_string()
+{
+    return bxs_from_ascii("");
+}
+
+
+
 bxstr_t *bxs_strdup(bxstr_t *pString)
 {
     if (pString == NULL) {
@@ -329,6 +336,36 @@ uint32_t *bxs_strchr(bxstr_t *pString, ucs4_t c, int *cursor)
 
 
 
+bxstr_t *bxs_cut_front(bxstr_t *pString, size_t n)
+{
+    if (pString == NULL) {
+        return NULL;
+    }
+    if (n >= pString->num_chars_visible) {
+        return bxs_new_empty_string();
+    }
+    if (n == 0) {
+        return bxs_strdup(pString);
+    }
+    uint32_t *s = pString->memory + pString->first_char[n];
+    return bxs_from_unicode(s);
+}
+
+
+
+uint32_t *bxs_first_char_ptr(bxstr_t *pString, size_t n)
+{
+    if (pString == NULL) {
+        return NULL;
+    }
+    if (n >= pString->num_chars_visible) {
+        return pString->memory + pString->first_char[pString->num_chars_visible];  /* pointer to NUL terminator */
+    }
+    return pString->memory + pString->first_char[n];
+}
+
+
+
 bxstr_t *bxs_trim(bxstr_t *pString)
 {
     if (pString == NULL) {
@@ -338,7 +375,7 @@ bxstr_t *bxs_trim(bxstr_t *pString)
         return bxs_strdup(pString);
     }
     if (pString->indent + pString->trailing == pString->num_chars_visible) {
-        return bxs_from_ascii("");
+        return bxs_new_empty_string();
     }
 
     uint32_t *e = u32_strdup(pString->memory);
@@ -369,6 +406,37 @@ bxstr_t *bxs_rtrim(bxstr_t *pString)
 
 
 
+void bxs_append_spaces(bxstr_t *pString, size_t n)
+{
+    if (pString == NULL || n == 0) {
+        return;
+    }
+
+    pString->memory = (uint32_t *) realloc(pString->memory, (pString->num_chars + n + 1) * sizeof(uint32_t));
+    u32_set(pString->memory + pString->num_chars, char_space, n);
+    set_char_at(pString->memory, pString->num_chars + n, char_nul);
+
+    pString->ascii = (char *) realloc(pString->ascii, (pString->num_columns + n + 1) * sizeof(char));
+    memset(pString->ascii + pString->num_columns, ' ', n);
+    pString->ascii[pString->num_columns + n] = '\0';
+
+    pString->first_char =
+            (size_t *) realloc(pString->first_char, (pString->num_chars_visible + n + 1) * sizeof(size_t));
+    pString->visible_char =
+            (size_t *) realloc(pString->visible_char, (pString->num_chars_visible + n + 1) * sizeof(size_t));
+    for (size_t i = 0; i <= n; i++) {
+        pString->first_char[pString->num_chars_visible + i] = pString->num_chars + i;
+        pString->visible_char[pString->num_chars_visible + i] = pString->num_chars + i;
+    }
+
+    pString->num_chars += n;
+    pString->num_chars_visible += n;
+    pString->num_columns += n;
+    pString->trailing += n;
+}
+
+
+
 char *bxs_to_output(bxstr_t *pString)
 {
     if (pString == NULL) {
@@ -393,6 +461,22 @@ int bxs_is_empty(bxstr_t *pString)
         return 1;
     }
     return pString->num_chars > 0 ? 0 : 1;
+}
+
+
+
+int bxs_is_blank(bxstr_t *pString)
+{
+    if (bxs_is_empty(pString)) {
+        return 1;
+    }
+    for (size_t i = 0; i < pString->num_chars_visible; i++) {
+        ucs4_t c = pString->memory[pString->visible_char[i]];
+        if (c != char_tab && c != char_cr && !uc_is_blank(c)) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 

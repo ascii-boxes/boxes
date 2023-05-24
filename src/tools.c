@@ -273,54 +273,17 @@ char *repeat(char *s, size_t count)
 
 
 int empty_line(const line_t *line)
-/*
- *  Return true if line is empty.
- *
- *  Empty lines either consist entirely of whitespace or don't exist.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
 {
-    char *p;
-    size_t j;
-
     if (!line) {
         return 1;
     }
-    if (line->text == NULL || line->len <= 0) {
-        return 1;
-    }
-
-    for (p = line->text, j = 0; *p && j < line->len; ++j, ++p) {
-        if (*p != ' ' && *p != '\t' && *p != '\r') {
-            return 0;
-        }
-    }
-    return 1;
+    return bxs_is_blank(line->text);
 }
 
 
 
 size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_t **text, size_t **tabpos,
         size_t *tabpos_len)
-/*
- *  Expand tab chars in input_buffer and store result in text.
- *
- *  input_buffer   Line of text with tab chars
- *  tabstop        tab stop distance
- *  text           address of the pointer that will take the result
- *  tabpos         array of ints giving the positions of the first
- *                 space of an expanded tab in the text result buffer
- *  tabpos_len     number of tabs recorded in tabpos
- *
- *  Memory will be allocated for text and tabpos.
- *  Should only be called for lines of length > 0;
- *
- *  RETURNS:  Success: Length of the result line in characters (> 0)
- *            Error:   0       (e.g. out of memory)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
 {
     static uint32_t temp[LINE_MAX_BYTES + 100]; /* work string */
     size_t io;                                  /* character position in work string */
@@ -574,9 +537,11 @@ void print_input_lines(const char *heading)
     fprintf(stderr, "Input Lines%s:\n", heading != NULL ? heading : "");
     fprintf(stderr, "     [num_chars] \"real text\" [num_cols] \"ascii_text\"\n");
     for (size_t i = 0; i < input.num_lines; ++i) {
+        char *outtext = bxs_to_output(input.lines[i].text);
         fprintf(stderr, "%4d [%02d] \"%s\"  [%02d] \"%s\"", (int) i,
-                (int) input.lines[i].num_chars, u32_strconv_to_output(input.lines[i].mbtext),
-                (int) input.lines[i].len, input.lines[i].text);
+                (int) input.lines[i].text->num_chars, outtext,
+                (int) input.lines[i].text->num_columns, input.lines[i].text->ascii);
+        bxs_free(outtext);
         fprintf(stderr, "\tTabs: [");
         if (input.lines[i].tabpos != NULL) {
             for (size_t j = 0; j < input.lines[i].tabpos_len; ++j) {
@@ -587,13 +552,27 @@ void print_input_lines(const char *heading)
             }
         }
         fprintf(stderr, "] (%d)", (int) input.lines[i].tabpos_len);
-        fprintf(stderr, "\tinvisible=%d\n", (int) input.lines[i].invis);
+        fprintf(stderr, "\tinvisible=%d\n", (int) input.lines[i].text->num_chars_invisible);
 
-        fprintf(stderr, "          posmap=");
-        if (input.lines[i].posmap != NULL) {
+        fprintf(stderr, "    visible_char=");
+        if (input.lines[i].text->visible_char != NULL) {
             fprintf(stderr, "[");
-            for (size_t j = 0; j < input.lines[i].len; j++) {
-                fprintf(stderr, "%d%s", (int) input.lines[i].posmap[j], j == (input.lines[i].len - 1) ? "" : ", ");
+            for (size_t j = 0; j < input.lines[i].text->num_chars_visible; j++) {
+                fprintf(stderr, "%d%s", (int) input.lines[i].text->visible_char[j],
+                    j == (input.lines[i].text->num_chars_visible - 1) ? "" : ", ");
+            }
+            fprintf(stderr, "]\n");
+        }
+        else {
+            fprintf(stderr, "null\n");
+        }
+
+        fprintf(stderr, "      first_char=");
+        if (input.lines[i].text->first_char != NULL) {
+            fprintf(stderr, "[");
+            for (size_t j = 0; j < input.lines[i].text->num_chars_visible; j++) {
+                fprintf(stderr, "%d%s", (int) input.lines[i].text->first_char[j],
+                    j == (input.lines[i].text->num_chars_visible - 1) ? "" : ", ");
             }
             fprintf(stderr, "]\n");
         }
@@ -720,21 +699,8 @@ int is_csi_reset(const uint32_t *csi)
 
 void analyze_line_ascii(input_t *input_ptr, line_t *line)
 {
-    size_t num_esc = 0;
-    char *ascii;
-    size_t *map;
-    size_t invis = count_invisible_chars(line->mbtext, &num_esc, &ascii, &(map));
-    line->invis = invis;
-    /* u32_strwidth() does not count control characters, i.e. ESC characters, for which we must correct */
-    line->len = u32_strwidth(line->mbtext, encoding) - invis + num_esc;
-    line->num_chars = u32_strlen(line->mbtext);
-    BFREE(line->text);
-    line->text = ascii;
-    BFREE(line->posmap);
-    line->posmap = map;
-
-    if (line->len > input_ptr->maxline) {
-        input_ptr->maxline = line->len;
+    if (line->text->num_columns > input_ptr->maxline) {
+        input_ptr->maxline = line->text->num_columns;
     }
 }
 

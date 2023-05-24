@@ -52,9 +52,29 @@ typedef void (*bx_fprintf_t)(FILE *stream, const char *format, ...);
  */
 extern bx_fprintf_t bx_fprintf;
 
+
+/*
+ * Return true (1) if line is empty.
+ * Empty lines either consist entirely of whitespace or don't exist.
+ * @param line the line to check
+ * @return 1 if line is empty, 0 if it isn't
+ */
 int empty_line(const line_t *line);
 
 
+/**
+ * Expand tab chars in `input_buffer` and store result in `text`.
+ * Memory will be allocated for text and tabpos.
+ * Should only be called for lines of length > 0;
+ *
+ * @param input_buffer Line of text with tab chars
+ * @param tabstop tab stop distance as per command line options
+ * @param text address of the pointer that will take the result of this function
+ * @param tabpos array of ints giving the positions of the first space of an expanded tab in the text result buffer
+ * @param tabpos_len number of tabs recorded in tabpos
+ * @return Success: Length of the result line in characters (> 0);
+ *         Error:   0       (e.g. out of memory)
+ */
 size_t expand_tabs_into(const uint32_t *input_buffer, const int tabstop, uint32_t **text,
                         size_t **tabpos, size_t *tabpos_len);
 

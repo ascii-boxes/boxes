@@ -53,11 +53,10 @@ static int best_match(const line_t *line,
     size_t k;                    /* line counter within shape */
     int w;                       /* shape counter */
     sentry_t *cs;                /* current shape */
-    char *s;                     /* duplicate of current shape part */
-    char *p;                     /* position found by strstr */
+    uint32_t *s;                 /* duplicate of current shape part */
+    uint32_t *p;                 /* position found by u32_strstr() */
     size_t cq;                   /* current quality */
-    char *q;                     /* space check rover */
-    line_t chkline;              /* for calls to empty_line() */
+    uint32_t *q;                 /* space check rover */
     size_t quality;
 
     *ws = *we = *es = *ee = NULL;
@@ -87,13 +86,11 @@ static int best_match(const line_t *line,
                 cs = opt.design->shape + west_side[--w];
             }
 
-            chkline.text = cs->chars[k];
-            chkline.len = cs->width;
-            if (empty_line(&chkline) && !(quality == 0 && j == numw - 1)) {
+            if (bxs_is_blank(cs->mbcs[k]) && !(quality == 0 && j == numw - 1)) {
                 continue;
             }
 
-            s = (char *) strdup(cs->chars[k]);
+            s = u32_strdup(cs->mbcs[k]->memory);
             if (s == NULL) {
                 perror(PROJECT);
                 return -1;
@@ -101,10 +98,10 @@ static int best_match(const line_t *line,
             cq = cs->width;
 
             do {
-                p = strstr(line->text, s);
+                p = u32_strstr(line->text->memory, s);
                 if (p) {
                     q = p - 1;
-                    while (q >= line->text) {
+                    while (q >= line->text->memory) {
                         if (*q-- != ' ') {
                             p = NULL;
                             break;
@@ -115,10 +112,10 @@ static int best_match(const line_t *line,
                     }
                 }
                 if (!p && cq) {
-                    if (*s == ' ') {
-                        memmove(s, s + 1, cq--);
-                    } else if (s[cq - 1] == ' ') {
-                        s[--cq] = '\0';
+                    if (*s == char_space) {
+                        u32_move(s, s + 1, cq--);
+                    } else if (s[cq - 1] == char_space) {
+                        s[--cq] = char_nul;
                     } else {
                         cq = 0;
                         break;
@@ -162,13 +159,11 @@ static int best_match(const line_t *line,
                 BFREE(mbcs_temp);
             #endif
 
-            chkline.text = cs->chars[k];
-            chkline.len = cs->width;
-            if (empty_line(&chkline)) {
+            if (bxs_is_blank(cs->mbcs[k])) {
                 continue;
             }
 
-            s = (char *) strdup(cs->chars[k]);
+            s = u32_strdup(cs->mbcs[k]->memory);
             if (s == NULL) {
                 perror(PROJECT);
                 return -1;
@@ -176,7 +171,7 @@ static int best_match(const line_t *line,
             cq = cs->width;
 
             do {
-                p = my_strnrstr(line->text, s, cq, 0);
+                p = u32_strnrstr(line->text->memory, s, cq, 0);
                 if (p) {
                     q = p + cq;
                     while (*q) {
@@ -191,7 +186,7 @@ static int best_match(const line_t *line,
                 }
                 if (!p && cq) {
                     if (*s == ' ') {
-                        memmove(s, s + 1, cq--);
+                        u32_move(s, s + 1, cq--);
                     } else if (s[cq - 1] == ' ') {
                         s[--cq] = '\0';
                     } else {
@@ -558,7 +553,7 @@ static design_t *detect_design()
                         break;
                     }
                     for (j = 0; j < d->shape[scnt].height; ++j) {
-                        shpln.text = d->shape[scnt].chars[j];   // TODO HERE
+                        shpln.text = d->shape[scnt].chars[j];   // TODO
                         shpln.len = d->shape[scnt].width;
                         if (empty_line(&shpln)) {
                             continue;
@@ -803,11 +798,7 @@ static void add_spaces_to_line(line_t* line, const size_t n)
     if (n == 0) {
         return;
     }
-    line->mbtext_org = (uint32_t *) realloc(line->mbtext_org, (line->num_chars + n + 1) * sizeof(uint32_t));
-    line->mbtext = line->mbtext_org;
-    u32_set(line->mbtext + line->num_chars, char_space, n);
-    set_char_at(line->mbtext, line->num_chars + n, char_nul);
-    line->num_chars += n;
+    bxs_append_spaces(line->text, n);
     analyze_line_ascii(&input, line);
 }
 
@@ -860,7 +851,7 @@ int remove_box()
      */
     const size_t normalized_len = input.maxline + opt.design->shape[NE].width;
     for (j = 0; j < input.num_lines; ++j) {
-        add_spaces_to_line(input.lines + j, normalized_len - input.lines[j].len);
+        add_spaces_to_line(input.lines + j, normalized_len - input.lines[j].text->num_columns);
     }
     #ifdef DEBUG
         fprintf(stderr, "Normalized all lines to %d columns (maxline + east width).\n", (int) input.maxline);
@@ -930,7 +921,7 @@ int remove_box()
                 fprintf(stderr, "\033[00;33;01mline %2d: no side match\033[00m\n", (int) j);
             #endif
         }
-        else {
+        else {      // TODO HERE
             #ifdef DEBUG
             fprintf(stderr, "\033[00;33;01mline %2d: west: %d (\'%c\') to %d (\'%c\') [len %d];  "
                             "east: %d (\'%c\') to %d (\'%c\') [len %d]\033[00m\n", (int) j,
@@ -1070,15 +1061,16 @@ void output_input(const int trim_only)
         if (input.lines[j].text == NULL) {
             continue;
         }
-        btrim(input.lines[j].text, &(input.lines[j].len));
-        btrim32(input.lines[j].mbtext, &(input.lines[j].num_chars));
+        bxstr_t *temp = bxs_rtrim(input.lines[j].text);
+        bxs_free(input.lines[j].text);
+        input.lines[j].text = temp;
         if (trim_only) {
             continue;
         }
 
         char *indentspc = NULL;
         if (opt.tabexp == 'u') {
-            indent = strspn(input.lines[j].text, " ");
+            indent = input.lines[j].text->indent;
             ntabs = indent / opt.tabstop;
             nspcs = indent % opt.tabstop;
             indentspc = (char *) malloc(ntabs + nspcs + 1);
@@ -1101,9 +1093,11 @@ void output_input(const int trim_only)
             indent = 0;
         }
 
-        fprintf(opt.outfile, "%s%s%s", indentspc, u32_strconv_to_output(advance32(input.lines[j].mbtext, indent)),
+        char *outtext = u32_strconv_to_output(bxs_first_char_ptr(input.lines[j].text, indent));
+        fprintf(opt.outfile, "%s%s%s", indentspc, outtext,
                 (input.final_newline || j < input.num_lines - 1 ? opt.eol : ""));
-        BFREE (indentspc);
+        BFREE(outtext);
+        BFREE(indentspc);
     }
 }
 

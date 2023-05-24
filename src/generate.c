@@ -789,14 +789,16 @@ static int justify_line(line_t *line, int skew)
     }
 
     #if defined(DEBUG) || 0
-        fprintf (stderr, "justify_line(%c):  Input: real: (%02d) \"%s\", text: (%02d) \"%s\", invisible=%d, skew=%d",
-             opt.justify ? opt.justify : '0', (int) line->num_chars, u32_strconv_to_output(line->mbtext),
-             (int) line->len, line->text, (int) line->invis, skew);
+        char *outtext = bxs_to_output(line->text);
+        fprintf(stderr, "justify_line(%c):  Input: real: (%02d) \"%s\", text: (%02d) \"%s\", invisible=%d, skew=%d",
+                opt.justify ? opt.justify : '0', (int) line->text->num_chars, outtext, (int) line->text->num_columns,
+                line->text->ascii, (int) line->text->num_chars_invisible, skew);
+        bxs_free(outtext);
     #endif
 
     int result = 0;
-    size_t initial_space_size = strspn(line->text, " \t");
-    size_t newlen = line->len - initial_space_size;
+    size_t initial_space_size = line->text->indent;
+    size_t newlen = line->text->num_columns - initial_space_size;
     size_t shift;
 
     switch (opt.justify) {
@@ -1043,16 +1045,17 @@ int output_box(const sentry_t *thebox)
             if (ti < (long) input.num_lines) {      /* box content (lines) */
                 int shift = justify_line(input.lines + ti, hpr - hpl);
                 restored_indent = tabbify_indent(ti, indentspc, indentspclen);
-                uint32_t *mbtext_shifted = advance32(input.lines[ti].mbtext, shift < 0 ? (size_t) (-shift) : 0);
+                bxstr_t *text_shifted = bxs_cut_front(input.lines[ti].text, shift < 0 ? (size_t) (-shift) : 0);
                 uint32_t *spc1 = empty_string;
                 if (ti >= 0 && shift > 0) {
                     spc1 = u32_nspaces(shift);
                 }
-                uint32_t *spc2 = u32_nspaces(input.maxline - input.lines[ti].len - shift);
+                uint32_t *spc2 = u32_nspaces(input.maxline - input.lines[ti].text->num_columns - shift);
                 obuf = bxs_concat(8, restored_indent,
                                 skip_left ? empty_string : thebox[BLEF].mbcs[j]->memory, hfill1, spc1,
-                                ti >= 0 ? mbtext_shifted : empty_string, hfill2, spc2,
+                                ti >= 0 ? text_shifted->memory : empty_string, hfill2, spc2,
                                 thebox[BRIG].mbcs[j]->memory);
+                bxs_free(text_shifted);
                 if (spc1 != empty_string) {
                     BFREE(spc1);
                 }

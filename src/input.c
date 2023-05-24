@@ -18,16 +18,17 @@
  */
 
 #include "config.h"
+
 #include <errno.h>
 #include <string.h>
 #include <unistr.h>
 #include <unitypes.h>
 
 #include "boxes.h"
+#include "input.h"
 #include "regulex.h"
 #include "tools.h"
 #include "unicode.h"
-#include "input.h"
 
 
 
@@ -61,8 +62,8 @@ static int has_linebreak(const uint32_t *s, const int len)
  */
 static int get_indent(const line_t *lines, const size_t lines_size)
 {
-    int res = LINE_MAX_BYTES;  /* result */
-    int nonblank = 0;          /* true if one non-blank line found */
+    int res = LINE_MAX_BYTES; /* result */
+    int nonblank = 0;         /* true if one non-blank line found */
 
     if (lines == NULL) {
         fprintf(stderr, "%s: internal error\n", PROJECT);
@@ -73,9 +74,9 @@ static int get_indent(const line_t *lines, const size_t lines_size)
     }
 
     for (size_t j = 0; j < lines_size; ++j) {
-        if (lines[j].len > 0) {
+        if (lines[j].text->num_columns > 0) {
             nonblank = 1;
-            size_t ispc = strspn(lines[j].text, " ");
+            size_t ispc = lines[j].text->indent;
             if ((int) ispc < res) {
                 res = ispc;
             }
@@ -83,9 +84,10 @@ static int get_indent(const line_t *lines, const size_t lines_size)
     }
 
     if (nonblank) {
-        return res;            /* success */
-    } else {
-        return 0;              /* success, but only blank lines */
+        return res; /* success */
+    }
+    else {
+        return 0; /* success, but only blank lines */
     }
 }
 
@@ -140,28 +142,34 @@ int apply_substitutions(input_t *result, const int mode)
         opt.design->current_rule = rules;
         for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
             #ifdef REGEXP_DEBUG
-            fprintf (stderr, "regex_replace(0x%p, \"%s\", \"%s\", %d, \'%c\') == ",
-                    rules[j].prog, rules[j].repstr, u32_strconv_to_output(result->lines[k].mbtext),
-                    (int) result->lines[k].num_chars, rules[j].mode);
+                char *outtext = bxs_to_output(result->lines[k].text);
+                char *outrepstr = bxs_to_output(rules[j].repstr);
+                fprintf(stderr, "regex_replace(0x%p, \"%s\", \"%s\", %d, \'%c\') == ", rules[j].prog, outrepstr,
+                    outtext, (int) result->lines[k].text->num_chars, rules[j].mode);
+                BFREE(outtext);
+                BFREE(outrepstr);
             #endif
-            uint32_t *newtext = u32_regex_replace(rules[j].prog, rules[j].repstr->memory,
-                    result->lines[k].mbtext, result->lines[k].num_chars, rules[j].mode == 'g');
+            uint32_t *newtext = u32_regex_replace(rules[j].prog, rules[j].repstr->memory, result->lines[k].text->memory,
+                    result->lines[k].text->num_chars, rules[j].mode == 'g');
             #ifdef REGEXP_DEBUG
-                fprintf (stderr, "\"%s\"\n", newtext ? u32_strconv_to_output(newtext) : "NULL");
+                char *outnewtext = newtext ? u32_strconv_to_output(newtext) : strdup("NULL");
+                fprintf(stderr, "\"%s\"\n", outnewtext);
+                BFREE(outnewtext);
             #endif
             if (newtext == NULL) {
                 return 1;
             }
 
-            BFREE(result->lines[k].mbtext_org);  /* original address allocated for mbtext */
-            result->lines[k].mbtext = newtext;
-            result->lines[k].mbtext_org = newtext;
+            bxs_free(result->lines[k].text);
+            result->lines[k].text = bxs_from_unicode(newtext);
 
-            analyze_line_ascii(result, result->lines + k);
+            analyze_line_ascii(result, result->lines + k);   /* update maxline value */
 
             #ifdef REGEXP_DEBUG
-                fprintf (stderr, "result->lines[%d] == {%d, \"%s\"}\n", (int) k,
-                    (int) result->lines[k].num_chars, u32_strconv_to_output(result->lines[k].mbtext));
+                char *outtext2 = bxs_to_output(result->lines[k].text);
+                fprintf(stderr, "result->lines[%d] == {%d, \"%s\"}\n", (int) k, (int) result->lines[k].text->num_chars,
+                    outtext2);
+                BFREE(outtext2);
             #endif
         }
         opt.design->current_rule = NULL;
@@ -176,7 +184,8 @@ int apply_substitutions(input_t *result, const int mode)
         rc = get_indent(result->lines, result->num_lines);
         if (rc >= 0) {
             result->indent = (size_t) rc;
-        } else {
+        }
+        else {
             return 4;
         }
     }
@@ -209,20 +218,19 @@ static void trim_trailing_ws_carefully(uint32_t *mbtemp, size_t *len_chars)
 
 input_t *read_all_input()
 {
-    char buf[LINE_MAX_BYTES + 3];    /* static input buffer incl. newline + zero terminator */
-    size_t input_size = 0;           /* number of elements allocated */
+    char buf[LINE_MAX_BYTES + 3];      /* static input buffer incl. newline + zero terminator */
+    size_t input_size = 0;             /* number of elements allocated */
 
     input_t *result = (input_t *) calloc(1, sizeof(input_t));
     result->indent = LINE_MAX_BYTES;
 
-    while (fgets(buf, LINE_MAX_BYTES + 2, opt.infile))
-    {
+    while (fgets(buf, LINE_MAX_BYTES + 2, opt.infile)) {
         if (result->num_lines % 100 == 0) {
             input_size += 100;
             line_t *tmp = (line_t *) realloc(result->lines, input_size * sizeof(line_t));
             if (tmp == NULL) {
                 perror(PROJECT);
-                BFREE (result->lines);
+                BFREE(result->lines);
                 return NULL;
             }
             result->lines = tmp;
@@ -240,30 +248,27 @@ input_t *read_all_input()
          */
         if (len_chars > 0) {
             uint32_t *temp = NULL;
-            len_chars = expand_tabs_into(mbtemp, opt.tabstop, &temp,
-                                         &(result->lines[result->num_lines].tabpos),
-                                         &(result->lines[result->num_lines].tabpos_len));
+            len_chars = expand_tabs_into(mbtemp, opt.tabstop, &temp, &(result->lines[result->num_lines].tabpos),
+                    &(result->lines[result->num_lines].tabpos_len));
             if (len_chars == 0) {
                 perror(PROJECT);
-                BFREE (result->lines);
+                BFREE(result->lines);
                 return NULL;
             }
-            result->lines[result->num_lines].mbtext = temp;
-            BFREE(mbtemp);
-            temp = NULL;
+            result->lines[result->num_lines].text = bxs_from_unicode(temp);
+            BFREE(temp);
         }
         else {
-            result->lines[result->num_lines].mbtext = mbtemp;
+            result->lines[result->num_lines].text = bxs_new_empty_string();
         }
-        result->lines[result->num_lines].mbtext_org = result->lines[result->num_lines].mbtext;
-        result->lines[result->num_lines].num_chars = len_chars;
 
+        BFREE(mbtemp);
         ++result->num_lines;
     }
 
     if (ferror(stdin)) {
         perror(PROJECT);
-        BFREE (result->lines);
+        BFREE(result->lines);
         return NULL;
     }
     return result;
@@ -296,7 +301,8 @@ int analyze_input(input_t *result)
     int rc = get_indent(result->lines, result->num_lines);
     if (rc >= 0) {
         result->indent = (size_t) rc;
-    } else {
+    }
+    else {
         return 1;
     }
 
@@ -306,21 +312,23 @@ int analyze_input(input_t *result)
      */
     if (opt.design->indentmode != 't' && opt.r == 0) {
         for (size_t i = 0; i < result->num_lines; ++i) {
-            #ifdef DEBUG
-                fprintf(stderr, "%2d: mbtext = \"%s\" (%d chars)\n", (int) i,
-                    u32_strconv_to_output(result->lines[i].mbtext), (int) result->lines[i].num_chars);
-            #endif
-            if (result->lines[i].num_chars >= result->indent) {
-                memmove(result->lines[i].text, result->lines[i].text + result->indent,
-                        result->lines[i].len - result->indent + 1);
-                result->lines[i].len -= result->indent;
-
-                result->lines[i].mbtext = advance32(result->lines[i].mbtext, result->indent);
-                result->lines[i].num_chars -= result->indent;
+            if (result->lines[i].text->num_columns >= result->indent) {
+                /*
+                 * We should really remove *columns* rather than *characters*, but since the removed characters are
+                 * spaces (indentation), and there are no double-wide spaces in Unicode, both actions are equivalent.
+                 */
+                bxstr_t *unindented = bxs_cut_front(result->lines[i].text, result->indent);
+                bxs_free(result->lines[i].text);
+                result->lines[i].text = unindented;
             }
             #ifdef DEBUG
-                fprintf(stderr, "%2d: mbtext = \"%s\" (%d chars)\n", (int) i,
-                    u32_strconv_to_output(result->lines[i].mbtext), (int) result->lines[i].num_chars);
+                char *outtext = bxs_to_output(result->lines[i].text);
+                fprintf(stderr, "%2d: text = \"%s\" (%d chars, %d visible, %d invisible, %d columns)\n"
+                                "    ascii = \"%s\"\n", (int) i, outtext,
+                    (int) result->lines[i].text->num_chars, (int) result->lines[i].text->num_chars_visible,
+                    (int) result->lines[i].text->num_chars_invisible, (int) result->lines[i].text->num_columns,
+                    result->lines[i].text->ascii);
+                BFREE(outtext);
             #endif
         }
         result->maxline -= result->indent;
@@ -336,10 +344,11 @@ int analyze_input(input_t *result)
     }
 
     #ifdef DEBUG
-        fprintf (stderr, "Effective encoding: %s\n", encoding);
+        fprintf(stderr, "Effective encoding: %s\n", encoding);
         print_input_lines(NULL);
     #endif
     return 0;
 }
 
-/*EOF*/                                                  /* vim: set sw=4: */
+
+/* vim: set sw=4: */

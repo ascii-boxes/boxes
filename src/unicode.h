@@ -227,6 +227,17 @@ char *to_utf8(uint32_t *src);
 uint32_t *u32_nspaces(const size_t n);
 
 
+/**
+ * Return pointer to last occurrence of string `s2` in string `s1`.
+ * @param s1 string to search
+ * @param s2 string to search for in `s1`
+ * @param s2_len length in characters of `s2`
+ * @param skip number of finds to ignore before returning anything
+ * @return pointer to last occurrence of string `s2` in string `s1`; NULL if not found or error
+ */
+uint32_t *u32_strnrstr(const uint32_t *s1, const uint32_t *s2, const size_t s2_len, int skip);
+
+
 #endif
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */
