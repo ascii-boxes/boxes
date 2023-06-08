@@ -24,6 +24,7 @@
 #include <string.h>
 #include <unistr.h>
 
+#include "detect.h"
 #include "shape.h"
 #include "boxes.h"
 #include "tools.h"
@@ -32,20 +33,18 @@
 
 
 
-static int best_match(const line_t *line,
-                      char **ws, char **we, char **es, char **ee)
-/*
- *  Find positions of west and east box parts in line.
- *
- *    line      line to examine
- *    ws etc.   result parameters (west start, west end, east start, east end)
- *
- *  RETURNS:    > 0   a match was found (ws etc are set to indicate positions)
- *             == 0   no match was found
- *              < 0   internal error (out of memory)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/**
+ * Find positions of west and east box parts in line.
+ * @param line line to examine
+ * @param ws result parameter: west start as pointer to a character in `line->text->memory`
+ * @param we result parameter: west end as pointer to a character in `line->text->memory`
+ * @param es result parameter: east start as pointer to a character in `line->text->memory`
+ * @param ee result parameter: east end as pointer to a character in `line->text->memory`
+ * @return > 0: a match was found (ws etc. are set to indicate positions);
+ *         == 0: no match was found;
+ *         < 0: internal error (out of memory)
  */
+static int best_match(const line_t *line, uint32_t **ws, uint32_t **we, uint32_t **es, uint32_t **ee)
 {
     size_t numw = 0;             /* number of shape lines on west side */
     size_t nume = 0;             /* number of shape lines on east side */
@@ -70,8 +69,8 @@ static int best_match(const line_t *line,
     nume += opt.design->shape[ESE].height;
 
     #ifdef DEBUG
-    fprintf (stderr, "Number of WEST side shape lines: %d\n", (int) numw);
-    fprintf (stderr, "Number of EAST side shape lines: %d\n", (int) nume);
+        fprintf (stderr, "Number of WEST side shape lines: %d\n", (int) numw);
+        fprintf (stderr, "Number of EAST side shape lines: %d\n", (int) nume);
     #endif
 
     /*
@@ -498,301 +497,6 @@ static int detect_horiz(const int aside, size_t *hstart, size_t *hend)
 
 
 
-static design_t *detect_design()
-/*
- *  Autodetect design used by box in input.
- *
- *  This requires knowledge about ALL designs, so the entire config file had
- *  to be parsed at some earlier time.
- *
- *  RETURNS:  != NULL   success, pointer to detected design
- *            == NULL   on error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    design_t *d = designs;         /* ptr to currently tested design */
-    long hits;                     /* hit points of the current design */
-    long maxhits = 0;              /* maximum no. of hits so far */
-    design_t *res = NULL;          /* ptr to design with the most hits */
-    int dcnt;                      /* design loop counter */
-    shape_t scnt;                  /* shape loop counter */
-    size_t j, k;
-    char *p;
-    char *s;
-    line_t shpln;                  /* a line which is part of a shape */
-    size_t a;
-    int empty[NUM_SIDES];
-
-    for (dcnt = 0; dcnt < num_designs; ++dcnt, ++d) {
-        #ifdef DEBUG
-            fprintf(stderr, "CONSIDERING DESIGN ---- \"%s\" ---------------\n", d->name);
-        #endif
-        hits = 0;
-
-        for (j = 0; j < NUM_SIDES; ++j) {
-            empty[j] = empty_side(d->shape, j);
-        }
-        #ifdef DEBUG
-            fprintf (stderr, "Empty sides: TOP %d, LEFT %d, BOTTOM %d, RIGHT %d\n",
-                empty[BTOP], empty[BLEF], empty[BBOT], empty[BRIG]);
-        #endif
-
-        for (scnt = 0; scnt < NUM_SHAPES; ++scnt) {
-
-            switch (scnt) {
-                case NW:
-                case SW:
-                    /*
-                     *  Try and find west corner shapes. Every non-empty shape
-                     *  line is searched for on every input line. A hit is
-                     *  generated whenever a match is found.
-                     */
-                    if (empty[BLEF] || (empty[BTOP] && scnt == NW)
-                            || (empty[BBOT] && scnt == SW)) {
-                        break;
-                    }
-                    for (j = 0; j < d->shape[scnt].height; ++j) {
-                        shpln.text = d->shape[scnt].chars[j];   // TODO
-                        shpln.len = d->shape[scnt].width;
-                        if (empty_line(&shpln)) {
-                            continue;
-                        }
-                        for (s = shpln.text; *s == ' ' || *s == '\t'; ++s) {
-                        }
-                        for (k = 0; k < d->shape[scnt].height; ++k) {
-                            a = k;
-                            if (scnt == SW) {
-                                a += input.num_lines - d->shape[scnt].height;
-                            }
-                            if (a >= input.num_lines) {
-                                break;
-                            }
-                            for (p = input.lines[a].text; *p == ' ' || *p == '\t'; ++p) {
-                            }
-                            if (strncmp(p, s, shpln.len - (s - shpln.text)) == 0) {
-                                ++hits;
-                            }
-                        }
-                    }
-                    #ifdef DEBUG
-                        fprintf(stderr, "After %s corner check:\t%ld hits.\n", shape_name[scnt], hits);
-                    #endif
-                    break;
-
-                case NE:
-                case SE:
-                    /*
-                     *  Try and find east corner shapes. Every non-empty shape
-                     *  line is searched for on every input line. A hit is
-                     *  generated whenever a match is found.
-                     */
-                    if (empty[BRIG] || (empty[BTOP] && scnt == NE)
-                            || (empty[BBOT] && scnt == SE)) {
-                        break;
-                    }
-                    for (j = 0; j < d->shape[scnt].height; ++j) {
-                        shpln.text = d->shape[scnt].chars[j];
-                        shpln.len = d->shape[scnt].width;
-                        if (empty_line(&shpln)) {
-                            continue;
-                        }
-                        for (s = shpln.text + shpln.len - 1;
-                                (*s == ' ' || *s == '\t') && shpln.len;
-                                --s, --(shpln.len)) {
-                        }
-                        for (k = 0; k < d->shape[scnt].height; ++k) {
-                            a = k;
-                            if (scnt == SE) {
-                                a += input.num_lines - d->shape[scnt].height;
-                            }
-                            if (a >= input.num_lines) {
-                                break;
-                            }
-                            for (p = input.lines[a].text + input.lines[a].len - 1;
-                                    p >= input.lines[a].text && (*p == ' ' || *p == '\t');
-                                    --p) {
-                            }
-                            p = p - shpln.len + 1;
-                            if (p < input.lines[a].text) {
-                                continue;
-                            }
-                            if (strncmp(p, shpln.text, shpln.len) == 0) {
-                                ++hits;
-                            }
-                        }
-                    }
-#ifdef DEBUG
-                    fprintf (stderr, "After %s corner check:\t%ld hits.\n", shape_name[scnt], hits);
-#endif
-                    break;
-
-                default:
-                    if (isempty(d->shape + scnt)) {
-                        continue;
-                    }
-
-                    if ((scnt >= NNW && scnt <= NNE)
-                            || (scnt >= SSE && scnt <= SSW)) {
-                        /*
-                         *  Try and find horizontal shapes between the box
-                         *  corners. Every non-empty shape line is searched for
-                         *  on every input line. Elastic shapes must occur
-                         *  twice in an uninterrupted row to generate a hit.
-                         */
-                        if ((scnt >= NNW && scnt <= NNE && empty[BTOP])
-                                || (scnt >= SSE && scnt <= SSW && empty[BBOT])) {
-                            ++hits;
-                            break;       /* horizontal box part is empty */
-                        }
-                        for (j = 0; j < d->shape[scnt].height; ++j) {
-                            shpln.text = d->shape[scnt].chars[j];
-                            shpln.len = d->shape[scnt].width;
-                            if (empty_line(&shpln)) {
-                                continue;
-                            }
-                            for (k = 0; k < d->shape[scnt].height; ++k) {
-                                a = k;
-                                if (scnt >= SSE && scnt <= SSW) {
-                                    a += input.num_lines - d->shape[scnt].height;
-                                }
-                                if (a >= input.num_lines) {
-                                    break;
-                                }
-                                for (p = input.lines[a].text;
-                                        *p == ' ' || *p == '\t'; ++p) {
-                                }
-                                p += d->shape[NW].width;
-                                if (p - input.lines[a].text
-                                        >= (long) input.lines[a].len) {
-                                    continue;
-                                }
-                                p = strstr(p, shpln.text);
-                                if (p) {
-                                    if (d->shape[scnt].elastic) {
-                                        p += shpln.len;
-                                        if (p - input.lines[a].text
-                                                >= (long) input.lines[a].len) {
-                                            continue;
-                                        }
-                                        if (!strncmp(p, shpln.text, shpln.len)) {
-                                            ++hits;
-                                        }
-                                    }
-                                    else {
-                                        ++hits;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    else if ((scnt >= ENE && scnt <= ESE)
-                            || (scnt >= WSW && scnt <= WNW)) {
-                        /* handle later */
-                        break;
-                    }
-                    else {
-                        fprintf(stderr, "%s: internal error\n", PROJECT);
-                        return NULL;
-                    }
-                #ifdef DEBUG
-                fprintf (stderr, "After %s shape check:\t%ld hits.\n",
-                        shape_name[scnt], hits);
-                #endif
-            }
-        }
-
-        /*
-         *  Now iterate over all input lines except for potential top and
-         *  bottom box parts. Check if east and west line ends match a
-         *  non-empty shape line. If so, generate a hit.
-         */
-        if (((empty[BTOP] ? 0 : d->shape[NW].height)
-                + (empty[BBOT] ? 0 : d->shape[SW].height)) < input.num_lines) {
-            for (k = empty[BTOP] ? 0 : d->shape[NW].height;
-                    k < input.num_lines - (empty[BBOT] ? 0 : d->shape[SW].height);
-                    ++k) {
-                for (p = input.lines[k].text; *p == ' ' || *p == '\t'; ++p) {
-                }
-                for (scnt = WSW; scnt <= WNW; ++scnt) {
-                    a = 0;
-                    if (isempty(d->shape + scnt)) {
-                        continue;
-                    }
-                    for (j = 0; j < d->shape[scnt].height; ++j) {
-                        shpln.text = d->shape[scnt].chars[j];
-                        shpln.len = d->shape[scnt].width;
-                        if (empty_line(&shpln)) {
-                            continue;
-                        }
-                        for (s = shpln.text; *s == ' ' || *s == '\t'; ++s) {
-                        }
-                        if (strncmp(p, s, shpln.len - (s - shpln.text)) == 0) {
-                            ++hits;
-                            a = 1;
-                            break;
-                        }
-                    }
-                    if (a) {
-                        break;
-                    }
-                }
-
-                for (scnt = ENE; scnt <= ESE; ++scnt) {
-                    a = 0;
-                    if (isempty(d->shape + scnt)) {
-                        continue;
-                    }
-                    for (j = 0; j < d->shape[scnt].height; ++j) {
-                        shpln.text = d->shape[scnt].chars[j];
-                        shpln.len = d->shape[scnt].width;
-                        if (empty_line(&shpln)) {
-                            continue;
-                        }
-                        for (p = input.lines[k].text + input.lines[k].len - 1;
-                                p >= input.lines[a].text && (*p == ' ' || *p == '\t');
-                                --p) {
-                        }
-                        for (s = shpln.text + shpln.len - 1;
-                                (*s == ' ' || *s == '\t') && shpln.len;
-                                --s, --(shpln.len)) {
-                        }
-                        p = p - shpln.len + 1;
-                        if (strncmp(p, shpln.text, shpln.len) == 0) {
-                            ++hits;
-                            a = 1;
-                            break;
-                        }
-                    }
-                    if (a) {
-                        break;
-                    }
-                }
-            }
-        }
-#ifdef DEBUG
-        fprintf (stderr, "After side checks:\t%ld hits.\n", hits);
-#endif
-        if (hits > maxhits) {
-            maxhits = hits;
-            res = d;
-        }
-    }
-
-#ifdef DEBUG
-    if (res) {
-        fprintf (stderr, "CHOOSING \"%s\" design (%ld hits).\n", res->name, maxhits);
-    } else {
-        fprintf (stderr, "NO DESIGN FOUND WITH EVEN ONE HIT!\n");
-    }
-#endif
-
-    return res;
-}
-
-
-
 static void add_spaces_to_line(line_t* line, const size_t n)
 {
     if (n == 0) {
@@ -828,7 +532,7 @@ int remove_box()
      *  config file had to be parsed (earlier).
      */
     if (opt.design_choice_by_user == 0) {
-        design_t *tmp = detect_design();
+        design_t *tmp = autodetect_design();
         if (tmp) {
             opt.design = tmp;
             #ifdef DEBUG
@@ -905,8 +609,8 @@ int remove_box()
      *  Phase 3: Iterate over body lines, removing box sides where applicable
      */
     for (j = textstart; j < textend; ++j) {
-        char *ws, *we, *es, *ee;         /* west start & end, east start&end */
-        char *p;
+        uint32_t *ws, *we, *es, *ee;         /* west start & end, east start & end */
+        uint32_t *p;
 
         #ifdef DEBUG
             fprintf(stderr, "Calling best_match() for line %d:\n", (int) j);
@@ -921,22 +625,22 @@ int remove_box()
                 fprintf(stderr, "\033[00;33;01mline %2d: no side match\033[00m\n", (int) j);
             #endif
         }
-        else {      // TODO HERE
+        else {
             #ifdef DEBUG
-            fprintf(stderr, "\033[00;33;01mline %2d: west: %d (\'%c\') to %d (\'%c\') [len %d];  "
-                            "east: %d (\'%c\') to %d (\'%c\') [len %d]\033[00m\n", (int) j,
-                    (int) (ws       ?  ws - input.lines[j].text : 0),     ws ? ws[0]  : '?',
-                    (int) (we       ?  we - input.lines[j].text - 1 : 0), we ? we[-1] : '?',
-                    (int) (ws && we ? (we - input.lines[j].text - (ws - input.lines[j].text)) : 0),
-                    (int) (es       ?  es - input.lines[j].text : 0),     es ? es[0]  : '?',
-                    (int) (ee       ?  ee - input.lines[j].text - 1 : 0), ee ? ee[-1] : '?',
-                    (int) (es && ee ? (ee - input.lines[j].text - (es - input.lines[j].text)) : 0));
+            fprintf(stderr, "\033[00;33;01mline %2d: west: %d (\'%lc\') to %d (\'%lc\') [len %d];  "
+                            "east: %d (\'%lc\') to %d (\'%lc\') [len %d]\033[00m\n", (int) j,
+                    (int) (ws       ?  ws - input.lines[j].text->memory : 0),     ws ? ws[0]  : to_utf32('?'),
+                    (int) (we       ?  we - input.lines[j].text->memory - 1 : 0), we ? we[-1] : to_utf32('?'),
+                    (int) (ws && we ? (we - input.lines[j].text->memory - (ws - input.lines[j].text->memory)) : 0),
+                    (int) (es       ?  es - input.lines[j].text->memory : 0),     es ? es[0]  : to_utf32('?'),
+                    (int) (ee       ?  ee - input.lines[j].text->memory - 1 : 0), ee ? ee[-1] : to_utf32('?'),
+                    (int) (es && ee ? (ee - input.lines[j].text->memory - (es - input.lines[j].text->memory)) : 0));
             #endif
             if (ws && we) {
                 did_something = 1;
                 for (p = ws; p < we; ++p) {
-                    size_t idx = p - input.lines[j].text;
-                    *p = ' ';
+                    size_t idx = p - input.lines[j].text->memory;      // TODO HERE
+                    *p = char_space;  // TODO this might be wrong
                     set_char_at(input.lines[j].mbtext, input.lines[j].posmap[idx], char_space);
                 }
             }

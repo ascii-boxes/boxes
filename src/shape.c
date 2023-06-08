@@ -190,7 +190,7 @@ int isempty(const sentry_t *shape)
 {
     if (shape == NULL) {
         return 1;
-    } else if (shape->chars == NULL) {
+    } else if (shape->chars == NULL || shape->mbcs == NULL) {
         return 1;
     } else if (shape->width == 0 || shape->height == 0) {
         return 1;
@@ -358,19 +358,16 @@ shape_t leftmost(const int aside, const int cnt)
 
 
 
-int empty_side(sentry_t *sarr, const int aside)
-/*
- *  Return true if the shapes on the given side consist entirely out of
- *  spaces - and spaces only, tabs are considered non-empty.
+/**
+ * Return true if the shapes on the given side consist entirely of spaces - and spaces only, tabs are considered
+ * non-empty.
  *
- *      sarr    pointer to shape list of design to check
- *      aside   the box side (one of BTOP etc.)
- *
- *  RETURNS:  == 0   side is not empty
- *            != 0   side is empty
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * @param sarr pointer to shape list of design to check
+ * @param aside the box side (one of `BTOP` etc.)
+ * @return == 0: side is not empty;
+ *         \!= 0: side is empty
  */
+int empty_side(sentry_t *sarr, const int aside)
 {
     int i;
 
@@ -387,4 +384,4 @@ int empty_side(sentry_t *sarr, const int aside)
 
 
 
-/*EOF*/                                                 /* vim: set sw=4: */
+/* vim: set sw=4: */

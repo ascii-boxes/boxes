@@ -24,7 +24,8 @@
 
 
 /**
- * A boxes-internal string. Should be treated as immutable.
+ * A boxes-internal string. Should be treated as immutable, although some functions DO modify an instance. At the very
+ * least, make sure never to change the values of an instance from outside this module.
  */
 typedef struct {
     /** Pointer to the original memory area for the string, NUL terminated */
@@ -159,6 +160,15 @@ bxstr_t *bxs_cut_front(bxstr_t *pString, size_t n);
  * @return a pointer into existing memory
  */
 uint32_t *bxs_first_char_ptr(bxstr_t *pString, size_t n);
+
+
+/**
+ * Return the first character of the visible character directly following the indent (for example a letter following
+ * some spaces).
+ * @param pString the string to use
+ * @return a pointer into existing memory
+ */
+uint32_t *bxs_unindent_ptr(bxstr_t *pString);
 
 
 /**

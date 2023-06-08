@@ -147,6 +147,7 @@ extern int color_output_enabled;
 
 typedef struct {
     bxstr_t  *text;                  /* text content of the line as a boxes string */
+    uint32_t *cache_visible;         /* only the visible characters of `text`, initially NULL. This is a cache. */
     size_t   *tabpos;                /* tab positions in expanded work strings, or NULL if not needed */
     size_t    tabpos_len;            /* number of tabs in a line */
 } line_t;

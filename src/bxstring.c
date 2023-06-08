@@ -366,6 +366,16 @@ uint32_t *bxs_first_char_ptr(bxstr_t *pString, size_t n)
 
 
 
+uint32_t *bxs_unindent_ptr(bxstr_t *pString)
+{
+    if (pString == NULL) {
+        return NULL;
+    }
+    return pString->memory + pString->first_char[pString->indent];
+}
+
+
+
 bxstr_t *bxs_trim(bxstr_t *pString)
 {
     if (pString == NULL) {
