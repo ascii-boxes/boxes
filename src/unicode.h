@@ -80,6 +80,16 @@ void set_char_at(uint32_t *text, const size_t idx, const ucs4_t char_to_set);
 int is_empty(const uint32_t *text);
 
 
+/**
+ *  Determine if a string consists entirely of blanks.
+ *
+ *  @param text the string to check, NULL/empty strings count as blank
+ *  @return > 0: the string is blank, empty, or NULL;
+ *         == 0: the string contains at least 1 non-blank character
+ */
+int u32_is_blank(const uint32_t *text);
+
+
 int is_ascii_printable(const ucs4_t c);
 
 

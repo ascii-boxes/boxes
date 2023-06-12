@@ -77,6 +77,22 @@ int is_empty(const uint32_t *text)
 
 
 
+int u32_is_blank(const uint32_t *text)
+{
+    if (is_empty(text)) {
+        return 1;
+    }
+
+    for (const uint32_t *c = text; *c != char_nul; c++) {
+        if (!is_blank(*c)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+
+
 int is_ascii_printable(const ucs4_t c)
 {
     return c >= 0x20 && c < 0x7f;
