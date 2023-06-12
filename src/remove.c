@@ -19,518 +19,560 @@
 
 #include "config.h"
 
-#include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistr.h>
+#include <uniwidth.h>
 
-#include "detect.h"
-#include "shape.h"
 #include "boxes.h"
+#include "detect.h"
+#include "remove.h"
+#include "shape.h"
 #include "tools.h"
 #include "unicode.h"
-#include "remove.h"
+
+
+
+typedef struct _line_ctx_t {
+    /** index of the first character of the west shape */
+    size_t west_start;
+
+    /** index of the character following the last character of the west shape. If equal to `west_start`, then no west
+     *  shape was detected. */
+    size_t west_end;
+
+    /** the length in characters of the matched west shape part */
+    size_t west_quality;
+
+    /** index of the first character of the east shape */
+    size_t east_start;
+
+    /** index of the character following the last character of the east shape. If equal to `east_start`, then no east
+     *  shape was detected.  */
+    size_t east_end;
+
+    /** the length in characters of the matched east shape part */
+    size_t east_quality;
+
+    /** the input line to which the above values refer. Will look very different depending on comparison type. */
+    uint32_t *input_line_used;
+} line_ctx_t;
+
+
+
+typedef struct _remove_ctx_t {
+    /** Array of flags indicating which sides of the box design are defined as empty. Access via `BTOP` etc. constants. */
+    int empty_side[NUM_SIDES];
+
+    /** Flag indicating that there are no invisible characters in the definition of the design we are removing. */
+    int design_is_mono;
+
+    /** Flag indicating that there are no invisible characters in the input. */
+    int input_is_mono;
+
+    /** Index into `input.lines` of the first line of the box (topmost box line). Lines above are blank. */
+    size_t top_start_idx;
+
+    /** Index into `input.lines` of the line following the last line of the top part of the box. If the top part of the
+     *  box is empty or missing, this value will be equal to `top_start_idx`. */
+    size_t top_end_idx;
+
+    /** Index into `input.lines` of the first line of the bottom side of the box. */
+    size_t bottom_start_idx;
+
+    /** Index into `input.lines` of the line following the last line of the bottom part of the box. If the bottom part
+     *  of the box is empty or missing, this value will be equal to `bottom_start_idx`. Lines below are blank. */
+    size_t bottom_end_idx;
+
+    /** Information on the vertical east and west shapes in body lines, one entry for each line between `top_end_idx`
+     *  (inclusive) and `bottom_start_idx` (exclusive) */
+    line_ctx_t *body;
+} remove_ctx_t;
+
+
+
+typedef struct _shape_line_ctx_t {
+    /** flag indicating whether the shape is empty */
+    int empty;
+
+    /** one line of a shape, possibly trimmed, with invisible characters filtered according to the comparison type */
+    uint32_t *text;
+
+    /** the length of `text` in characters */
+    size_t length;
+
+    /** flag indicating whether the shape to which this line belongs is elastic */
+    int elastic;
+} shape_line_ctx_t;
+
+
+
+static size_t find_first_line()
+{
+    size_t result = input.num_lines;
+    for (size_t line_idx = 0; line_idx < input.num_lines; line_idx++) {
+        if (!bxs_is_blank(input.lines[line_idx].text)) {
+            result = line_idx;
+            break;
+        }
+    }
+    return result;
+}
+
+
+
+static size_t find_last_line()
+{
+    size_t result = input.num_lines - 1;
+    for (long line_idx = (long) input.num_lines - 1; line_idx >= 0; line_idx--) {
+        if (!bxs_is_blank(input.lines[line_idx].text)) {
+            result = (size_t) line_idx;
+            break;
+        }
+    }
+    return result;
+}
 
 
 
 /**
- * Find positions of west and east box parts in line.
- * @param line line to examine
- * @param ws result parameter: west start as pointer to a character in `line->text->memory`
- * @param we result parameter: west end as pointer to a character in `line->text->memory`
- * @param es result parameter: east start as pointer to a character in `line->text->memory`
- * @param ee result parameter: east end as pointer to a character in `line->text->memory`
- * @return > 0: a match was found (ws etc. are set to indicate positions);
- *         == 0: no match was found;
- *         < 0: internal error (out of memory)
+ * (horizontal middle match)
+ * Recursive helper function for match_horiz_line(), uses backtracking.
+ * @param shapes_relevant the prepared shape lines to be concatenated
+ * @param cur_pos current position in the input line being matched
+ * @param shape_idx index into `shapes_relevant` indicating which shape to try now
+ * @param end_pos first character of the east corner
+ * @return `== 1`: success;
+ *         `== 0`: failed to match
  */
-static int best_match(const line_t *line, uint32_t **ws, uint32_t **we, uint32_t **es, uint32_t **ee)
+static int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, uint32_t *end_pos)
 {
-    size_t numw = 0;             /* number of shape lines on west side */
-    size_t nume = 0;             /* number of shape lines on east side */
-    size_t j;                    /* counts number of lines of all shapes tested */
-    size_t k;                    /* line counter within shape */
-    int w;                       /* shape counter */
-    sentry_t *cs;                /* current shape */
-    uint32_t *s;                 /* duplicate of current shape part */
-    uint32_t *p;                 /* position found by u32_strstr() */
-    size_t cq;                   /* current quality */
-    uint32_t *q;                 /* space check rover */
-    size_t quality;
-
-    *ws = *we = *es = *ee = NULL;
-
-    numw = opt.design->shape[WNW].height;
-    numw += opt.design->shape[W].height;
-    numw += opt.design->shape[WSW].height;
-
-    nume = opt.design->shape[ENE].height;
-    nume += opt.design->shape[E].height;
-    nume += opt.design->shape[ESE].height;
-
     #ifdef DEBUG
-        fprintf (stderr, "Number of WEST side shape lines: %d\n", (int) numw);
-        fprintf (stderr, "Number of EAST side shape lines: %d\n", (int) nume);
+        char *out_cur_pos = u32_strconv_to_output(cur_pos);
+        char *out_end_pos = u32_strconv_to_output(end_pos);
+        fprintf(stderr, "hmm(shapes_relevant, \"%s\", %d, \"%s\")", out_cur_pos, (int) shape_idx, out_end_pos);
+        BFREE(out_cur_pos);
+        BFREE(out_end_pos);
     #endif
 
-    /*
-     *  Find match for WEST side
-     */
-    if (!empty_side(opt.design->shape, BLEF)) {
-        quality = 0;
-        cs = opt.design->shape + WNW;
-        for (j = 0, k = 0, w = 3; j < numw; ++j, ++k) {
-            if (k == cs->height) {
-                k = 0;
-                cs = opt.design->shape + west_side[--w];
-            }
+    int result = 0;
 
-            if (bxs_is_blank(cs->mbcs[k]) && !(quality == 0 && j == numw - 1)) {
-                continue;
-            }
-
-            s = u32_strdup(cs->mbcs[k]->memory);
-            if (s == NULL) {
-                perror(PROJECT);
-                return -1;
-            }
-            cq = cs->width;
-
-            do {
-                p = u32_strstr(line->text->memory, s);
-                if (p) {
-                    q = p - 1;
-                    while (q >= line->text->memory) {
-                        if (*q-- != ' ') {
-                            p = NULL;
-                            break;
-                        }
-                    }
-                    if (p) {
-                        break;
-                    }
-                }
-                if (!p && cq) {
-                    if (*s == char_space) {
-                        u32_move(s, s + 1, cq--);
-                    } else if (s[cq - 1] == char_space) {
-                        s[--cq] = char_nul;
-                    } else {
-                        cq = 0;
-                        break;
-                    }
-                }
-            } while (cq && !p);
-
-            if (cq == 0) {
-                BFREE (s);
-                continue;
-            }
-
-            /*
-            *  If the current match is the best yet, adjust result values
-            */
-            if (cq > quality) {
-                quality = cq;
-                *ws = p;
-                *we = p + cq;
-            }
-
-            BFREE (s);
+    if (cur_pos > end_pos) {
+        result = 0; /* last shape tried was too long */
+    }
+    else if (shape_idx == SHAPES_PER_SIDE) {
+        if (cur_pos == end_pos) {
+            result = 1; /* success */
         }
     }
-
-    /*
-     *  Find match for EAST side
-     */
-    if (!empty_side(opt.design->shape, BRIG)) {
-        quality = 0;
-        cs = opt.design->shape + ENE;
-        for (j = 0, k = 0, w = 1; j < nume; ++j, ++k) {
-            if (k == cs->height) {
-                k = 0;
-                cs = opt.design->shape + east_side[++w];
-            }
-            #ifdef DEBUG
-                char *mbcs_temp = bxs_to_output(cs->mbcs[k]);
-                fprintf(stderr, "\nj %d, k %d, w %d, cs->chars[k] = \"%s\", cs->mbcs[k] = \"%s\"\n",
-                        (int) j, (int) k, w, cs->chars[k] ? cs->chars[k] : "(null)", mbcs_temp);
-                BFREE(mbcs_temp);
-            #endif
-
-            if (bxs_is_blank(cs->mbcs[k])) {
-                continue;
-            }
-
-            s = u32_strdup(cs->mbcs[k]->memory);
-            if (s == NULL) {
-                perror(PROJECT);
-                return -1;
-            }
-            cq = cs->width;
-
-            do {
-                p = u32_strnrstr(line->text->memory, s, cq, 0);
-                if (p) {
-                    q = p + cq;
-                    while (*q) {
-                        if (*q++ != ' ') {
-                            p = NULL;
-                            break;
-                        }
-                    }
-                    if (p) {
-                        break;
-                    }
-                }
-                if (!p && cq) {
-                    if (*s == ' ') {
-                        u32_move(s, s + 1, cq--);
-                    } else if (s[cq - 1] == ' ') {
-                        s[--cq] = '\0';
-                    } else {
-                        cq = 0;
-                        break;
-                    }
-                }
-            } while (cq && !p);
-
-            if (cq == 0) {
-                BFREE (s);
-                continue;
-            }
-
-            /*
-            *  If the current match is the best yet, adjust result values
-            */
-            if (cq > quality) {
-                quality = cq;
-                *es = p;
-                *ee = p + cq;
-            }
-
-            BFREE (s);
-        }
+    else if (shapes_relevant[shape_idx].empty) {
+        result = hmm(shapes_relevant, cur_pos, shape_idx + 1, end_pos);
     }
-
-    return *ws || *es ? 1 : 0;
-}
-
-
-
-static int hmm(const int aside, const size_t follow,
-               const char *p, const char *ecs, const int cnt)
-/*
- *  (horizontal middle match)
- *
- *      aside   box part to check (BTOP or BBOT)
- *      follow  index of line number in shape spec to check
- *      p       current check position
- *      ecs     pointer to first char of east corner shape
- *      cnt     current shape to check (0 == leftmost middle shape)
- *
- *  Recursive helper function for detect_horiz(), uses backtracking
- *
- *  RETURNS:  == 0  success
- *            != 0  error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int cmp;
-    sentry_t *cs;
-    shape_t sh;
-    int rc;
-
-    #ifdef DEBUG
-        fprintf(stderr, "hmm (%s, %d, \'%c\', \'%c\', %d)\n",
-                aside == BTOP ? "BTOP" : "BBOT", (int) follow, p[0], *ecs, cnt);
-    #endif
-
-    if (p > ecs) {                         /* last shape tried was too long */
-        return 2;
-    }
-
-    sh = leftmost(aside, cnt);
-    if (sh == NUM_SHAPES) {
-        return 1;
-    }
-
-    cs = opt.design->shape + sh;
-
-    cmp = strncmp(p, cs->chars[follow], cs->width);
-
-    if (cmp == 0) {
-        if (p + cs->width == ecs) {
-            if (leftmost(aside, cnt + 1) == NUM_SHAPES) {
-                return 0;                /* good! all clear, it matched */
-            } else {
-                return 3;
-            }                /* didn't use all shapes to do it */
-        }
-        if (cs->elastic) {
-            rc = hmm(aside, follow, p + cs->width, ecs, cnt);
-            #ifdef DEBUG
-            fprintf (stderr, "hmm returned %d\n", rc);
-            #endif
-            if (rc) {
-                rc = hmm(aside, follow, p + cs->width, ecs, cnt + 1);
-                #ifdef DEBUG
-                fprintf (stderr, "hmm returned %d\n", rc);
-                #endif
-            }
-        }
-        else {
-            rc = hmm(aside, follow, p + cs->width, ecs, cnt + 1);
-            #ifdef DEBUG
-            fprintf (stderr, "hmm returned %d\n", rc);
-            #endif
+    else if (u32_strncmp(cur_pos, shapes_relevant[shape_idx].text, shapes_relevant[shape_idx].length) == 0) {
+        int rc = 0;
+        if (shapes_relevant[shape_idx].elastic) {
+            rc = hmm(shapes_relevant, cur_pos + shapes_relevant[shape_idx].length, shape_idx, end_pos);
         }
         if (rc == 0) {
-            return 0;                    /* we're on the way back */
-        } else {
-            return 4;
-        }                    /* can't continue on this path */
+            result = hmm(shapes_relevant, cur_pos + shapes_relevant[shape_idx].length, shape_idx + 1, end_pos);
+        }
     }
-    else {
-        return 5;                        /* no match */
-    }
+
+    #ifdef DEBUG
+        fprintf(stderr, " -> %d\n", result);
+    #endif
+    return result;
 }
 
 
 
-static int detect_horiz(const int aside, size_t *hstart, size_t *hend)
-/*
- *  Detect which part of the input belongs to the top/bottom of the box
- *
- *      aside   part of box to detect (BTOP or BBOT)
- *      hstart  index of first line of detected box part (result)
- *      hend    index of first line following detected box part (result)
- *
- *  We assume the horizontal parts of the box to be in one piece, i.e. no
- *  blank lines inserted. Lines may be missing, though. Lines may not be
- *  duplicated. They may be shifted left and right by inserting whitespace,
- *  but whitespace which is part of the box must not have been deleted
- *  (unless it's because an entire box side is empty). Box part lines may
- *  even differ in length as long as each line is in itself a valid
- *  horizontal box line.
- *
- *  RETURNS:  == 0   success (hstart & hend are set)
- *            != 0   error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
+static shape_line_ctx_t *prepare_comp_shapes_horiz(int hside, comparison_t comp_type, size_t shape_line_idx)
 {
-    size_t follow;                 /* possible box line */
-    sentry_t *cs;                  /* current shape */
-    line_t *line;                  /* currently processed input line */
-    size_t lcnt;                   /* line counter */
-    char *p = NULL;                /* middle line part scanner */
-    char *q;                       /* space check rover */
-    char *wcs = NULL;              /* west corner shape position */
-    char *ecs = NULL;              /* east corner shape position */
-    int mmok = 0;                  /* true if middle match was ok */
-    size_t mheight;                /* regular height of box part */
-    int result_init = 0;           /* true if hstart etc. was init. */
-    int nowside;                   /* true if west side is empty */
-    int goeast;                    /* no. of finds to ignore on right */
-    int gowest;                    /* set to request search start incr. */
-
-    *hstart = *hend = 0;
-    nowside = empty_side(opt.design->shape, BLEF);
-
-    mheight = opt.design->shape[sides[aside][0]].height;
-    if (aside == BTOP) {
-        follow = 0;
-        line = input.lines;
+    shape_t start_shape = hside == BTOP ? NW : SW;
+    shape_t top_side_shapes[SHAPES_PER_SIDE - CORNERS_PER_SIDE] = {NNW, N, NNE};
+    shape_t bottom_side_shapes[SHAPES_PER_SIDE - CORNERS_PER_SIDE] = {SSW, S, SSE};
+    shape_t end_shape = hside == BTOP ? NE : SE;
+    shape_t side_shapes[SHAPES_PER_SIDE - CORNERS_PER_SIDE];
+    if (hside == BTOP) {
+        memcpy(side_shapes, top_side_shapes, (SHAPES_PER_SIDE - CORNERS_PER_SIDE) * sizeof(shape_t));
     }
     else {
-        follow = mheight - 1;
-        line = input.lines + input.num_lines - 1;
+        memcpy(side_shapes, bottom_side_shapes, (SHAPES_PER_SIDE - CORNERS_PER_SIDE) * sizeof(shape_t));
     }
 
-    for (lcnt = 0; lcnt < mheight && lcnt < input.num_lines
-            && line >= input.lines; ++lcnt) {
-        goeast = gowest = 0;
+    shape_line_ctx_t *shapes_relevant = (shape_line_ctx_t *) calloc(SHAPES_PER_SIDE, sizeof(shape_line_ctx_t));
 
-        #ifdef DEBUG
-            fprintf(stderr, "----- Processing line index %2d -----------------------------------------------\n",
-                    (int) (aside == BTOP ? lcnt : input.num_lines - lcnt - 1));
-        #endif
+    shapes_relevant[0].text = prepare_comp_shape(opt.design, start_shape, shape_line_idx, comp_type, 1, 0);
+    shapes_relevant[0].length = u32_strlen(shapes_relevant[0].text);
+    shapes_relevant[0].elastic = 0;
+    shapes_relevant[0].empty = 0;
 
-        do {
-            /*
-             *  Look for west corner shape
-             */
-            if (!goeast) {
-                if (nowside) {
-                    wcs = NULL;
-                    if (gowest) {
-                        gowest = 0;
-                        if (*p == ' ' || *p == '\t') {
-                            ++p;
-                        } else {
-                            break;
-                        }
-                    }
-                    else {
-                        p = line->text;
-                    }
-                }
-                else {
-                    cs = opt.design->shape + sides[aside][aside == BTOP ? 0 : SHAPES_PER_SIDE - 1];
-                    if (gowest) {
-                        gowest = 0;
-                        wcs = strstr(wcs + 1, cs->chars[follow]);
-                    }
-                    else {
-                        wcs = strstr(line->text, cs->chars[follow]);
-                    }
-                    if (wcs) {
-                        for (q = wcs - 1; q >= line->text; --q) {
-                            if (*q != ' ' && *q != '\t') {
-                                break;
-                            }
-                        }
-                        if (q >= line->text) {
-                            wcs = NULL;
-                        }
-                    }
-                    if (!wcs) {
-                        break;
-                    }
-
-                    p = wcs + cs->width;
-                }
-            }
-            /* Now, wcs is either NULL (if west side is empty)         */
-            /* or not NULL (if west side is not empty). In any case, p */
-            /* points to where we start searching for the east corner. */
-            #ifdef DEBUG
-                if (wcs) {
-                    fprintf(stderr, "West corner shape matched at position %d.\n", (int) (wcs - line->text));
-                } else {
-                    fprintf(stderr, "West box side is empty.\n");
-                }
-            #endif
-            /*
-             *  Look for east corner shape
-             */
-            cs = opt.design->shape + sides[aside][aside == BTOP ? SHAPES_PER_SIDE - 1 : 0];
-            ecs = my_strnrstr(p, cs->chars[follow], cs->width, goeast);
-            if (ecs) {
-                for (q = ecs + cs->width; *q; ++q) {
-                    if (*q != ' ' && *q != '\t') {
-                        break;
-                    }
-                }
-                if (*q) {
-                    ecs = NULL;
-                }
-            }
-            if (!ecs) {
-                if (goeast == 0) {
-                    break;
-                } else {
-                    goeast = 0;
-                    gowest = 1;
-                    continue;
-                }
-            }
-            #ifdef DEBUG
-                fprintf(stderr, "East corner shape matched at position %d.\n", (int) (ecs - line->text));
-            #endif
-
-            /*
-             *  Check if text between corner shapes is valid
-             */
-            mmok = !hmm(aside, follow, p, ecs, 0);
-            if (!mmok) {
-                ++goeast;
-            }
-            #ifdef DEBUG
-                fprintf(stderr, "Text between corner shapes is %s.\n", mmok ? "VALID" : "NOT valid");
-            #endif
-        } while (!mmok);
-
-        /*
-         *  Proceed to next line
-         */
-        if (mmok) {                      /* match found */
-            if (!result_init) {
-                result_init = 1;
-                if (aside == BTOP) {
-                    *hstart = lcnt;
-                } else {
-                    *hend = (input.num_lines - lcnt - 1) + 1;
-                }
-            }
-            if (aside == BTOP) {
-                *hend = lcnt + 1;
-            } else {
-                *hstart = input.num_lines - lcnt - 1;
-            }
+    for (size_t i = 0; i < SHAPES_PER_SIDE - CORNERS_PER_SIDE; i++) {
+        shapes_relevant[i + 1].empty = isempty(opt.design->shape + side_shapes[i]);
+        if (!shapes_relevant[i + 1].empty) {
+            shapes_relevant[i + 1].text
+                    = prepare_comp_shape(opt.design, side_shapes[i], shape_line_idx, comp_type, 0, 0);
+            shapes_relevant[i + 1].length = u32_strlen(shapes_relevant[i + 1].text);
+            shapes_relevant[i + 1].elastic = opt.design->shape[side_shapes[i]].elastic;
         }
-        else {
-            if (result_init) {
+    }
+
+    shapes_relevant[SHAPES_PER_SIDE - 1].text
+            = prepare_comp_shape(opt.design, end_shape, shape_line_idx, comp_type, 0, 1);
+    shapes_relevant[SHAPES_PER_SIDE - 1].length = u32_strlen(shapes_relevant[SHAPES_PER_SIDE - 1].text);
+    shapes_relevant[SHAPES_PER_SIDE - 1].elastic = 0;
+    shapes_relevant[SHAPES_PER_SIDE - 1].empty = 0;
+
+    return shapes_relevant;
+}
+
+
+
+static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx, size_t shape_line_idx)
+{
+    int result = 0;
+    for (comparison_t comp_type = 0; comp_type < NUM_COMPARISON_TYPES; comp_type++) {
+        if (!comp_type_is_viable(comp_type, ctx->input_is_mono, ctx->design_is_mono)) {
+            continue;
+        }
+
+        shape_line_ctx_t *shapes_relevant = prepare_comp_shapes_horiz(hside, comp_type, shape_line_idx);
+
+        uint32_t *cur_pos = NULL;
+        uint32_t *input_prepped = prepare_comp_input(input_line_idx, 1, comp_type, 0, NULL, NULL);
+        if (input_prepped != NULL
+                && u32_strncmp(input_prepped, shapes_relevant[0].text, shapes_relevant[0].length) == 0)
+        {
+            cur_pos = input_prepped + shapes_relevant[0].length;
+        }
+
+        uint32_t *end_pos = NULL;
+        input_prepped = prepare_comp_input(
+                input_line_idx, 0, comp_type, shapes_relevant[SHAPES_PER_SIDE - 1].length, NULL, NULL);
+        if (input_prepped != NULL && u32_strncmp(input_prepped, shapes_relevant[SHAPES_PER_SIDE - 1].text,
+                shapes_relevant[SHAPES_PER_SIDE - 1].length) == 0)
+        {
+            end_pos = input_prepped;
+        }
+
+        if (cur_pos && end_pos) {
+            result = hmm(shapes_relevant, cur_pos, 1, end_pos);
+        }
+
+        for (size_t i = 0; i < SHAPES_PER_SIDE; i++) {
+            BFREE(shapes_relevant[i].text);
+        }
+        BFREE(shapes_relevant);
+
+        if (result) {
+            #ifdef DEBUG
+                fprintf(stderr, "Matched %s side line using comp_type=%s and shape_line_idx=%d\n",
+                    hside == BTOP ? "top" : "bottom", comparison_name[comp_type], (int) shape_line_idx);
+            #endif
+            break;
+        }
+    }
+
+    return result;
+}
+
+
+
+static size_t find_top_side(remove_ctx_t *ctx)
+{
+    size_t result = ctx->top_start_idx;
+    sentry_t *shapes = opt.design->shape;
+    for (size_t input_line_idx = ctx->top_start_idx, shape_line_count = 0;
+            input_line_idx < input.num_lines && shape_line_count < shapes[NE].height;
+            input_line_idx++, shape_line_count++)
+    {
+        int matched = 0;
+        for (size_t shape_line_idx = input_line_idx - ctx->top_start_idx;;
+                shape_line_idx = (shape_line_idx + 1) % shapes[NE].height)
+        {
+            if (match_horiz_line(ctx, BTOP, input_line_idx, shape_line_idx)) {
+                matched = 1;
                 break;
             }
         }
+        if (!matched) {
+            break;
+        }
+        result = input_line_idx + 1;
+    }
+    return result;
+}
 
-        wcs = NULL;
-        ecs = NULL;
-        p = NULL;
-        mmok = 0;
 
-        if (aside == BTOP) {
-            ++follow;
-            ++line;
+
+static size_t find_bottom_side(remove_ctx_t *ctx)
+{
+    size_t result = ctx->top_start_idx;
+    sentry_t *shapes = opt.design->shape;
+    for (long input_line_idx = (long) ctx->bottom_end_idx - 1, shape_line_count = (long) shapes[SE].height - 1;
+            input_line_idx >= 0 && shape_line_count >= 0;
+            input_line_idx--, shape_line_count--)
+    {
+        int matched = 0;
+        for (size_t shape_line_idx = shapes[SE].height - (ctx->bottom_end_idx - input_line_idx);;
+                shape_line_idx = (shape_line_idx + 1) % shapes[SE].height)
+        {
+            if (match_horiz_line(ctx, BBOT, input_line_idx, shape_line_idx)) {
+                matched = 1;
+                break;
+            }
+        }
+        if (!matched) {
+            break;
+        }
+        result = input_line_idx;
+    }
+    return result;
+}
+
+
+
+static size_t count_shape_lines(shape_t side_shapes[])
+{
+    size_t result = 0;
+    for (size_t i = 0; i < SHAPES_PER_SIDE - CORNERS_PER_SIDE; i++) {
+        if (!isempty(opt.design->shape + side_shapes[i])) {
+            result += opt.design->shape[side_shapes[i]].height;
+        }
+    }
+    return result;
+}
+
+
+static shape_line_ctx_t **prepare_comp_shapes_vert(int vside, comparison_t comp_type)
+{
+    shape_t west_side_shapes[SHAPES_PER_SIDE - CORNERS_PER_SIDE] = {WSW, W, WNW};
+    shape_t east_side_shapes[SHAPES_PER_SIDE - CORNERS_PER_SIDE] = {ENE, E, ESE};
+    shape_t side_shapes[SHAPES_PER_SIDE - CORNERS_PER_SIDE];
+    if (vside == BLEF) {
+        memcpy(side_shapes, west_side_shapes, (SHAPES_PER_SIDE - CORNERS_PER_SIDE) * sizeof(shape_t));
+    }
+    else {
+        memcpy(side_shapes, east_side_shapes, (SHAPES_PER_SIDE - CORNERS_PER_SIDE) * sizeof(shape_t));
+    }
+
+    size_t num_shape_lines = count_shape_lines(side_shapes);
+
+    /* allocate a NUL-terminated array: */
+    shape_line_ctx_t **shape_lines = (shape_line_ctx_t **) calloc(num_shape_lines + 1, sizeof(shape_line_ctx_t *));
+
+    for (size_t shape_idx = 0, i = 0; shape_idx < SHAPES_PER_SIDE - CORNERS_PER_SIDE; shape_idx++) {
+        if (!isempty(opt.design->shape + side_shapes[shape_idx])) {
+            shape_lines[i] = (shape_line_ctx_t *) calloc(1, sizeof(shape_line_ctx_t));
+            for (size_t slno = 0; slno < opt.design->shape[side_shapes[shape_idx]].height; slno++, i++) {
+                shape_lines[i]->text = prepare_comp_shape(opt.design, side_shapes[shape_idx], slno, comp_type, 0, 0);
+                shape_lines[i]->empty = u32_is_blank(shape_lines[i]->text);
+                shape_lines[i]->length = u32_strlen(shape_lines[i]->text);
+                shape_lines[i]->elastic = opt.design->shape[side_shapes[shape_idx]].elastic;
+            }
+        }
+    }
+
+    return shape_lines;
+}
+
+
+
+static void free_shape_lines(shape_line_ctx_t **shape_lines)
+{
+    if (shape_lines != NULL) {
+        for (shape_line_ctx_t **p = shape_lines; *p != NULL; p++) {
+            BFREE((*p)->text);
+            BFREE(*p);
+        }
+        BFREE(shape_lines);
+    }
+}
+
+
+
+/**
+ * Take a shape line and shorten it by cutting off blanks from both ends.
+ * @param shape_line_ctx info record on the shape line to work on. Contains the original shape line, unshortened.
+ * @param quality (IN/OUT) the current quality, here the value that was last tested. We will reduce this by one.
+ * @param prefer_left if 1, first cut blanks from the start of the shape line, if 0, first cut at the end
+ * @return the shortened shape line, in new memory, or NULL if further shortening was not possible
+ */
+static uint32_t *shorten(shape_line_ctx_t *shape_line_ctx, size_t *quality, int prefer_left)
+{
+    uint32_t *s = shape_line_ctx->text;
+    uint32_t *e = shape_line_ctx->text + shape_line_ctx->length;
+    size_t reduction_steps = shape_line_ctx->length - *quality + 1;
+    for (size_t i = 0; i < reduction_steps; i++) {
+        if (prefer_left) {
+            if (is_blank(*s) && s < e) {
+                s++;
+            }
+            else if (is_blank(*(e - 1)) && e > s) {
+                e--;
+            }
+            else {
+                break;
+            }
         }
         else {
-            --follow;
-            --line;
+            if (is_blank(*(e - 1)) && e > s) {
+                e--;
+            }
+            else if (is_blank(*s) && s < e) {
+                s++;
+            }
+            else {
+                break;
+            }
         }
     }
 
-    return result_init ? 0 : 1;
+    uint32_t *result = NULL;
+    size_t new_quality = e - s;
+    if (new_quality < *quality) {
+        result = u32_strdup(s);
+        set_char_at(result, new_quality, char_nul);
+        *quality = new_quality;
+    }
+    return result;
 }
 
 
 
-static void add_spaces_to_line(line_t* line, const size_t n)
+static void match_vertical_side(remove_ctx_t *ctx, int vside, shape_line_ctx_t **shape_lines, uint32_t *input_line,
+    size_t line_idx, size_t input_length, size_t input_indent, size_t input_trailing)
 {
-    if (n == 0) {
+    line_ctx_t *line_ctx = ctx->body + (line_idx - ctx->top_end_idx);
+
+    for (shape_line_ctx_t **shape_line_ctx = shape_lines; *shape_line_ctx != NULL; shape_line_ctx++) {
+        if ((*shape_line_ctx)->empty) {
+            continue;
+        }
+
+        size_t max_quality = (*shape_line_ctx)->length;
+        size_t quality = max_quality;
+        uint32_t *shape_text = (*shape_line_ctx)->text;
+        uint32_t *to_free = NULL;
+        while(shape_text != NULL) {
+            uint32_t *p;
+            if (vside == BLEF) {
+                p = u32_strstr(input_line, shape_text);
+            }
+            else {
+                p = u32_strnrstr(input_line, shape_text, quality, 0);
+            }
+            BFREE(to_free);
+            shape_text = NULL;
+
+            if (p == NULL) {
+                shape_text = shorten(*shape_line_ctx, &quality, vside == BLEF);
+                to_free = shape_text;
+            }
+            else if (vside == BLEF && ((size_t) (p - input_line) <= input_indent + (max_quality - quality))) {
+                if (quality > line_ctx->west_quality) {
+                    line_ctx->west_start = (size_t) (p - input_line);
+                    line_ctx->west_end = line_ctx->west_start + quality;
+                    line_ctx->west_quality = quality;
+                    BFREE(line_ctx->input_line_used);
+                    line_ctx->input_line_used = u32_strdup(input_line);
+                }
+            }
+            else if (vside == BRIG && ((size_t) (p - input_line) >= input_length - input_trailing - quality)) {
+                if (quality > line_ctx->east_quality) {
+                    line_ctx->east_start = (size_t) (p - input_line);
+                    line_ctx->east_end = line_ctx->east_start + quality;
+                    line_ctx->east_quality = quality;
+                    BFREE(line_ctx->input_line_used);
+                    line_ctx->input_line_used = u32_strdup(input_line);
+                }
+            }
+        }
+    }
+}
+
+
+
+static int sufficient_body_quality(remove_ctx_t *ctx)
+{
+    size_t num_body_lines = ctx->bottom_start_idx - ctx->top_end_idx;
+    size_t total_quality = 0;
+    line_ctx_t *body = ctx->body;
+    for (size_t body_line_idx = 0; body_line_idx < num_body_lines; body_line_idx++) {
+        line_ctx_t line_ctx = body[body_line_idx];
+        total_quality += line_ctx.east_quality + line_ctx.west_quality;
+    }
+
+    size_t max_quality = (opt.design->shape[NW].width + opt.design->shape[NE].width) * num_body_lines;
+    /* If we manage to match 50%, then it is unlikely to improve with a different comparison mode. */
+    int sufficient = total_quality > 0.5 * max_quality;
+    #ifdef DEBUG
+        fprintf(stderr, "sufficient_body_quality() found body match quality of %d/%d (%s).\n",
+                (int) total_quality, (int) max_quality, sufficient ? "sufficient" : "NOT sufficient");
+    #endif
+    return sufficient;
+}
+
+
+
+static void find_vertical_shapes(remove_ctx_t *ctx)
+{
+    int west_empty = ctx->empty_side[BLEF];
+    int east_empty = ctx->empty_side[BRIG];
+    if (west_empty && east_empty) {
         return;
     }
-    bxs_append_spaces(line->text, n);
-    analyze_line_ascii(&input, line);
+
+    for (comparison_t comp_type = 0; comp_type < NUM_COMPARISON_TYPES; comp_type++) {
+        if (!comp_type_is_viable(comp_type, ctx->input_is_mono, ctx->design_is_mono)) {
+            continue;
+        }
+
+        shape_line_ctx_t **shape_lines_west = NULL;
+        if (!west_empty) {
+            shape_lines_west = prepare_comp_shapes_vert(BLEF, comp_type);
+        }
+        shape_line_ctx_t **shape_lines_east = NULL;
+        if (!east_empty) {
+            shape_lines_east = prepare_comp_shapes_vert(BRIG, comp_type);
+        }
+
+        for (size_t input_line_idx = ctx->top_end_idx; input_line_idx < ctx->bottom_start_idx; input_line_idx++) {
+            size_t input_indent = 0;
+            size_t input_trailing = 0;
+            uint32_t *input_line = prepare_comp_input(input_line_idx, 0, comp_type, 0, &input_indent, &input_trailing);
+            size_t input_length = u32_strlen(input_line);
+
+            if (!west_empty) {
+                match_vertical_side(ctx, BLEF, shape_lines_west,
+                        input_line, input_line_idx, input_length, input_indent, input_trailing);
+            }
+            if (!east_empty) {
+                match_vertical_side(ctx, BRIG, shape_lines_east,
+                        input_line, input_line_idx, input_length, input_indent, input_trailing);
+            }
+        }
+
+        free_shape_lines(shape_lines_west);
+        free_shape_lines(shape_lines_east);
+
+        if (sufficient_body_quality(ctx)) {
+            break;
+        }
+        memset(ctx->body, 0, (ctx->bottom_start_idx - ctx->top_end_idx) * sizeof(line_ctx_t));
+    }
 }
 
 
 
-int remove_box()
-/*
- *  Remove box from input.
- *
- *  RETURNS:  == 0  success
- *            != 0  error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/**
+ * If the user didn't specify a design to remove, autodetect it.
+ * Since this requires knowledge of all available designs, the entire config file had to be parsed (earlier).
  */
+static void detect_design_if_needed()
 {
-    size_t textstart = 0;         /* index of 1st line of box body */
-    size_t textend = 0;           /* index of 1st line of south side */
-    size_t boxstart = 0;          /* index of 1st line of box */
-    size_t boxend = 0;            /* index of 1st line trailing the box */
-    int m;                        /* true if a match was found */
-    size_t j;                     /* loop counter */
-    int did_something = 0;        /* true if there was something to remove */
-
-    /*
-     *  If the user didn't specify a design to remove, autodetect it.
-     *  Since this requires knowledge of all available designs, the entire
-     *  config file had to be parsed (earlier).
-     */
     if (opt.design_choice_by_user == 0) {
         design_t *tmp = autodetect_design();
         if (tmp) {
@@ -541,219 +583,250 @@ int remove_box()
         }
         else {
             fprintf(stderr, "%s: Box design autodetection failed. Use -d option.\n", PROJECT);
-            return 1;
+            exit(EXIT_FAILURE);
         }
     }
-
-    /*
-     *  Make all lines the same length by adding trailing spaces (needed
-     *  for recognition).
-     *  Also append a number of spaces to ALL input lines. A greater number
-     *  takes more space and time, but enables the correct removal of boxes
-     *  whose east sides consist of lots of spaces (the given value). So we
-     *  add a number of spaces equal to the east side width.
-     */
-    const size_t normalized_len = input.maxline + opt.design->shape[NE].width;
-    for (j = 0; j < input.num_lines; ++j) {
-        add_spaces_to_line(input.lines + j, normalized_len - input.lines[j].text->num_columns);
-    }
-    #ifdef DEBUG
-        fprintf(stderr, "Normalized all lines to %d columns (maxline + east width).\n", (int) input.maxline);
-        print_input_lines(" (remove_box)");
-    #endif
-
-    /*
-     *  Phase 1: Try to find out how many lines belong to the top of the box
-     */
-    boxstart = 0;
-    textstart = 0;
-    if (empty_side(opt.design->shape, BTOP)) {
-        #ifdef DEBUG
-            fprintf(stderr, "----> Top box side is empty: boxstart == textstart == 0.\n");
-        #endif
-    }
-    else {
-        detect_horiz(BTOP, &boxstart, &textstart);
-        #ifdef DEBUG
-            fprintf(stderr, "----> First line of box is %d, ", (int) boxstart);
-            fprintf(stderr, "first line of box body (text) is %d.\n", (int) textstart);
-        #endif
-    }
+}
 
 
-    /*
-     *  Phase 2: Find out how many lines belong to the bottom of the box
-     */
-    if (empty_side(opt.design->shape, BBOT)) {
-        textend = input.num_lines;
-        boxend = input.num_lines;
-        #ifdef DEBUG
-            fprintf(stderr, "----> Bottom box side is empty: boxend == textend == %d.\n", (int) input.num_lines);
-        #endif
-    }
-    else {
-        textend = 0;
-        boxend = 0;
-        detect_horiz(BBOT, &textend, &boxend);
-        if (textend == 0 && boxend == 0) {
-            textend = input.num_lines;
-            boxend = input.num_lines;
+
+static void toblank_plain(uint32_t **s, size_t from, size_t n)
+{
+    if (n > 0) {
+        size_t cols = (size_t) u32_width((*s) + from, n, encoding);
+        if (cols > n) {
+            u32_insert_space_at(s, from, cols - n);
         }
-        #ifdef DEBUG
-            fprintf(stderr, "----> Last line of box body (text) is %d, ", (int) (textend - 1));
-            fprintf(stderr, "last line of box is %d.\n", (int) (boxend - 1));
-        #endif
+        u32_set((*s) + from, char_space, cols);
     }
+}
 
-    /*
-     *  Phase 3: Iterate over body lines, removing box sides where applicable
-     */
-    for (j = textstart; j < textend; ++j) {
-        uint32_t *ws, *we, *es, *ee;         /* west start & end, east start & end */
-        uint32_t *p;
 
-        #ifdef DEBUG
-            fprintf(stderr, "Calling best_match() for line %d:\n", (int) j);
-        #endif
-        m = best_match(input.lines + j, &ws, &we, &es, &ee);
-        if (m < 0) {
-            fprintf(stderr, "%s: internal error\n", PROJECT);
-            return 1;                    /* internal error */
+
+static void toblank_mixed(bxstr_t *org_line, uint32_t **s, size_t from, size_t to, size_t n)
+{
+    if (n > 0) {
+        for (int i = (int) to - 1; i >= (int) from; i--) {
+            if (bxs_is_visible_char(org_line, (size_t) i)) {
+                size_t cols = (size_t) uc_width((*s)[i], encoding);
+                if (cols > 1) {
+                    u32_insert_space_at(s, (size_t) i + 1, cols - 1);
+                }
+                u32_set((*s) + i, char_space, 1);
+            }
         }
-        else if (m == 0) {
-            #ifdef DEBUG
-                fprintf(stderr, "\033[00;33;01mline %2d: no side match\033[00m\n", (int) j);
-            #endif
+    }
+}
+
+
+
+static size_t count_leading_spaces_plain(uint32_t *s, size_t max)
+{
+    size_t result = 0;
+    for (size_t i = 0; i < max && is_char_at(s, i, char_space); i++, result++)
+        ;
+    return result;
+}
+
+
+
+static void clip_spaces_carefully_plain(remove_ctx_t *ctx, uint32_t *s)
+{
+    if (!ctx->empty_side[BLEF]) {
+        size_t num_remove = count_leading_spaces_plain(s, opt.design->shape[NW].width);
+        u32_move(s, s + num_remove, u32_strlen(s) - num_remove + 1);
+    }
+}
+
+
+
+static uint32_t *clip_spaces_carefully_mixed(remove_ctx_t *ctx, uint32_t *s)
+{
+    if (!ctx->empty_side[BLEF]) {
+        bxstr_t *bs = bxs_from_unicode(s);
+        return bxs_ltrim(bs, opt.design->shape[NW].width);
+    }
+    return NULL;
+}
+
+
+
+static void remove_vertical_shapes(remove_ctx_t *ctx)
+{
+    size_t num_body_lines = ctx->bottom_start_idx - ctx->top_end_idx;
+    line_ctx_t *body = ctx->body;
+    for (size_t body_line_idx = 0; body_line_idx < num_body_lines; body_line_idx++) {
+        line_ctx_t line_ctx = body[body_line_idx];
+        bxstr_t *org_line = input.lines[ctx->top_end_idx + body_line_idx].text;
+
+        if (org_line->num_chars_invisible > 0) {
+            toblank_mixed(
+                    org_line, &line_ctx.input_line_used, line_ctx.east_start, line_ctx.east_end, line_ctx.east_quality);
+            toblank_mixed(
+                    org_line, &line_ctx.input_line_used, line_ctx.west_start, line_ctx.west_end, line_ctx.west_quality);
+            uint32_t *clipped = clip_spaces_carefully_mixed(ctx, line_ctx.input_line_used);
+            if (clipped) {
+                BFREE(line_ctx.input_line_used);
+                line_ctx.input_line_used = clipped;
+            }
         }
         else {
-            #ifdef DEBUG
-            fprintf(stderr, "\033[00;33;01mline %2d: west: %d (\'%lc\') to %d (\'%lc\') [len %d];  "
-                            "east: %d (\'%lc\') to %d (\'%lc\') [len %d]\033[00m\n", (int) j,
-                    (int) (ws       ?  ws - input.lines[j].text->memory : 0),     ws ? ws[0]  : to_utf32('?'),
-                    (int) (we       ?  we - input.lines[j].text->memory - 1 : 0), we ? we[-1] : to_utf32('?'),
-                    (int) (ws && we ? (we - input.lines[j].text->memory - (ws - input.lines[j].text->memory)) : 0),
-                    (int) (es       ?  es - input.lines[j].text->memory : 0),     es ? es[0]  : to_utf32('?'),
-                    (int) (ee       ?  ee - input.lines[j].text->memory - 1 : 0), ee ? ee[-1] : to_utf32('?'),
-                    (int) (es && ee ? (ee - input.lines[j].text->memory - (es - input.lines[j].text->memory)) : 0));
-            #endif
-            if (ws && we) {
-                did_something = 1;
-                for (p = ws; p < we; ++p) {
-                    size_t idx = p - input.lines[j].text->memory;      // TODO HERE
-                    *p = char_space;  // TODO this might be wrong
-                    set_char_at(input.lines[j].mbtext, input.lines[j].posmap[idx], char_space);
-                }
-            }
-            if (es && ee) {
-                for (p = es; p < ee; ++p) {
-                    size_t idx = p - input.lines[j].text;
-                    *p = ' ';
-                    set_char_at(input.lines[j].mbtext, input.lines[j].posmap[idx], char_space);
-                }
-            }
+            toblank_plain(&line_ctx.input_line_used, line_ctx.east_start, line_ctx.east_quality); /* east first */
+            toblank_plain(&line_ctx.input_line_used, line_ctx.west_start, line_ctx.west_quality);
+            clip_spaces_carefully_plain(ctx, line_ctx.input_line_used);
         }
     }
+}
 
-    /*
-     *  Remove as many spaces from the left side of the line as the west side
-     *  of the box was wide. Don't do it if we never removed anything from the
-     *  west side. Don't harm the line's text if there aren't enough spaces.
-     */
-    if (did_something) {
-        for (j = textstart; j < textend; ++j) {
-            size_t c;
-            size_t widz = opt.design->shape[NW].width + opt.design->padding[BLEF];
-            for (c = 0; c < widz; ++c) {
-                if (input.lines[j].text[c] != ' ') {
-                    break;
-                }
-            }
-            #if defined(DEBUG)
-                fprintf(stderr, "memmove(\"%s\", \"%s\", %d);\n",
-                        input.lines[j].text, input.lines[j].text + c, (int) (input.lines[j].len - c + 1));
-            #endif
-            memmove(input.lines[j].text, input.lines[j].text + c,
-                    input.lines[j].len - c + 1);         /* +1 for zero byte */
-            input.lines[j].len -= c;
 
-            #if defined(DEBUG)
-                fprintf(stderr, "u32_move(\"%s\", \"%s\", %d); // posmap[c]=%d\n",
-                        u32_strconv_to_output(input.lines[j].mbtext),
-                        u32_strconv_to_output(input.lines[j].mbtext + input.lines[j].posmap[c]),
-                        (int) (input.lines[j].num_chars - input.lines[j].posmap[c] + 1), (int) input.lines[j].posmap[c]);
-            #endif
-            u32_move(input.lines[j].mbtext, input.lines[j].mbtext + input.lines[j].posmap[c],
-                     input.lines[j].num_chars - input.lines[j].posmap[c] + 1);  /* +1 for zero byte */
-            input.lines[j].num_chars -= c;
-        }
+
+static void free_line_text(line_t *line)
+{
+    BFREE(line->cache_visible);
+    bxs_free(line->text);
+    line->text = NULL;
+}
+
+
+
+static void free_line(line_t *line)
+{
+    free_line_text(line);
+    BFREE(line->tabpos);
+    line->tabpos_len = 0;
+}
+
+
+
+static void killblank(remove_ctx_t *ctx)
+{
+    while (ctx->top_end_idx < ctx->bottom_start_idx && empty_line(input.lines + ctx->top_end_idx)) {
+        #ifdef DEBUG
+            fprintf(stderr, "Killing leading blank line in box body.\n");
+        #endif
+        ++(ctx->top_end_idx);
     }
-    #ifdef DEBUG
-        if (!did_something) {
-            fprintf(stderr, "There is nothing to remove (did_something == 0).\n");
-        }
-    #endif
+    while (ctx->bottom_start_idx > ctx->top_end_idx && empty_line(input.lines + ctx->bottom_start_idx - 1)) {
+        #ifdef DEBUG
+            fprintf(stderr, "Killing trailing blank line in box body.\n");
+        #endif
+        --(ctx->bottom_start_idx);
+    }
+}
 
-    /*
-     *  Phase 4: Remove box top and body lines from input
-     */
+
+
+static void apply_results_to_input(remove_ctx_t *ctx)
+{
+    for (size_t j = ctx->top_end_idx; j < ctx->bottom_start_idx; ++j) {
+        free_line_text(input.lines + j);
+        input.lines[j].text = bxs_from_unicode(ctx->body[j - ctx->top_end_idx].input_line_used);
+        // FIXME now we might have lost the input colors
+    }
+
     if (opt.killblank) {
-        while (empty_line(input.lines + textstart) && textstart < textend) {
-            #ifdef DEBUG
-                fprintf(stderr, "Killing leading blank line in box body.\n");
-            #endif
-            ++textstart;
+        killblank(ctx);
+    }
+
+    if (ctx->top_end_idx > ctx->top_start_idx) {
+        for (size_t j = ctx->top_start_idx; j < ctx->top_end_idx; ++j) {
+            free_line(input.lines + j);
         }
-        while (empty_line(input.lines + textend - 1) && textend > textstart) {
-            #ifdef DEBUG
-                fprintf(stderr, "Killing trailing blank line in box body.\n");
-            #endif
-            --textend;
+        memmove(input.lines + ctx->top_start_idx, input.lines + ctx->top_end_idx,
+                (input.num_lines - ctx->top_end_idx) * sizeof(line_t));
+        size_t num_lines_removed = ctx->top_end_idx - ctx->top_start_idx;
+        input.num_lines -= num_lines_removed;
+        ctx->bottom_start_idx -= num_lines_removed;
+        ctx->bottom_end_idx -= num_lines_removed;
+    }
+
+    if (ctx->bottom_end_idx > ctx->bottom_start_idx) {
+        for (size_t j = ctx->bottom_start_idx; j < ctx->bottom_end_idx; ++j) {
+            free_line(input.lines + j);
+        }
+        if (ctx->bottom_end_idx < input.num_lines) {
+            memmove(input.lines + ctx->bottom_start_idx, input.lines + ctx->bottom_end_idx,
+                    (input.num_lines - ctx->bottom_end_idx) * sizeof(line_t));
+        }
+        input.num_lines -= ctx->bottom_end_idx - ctx->bottom_start_idx;
+    }
+
+    input.maxline = 0;
+    input.indent = SIZE_MAX;
+    for (size_t j = 0; j < input.num_lines; ++j) {
+        if (input.lines[j].text->num_columns > input.maxline) {
+            input.maxline = input.lines[j].text->num_columns;
+        }
+        if (input.lines[j].text->indent < input.indent) {
+            input.indent = input.lines[j].text->indent;
         }
     }
 
-    if (textstart > boxstart) {
-        for (j = boxstart; j < textstart; ++j) BFREE (input.lines[j].text);
-        memmove(input.lines + boxstart, input.lines + textstart,
-                (input.num_lines - textstart) * sizeof(line_t));
-        input.num_lines -= textstart - boxstart;
-        textend -= textstart - boxstart;
-        boxend -= textstart - boxstart;
-    }
-    if (boxend > textend) {
-        for (j = textend; j < boxend; ++j) BFREE (input.lines[j].text);
-        if (boxend < input.num_lines) {
-            memmove(input.lines + textend, input.lines + boxend,
-                    (input.num_lines - boxend) * sizeof(line_t));
-        }
-        input.num_lines -= boxend - textend;
-    }
-    input.maxline = 0;
-    for (j = 0; j < input.num_lines; ++j) {
-        if (input.lines[j].len - input.lines[j].invis > input.maxline) {
-            input.maxline = input.lines[j].len - input.lines[j].invis;
-        }
-    }
-    memset(input.lines + input.num_lines, 0,
-           (BMAX (textstart - boxstart, (size_t) 0) + BMAX (boxend - textend, (size_t) 0)) * sizeof(line_t));
+    size_t num_lines_removed = BMAX(ctx->top_end_idx - ctx->top_start_idx, (size_t) 0)
+            + BMAX(ctx->bottom_end_idx - ctx->bottom_start_idx, (size_t) 0);
+    memset(input.lines + input.num_lines, 0, num_lines_removed * sizeof(line_t));
 
     #ifdef DEBUG
         print_input_lines(" (remove_box) after box removal");
-        fprintf(stderr, "Number of lines shrunk by %d.\n",
-                (int) (BMAX (textstart - boxstart, (size_t) 0) + BMAX (boxend - textend, (size_t) 0)));
+        fprintf(stderr, "Number of lines shrunk by %d.\n", (int) num_lines_removed);
     #endif
+}
 
-    return 0;                            /* all clear */
+
+
+int remove_box()
+{
+    detect_design_if_needed();
+
+    remove_ctx_t *ctx = (remove_ctx_t *) calloc(1, sizeof(remove_ctx_t));
+    ctx->empty_side[BTOP] = empty_side(opt.design->shape, BTOP);
+    ctx->empty_side[BRIG] = empty_side(opt.design->shape, BRIG);
+    ctx->empty_side[BBOT] = empty_side(opt.design->shape, BBOT);
+    ctx->empty_side[BLEF] = empty_side(opt.design->shape, BLEF);
+
+    ctx->design_is_mono = design_is_mono(opt.design);
+    ctx->input_is_mono = input_is_mono();
+
+    ctx->top_start_idx = find_first_line();
+    if (ctx->top_start_idx >= input.num_lines) {
+        return 0;  /* all lines were already blank, so there is no box to remove */
+    }
+
+    if (ctx->empty_side[BTOP]) {
+        ctx->top_end_idx = ctx->top_start_idx;
+    }
+    else {
+        ctx->top_end_idx = find_top_side(ctx);
+    }
+
+    ctx->bottom_end_idx = find_last_line() + 1;
+    if (ctx->empty_side[BBOT]) {
+        ctx->bottom_start_idx = ctx->bottom_end_idx;
+    }
+    else {
+        ctx->bottom_start_idx = find_bottom_side(ctx);
+    }
+
+    ctx->body = (line_ctx_t *) calloc(ctx->bottom_start_idx - ctx->top_end_idx, sizeof(line_ctx_t));
+    if (ctx->bottom_start_idx > ctx->top_end_idx) {
+        find_vertical_shapes(ctx);
+    }
+
+    remove_vertical_shapes(ctx);
+
+    apply_results_to_input(ctx);
+
+    for (size_t i = 0; i < ctx->bottom_start_idx - ctx->top_end_idx; i++) {
+        BFREE(ctx->body[i].input_line_used);
+    }
+    BFREE(ctx->body);
+    BFREE(ctx);
+    return 1;
 }
 
 
 
 void output_input(const int trim_only)
-/*
- *  Output contents of input line list "as is" to standard output, except
- *  for removal of trailing spaces (trimming).
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
 {
     size_t indent;
     int ntabs, nspcs;

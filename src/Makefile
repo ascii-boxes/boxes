@@ -121,7 +121,7 @@ parser.o:    parser.c boxes.h bxstring.h lex.yy.h parsecode.h parser.h parsing.h
 parsing.o:   parsing.c parsing.h bxstring.h parser.h lex.yy.h boxes.h tools.h config.h | check_dir
 query.o:     query.c query.h boxes.h list.h tools.h config.h | check_dir
 regulex.o:   regulex.c regulex.h boxes.h tools.h unicode.h config.h | check_dir
-remove.o:    remove.c remove.h boxes.h shape.h tools.h unicode.h config.h | check_dir
+remove.o:    remove.c remove.h boxes.h detect.h shape.h tools.h unicode.h config.h | check_dir
 shape.o:     shape.c shape.h boxes.h bxstring.h tools.h config.h | check_dir
 tools.o:     tools.c tools.h boxes.h regulex.h shape.h unicode.h config.h | check_dir
 unicode.o:   unicode.c unicode.h boxes.h tools.h config.h | check_dir

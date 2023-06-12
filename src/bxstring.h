@@ -51,7 +51,8 @@ typedef struct {
     /** Number of invisible characters in the original string */
     size_t num_chars_invisible;
 
-    /** Number of trailing spaces in the original string */
+    /** Number of trailing spaces in the original string. In a line consisting only of spaces, this is zero, because
+     *  the spaces would count towards the indent. */
     size_t trailing;
 
     /** Array of index values into `memory` of the first actual character (possibly invisible) of each visible

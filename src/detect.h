@@ -41,7 +41,7 @@ typedef enum {
 } comparison_t;
 
 /** The elements of `comparision_t` as strings for printing */
-char *comparison_name[];
+extern char *comparison_name[];
 
 
 /**
@@ -94,10 +94,17 @@ uint32_t *prepare_comp_shape(
  * @param offset_right `> 0`: the result pointer will point to the last `offset_right` non-blank characters (visible
  *          or invisible) of the string; `== 0`: result pointer will point to start of string (possibly trimmed as
  *          per `trim_left`)
+ * @param out_indent pointer to a memory location where it is stored how many characters at the start of the result
+ *          string are considered part of the indent, for example leading spaces, including any invisible characters.
+ *          If NULL, it is ignored.
+ * @param out_trailing pointer to a memory location where it is stored how many characters at the end of the result
+ *          string are considered trailing, for example trailing spaces, including any invisible characters. If NULL,
+ *          it is ignored.
  * @return the relevant part of the selected input line, in original memory (do not free this), or
  *          NULL if `input_line_idx` out of bounds or `offset_right` too large
  */
-uint32_t *prepare_comp_input(size_t input_line_idx, int trim_left, comparison_t comp_type, size_t offset_right);
+uint32_t *prepare_comp_input(size_t input_line_idx, int trim_left, comparison_t comp_type, size_t offset_right,
+        size_t *out_indent, size_t *out_trailing);
 
 
 /**

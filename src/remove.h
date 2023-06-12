@@ -21,7 +21,19 @@
 #define REMOVE_H
 
 
+/**
+ * Remove box from input.
+ * @return == 0: success;
+ *         \!= 0:  error
+ */
 int remove_box();
+
+
+/**
+ * Output contents of input line list "as is" to standard output, except for removal of trailing spaces (trimming).
+ * The trimming is performed on the actual input lines, modifying them.
+ * @param trim_only only perform the trimming of trailing spaces, but do not output anything
+ */
 void output_input(const int trim_only);
 
 

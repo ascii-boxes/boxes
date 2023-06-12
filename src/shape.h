@@ -32,6 +32,7 @@ extern char *shape_name[];
 #define NUM_SHAPES 16
 
 #define SHAPES_PER_SIDE 5
+#define CORNERS_PER_SIDE 2
 #define NUM_SIDES       4
 #define NUM_CORNERS     4
 

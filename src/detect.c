@@ -91,6 +91,7 @@ int design_is_mono(design_t *design)
 int comp_type_is_viable(comparison_t comp_type, int mono_input, int mono_design)
 {
     int result = 1;
+    /* TODO What if a mono box was drawn around colored text? -> literal would be fine. Be less strict? */
     if ((comp_type == literal && mono_input != mono_design)
             || (comp_type == ignore_invisible_input && (mono_input || !mono_design))
             || (comp_type == ignore_invisible_shape && (!mono_input || mono_design))
@@ -171,7 +172,8 @@ uint32_t *prepare_comp_shape(
 
 
 
-uint32_t *prepare_comp_input(size_t input_line_idx, int trim_left, comparison_t comp_type, size_t offset_right)
+uint32_t *prepare_comp_input(size_t input_line_idx, int trim_left, comparison_t comp_type, size_t offset_right,
+    size_t *out_indent, size_t *out_trailing)
 {
     if (input_line_idx >= input.num_lines) {
         bx_fprintf(stderr, "%s: prepare_comp_input(%d, %d, %s, %d): Index out of bounds\n", PROJECT,
@@ -187,11 +189,20 @@ uint32_t *prepare_comp_input(size_t input_line_idx, int trim_left, comparison_t 
             uint32_t *p = visible + input_line->num_chars_visible - input_line->trailing - offset_right;
             if (p >= visible) {
                 result = p;
+                if (out_indent != NULL) {
+                    *out_indent = BMAX(input_line->indent - (size_t) (p - visible), (size_t) 0);
+                }
             }
         }
         else {
             size_t ltrim = trim_left ? input_line->indent : 0;
             result = get_visible_text(input.lines + input_line_idx) + ltrim;
+            if (out_indent != NULL) {
+                *out_indent = trim_left ? 0 : input_line->indent;
+            }
+        }
+        if (out_trailing != NULL) {
+            *out_trailing = input_line->trailing;
         }
     }
     else {
@@ -200,10 +211,20 @@ uint32_t *prepare_comp_input(size_t input_line_idx, int trim_left, comparison_t 
                         - offset_right;
             if (idx >= 0) {
                 result = input_line->memory + idx;
+                if (out_indent != NULL) {
+                    *out_indent = BMAX(input_line->first_char[input_line->indent] - (size_t) idx, (size_t) 0);
+                }
             }
         }
         else {
             result = trim_left ? bxs_unindent_ptr(input_line) : input_line->memory;
+            if (out_indent != NULL) {
+                *out_indent = trim_left ? 0 : input_line->first_char[input_line->indent];
+            }
+        }
+        if (out_trailing != NULL) {
+            *out_trailing = input_line->num_chars
+                    - input_line->first_char[input_line->num_chars_visible - input_line->trailing];
         }
     }
     return result;
@@ -245,7 +266,7 @@ static size_t find_west_corner(design_t *current_design, comparison_t comp_type,
                 break;
             }
 
-            uint32_t *input_relevant = prepare_comp_input(a, 1, comp_type, 0);
+            uint32_t *input_relevant = prepare_comp_input(a, 1, comp_type, 0, NULL, NULL);
             if (u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
                 ++hits; /* CHECK more hit points for longer matches, or simple boxes might match too easily */
             }
@@ -295,7 +316,7 @@ static size_t find_east_corner(design_t *current_design, comparison_t comp_type,
                 break;
             }
 
-            uint32_t *input_relevant = prepare_comp_input(a, 0, comp_type, length_relevant);
+            uint32_t *input_relevant = prepare_comp_input(a, 0, comp_type, length_relevant, NULL, NULL);
             if (u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
                 ++hits; /* CHECK more hit points for longer matches, or simple boxes might match too easily */
             }
@@ -345,8 +366,8 @@ static size_t find_horizontal_shape(design_t *current_design, comparison_t comp_
                 break;
             }
 
-            uint32_t *input_relevant = prepare_comp_input(a, 1, comp_type, 0);  /* CHECK this eats blank NW corners */
-
+            uint32_t *input_relevant = prepare_comp_input(a, 1, comp_type, 0, NULL, NULL);
+                                       /* CHECK this eats blank NW corners */
             uint32_t *p = u32_strstr(input_relevant, shape_relevant);
             if (p) {
                 if (current_design->shape[hshape].elastic) {
@@ -397,7 +418,7 @@ static size_t find_vertical_west(design_t *current_design, comparison_t comp_typ
     for (size_t k = empty[BTOP] ? 0 : current_design->shape[NW].height;
             k < input.num_lines - (empty[BBOT] ? 0 : current_design->shape[SW].height); ++k)
     {
-        uint32_t *input_relevant = prepare_comp_input(k, 1, comp_type, 0);
+        uint32_t *input_relevant = prepare_comp_input(k, 1, comp_type, 0, NULL, NULL);
 
         for (size_t j = 0; j < current_design->shape[vshape].height; ++j) {
             bxstr_t *shape_line = current_design->shape[vshape].mbcs[j];

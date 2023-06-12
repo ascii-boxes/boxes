@@ -350,7 +350,7 @@ uint32_t *u32_nspaces(const size_t n)
 }
 
 
-
+// TODO It seems skip is always 0, can we remove that parameter?
 uint32_t *u32_strnrstr(const uint32_t *s1, const uint32_t *s2, const size_t s2_len, int skip)
 {
     if (is_empty(s2)) {

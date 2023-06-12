@@ -249,8 +249,8 @@ uint32_t *u32_strnrstr(const uint32_t *s1, const uint32_t *s2, const size_t s2_l
 
 
 /**
- * Insert `n` spaces at position `idx` into `s`. This modifies the given string.
- * @param s the string to modify
+ * Insert `n` spaces at position `idx` into `*s`. This modifies the given string.
+ * @param s **pointer to** the string to modify. `*s` will be `realloc()`ed if needed.
  * @param idx the position at which to insert. The character previously at this position will move to the right.
  * @param n the number of spaces to insert
  */
