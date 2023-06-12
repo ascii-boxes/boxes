@@ -47,37 +47,18 @@
 #include "bxstring.h"
 #include "shape.h"
 #include "tools.h"
+#include "unicode.h"
 #include "detect.h"
 
 
 
-#define NUM_COMPARISON_TYPES 4  /* number of elements in `comparison_t` */
-
-typedef enum {
-    /** leave invisible characters in both shapes and input */
-    literal,
-    
-    /** leave invisible characters in shapes, but ignore them in input */
-    ignore_invisible_input,
-    
-    /** ignore invisible characters in shapes, but leave them in input */
-    ignore_invisible_shape,
-    
-    /** ignore all invisible characters in both shapes and input */
-    ignore_invisible_all
-} comparison_t;
-
-static char *comparison_name[] = {
+char *comparison_name[] = {
         "literal", "ignore_invisible_input", "ignore_invisible_shape", "ignore_invisible_all"
 };
 
 
 
-/**
- * Determine whether the input text contains ANSI escape codes (i.e. it is potentially colored) or not.
- * @return 1 if no invisible characters are in the input, 0 if there are any
- */
-static int input_is_mono()
+int input_is_mono()
 {
     for (size_t line_no = 0; line_no < input.num_lines; line_no++) {
         if (input.lines[line_no].text->num_chars_invisible > 0) {
@@ -89,26 +70,35 @@ static int input_is_mono()
 
 
 
-/**
- * Determine whether the given box design contains ANSI escape codes in any of its shapes (i.e. it is potentially
- * colored) or not.
- * @param current_design the box design to check
- * @return 1 if no invisible characters are found in the box design, 0 if there are any
- */
-static int design_is_mono(design_t *current_design)
+int design_is_mono(design_t *design)
 {
     for (shape_t scnt = 0; scnt < NUM_SHAPES; ++scnt) {
-        if (isempty(current_design->shape + scnt)) {
+        if (isempty(design->shape + scnt)) {
             continue;
         }
         for (size_t line_no = 0; line_no < input.num_lines; line_no++) {
-            bxstr_t *shape_line = current_design->shape[scnt].mbcs[line_no];
+            bxstr_t *shape_line = design->shape[scnt].mbcs[line_no];
             if (shape_line->num_chars_invisible > 0) {
                 return 0;
             }
         }
     }
     return 1;
+}
+
+
+
+int comp_type_is_viable(comparison_t comp_type, int mono_input, int mono_design)
+{
+    int result = 1;
+    if ((comp_type == literal && mono_input != mono_design)
+            || (comp_type == ignore_invisible_input && (mono_input || !mono_design))
+            || (comp_type == ignore_invisible_shape && (!mono_input || mono_design))
+            || (comp_type == ignore_invisible_all && (mono_input || mono_design)))
+    {
+        result = 0;
+    }
+    return result;
 }
 
 
@@ -143,6 +133,84 @@ static uint32_t *get_visible_text(line_t *line)
 
 
 
+uint32_t *prepare_comp_shape(
+        design_t *design, shape_t shape, size_t shape_line_idx, comparison_t comp_type, int trim_left, int trim_right)
+{
+    sentry_t shape_def = design->shape[shape];
+    if (shape_line_idx >= shape_def.height) {
+        bx_fprintf(stderr, "%s: prepare_comp_shape(\"%s\", %s, %d, %s, %d, %d): Index out of bounds\n", PROJECT,
+                design->name, shape, (int) shape_line_idx, comparison_name[comp_type], trim_left, trim_right);
+        return NULL;
+    }
+
+    bxstr_t *shape_line = shape_def.mbcs[shape_line_idx];
+    uint32_t *result = NULL;
+
+    if ((comp_type == ignore_invisible_shape || comp_type == ignore_invisible_all)
+            && shape_line->num_chars_invisible > 0)
+    {
+        size_t ltrim = trim_left ? shape_line->indent : 0;
+        uint32_t *visible = bxs_filter_visible(shape_line);
+        result = u32_strdup(visible + ltrim);
+        BFREE(visible);
+
+        if (trim_right && shape_line->trailing > 0) {
+            set_char_at(result, shape_line->num_chars_visible - ltrim - shape_line->trailing, char_nul);
+        }
+    }
+    else {
+        result = u32_strdup(trim_left ? bxs_unindent_ptr(shape_line) : shape_line->memory);
+
+        if (trim_right && shape_line->trailing > 0) {
+            size_t x = shape_line->num_chars_visible - (trim_left ? shape_line->indent : 0) - shape_line->trailing;
+            set_char_at(result, shape_line->first_char[x], char_nul);
+        }
+    }
+    return result;
+}
+
+
+
+uint32_t *prepare_comp_input(size_t input_line_idx, int trim_left, comparison_t comp_type, size_t offset_right)
+{
+    if (input_line_idx >= input.num_lines) {
+        bx_fprintf(stderr, "%s: prepare_comp_input(%d, %d, %s, %d): Index out of bounds\n", PROJECT,
+                (int) input_line_idx, trim_left, comparison_name[comp_type], (int) offset_right);
+        return NULL;
+    }
+    bxstr_t *input_line = input.lines[input_line_idx].text;
+
+    uint32_t *result = NULL;
+    if (comp_type == ignore_invisible_input || comp_type == ignore_invisible_all) {
+        if (offset_right > 0) {
+            uint32_t *visible = get_visible_text(input.lines + input_line_idx);
+            uint32_t *p = visible + input_line->num_chars_visible - input_line->trailing - offset_right;
+            if (p >= visible) {
+                result = p;
+            }
+        }
+        else {
+            size_t ltrim = trim_left ? input_line->indent : 0;
+            result = get_visible_text(input.lines + input_line_idx) + ltrim;
+        }
+    }
+    else {
+        if (offset_right > 0) {
+            int idx = (int) input_line->first_char[input_line->num_chars_visible - input_line->trailing]
+                        - offset_right;
+            if (idx >= 0) {
+                result = input_line->memory + idx;
+            }
+        }
+        else {
+            result = trim_left ? bxs_unindent_ptr(input_line) : input_line->memory;
+        }
+    }
+    return result;
+}
+
+
+
 /**
  * Try and find west corner shapes. Every non-empty shape line is searched for on every input line. A hit is generated
  * whenever a match is found.
@@ -165,20 +233,8 @@ static size_t find_west_corner(design_t *current_design, comparison_t comp_type,
             continue;
         }
 
-        uint32_t *shape_relevant_for_freeing = NULL;
-        uint32_t *shape_relevant = NULL;
-        size_t length_relevant;
-        if ((comp_type == ignore_invisible_shape || comp_type == ignore_invisible_all)
-                && shape_line->num_chars_invisible > 0)
-        {
-            shape_relevant_for_freeing = bxs_filter_visible(shape_line);
-            shape_relevant = shape_relevant_for_freeing + shape_line->indent;
-            length_relevant = shape_line->num_chars_visible - shape_line->indent;
-        }
-        else {
-            shape_relevant = bxs_unindent_ptr(shape_line);
-            length_relevant = shape_line->num_chars - (shape_relevant - shape_line->memory);
-        }
+        uint32_t *shape_relevant = prepare_comp_shape(current_design, corner, j, comp_type, 1, 0);
+        size_t length_relevant = u32_strlen(shape_relevant);
 
         for (size_t k = 0; k < current_design->shape[corner].height; ++k) {
             size_t a = k;
@@ -189,19 +245,12 @@ static size_t find_west_corner(design_t *current_design, comparison_t comp_type,
                 break;
             }
 
-            uint32_t *input_relevant = NULL;
-            if (comp_type == ignore_invisible_input || comp_type == ignore_invisible_all) {
-                input_relevant = get_visible_text(input.lines + a) + input.lines[a].text->indent;
-            }
-            else {
-                input_relevant = bxs_unindent_ptr(input.lines[a].text);
-            }
-
+            uint32_t *input_relevant = prepare_comp_input(a, 1, comp_type, 0);
             if (u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
                 ++hits; /* CHECK more hit points for longer matches, or simple boxes might match too easily */
             }
         }
-        BFREE(shape_relevant_for_freeing);
+        BFREE(shape_relevant);
     }
 
     #ifdef DEBUG
@@ -234,21 +283,8 @@ static size_t find_east_corner(design_t *current_design, comparison_t comp_type,
             continue;
         }
 
-        bxstr_t *shape_line_rtrimmed = bxs_rtrim(shape_line);
-        uint32_t *shape_relevant_for_freeing = NULL;
-        uint32_t *shape_relevant = NULL;
-        size_t length_relevant;
-        if ((comp_type == ignore_invisible_shape || comp_type == ignore_invisible_all)
-                && shape_line_rtrimmed->num_chars_invisible > 0)
-        {
-            shape_relevant_for_freeing = bxs_filter_visible(shape_line_rtrimmed);
-            shape_relevant = shape_relevant_for_freeing;
-            length_relevant = shape_line_rtrimmed->num_chars_visible;
-        }
-        else {
-            shape_relevant = shape_line_rtrimmed->memory;
-            length_relevant = shape_line_rtrimmed->num_chars;
-        }
+        uint32_t *shape_relevant = prepare_comp_shape(current_design, corner, j, comp_type, 0, 1);
+        size_t length_relevant = u32_strlen(shape_relevant);
 
         for (size_t k = 0; k < current_design->shape[corner].height; ++k) {
             size_t a = k;
@@ -258,32 +294,13 @@ static size_t find_east_corner(design_t *current_design, comparison_t comp_type,
             if (a >= input.num_lines) {
                 break;
             }
-            bxstr_t *input_line = input.lines[a].text;
 
-            uint32_t *input_relevant = NULL;
-            if (comp_type == ignore_invisible_input || comp_type == ignore_invisible_all) {
-                input_relevant = get_visible_text(input.lines + a);
-                uint32_t *p = input_relevant + input_line->num_chars_visible - input_line->trailing - length_relevant;
-                if (p < input_relevant) {
-                    continue;
-                }
-                input_relevant = p;
-            }
-            else {
-                int idx = (int) input_line->first_char[input_line->num_chars_visible - input_line->trailing]
-                          - length_relevant;
-                if (idx < 0) {
-                    continue;
-                }
-                input_relevant = input_line->memory + idx;
-            }
-
+            uint32_t *input_relevant = prepare_comp_input(a, 0, comp_type, length_relevant);
             if (u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
                 ++hits; /* CHECK more hit points for longer matches, or simple boxes might match too easily */
             }
         }
-        BFREE(shape_relevant_for_freeing);
-        bxs_free(shape_line_rtrimmed);
+        BFREE(shape_relevant);
     }
 
     #ifdef DEBUG
@@ -307,7 +324,7 @@ static size_t find_horizontal_shape(design_t *current_design, comparison_t comp_
 {
     size_t hits = 0;
     if (empty[BTOP] || empty[BBOT]) {
-        return ++hits;   /* horizontal box part is empty */
+        return 0;   /* horizontal box part is empty */
     }
 
     for (size_t j = 0; j < current_design->shape[hshape].height; ++j) {
@@ -316,20 +333,8 @@ static size_t find_horizontal_shape(design_t *current_design, comparison_t comp_
             continue;
         }
 
-        uint32_t *shape_relevant_for_freeing = NULL;
-        uint32_t *shape_relevant = NULL;
-        size_t length_relevant;
-        if ((comp_type == ignore_invisible_shape || comp_type == ignore_invisible_all)
-                && shape_line->num_chars_invisible > 0)
-        {
-            shape_relevant_for_freeing = bxs_filter_visible(shape_line);
-            shape_relevant = shape_relevant_for_freeing;
-            length_relevant = shape_line->num_chars_visible;
-        }
-        else {
-            shape_relevant = shape_line->memory;
-            length_relevant = shape_line->num_chars;
-        }
+        uint32_t *shape_relevant = prepare_comp_shape(current_design, hshape, j, comp_type, 0, 0);
+        size_t length_relevant = u32_strlen(shape_relevant);
 
         for (size_t k = 0; k < current_design->shape[hshape].height; ++k) {
             size_t a = k;
@@ -340,13 +345,7 @@ static size_t find_horizontal_shape(design_t *current_design, comparison_t comp_
                 break;
             }
 
-            uint32_t *input_relevant = NULL; /* CHECK this eats blank NW corners, too */
-            if (comp_type == ignore_invisible_input || comp_type == ignore_invisible_all) {
-                input_relevant = get_visible_text(input.lines + a) + input.lines[a].text->indent;
-            }
-            else {
-                input_relevant = bxs_unindent_ptr(input.lines[a].text);
-            }
+            uint32_t *input_relevant = prepare_comp_input(a, 1, comp_type, 0);  /* CHECK this eats blank NW corners */
 
             uint32_t *p = u32_strstr(input_relevant, shape_relevant);
             if (p) {
@@ -364,7 +363,7 @@ static size_t find_horizontal_shape(design_t *current_design, comparison_t comp_
                 }
             }
         }
-        BFREE(shape_relevant_for_freeing);
+        BFREE(shape_relevant);
     }
 
     #ifdef DEBUG
@@ -398,13 +397,7 @@ static size_t find_vertical_west(design_t *current_design, comparison_t comp_typ
     for (size_t k = empty[BTOP] ? 0 : current_design->shape[NW].height;
             k < input.num_lines - (empty[BBOT] ? 0 : current_design->shape[SW].height); ++k)
     {
-        uint32_t *input_relevant = NULL;
-        if (comp_type == ignore_invisible_input || comp_type == ignore_invisible_all) {
-            input_relevant = get_visible_text(input.lines + k) + input.lines[k].text->indent;
-        }
-        else {
-            input_relevant = bxs_unindent_ptr(input.lines[k].text);
-        }
+        uint32_t *input_relevant = prepare_comp_input(k, 1, comp_type, 0);
 
         for (size_t j = 0; j < current_design->shape[vshape].height; ++j) {
             bxstr_t *shape_line = current_design->shape[vshape].mbcs[j];
@@ -412,26 +405,14 @@ static size_t find_vertical_west(design_t *current_design, comparison_t comp_typ
                 continue;
             }
 
-            uint32_t *shape_relevant_for_freeing = NULL;
-            uint32_t *shape_relevant = NULL;
-            size_t length_relevant;
-            if ((comp_type == ignore_invisible_shape || comp_type == ignore_invisible_all)
-                    && shape_line->num_chars_invisible > 0)
-            {
-                shape_relevant_for_freeing = bxs_filter_visible(shape_line);
-                shape_relevant = shape_relevant_for_freeing + shape_line->indent;
-                length_relevant = shape_line->num_chars_visible - shape_line->indent;
-            }
-            else {
-                shape_relevant = bxs_unindent_ptr(shape_line);
-                length_relevant = shape_line->num_chars - (shape_relevant - shape_line->memory);
-            }
+            uint32_t *shape_relevant = prepare_comp_shape(current_design, vshape, j, comp_type, 1, 0);
+            size_t length_relevant = u32_strlen(shape_relevant);
 
             if (u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
                 ++hits;
                 break;
             }
-            BFREE(shape_relevant_for_freeing);
+            BFREE(shape_relevant);
         }
     }
 
@@ -469,51 +450,19 @@ static size_t find_vertical_east(design_t *current_design, comparison_t comp_typ
             continue;
         }
 
-        bxstr_t *shape_line_trimmed = bxs_trim(shape_line);
-        uint32_t *shape_relevant_for_freeing = NULL;
-        uint32_t *shape_relevant = NULL;
-        size_t length_relevant;
-        if ((comp_type == ignore_invisible_shape || comp_type == ignore_invisible_all)
-                && shape_line_trimmed->num_chars_invisible > 0)
-        {
-            shape_relevant_for_freeing = bxs_filter_visible(shape_line_trimmed);
-            shape_relevant = shape_relevant_for_freeing;
-            length_relevant = shape_line_trimmed->num_chars_visible;
-        }
-        else {
-            shape_relevant = shape_line_trimmed->memory;
-            length_relevant = shape_line_trimmed->num_chars;
-        }
+        uint32_t *shape_relevant = prepare_comp_shape(current_design, vshape, j, comp_type, 1, 1);
+        size_t length_relevant = u32_strlen(shape_relevant);
 
         for (size_t k = empty[BTOP] ? 0 : current_design->shape[NW].height;
                 k < input.num_lines - (empty[BBOT] ? 0 : current_design->shape[SW].height); ++k)
         {
-            bxstr_t *input_line = input.lines[k].text;
-            uint32_t *input_relevant = NULL;
-            if (comp_type == ignore_invisible_input || comp_type == ignore_invisible_all) {
-                input_relevant = get_visible_text(input.lines + k);
-                uint32_t *p = input_relevant + input_line->num_chars_visible - input_line->trailing - length_relevant;
-                if (p < input_relevant) {
-                    continue;
-                }
-                input_relevant = p;
-            }
-            else {
-                int idx = (int) input_line->first_char[input_line->num_chars_visible - input_line->trailing]
-                          - length_relevant;
-                if (idx < 0) {
-                    continue;
-                }
-                input_relevant = input_line->memory + idx;
-            }
-
-            if (u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
+            uint32_t *input_relevant = prepare_comp_input(k, 0, comp_type, length_relevant, NULL, NULL);
+            if (input_relevant != NULL && u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
                 ++hits;
                 break;
             }
         }
-        BFREE(shape_relevant_for_freeing);
-        bxs_free(shape_line_trimmed);
+        BFREE(shape_relevant);
     }
 
     #ifdef DEBUG
@@ -578,11 +527,7 @@ design_t *autodetect_design()
         current_design = designs;
         for (size_t dcnt = 0; ((int) dcnt) < num_designs; ++dcnt, ++current_design) {
             int mono_design = design_is_mono(current_design);
-            if ((comp_type == literal && mono_input != mono_design)
-                || (comp_type == ignore_invisible_input && (mono_input || !mono_design))
-                || (comp_type == ignore_invisible_shape && (!mono_input || mono_design))
-                || (comp_type == ignore_invisible_all && (mono_input || mono_design)))
-            {
+            if (!comp_type_is_viable(comp_type, mono_input, mono_design)) {
                 #ifdef DEBUG
                     fprintf(stderr, "Design \"%s\" skipped for comparison type '%s' because mono_input=%d and "
                         "mono_design=%d\n", current_design->name, comparison_name[comp_type], mono_input, mono_design);
