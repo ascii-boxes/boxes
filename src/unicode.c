@@ -387,4 +387,23 @@ uint32_t *u32_strnrstr(const uint32_t *s1, const uint32_t *s2, const size_t s2_l
 }
 
 
+
+void u32_insert_space_at(uint32_t **s, const size_t idx, const size_t n)
+{
+    if (s == NULL || n == 0) {
+        return;
+    }
+
+    size_t len = u32_strlen(*s);
+    size_t x = idx;
+    if (idx > len) {
+        x = len;
+    }
+
+    *s = (uint32_t *) realloc(*s, (len + 1 + n) * sizeof(uint32_t));
+    u32_move(*s + x + n, *s + x, len - x);
+    u32_set(*s + x, char_space, n);
+}
+
+
 /* vim: set cindent sw=4: */

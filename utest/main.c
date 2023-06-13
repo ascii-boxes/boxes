@@ -116,7 +116,8 @@ int main(void)
         cmocka_unit_test(test_is_allowed_in_shape),
         cmocka_unit_test(test_is_allowed_in_filename),
         cmocka_unit_test(test_is_allowed_in_kv_string),
-        cmocka_unit_test(test_u32_strnrstr)
+        cmocka_unit_test(test_u32_strnrstr),
+        cmocka_unit_test(test_u32_insert_space_at)
     };
 
     const struct CMUnitTest bxstring_tests[] = {

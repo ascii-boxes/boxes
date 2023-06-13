@@ -28,6 +28,8 @@ void test_is_allowed_in_shape(void **state);
 void test_is_allowed_in_filename(void **state);
 void test_is_allowed_in_kv_string(void **state);
 void test_u32_strnrstr(void **state);
+void test_u32_insert_space_at(void **state);
+
 
 #endif
 

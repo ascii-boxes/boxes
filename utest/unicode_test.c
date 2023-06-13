@@ -26,6 +26,7 @@
 #include <cmocka.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistr.h>
 
 #include "boxes.h"
 #include "tools.h"
@@ -180,6 +181,28 @@ void test_u32_strnrstr(void **state)
 
     BFREE(haystack);
     BFREE(needle);
+}
+
+
+
+void test_u32_insert_space_at(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *expected = u32_strconv_from_arg("x xxx  ", "ASCII");
+    assert_non_null(expected);
+    uint32_t *s = u32_strconv_from_arg("xxxx", "ASCII");
+    assert_non_null(s);
+
+    u32_insert_space_at(NULL, 2, 3);
+    u32_insert_space_at(&s, 3, 0);
+    u32_insert_space_at(&s, 1, 1);
+    u32_insert_space_at(&s, 10000, 2);
+
+    assert_int_equal(0, u32_strcmp(expected, s));
+
+    BFREE(s);
+    BFREE(expected);
 }
 
 

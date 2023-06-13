@@ -248,6 +248,15 @@ uint32_t *u32_nspaces(const size_t n);
 uint32_t *u32_strnrstr(const uint32_t *s1, const uint32_t *s2, const size_t s2_len, int skip);
 
 
+/**
+ * Insert `n` spaces at position `idx` into `s`. This modifies the given string.
+ * @param s the string to modify
+ * @param idx the position at which to insert. The character previously at this position will move to the right.
+ * @param n the number of spaces to insert
+ */
+void u32_insert_space_at(uint32_t **s, const size_t idx, const size_t n);
+
+
 #endif
 
 /* vim: set cindent sw=4: */
