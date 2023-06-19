@@ -67,6 +67,11 @@ void test_bxs_trim(void **state);
 void test_bxs_trim_blanks(void **state);
 void test_bxs_trim_none(void **state);
 
+void test_bxs_ltrim2(void **state);
+void test_bxs_ltrim5(void **state);
+void test_bxs_ltrim_empty(void **state);
+void test_bxs_ltrim_max(void **state);
+
 void test_bxs_rtrim(void **state);
 void test_bxs_rtrim_empty(void **state);
 

@@ -914,6 +914,95 @@ void test_bxs_trim_none(void **state)
 
 
 
+void test_bxs_ltrim2(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("\xe2\x80\x83 \x1b[38;5;203m\xe2\x80\x82\x1b[0m X", "UTF-8");
+    /* em-space, space, en-space, space, X */
+    bxstr_t *bxstr = bxs_from_unicode(ustr32);
+    uint32_t *expected = u32_strconv_from_arg("\x1b[38;5;203m\xe2\x80\x82\x1b[0m X", "UTF-8");
+
+    uint32_t *actual = bxs_ltrim(bxstr, 2);
+    
+    assert_non_null(actual);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+
+    BFREE(ustr32);
+    BFREE(actual);
+    BFREE(expected);
+    bxs_free(bxstr);
+}
+
+
+
+void test_bxs_ltrim5(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("\xe2\x80\x83 \x1b[38;5;203m\xe2\x80\x82\x1b[0m abc", "UTF-8");
+    /* em-space, space, en-space, space, abc */
+    bxstr_t *bxstr = bxs_from_unicode(ustr32);
+    uint32_t *expected = u32_strconv_from_arg("abc", "ASCII");
+
+    uint32_t *actual = bxs_ltrim(bxstr, 5);
+    
+    assert_non_null(actual);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+
+    BFREE(ustr32);
+    BFREE(actual);
+    BFREE(expected);
+    bxs_free(bxstr);
+}
+
+
+
+void test_bxs_ltrim_empty(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *actual = bxs_ltrim(NULL, 2);
+    assert_null(actual);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("\xe2\x80\x83 \x1b[38;5;203m\xe2\x80\x82\x1b[0m X", "UTF-8");
+    /* em-space, space, en-space, space, X */
+    bxstr_t *bxstr = bxs_from_unicode(ustr32);
+
+    actual = bxs_ltrim(bxstr, 0);
+    assert_ptr_not_equal(ustr32, actual);
+    assert_int_equal(0, u32_strcmp(ustr32, actual));
+
+    BFREE(ustr32);
+    BFREE(actual);
+    bxs_free(bxstr);
+}
+
+
+
+void test_bxs_ltrim_max(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("\xe2\x80\x83 \x1b[38;5;203m\xe2\x80\x82\x1b[0m ", "UTF-8");
+    /* em-space, space, en-space, space */
+    bxstr_t *bxstr = bxs_from_unicode(ustr32);
+    uint32_t *expected = new_empty_string32();
+
+    uint32_t *actual = bxs_ltrim(bxstr, 20);
+    
+    assert_non_null(actual);
+    assert_int_equal(0, u32_strlen(actual));
+    assert_int_equal(0, u32_strcmp(expected, actual));
+
+    BFREE(ustr32);
+    BFREE(actual);
+    BFREE(expected);
+    bxs_free(bxstr);
+}
+
+
+
 void test_bxs_rtrim(void **state)
 {
     UNUSED(state);

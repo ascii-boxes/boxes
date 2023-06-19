@@ -398,6 +398,24 @@ bxstr_t *bxs_trim(bxstr_t *pString)
 
 
 
+uint32_t *bxs_ltrim(bxstr_t *pString, size_t max)
+{
+    if (pString == NULL) {
+        return NULL;
+    }
+
+    size_t num_trimmed = BMIN(max, pString->num_chars_visible);
+    for (size_t i = 0; i < max; i++) {
+        if (!is_blank(pString->memory[pString->visible_char[i]])) {
+            num_trimmed = i;
+            break;
+        }
+    }
+    return u32_strdup(pString->memory + pString->first_char[num_trimmed]);
+}
+
+
+
 bxstr_t *bxs_rtrim(bxstr_t *pString)
 {
     if (pString == NULL) {

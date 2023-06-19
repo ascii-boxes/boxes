@@ -180,6 +180,16 @@ bxstr_t *bxs_trim(bxstr_t *pString);
 
 
 /**
+ * Create a new string from which up to `max` leading spaces have been removed along with associated invisible
+ * characters.
+ * @param pString the string to trim, which will not be modified
+ * @param max the maximum number of leading spaces to remove
+ * @return a new, trimmed string
+ */
+uint32_t *bxs_ltrim(bxstr_t *pString, size_t max);
+
+
+/**
  * Create a new string from which all trailing whitespace have been removed.
  * @param pString the string to trim, which will not be modified
  * @return a new, trimmed string
