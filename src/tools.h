@@ -26,13 +26,22 @@
 
 
 
-#define BMAX(a, b) ({                    /* return the larger value */ \
+/** return the larger value */
+#define BMAX(a, b) ({        \
     __typeof__ (a) _a = (a); \
     __typeof__ (b) _b = (b); \
     _a > _b ? _a : _b;       \
 })
 
-#define BFREE(p) {                       /* free memory and clear pointer */ \
+/** return the smaller value */
+#define BMIN(a, b) ({        \
+    __typeof__ (a) _a = (a); \
+    __typeof__ (b) _b = (b); \
+    _a < _b ? _a : _b;       \
+})
+
+/** free memory and clear pointer */
+#define BFREE(p) {          \
     if (p) {                \
         free((void *) (p)); \
         (p) = NULL;         \
