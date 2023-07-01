@@ -39,7 +39,7 @@ WIN_FLEX_BISON_DIR     = vendor/flex_bison_$(WIN_FLEX_BISON_VERSION)
 WIN_CMOCKA_VERSION     = 1.1.0
 WIN_CMOCKA_DIR         = vendor/cmocka-$(WIN_CMOCKA_VERSION)
 
-.PHONY: clean build cov win32 debug win32.debug win32.pcre infomsg replaceinfos test covtest \
+.PHONY: clean cleanall build cov win32 debug win32.debug win32.pcre infomsg replaceinfos test covtest \
         package win32.package package_common utest win32.utest static
 
 
@@ -206,10 +206,12 @@ win32.utest: $(OUT_DIR)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 clean:
-	rm -f $(OUT_DIR)/boxes.h tools/boxes.cfg tools/LICENSE.txt tools/boxes.exe tools/README*.md boxes.portable.*.nupkg
+	rm -f tools/boxes.cfg tools/LICENSE.txt tools/boxes.exe tools/README*.md boxes.portable.*.nupkg
 	rm -f doc/boxes.1 doc/boxes.1.raw.html doc/boxes.1.html
-	rm -rf vendor
 	$(MAKE) -C src clean
+
+cleanall: clean
+	rm -rf vendor
 
 
 #EOF

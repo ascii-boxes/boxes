@@ -133,7 +133,7 @@ package: $(BOXES_EXECUTABLE_NAME)
 
 clean:
 	rm -rf $(OUT_DIR)
-	rm -f core $(GEN_HDR)
+	rm -f core
 
 
 #EOF
