@@ -61,7 +61,7 @@ cov: flags_$(BOXES_PLATFORM) | $(OUT_DIR)
 
 debug: flags_$(BOXES_PLATFORM) | $(OUT_DIR)
 	$(MAKE) -C $(OUT_DIR) -f $(SRC_DIR)/Makefile BOXES_PLATFORM=$(BOXES_PLATFORM) ALL_OBJ="$(ALL_OBJ)" STRIP=false \
-	    CFLAGS_ADDTL="-g $(CFLAGS_ADDTL)" flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
+	    CFLAGS_ADDTL="-ggdb3 $(CFLAGS_ADDTL)" flags_$(BOXES_PLATFORM) $(BOXES_EXECUTABLE_NAME)
 
 boxes: $(ALL_OBJ) | check_dir
 	$(CC) $(LDFLAGS) $^ -o $@ -lunistring -lpcre2-32 -lncurses

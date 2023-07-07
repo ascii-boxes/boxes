@@ -58,6 +58,13 @@ utest: flags_$(BOXES_PLATFORM) | $(OUT_DIR)
 	cd $(OUT_DIR) ; ./$(UTEST_EXECUTABLE_NAME)
 	@OUT_DIR=$(OUT_DIR) SRC_DIR=$(SRC_DIR) ./report.sh
 
+debugutest: flags_$(BOXES_PLATFORM) | $(OUT_DIR)
+	$(MAKE) -C $(OUT_DIR) -f $(UTEST_DIR)/Makefile BOXES_PLATFORM=$(BOXES_PLATFORM) UTEST_OBJ="$(UTEST_OBJ)" \
+	    CFLAGS_ADDTL="-ggdb3 $(CFLAGS_ADDTL)" flags_$(BOXES_PLATFORM) $(UTEST_EXECUTABLE_NAME)
+	rm -f $(OUT_DIR)/*.gcda
+	cd $(OUT_DIR) ; ./$(UTEST_EXECUTABLE_NAME)
+	@OUT_DIR=$(OUT_DIR) SRC_DIR=$(SRC_DIR) ./report.sh
+
 unittest: $(UTEST_OBJ) | check_dir
 	$(CC) $(LDFLAGS) $^ $(shell cat modules.txt) -o $@ -lunistring -lpcre2-32 -lcmocka
 

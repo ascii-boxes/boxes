@@ -195,6 +195,9 @@ covtest:
 utest:
 	$(MAKE) -C utest BOXES_PLATFORM=unix utest
 
+debugutest:
+	$(MAKE) -C utest BOXES_PLATFORM=unix debugutest
+
 win32.utest: $(OUT_DIR)
 	cp $(WIN_CMOCKA_DIR)/bin/cmocka.dll $(OUT_DIR)/
 	$(MAKE) -C utest BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(PCRE2_DIR)/src:../$(WIN_CMOCKA_DIR)/include \
