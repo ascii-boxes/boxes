@@ -534,14 +534,14 @@ char *nspaces(const size_t n)
  */
 void print_input_lines(const char *heading)
 {
-    fprintf(stderr, "Input Lines%s:\n", heading != NULL ? heading : "");
+    fprintf(stderr, "%d Input Lines%s:\n", (int) input.num_lines, heading != NULL ? heading : "");
     fprintf(stderr, "     [num_chars] \"real text\" [num_cols] \"ascii_text\"\n");
     for (size_t i = 0; i < input.num_lines; ++i) {
         char *outtext = bxs_to_output(input.lines[i].text);
         fprintf(stderr, "%4d [%02d] \"%s\"  [%02d] \"%s\"", (int) i,
                 (int) input.lines[i].text->num_chars, outtext,
                 (int) input.lines[i].text->num_columns, input.lines[i].text->ascii);
-        bxs_free(outtext);
+        BFREE(outtext);
         fprintf(stderr, "\tTabs: [");
         if (input.lines[i].tabpos != NULL) {
             for (size_t j = 0; j < input.lines[i].tabpos_len; ++j) {

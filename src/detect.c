@@ -60,12 +60,17 @@ char *comparison_name[] = {
 
 int input_is_mono()
 {
+    int result = 1;
     for (size_t line_no = 0; line_no < input.num_lines; line_no++) {
         if (input.lines[line_no].text->num_chars_invisible > 0) {
-            return 0;
+            result = 0;
+            break;
         }
     }
-    return 1;
+    #ifdef DEBUG
+        fprintf(stderr, "Input is %s\n", result ? "mono" : "potentially colored");
+    #endif
+    return result;
 }
 
 
@@ -76,13 +81,19 @@ int design_is_mono(design_t *design)
         if (isempty(design->shape + scnt)) {
             continue;
         }
-        for (size_t line_no = 0; line_no < input.num_lines; line_no++) {
+        for (size_t line_no = 0; line_no < design->shape[scnt].height; line_no++) {
             bxstr_t *shape_line = design->shape[scnt].mbcs[line_no];
             if (shape_line->num_chars_invisible > 0) {
+                #ifdef DEBUG
+                    fprintf(stderr, "Design is potentially colored\n");
+                #endif
                 return 0;
             }
         }
     }
+    #ifdef DEBUG
+        fprintf(stderr, "Design is mono\n");
+    #endif
     return 1;
 }
 
@@ -91,7 +102,6 @@ int design_is_mono(design_t *design)
 int comp_type_is_viable(comparison_t comp_type, int mono_input, int mono_design)
 {
     int result = 1;
-    /* TODO What if a mono box was drawn around colored text? -> literal would be fine. Be less strict? */
     if ((comp_type == literal && mono_input != mono_design)
             || (comp_type == ignore_invisible_input && (mono_input || !mono_design))
             || (comp_type == ignore_invisible_shape && (!mono_input || mono_design))

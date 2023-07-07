@@ -793,7 +793,7 @@ static int justify_line(line_t *line, int skew)
         fprintf(stderr, "justify_line(%c):  Input: real: (%02d) \"%s\", text: (%02d) \"%s\", invisible=%d, skew=%d",
                 opt.justify ? opt.justify : '0', (int) line->text->num_chars, outtext, (int) line->text->num_columns,
                 line->text->ascii, (int) line->text->num_chars_invisible, skew);
-        bxs_free(outtext);
+        BFREE(outtext);
     #endif
 
     int result = 0;

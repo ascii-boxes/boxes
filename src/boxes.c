@@ -278,6 +278,11 @@ static void handle_input()
         memcpy(&input, raw_input, sizeof(input_t));
         BFREE(raw_input);
     }
+
+    #ifdef DEBUG
+        fprintf(stderr, "Effective encoding: %s\n", encoding);
+        print_input_lines(NULL);
+    #endif
     if (input.num_lines == 0) {
         exit(EXIT_SUCCESS);
     }

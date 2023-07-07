@@ -343,10 +343,6 @@ int analyze_input(input_t *result)
         }
     }
 
-    #ifdef DEBUG
-        fprintf(stderr, "Effective encoding: %s\n", encoding);
-        print_input_lines(NULL);
-    #endif
     return 0;
 }
 

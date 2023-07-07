@@ -158,7 +158,7 @@ static int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shap
     #endif
 
     int result = 0;
-
+// FIXME cat test/117_unicode_ansi_mending.input.tmp | out/boxes -n UTF-8 -d diamonds -ac -m recurses indefinitely with result 0
     if (cur_pos > end_pos) {
         result = 0; /* last shape tried was too long */
     }
@@ -190,48 +190,31 @@ static int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shap
 
 static shape_line_ctx_t *prepare_comp_shapes_horiz(int hside, comparison_t comp_type, size_t shape_line_idx)
 {
-    shape_t start_shape = hside == BTOP ? NW : SW;
-    shape_t top_side_shapes[SHAPES_PER_SIDE - CORNERS_PER_SIDE] = {NNW, N, NNE};
-    shape_t bottom_side_shapes[SHAPES_PER_SIDE - CORNERS_PER_SIDE] = {SSW, S, SSE};
-    shape_t end_shape = hside == BTOP ? NE : SE;
-    shape_t side_shapes[SHAPES_PER_SIDE - CORNERS_PER_SIDE];
-    if (hside == BTOP) {
-        memcpy(side_shapes, top_side_shapes, (SHAPES_PER_SIDE - CORNERS_PER_SIDE) * sizeof(shape_t));
-    }
-    else {
-        memcpy(side_shapes, bottom_side_shapes, (SHAPES_PER_SIDE - CORNERS_PER_SIDE) * sizeof(shape_t));
-    }
-
+    shape_t *side_shapes = hside == BTOP ? north_side : south_side_rev;
     shape_line_ctx_t *shapes_relevant = (shape_line_ctx_t *) calloc(SHAPES_PER_SIDE, sizeof(shape_line_ctx_t));
 
-    shapes_relevant[0].text = prepare_comp_shape(opt.design, start_shape, shape_line_idx, comp_type, 1, 0);
-    shapes_relevant[0].length = u32_strlen(shapes_relevant[0].text);
-    shapes_relevant[0].elastic = 0;
-    shapes_relevant[0].empty = 0;
-
-    for (size_t i = 0; i < SHAPES_PER_SIDE - CORNERS_PER_SIDE; i++) {
-        shapes_relevant[i + 1].empty = isempty(opt.design->shape + side_shapes[i]);
-        if (!shapes_relevant[i + 1].empty) {
-            shapes_relevant[i + 1].text
-                    = prepare_comp_shape(opt.design, side_shapes[i], shape_line_idx, comp_type, 0, 0);
-            shapes_relevant[i + 1].length = u32_strlen(shapes_relevant[i + 1].text);
-            shapes_relevant[i + 1].elastic = opt.design->shape[side_shapes[i]].elastic;
+    for (size_t i = 0; i < SHAPES_PER_SIDE; i++) {
+        shapes_relevant[i].empty = isempty(opt.design->shape + side_shapes[i]);
+        if (!shapes_relevant[i].empty) {
+            shapes_relevant[i].text = prepare_comp_shape(opt.design, side_shapes[i], shape_line_idx, comp_type, 0,
+                    i == SHAPES_PER_SIDE - 1);
+            shapes_relevant[i].length = u32_strlen(shapes_relevant[i].text);
+            shapes_relevant[i].elastic = opt.design->shape[side_shapes[i]].elastic;
         }
     }
-
-    shapes_relevant[SHAPES_PER_SIDE - 1].text
-            = prepare_comp_shape(opt.design, end_shape, shape_line_idx, comp_type, 0, 1);
-    shapes_relevant[SHAPES_PER_SIDE - 1].length = u32_strlen(shapes_relevant[SHAPES_PER_SIDE - 1].text);
-    shapes_relevant[SHAPES_PER_SIDE - 1].elastic = 0;
-    shapes_relevant[SHAPES_PER_SIDE - 1].empty = 0;
 
     return shapes_relevant;
 }
 
 
-
+// TODO gdb --args out/boxes -n UTF-8 -d diamonds -ac -m test/117_unicode_ansi_mending.input.tmp
 static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx, size_t shape_line_idx)
 {
+    #ifdef DEBUG
+        fprintf(stderr, "match_horiz_line(ctx, %s, %d, %d)\n",
+                hside == BTOP ? "BTOP" : "BBOT", (int) input_line_idx, (int) shape_line_idx);
+    #endif
+
     int result = 0;
     for (comparison_t comp_type = 0; comp_type < NUM_COMPARISON_TYPES; comp_type++) {
         if (!comp_type_is_viable(comp_type, ctx->input_is_mono, ctx->design_is_mono)) {
@@ -239,23 +222,59 @@ static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx,
         }
 
         shape_line_ctx_t *shapes_relevant = prepare_comp_shapes_horiz(hside, comp_type, shape_line_idx);
+        #ifdef DEBUG
+            fprintf(stderr, "  shapes_relevant = {");
+            for (size_t ds = 0; ds < SHAPES_PER_SIDE; ds++) {
+                if (shapes_relevant[ds].empty) {
+                    fprintf(stderr, "-");
+                }
+                else {
+                    char *out_shp_text = u32_strconv_to_output(shapes_relevant[ds].text);
+                    fprintf(stderr, "\"%s\"(%d%s)", out_shp_text, (int) shapes_relevant[ds].length,
+                        shapes_relevant[ds].elastic ? "E" : "");
+                    BFREE(out_shp_text);
+                }
+                if (ds < SHAPES_PER_SIDE - 1) {
+                    fprintf(stderr, ", ");
+                }
+            }
+            fprintf(stderr, "}\n");
+        #endif
 
         uint32_t *cur_pos = NULL;
-        uint32_t *input_prepped = prepare_comp_input(input_line_idx, 1, comp_type, 0, NULL, NULL);
-        if (input_prepped != NULL
-                && u32_strncmp(input_prepped, shapes_relevant[0].text, shapes_relevant[0].length) == 0)
+        uint32_t *input_prepped = prepare_comp_input(input_line_idx, 0, comp_type, 0, NULL, NULL);
+        #ifdef DEBUG
+            char *out_input_prepped = u32_strconv_to_output(input_prepped);
+            fprintf(stderr, "  input_prepped = \"%s\"\n", out_input_prepped);
+            BFREE(out_input_prepped);
+        #endif
+        if (input_prepped != NULL && (shapes_relevant[0].length == 0
+                || u32_strncmp(input_prepped, shapes_relevant[0].text, shapes_relevant[0].length) == 0))
         {
-            cur_pos = input_prepped + shapes_relevant[0].length;
+            cur_pos = input_prepped + shapes_relevant[0].length; // TODO check cur_pos and end_pos
         }
 
         uint32_t *end_pos = NULL;
         input_prepped = prepare_comp_input(
                 input_line_idx, 0, comp_type, shapes_relevant[SHAPES_PER_SIDE - 1].length, NULL, NULL);
-        if (input_prepped != NULL && u32_strncmp(input_prepped, shapes_relevant[SHAPES_PER_SIDE - 1].text,
-                shapes_relevant[SHAPES_PER_SIDE - 1].length) == 0)
-        {
-            end_pos = input_prepped;
+        if (input_prepped != NULL) {
+            if (shapes_relevant[SHAPES_PER_SIDE - 1].length == 0) {
+                end_pos = input_prepped + u32_strlen(input_prepped);  // point to NUL terminator
+            }
+            else if (u32_strncmp(input_prepped, shapes_relevant[SHAPES_PER_SIDE - 1].text,
+                    shapes_relevant[SHAPES_PER_SIDE - 1].length) == 0)
+            {
+                end_pos = input_prepped;
+            }
         }
+        #ifdef DEBUG
+            char *out_cur_pos = u32_strconv_to_output(cur_pos);
+            char *out_end_pos = u32_strconv_to_output(end_pos);
+            fprintf(stderr, "  cur_pos = \"%s\" (index %d)\n", out_cur_pos, (int) BMAX(cur_pos - input_prepped, 0));
+            fprintf(stderr, "  end_pos = \"%s\" (index %d)\n", out_end_pos, (int) BMAX(end_pos - input_prepped, 0));
+            BFREE(out_cur_pos);
+            BFREE(out_end_pos);
+        #endif
 
         if (cur_pos && end_pos) {
             result = hmm(shapes_relevant, cur_pos, 1, end_pos);
@@ -586,6 +605,11 @@ static void detect_design_if_needed()
             exit(EXIT_FAILURE);
         }
     }
+    #ifdef DEBUG
+    else {
+        fprintf(stderr, "Design was chosen by user: %s\n", opt.design->name);
+    }
+    #endif
 }
 
 
@@ -783,6 +807,10 @@ int remove_box()
     ctx->empty_side[BRIG] = empty_side(opt.design->shape, BRIG);
     ctx->empty_side[BBOT] = empty_side(opt.design->shape, BBOT);
     ctx->empty_side[BLEF] = empty_side(opt.design->shape, BLEF);
+    #ifdef DEBUG
+        fprintf(stderr, "Empty sides? Top: %d, Right: %d, Bottom: %d, Left: %d\n",
+                ctx->empty_side[BTOP], ctx->empty_side[BRIG], ctx->empty_side[BBOT], ctx->empty_side[BLEF]);
+    #endif
 
     ctx->design_is_mono = design_is_mono(opt.design);
     ctx->input_is_mono = input_is_mono();
