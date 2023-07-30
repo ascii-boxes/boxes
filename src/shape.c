@@ -41,6 +41,7 @@ shape_t north_side[SHAPES_PER_SIDE] = {NW, NNW, N, NNE, NE};  /* clockwise */
 shape_t east_side[SHAPES_PER_SIDE] = {NE, ENE, E, ESE, SE};
 
 shape_t south_side[SHAPES_PER_SIDE] = {SE, SSE, S, SSW, SW};
+shape_t south_side_rev[SHAPES_PER_SIDE] = {SW, SSW, S, SSE, SE};
 
 shape_t west_side[SHAPES_PER_SIDE] = {SW, WSW, W, WNW, NW};
 

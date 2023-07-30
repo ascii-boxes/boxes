@@ -39,6 +39,7 @@ extern char *shape_name[];
 extern shape_t north_side[SHAPES_PER_SIDE];  /* groups of shapes, clockwise */
 extern shape_t  east_side[SHAPES_PER_SIDE];
 extern shape_t south_side[SHAPES_PER_SIDE];
+extern shape_t south_side_rev[SHAPES_PER_SIDE];
 extern shape_t  west_side[SHAPES_PER_SIDE];
 extern shape_t corners[NUM_CORNERS];
 extern shape_t *sides[NUM_SIDES];
