@@ -30,6 +30,7 @@
 #include "cmdline_test.h"
 #include "tools_test.h"
 #include "regulex_test.h"
+#include "remove_test.h"
 #include "unicode_test.h"
 
 
@@ -178,12 +179,31 @@ int main(void)
         cmocka_unit_test_setup(test_bxs_concat_nullarg, beforeTest)
     };
 
+    const struct CMUnitTest remove_tests[] = {
+        cmocka_unit_test_setup(test_match_outer_shape_null, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_left_anchored, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_left_shiftable, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_left_shortened, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_left_not_found, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_left_too_far_in, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_left_edge, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_right_anchored, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_right_shiftable, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_right_shortened, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_right_shortened2, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_right_not_found, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_right_too_far_in, beforeTest),
+        cmocka_unit_test_setup(test_match_outer_shape_right_edge, beforeTest)
+    };
+
+
     int num_failed = 0;
     num_failed += cmocka_run_group_tests(cmdline_tests, NULL, NULL);
     num_failed += cmocka_run_group_tests(regulex_tests, NULL, NULL);
     num_failed += cmocka_run_group_tests(tools_tests, NULL, NULL);
     num_failed += cmocka_run_group_tests(unicode_tests, NULL, NULL);
     num_failed += cmocka_run_group_tests(bxstring_tests, NULL, NULL);
+    num_failed += cmocka_run_group_tests(remove_tests, NULL, NULL);
 
     teardown();
     return num_failed;

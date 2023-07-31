@@ -21,6 +21,23 @@
 #define REMOVE_H
 
 
+/** the result of a match operation at the beginning or end of a line */
+typedef struct _match_result_t {
+    /** pointer to the matched position */
+    uint32_t *p;
+
+    /** index of the matched position in the haystack string */
+    size_t p_idx;
+
+    /** number of characters matched (between 1 and shape_line->num_chars) */
+    size_t len;
+
+    /** flag indicating the match was secured by including non-blank characters (0) or only blanks were matched (1) */
+    int shiftable;
+} match_result_t;
+
+
+
 /**
  * Remove box from input.
  * @return == 0: success;
