@@ -351,25 +351,25 @@ uint32_t *u32_nspaces(const size_t n)
 
 
 // TODO It seems skip is always 0, can we remove that parameter?
-uint32_t *u32_strnrstr(const uint32_t *s1, const uint32_t *s2, const size_t s2_len, int skip)
+uint32_t *u32_strnrstr(const uint32_t *haystack, const uint32_t *needle, const size_t needle_len, int skip)
 {
-    if (is_empty(s2)) {
-        return (uint32_t *) s1;
+    if (is_empty(needle)) {
+        return (uint32_t *) haystack;
     }
-    if (is_empty(s1)) {
+    if (is_empty(haystack)) {
         return NULL;
     }
     if (skip < 0) {
         skip = 0;
     }
 
-    uint32_t *p = u32_strrchr(s1, s2[0]);
+    uint32_t *p = u32_strrchr(haystack, needle[0]);
     if (!p) {
         return NULL;
     }
 
-    while (p >= s1) {
-        int comp = u32_strncmp(p, s2, s2_len);
+    while (p >= haystack) {
+        int comp = u32_strncmp(p, needle, needle_len);
         if (comp == 0) {
             if (skip--) {
                 --p;
