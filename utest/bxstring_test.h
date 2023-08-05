@@ -45,6 +45,8 @@ void test_bxs_strdup(void **state);
 void test_bxs_cut_front(void **state);
 void test_bxs_cut_front_zero(void **state);
 
+void test_bxs_last_char_ptr(void **state);
+
 void test_bxs_trimdup_null(void **state);
 void test_bxs_trimdup_invalid_startidx(void **state);
 void test_bxs_trimdup_invalid_endidx(void **state);

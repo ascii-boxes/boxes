@@ -139,6 +139,7 @@ int main(void)
         cmocka_unit_test_setup(test_bxs_strdup, beforeTest),
         cmocka_unit_test_setup(test_bxs_cut_front, beforeTest),
         cmocka_unit_test_setup(test_bxs_cut_front_zero, beforeTest),
+        cmocka_unit_test_setup(test_bxs_last_char_ptr, beforeTest),
         cmocka_unit_test_setup(test_bxs_trimdup_null, beforeTest),
         cmocka_unit_test_setup(test_bxs_trimdup_invalid_startidx, beforeTest),
         cmocka_unit_test_setup(test_bxs_trimdup_invalid_endidx, beforeTest),

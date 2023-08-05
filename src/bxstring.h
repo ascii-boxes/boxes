@@ -164,6 +164,14 @@ uint32_t *bxs_first_char_ptr(bxstr_t *pString, size_t n);
 
 
 /**
+ * Return a pointer to the NUL terminator of the given string's `memory`.
+ * @param pString the string to use
+ * @return a pointer into existing memory
+ */
+uint32_t *bxs_last_char_ptr(bxstr_t *pString);
+
+
+/**
  * Return the first character of the visible character directly following the indent (for example a letter following
  * some spaces).
  * @param pString the string to use

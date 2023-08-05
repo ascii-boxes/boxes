@@ -487,6 +487,26 @@ void test_bxs_cut_front_zero(void **state)
 
 
 
+void test_bxs_last_char_ptr(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("abc", "ASCII");
+    assert_non_null(ustr32);
+    bxstr_t *input = bxs_from_unicode(ustr32);
+
+    assert_null(bxs_last_char_ptr(NULL));
+
+    uint32_t *actual = bxs_last_char_ptr(input);
+    assert_true(*actual == char_nul);
+    assert_int_equal(3, actual - input->memory);
+
+    BFREE(ustr32);
+    bxs_free(input);
+}
+
+
+
 void test_bxs_trimdup_null(void **state)
 {
     UNUSED(state);
