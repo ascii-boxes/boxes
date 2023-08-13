@@ -315,4 +315,589 @@ void test_match_outer_shape_right_edge(void **state)
 }
 
 
+
+void test_shorten_preferleft_allowall(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shape_line_ctx = (shape_line_ctx_t *) calloc(1, sizeof(shape_line_ctx_t));
+    shape_line_ctx->text = bxs_from_ascii("  abc  ");
+    size_t quality = shape_line_ctx->text->num_chars;
+
+    uint32_t *actual = shorten(shape_line_ctx, &quality, 1, 1, 1);
+    uint32_t *expected = u32_strconv_from_arg(" abc  ", "ASCII");
+    assert_int_equal(6, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 1, 1, 1);
+    expected = u32_strconv_from_arg("abc  ", "ASCII");
+    assert_int_equal(5, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 1, 1, 1);
+    expected = u32_strconv_from_arg("abc ", "ASCII");
+    assert_int_equal(4, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 1, 1, 1);
+    expected = u32_strconv_from_arg("abc", "ASCII");
+    assert_int_equal(3, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 1, 1, 1);
+    assert_int_equal(3, (int) quality);
+    assert_null(actual);
+    BFREE(actual);
+
+    bxs_free(shape_line_ctx->text);
+    BFREE(shape_line_ctx);
+}
+
+
+
+void test_shorten_preferleft_allowright(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shape_line_ctx = (shape_line_ctx_t *) calloc(1, sizeof(shape_line_ctx_t));
+    shape_line_ctx->text = bxs_from_ascii("  abc  ");
+    size_t quality = shape_line_ctx->text->num_chars;
+
+    uint32_t *actual = shorten(shape_line_ctx, &quality, 1, 0, 1);
+    uint32_t *expected = u32_strconv_from_arg("  abc ", "ASCII");
+    assert_int_equal(6, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 1, 0, 1);
+    expected = u32_strconv_from_arg("  abc", "ASCII");
+    assert_int_equal(5, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 1, 0, 1);
+    assert_int_equal(5, (int) quality);
+    assert_null(actual);
+    BFREE(actual);
+
+    bxs_free(shape_line_ctx->text);
+    BFREE(shape_line_ctx);
+}
+
+
+
+void test_shorten_preferleft_allowleft(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shape_line_ctx = (shape_line_ctx_t *) calloc(1, sizeof(shape_line_ctx_t));
+    shape_line_ctx->text = bxs_from_ascii("  abc  ");
+    size_t quality = shape_line_ctx->text->num_chars;
+
+    uint32_t *actual = shorten(shape_line_ctx, &quality, 1, 1, 0);
+    uint32_t *expected = u32_strconv_from_arg(" abc  ", "ASCII");
+    assert_int_equal(6, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 1, 1, 0);
+    expected = u32_strconv_from_arg("abc  ", "ASCII");
+    assert_int_equal(5, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 1, 1, 0);
+    assert_int_equal(5, (int) quality);
+    assert_null(actual);
+    BFREE(actual);
+
+    bxs_free(shape_line_ctx->text);
+    BFREE(shape_line_ctx);
+}
+
+
+
+void test_shorten_preferright_allowall(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shape_line_ctx = (shape_line_ctx_t *) calloc(1, sizeof(shape_line_ctx_t));
+    shape_line_ctx->text = bxs_from_ascii("  abc  ");
+    size_t quality = shape_line_ctx->text->num_chars;
+
+    uint32_t *actual = shorten(shape_line_ctx, &quality, 0, 1, 1);
+    uint32_t *expected = u32_strconv_from_arg("  abc ", "ASCII");
+    assert_int_equal(6, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 0, 1, 1);
+    expected = u32_strconv_from_arg("  abc", "ASCII");
+    assert_int_equal(5, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 0, 1, 1);
+    expected = u32_strconv_from_arg(" abc", "ASCII");
+    assert_int_equal(4, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 0, 1, 1);
+    expected = u32_strconv_from_arg("abc", "ASCII");
+    assert_int_equal(3, (int) quality);
+    assert_int_equal(0, u32_strcmp(expected, actual));
+    BFREE(actual);
+    BFREE(expected);
+
+    actual = shorten(shape_line_ctx, &quality, 0, 1, 1);
+    assert_int_equal(3, (int) quality);
+    assert_null(actual);
+    BFREE(actual);
+
+    bxs_free(shape_line_ctx->text);
+    BFREE(shape_line_ctx);
+}
+
+
+
+void test_shorten_corner_cases(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shape_line_ctx = (shape_line_ctx_t *) calloc(1, sizeof(shape_line_ctx_t));
+    shape_line_ctx->text = bxs_from_ascii("  abc  ");
+    size_t quality = shape_line_ctx->text->num_chars;
+
+    uint32_t *actual = shorten(shape_line_ctx, &quality, 0, 0, 0);
+    assert_int_equal(7, (int) quality);
+    assert_null(actual);
+
+    actual = shorten(NULL, &quality, 1, 1, 0);
+    assert_int_equal(7, (int) quality);
+    assert_null(actual);
+
+    quality = 100;  /* > 7 */
+    actual = shorten(shape_line_ctx, &quality, 0, 0, 0);
+    assert_int_equal(100, (int) quality);
+    assert_null(actual);
+
+    actual = shorten(shape_line_ctx, NULL, 0, 0, 1);
+    assert_null(actual);  /* quality == NULL */
+
+    quality = 7;
+    bxs_free(shape_line_ctx->text);
+    shape_line_ctx->text = NULL;
+    actual = shorten(shape_line_ctx, &quality, 0, 0, 1);
+    assert_null(actual);  /* text == NULL */
+
+    BFREE(shape_line_ctx);
+}
+
+
+
+static shape_line_ctx_t *build_shapes_relevant_sunny()
+{
+    shape_line_ctx_t *shapes_relevant = (shape_line_ctx_t *) calloc(SHAPES_PER_SIDE, sizeof(shape_line_ctx_t));
+    shapes_relevant[0].empty = 0;
+    shapes_relevant[0].text = bxs_from_ascii("WCORNER");
+    shapes_relevant[0].elastic = 0;
+    shapes_relevant[1].empty = 0;
+    shapes_relevant[1].text = bxs_from_ascii("-");
+    shapes_relevant[1].elastic = 1;
+    shapes_relevant[2].empty = 0;
+    shapes_relevant[2].text = bxs_from_ascii("middle");
+    shapes_relevant[2].elastic = 0;
+    shapes_relevant[3].empty = 0;
+    shapes_relevant[3].text = bxs_from_ascii("-");
+    shapes_relevant[3].elastic = 1;
+    shapes_relevant[4].empty = 0;
+    shapes_relevant[4].text = bxs_from_ascii("ECORNER");
+    shapes_relevant[4].elastic = 0;
+    return shapes_relevant;
+}
+
+
+
+static void free_shapes_relevant(shape_line_ctx_t *shapes_relevant)
+{
+    for (size_t i = 0; i < SHAPES_PER_SIDE; i++) {
+        bxs_free(shapes_relevant[i].text);
+    }
+    BFREE(shapes_relevant);
+}
+
+
+
+void test_hmm_sunny_day(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_sunny();
+
+    uint32_t *input_line = u32_strconv_from_arg("  WCORNER-----middle-----ECORNER  ", "ASCII");
+    uint32_t *cur_pos = input_line + 9;  /* '-' after WCORNER */
+    uint32_t *end_pos = input_line + 25; /* 'E' of ECORNER */
+
+    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+
+    assert_int_equal(1, actual);
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
+
+void test_hmm_sunny_day_short(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_sunny();
+
+    uint32_t *input_line = u32_strconv_from_arg("WCORNER-middle-", "ASCII");
+    uint32_t *cur_pos = input_line + 7;  /* '-' after WCORNER */
+    uint32_t *end_pos = input_line + 15; /* NUL */
+
+    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+
+    assert_int_equal(1, actual);
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
+
+void test_hmm_missing_elastic_nne(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_sunny();
+
+    uint32_t *input_line = u32_strconv_from_arg("WCORNER---middleECORNER", "ASCII");
+    uint32_t *cur_pos = input_line + 7;  /* '-' after WCORNER */
+    uint32_t *end_pos = input_line + 16; /* 'E' of ECORNER */
+
+    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+
+    assert_int_equal(0, actual); /* should fail because NNE shape is not present */
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
+
+void test_hmm_invalid_input(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_sunny();
+
+    uint32_t *input_line = u32_strconv_from_arg("not_used", "ASCII");
+    uint32_t *cur_pos = input_line + 5;
+    uint32_t *end_pos = input_line + 2; /* before cur_pos, which is an error */
+
+    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+
+    assert_int_equal(0, actual); /* should fail because cur_pos > end_pos */
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
+
+static shape_line_ctx_t *build_shapes_relevant_empty_r()
+{
+    shape_line_ctx_t *shapes_relevant = (shape_line_ctx_t *) calloc(SHAPES_PER_SIDE, sizeof(shape_line_ctx_t));
+    shapes_relevant[0].empty = 0;
+    shapes_relevant[0].text = bxs_from_ascii("WCORNER");
+    shapes_relevant[0].elastic = 0;
+    shapes_relevant[1].empty = 1;
+    shapes_relevant[1].text = NULL;
+    shapes_relevant[1].elastic = 0;
+    shapes_relevant[2].empty = 0;
+    shapes_relevant[2].text = bxs_from_ascii("xx");
+    shapes_relevant[2].elastic = 1;
+    shapes_relevant[3].empty = 1;
+    shapes_relevant[3].text =  NULL;
+    shapes_relevant[3].elastic = 0;
+    shapes_relevant[4].empty = 1;
+    shapes_relevant[4].text = NULL;
+    shapes_relevant[4].elastic = 0;
+    return shapes_relevant;
+}
+
+
+
+void test_hmm_empty_shapes_success(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_empty_r();
+
+    uint32_t *input_line = u32_strconv_from_arg(" WCORNERxxxxxxxx", "ASCII");
+    uint32_t *cur_pos = input_line + 8;  /* first 'x' */
+    uint32_t *end_pos = input_line + 16; /* NUL */
+
+    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+
+    assert_int_equal(1, actual); /* matches */
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
+
+static shape_line_ctx_t *build_shapes_relevant_backtrack()
+{
+    shape_line_ctx_t *shapes_relevant = (shape_line_ctx_t *) calloc(SHAPES_PER_SIDE, sizeof(shape_line_ctx_t));
+    shapes_relevant[0].empty = 0;
+    shapes_relevant[0].text = bxs_from_ascii("WCORNER");
+    shapes_relevant[0].elastic = 0;
+    shapes_relevant[1].empty = 0;
+    shapes_relevant[1].text = bxs_from_ascii("-");
+    shapes_relevant[1].elastic = 1;
+    shapes_relevant[2].empty = 0;
+    shapes_relevant[2].text = bxs_from_ascii("--middle--");
+    shapes_relevant[2].elastic = 0;
+    shapes_relevant[3].empty = 0;
+    shapes_relevant[3].text = bxs_from_ascii("-");
+    shapes_relevant[3].elastic = 1;
+    shapes_relevant[4].empty = 1;
+    shapes_relevant[4].text = NULL;
+    shapes_relevant[4].elastic = 0;
+    return shapes_relevant;
+}
+
+
+
+void test_hmm_backtracking(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_backtrack();
+
+    uint32_t *input_line = u32_strconv_from_arg(" WCORNER-----middle-----", "ASCII");
+    uint32_t *cur_pos = input_line + 8;  /* first '-' */
+    uint32_t *end_pos = input_line + 24; /* NUL */
+
+    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+
+    assert_int_equal(1, actual); /* matches, elastic NNW doesn't eat part of N shape */
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
+
+static shape_line_ctx_t *build_shapes_relevant_shiftable()
+{
+    shape_line_ctx_t *shapes_relevant = (shape_line_ctx_t *) calloc(SHAPES_PER_SIDE, sizeof(shape_line_ctx_t));
+    shapes_relevant[0].empty = 0; /* maybe there is text in a different shape line */
+    shapes_relevant[0].text = bxs_from_ascii("  ");
+    shapes_relevant[0].elastic = 0;
+    shapes_relevant[1].empty = 1;
+    shapes_relevant[1].text = bxs_from_ascii("   ");
+    shapes_relevant[1].elastic = 1;
+    shapes_relevant[2].empty = 0;
+    shapes_relevant[2].text = bxs_from_ascii("  NORTH  ");
+    shapes_relevant[2].elastic = 0;
+    shapes_relevant[3].empty = 1;
+    shapes_relevant[3].text = NULL;
+    shapes_relevant[3].elastic = 1;
+    shapes_relevant[4].empty = 1;
+    shapes_relevant[4].text = NULL;
+    shapes_relevant[4].elastic = 0;
+    return shapes_relevant;
+}
+
+
+
+void test_hmm_shiftable(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_shiftable();
+
+    uint32_t *input_line = u32_strconv_from_arg("      NORTH      ", "ASCII");
+    uint32_t *cur_pos = input_line;      /* first character */
+    uint32_t *end_pos = input_line + 17; /* NUL */
+
+    int actual = hmm(shapes_relevant, cur_pos, 1, 1, end_pos);
+
+    assert_int_equal(1, actual); /* matches */
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
+
+void test_hmm_shortened(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_shiftable();
+
+    uint32_t *input_line = u32_strconv_from_arg("NORTH", "ASCII");
+    uint32_t *cur_pos = input_line;      /* first character */
+    uint32_t *end_pos = input_line + 5;  /* NUL */
+
+    int actual = hmm(shapes_relevant, cur_pos, 1, 1, end_pos);
+
+    assert_int_equal(1, actual); /* matches, because "  NORTH  " can be shortened because shiftable */
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
+
+static shape_line_ctx_t *build_shapes_relevant_shiftable_left()
+{
+    shape_line_ctx_t *shapes_relevant = (shape_line_ctx_t *) calloc(SHAPES_PER_SIDE, sizeof(shape_line_ctx_t));
+    shapes_relevant[0].empty = 0; /* maybe there is text in a different shape line */
+    shapes_relevant[0].text = bxs_from_ascii("  ");
+    shapes_relevant[0].elastic = 0;
+    shapes_relevant[1].empty = 1;
+    shapes_relevant[1].text = bxs_from_ascii("   ");
+    shapes_relevant[1].elastic = 1;
+    shapes_relevant[2].empty = 0;
+    shapes_relevant[2].text = bxs_from_ascii("  NORTH  ");
+    shapes_relevant[2].elastic = 0;
+    shapes_relevant[3].empty = 1;
+    shapes_relevant[3].text = NULL;
+    shapes_relevant[3].elastic = 1;
+    shapes_relevant[4].empty = 0;
+    shapes_relevant[4].text = bxs_from_ascii("ECORNER  ");
+    shapes_relevant[4].elastic = 0;
+    return shapes_relevant;
+}
+
+
+
+void test_hmm_shortened_right_fail(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_shiftable_left();
+
+    uint32_t *input_line = u32_strconv_from_arg("NORTH ECORNER  ", "ASCII");
+    uint32_t *cur_pos = input_line;      /* first character */
+    uint32_t *end_pos = input_line + 6;  /* 'E' of "ECORNER" */
+
+    int actual = hmm(shapes_relevant, cur_pos, 1, 1, end_pos);
+
+    assert_int_equal(0, actual); /* does not match */
+                                 /* because "  NORTH  " cannot be shortened right b/c right not shiftable */
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
+
+void test_hmm_shortened_right(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_shiftable_left();
+
+    uint32_t *input_line = u32_strconv_from_arg("NORTH  ECORNER", "ASCII");
+    uint32_t *cur_pos = input_line;      /* first character */
+    uint32_t *end_pos = input_line + 7;  /* 'E' of "ECORNER" */
+
+    int actual = hmm(shapes_relevant, cur_pos, 1, 1, end_pos);
+
+    assert_int_equal(1, actual); /* matches */
+                                 /* because "  NORTH  " can be shortened left, and ECORNER can be shortened right */
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
+
+static shape_line_ctx_t *build_shapes_relevant_blank()
+{
+    shape_line_ctx_t *shapes_relevant = (shape_line_ctx_t *) calloc(SHAPES_PER_SIDE, sizeof(shape_line_ctx_t));
+    shapes_relevant[0].empty = 0; /* maybe there is text in a different shape line */
+    shapes_relevant[0].text = bxs_from_ascii("  ");
+    shapes_relevant[0].elastic = 0;
+    shapes_relevant[1].empty = 0;
+    shapes_relevant[1].text = bxs_from_ascii("   ");
+    shapes_relevant[1].elastic = 1;
+    shapes_relevant[2].empty = 0;
+    shapes_relevant[2].text = bxs_from_ascii(" ");
+    shapes_relevant[2].elastic = 0;
+    shapes_relevant[3].empty = 1;
+    shapes_relevant[3].text = bxs_from_ascii(" ");
+    shapes_relevant[3].elastic = 1;
+    shapes_relevant[4].empty = 1;
+    shapes_relevant[4].text = NULL;
+    shapes_relevant[4].elastic = 0;
+    return shapes_relevant;
+}
+
+
+
+void test_hmm_blank_shiftable(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_blank();
+
+    uint32_t *input_line = u32_strconv_from_arg("      ", "ASCII");
+    uint32_t *cur_pos = input_line;      /* first character */
+    uint32_t *end_pos = input_line + 6;  /* NUL */
+
+    int actual = hmm(shapes_relevant, cur_pos, 1, 1, end_pos);
+
+    assert_int_equal(1, actual); /* matches */
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
+
+void test_hmm_blank(void **state)
+{
+    UNUSED(state);
+
+    shape_line_ctx_t *shapes_relevant = build_shapes_relevant_blank();
+
+    uint32_t *input_line = u32_strconv_from_arg("WCORNER       ECORNER", "ASCII");
+    uint32_t *cur_pos = input_line + 7;   /* first blank */
+    uint32_t *end_pos = input_line + 14;  /* 'E' of "ECORNER" */
+
+    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+
+    assert_int_equal(1, actual); /* matches */
+
+    free_shapes_relevant(shapes_relevant);
+    BFREE(input_line);
+}
+
+
 /* vim: set cindent sw=4: */

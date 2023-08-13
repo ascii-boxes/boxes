@@ -93,19 +93,6 @@ typedef struct _remove_ctx_t {
 
 
 
-typedef struct _shape_line_ctx_t {
-    /** flag indicating whether the (entire!) shape is empty */
-    int empty;
-
-    /** one line of a shape, with invisible characters filtered according to the comparison type */
-    bxstr_t *text;
-
-    /** flag indicating whether the shape to which this line belongs is elastic */
-    int elastic;
-} shape_line_ctx_t;
-
-
-
 static size_t find_first_line()
 {
     size_t result = input.num_lines;
@@ -134,52 +121,202 @@ static size_t find_last_line()
 
 
 
+static int is_shape_line_empty(shape_line_ctx_t *shapes_relevant, size_t shape_idx)
+{
+    if (shape_idx < SHAPES_PER_SIDE) {
+        return shapes_relevant[shape_idx].empty || bxs_is_blank(shapes_relevant[shape_idx].text);
+    }
+    return 1;
+}
+
+
+
+static int non_empty_shapes_after(shape_line_ctx_t *shapes_relevant, size_t shape_idx)
+{
+    for (size_t i = shape_idx + 1; i < SHAPES_PER_SIDE - 1; i++) {
+        if (!is_shape_line_empty(shapes_relevant, i)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+
+static int is_blank_between(uint32_t *start, uint32_t *end)
+{
+    for (uint32_t *p = start; p < end; p++) {
+        if (!is_blank(*p)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+
+
+/**
+ * Take a shape line and shorten it by cutting off blanks from both ends.
+ * @param shape_line_ctx info record on the shape line to work on. Contains the original shape line, unshortened.
+ * @param quality (IN/OUT) the current quality, here the value that was last tested. We will reduce this by one.
+ * @param prefer_left if 1, first cut all blanks from the start of the shape line, if 0, first cut at the end
+ * @param allow_left if 1, blanks may be cut from the left of the shape line, if 0, we never cut from the left
+ * @param allow_right if 1, blanks may be cut from the right of the shape line, if 0, we never cut from the right
+ * @return the shortened shape line, in new memory, or NULL if further shortening was not possible
+ */
+uint32_t *shorten(shape_line_ctx_t *shape_line_ctx, size_t *quality, int prefer_left, int allow_left, int allow_right)
+{
+    if (shape_line_ctx == NULL || shape_line_ctx->text == NULL || quality == NULL
+            || *quality > shape_line_ctx->text->num_chars) {
+        return NULL;
+    }
+
+    uint32_t *s = shape_line_ctx->text->memory;
+    uint32_t *e = shape_line_ctx->text->memory + shape_line_ctx->text->num_chars;
+    prefer_left = allow_left ? prefer_left : 0;
+    size_t reduction_steps = shape_line_ctx->text->num_chars - *quality + 1;
+    for (size_t i = 0; i < reduction_steps; i++) {
+        if (prefer_left) {
+            if (s < e && is_blank(*s)) {
+                s++;
+            }
+            else if (e > s && allow_right && is_blank(*(e - 1))) {
+                e--;
+            }
+            else {
+                break;
+            }
+        }
+        else {
+            if (e > s && allow_right && is_blank(*(e - 1))) {
+                e--;
+            }
+            else if (s < e && allow_left && is_blank(*s)) {
+                s++;
+            }
+            else {
+                break;
+            }
+        }
+    }
+
+    uint32_t *result = NULL;
+    size_t new_quality = e - s;
+    if (new_quality < *quality) {
+        result = u32_strdup(s);
+        set_char_at(result, new_quality, char_nul);
+        *quality = new_quality;
+    }
+    return result;
+}
+
+
+
+static int hmm_shiftable(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, uint32_t *end_pos);
+
+
+
 /**
  * (horizontal middle match)
  * Recursive helper function for match_horiz_line(), uses backtracking.
  * @param shapes_relevant the prepared shape lines to be concatenated
  * @param cur_pos current position in the input line being matched
+ * @param shiftable flag indicating that `cur_pos` is still shiftable (corner shape line was blank)
  * @param shape_idx index into `shapes_relevant` indicating which shape to try now
  * @param end_pos first character of the east corner
  * @return `== 1`: success;
  *         `== 0`: failed to match
  */
-static int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, uint32_t *end_pos)
+int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, int shiftable, size_t shape_idx, uint32_t *end_pos)
 {
     #ifdef DEBUG
         char *out_cur_pos = u32_strconv_to_output(cur_pos);
         char *out_end_pos = u32_strconv_to_output(end_pos);
-        fprintf(stderr, "hmm(shapes_relevant, \"%s\", %d, \"%s\")", out_cur_pos, (int) shape_idx, out_end_pos);
+        fprintf(stderr, "hmm(shapes_relevant, \"%s\", %s, %d, \"%s\") - enter\n", out_cur_pos,
+                shiftable ? "true" : "false", (int) shape_idx, out_end_pos);
         BFREE(out_cur_pos);
         BFREE(out_end_pos);
     #endif
 
     int result = 0;
-// FIXME cat test/117_unicode_ansi_mending.input.tmp | out/boxes -n UTF-8 -d diamonds -ac -m recurses indefinitely with result 0
-    if (cur_pos > end_pos) {
-        result = 0; /* last shape tried was too long */
+    if (shiftable) {
+        result = hmm_shiftable(shapes_relevant, cur_pos, shape_idx, end_pos);
     }
-    else if (shape_idx == SHAPES_PER_SIDE) {
-        if (cur_pos == end_pos) {
-            result = 1; /* success */
-        }
+    else if (cur_pos > end_pos) {
+        /* invalid input */
+        result = 0;
+    }
+    else if (cur_pos == end_pos) {
+        /* we are at the end, which is fine if there is nothing else to match */
+        result = (shapes_relevant[shape_idx].empty || bxs_is_blank(shapes_relevant[shape_idx].text))
+                && !non_empty_shapes_after(shapes_relevant, shape_idx) ? 1 : 0;
+    }
+    else if (shape_idx >= SHAPES_PER_SIDE - 1) {
+        /* no more shapes to try, which is fine if the rest of the line is blank */
+        result = u32_is_blank(cur_pos);
     }
     else if (shapes_relevant[shape_idx].empty) {
-        result = hmm(shapes_relevant, cur_pos, shape_idx + 1, end_pos);
+        /* the current shape line is empty, try the next one */
+        result = hmm(shapes_relevant, cur_pos, 0, shape_idx + 1, end_pos);
     }
     else if (u32_strncmp(cur_pos, shapes_relevant[shape_idx].text->memory, shapes_relevant[shape_idx].text->num_chars) == 0) {
-        int rc = 0;
-        if (shapes_relevant[shape_idx].elastic) {
-            rc = hmm(shapes_relevant, cur_pos + shapes_relevant[shape_idx].text->num_chars, shape_idx, end_pos);
+        cur_pos = cur_pos + shapes_relevant[shape_idx].text->num_chars;
+        if (cur_pos == end_pos && !non_empty_shapes_after(shapes_relevant, shape_idx)) {
+            result = 1; /* success */
         }
-        if (rc == 0) {
-            result = hmm(shapes_relevant, cur_pos + shapes_relevant[shape_idx].text->num_chars, shape_idx + 1, end_pos);
+        else {
+            int rc = 0;
+            if (shapes_relevant[shape_idx].elastic) {
+                rc = hmm(shapes_relevant, cur_pos, 0, shape_idx, end_pos);
+            }
+            if (rc == 0) {
+                result = hmm(shapes_relevant, cur_pos, 0, shape_idx + 1, end_pos);
+            }
+            else {
+                result = rc;
+            }
         }
     }
 
     #ifdef DEBUG
-        fprintf(stderr, " -> %d\n", result);
+        fprintf(stderr, "hmm() - exit, result = %d\n", result);
     #endif
+    return result;
+}
+
+
+
+static int hmm_shiftable(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, uint32_t *end_pos)
+{
+    int result = 0;
+    int shapes_are_empty = 1;
+    for (size_t i = shape_idx; i < SHAPES_PER_SIDE - 1; i++) {
+        if (!is_shape_line_empty(shapes_relevant, i)) {
+            shapes_are_empty = 0;
+            int can_shorten_right = -1;
+            size_t quality = shapes_relevant[i].text->num_chars;
+            uint32_t *shape_line = shapes_relevant[i].text->memory;
+            while (shape_line != NULL) {
+                uint32_t *p = u32_strstr(cur_pos, shape_line);
+                if (p != NULL && p < end_pos && is_blank_between(cur_pos, p)) {
+                    result = hmm(shapes_relevant, p + quality, 0, i + (shapes_relevant[i].elastic ? 0 : 1),
+                            end_pos);
+                    break;
+                }
+                if (can_shorten_right == -1) {
+                    /* we can only shorten right if the east corner shape line is also empty */
+                    can_shorten_right = non_empty_shapes_after(shapes_relevant, i)
+                            || !is_shape_line_empty(shapes_relevant, SHAPES_PER_SIDE - 1) ? 0 : 1;
+                }
+                shape_line = shorten(shapes_relevant + i, &quality, 0, 1, can_shorten_right);
+            }
+            break;
+        }
+    }
+    if (shapes_are_empty) {
+        /* all shapes were empty, which is fine if line was blank */
+        result = is_blank_between(cur_pos, end_pos);
+    }
     return result;
 }
 
@@ -191,12 +328,12 @@ static shape_line_ctx_t *prepare_comp_shapes_horiz(int hside, comparison_t comp_
     shape_line_ctx_t *shapes_relevant = (shape_line_ctx_t *) calloc(SHAPES_PER_SIDE, sizeof(shape_line_ctx_t));
 
     for (size_t i = 0; i < SHAPES_PER_SIDE; i++) {
+        shapes_relevant[i].elastic = opt.design->shape[side_shapes[i]].elastic;
         shapes_relevant[i].empty = isempty(opt.design->shape + side_shapes[i]);
         if (!shapes_relevant[i].empty) {
             uint32_t *s = prepare_comp_shape(opt.design, side_shapes[i], shape_line_idx, comp_type, 0,
                     i == SHAPES_PER_SIDE - 1);
             shapes_relevant[i].text = bxs_from_unicode(s);
-            shapes_relevant[i].elastic = opt.design->shape[side_shapes[i]].elastic;
             BFREE(s);
         }
     }
@@ -229,7 +366,7 @@ static match_result_t *new_match_result(uint32_t *p, size_t p_idx, size_t len, i
  */
 match_result_t *match_outer_shape(int vside, bxstr_t *input_line, bxstr_t *shape_line)
 {
-    if (input_line == NULL || shape_line == NULL) {
+    if (input_line == NULL || input_line->num_chars == 0 || shape_line == NULL || shape_line->num_chars == 0) {
         return NULL;
     }
 
@@ -272,6 +409,32 @@ match_result_t *match_outer_shape(int vside, bxstr_t *input_line, bxstr_t *shape
 
 
 
+static void debug_print_shapes_relevant(shape_line_ctx_t *shapes_relevant)
+{
+    #ifdef DEBUG
+        fprintf(stderr, "  shapes_relevant = {");
+        for (size_t ds = 0; ds < SHAPES_PER_SIDE; ds++) {
+            if (shapes_relevant[ds].empty) {
+                fprintf(stderr, "-");
+            }
+            else {
+                char *out_shp_text = bxs_to_output(shapes_relevant[ds].text);
+                fprintf(stderr, "\"%s\"(%d%s)", out_shp_text, (int) shapes_relevant[ds].text->num_chars,
+                    shapes_relevant[ds].elastic ? "E" : "");
+                BFREE(out_shp_text);
+            }
+            if (ds < SHAPES_PER_SIDE - 1) {
+                fprintf(stderr, ", ");
+            }
+        }
+        fprintf(stderr, "}\n");
+    #else
+        UNUSED(shapes_relevant);
+    #endif
+}
+
+
+
 // TODO gdb --args out/boxes -n UTF-8 -d diamonds -ac -m test/117_unicode_ansi_mending.input.tmp
 static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx, size_t shape_line_idx)
 {
@@ -287,50 +450,26 @@ static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx,
         }
 
         shape_line_ctx_t *shapes_relevant = prepare_comp_shapes_horiz(hside, comp_type, shape_line_idx);
-        #ifdef DEBUG
-            fprintf(stderr, "  shapes_relevant = {");
-            for (size_t ds = 0; ds < SHAPES_PER_SIDE; ds++) {
-                if (shapes_relevant[ds].empty) {
-                    fprintf(stderr, "-");
-                }
-                else {
-                    char *out_shp_text = bxs_to_output(shapes_relevant[ds].text);
-                    fprintf(stderr, "\"%s\"(%d%s)", out_shp_text, (int) shapes_relevant[ds].text->num_chars,
-                        shapes_relevant[ds].elastic ? "E" : "");
-                    BFREE(out_shp_text);
-                }
-                if (ds < SHAPES_PER_SIDE - 1) {
-                    fprintf(stderr, ", ");
-                }
-            }
-            fprintf(stderr, "}\n");
-        #endif
+        debug_print_shapes_relevant(shapes_relevant);
 
         uint32_t *cur_pos = NULL;
-        bxstr_t *input_prepped = bxs_from_unicode(prepare_comp_input(input_line_idx, 0, comp_type, 0, NULL, NULL));
+        bxstr_t *input_prepped1 = bxs_from_unicode(prepare_comp_input(input_line_idx, 0, comp_type, 0, NULL, NULL));
+        bxstr_t *input_prepped = bxs_rtrim(input_prepped1);
+        bxs_free(input_prepped1);
         #ifdef DEBUG
             char *out_input_prepped = bxs_to_output(input_prepped);
             fprintf(stderr, "  input_prepped = \"%s\"\n", out_input_prepped);
             BFREE(out_input_prepped);
         #endif
-        if (input_prepped != NULL && (shapes_relevant[0].text->num_chars == 0
-                || u32_strncmp(input_prepped->memory, shapes_relevant[0].text->memory, shapes_relevant[0].text->num_chars) == 0))
-        {
-            cur_pos = input_prepped->memory + shapes_relevant[0].text->num_chars; // TODO check cur_pos and end_pos
+        match_result_t *mrl = match_outer_shape(BLEF, input_prepped, shapes_relevant[0].text);
+        if (mrl != NULL) { // TODO if mrl->shiftable, might need to match the next shape line
+            cur_pos = mrl->p + mrl->len;
         }
 
         uint32_t *end_pos = NULL;
-        input_prepped = bxs_from_unicode(prepare_comp_input(
-                input_line_idx, 0, comp_type, shapes_relevant[SHAPES_PER_SIDE - 1].text->num_chars, NULL, NULL));
-        if (input_prepped != NULL) {
-            if (shapes_relevant[SHAPES_PER_SIDE - 1].text->num_chars == 0) {
-                end_pos = input_prepped->memory + input_prepped->num_chars;  // point to NUL terminator
-            }
-            else if (u32_strncmp(input_prepped->memory, shapes_relevant[SHAPES_PER_SIDE - 1].text->memory,
-                    shapes_relevant[SHAPES_PER_SIDE - 1].text->num_chars) == 0)
-            {
-                end_pos = input_prepped->memory;
-            }
+        match_result_t *mrr = match_outer_shape(BRIG, input_prepped, shapes_relevant[SHAPES_PER_SIDE - 1].text);
+        if (mrr != NULL) {
+            end_pos = mrr->p;
         }
         #ifdef DEBUG
             char *out_cur_pos = u32_strconv_to_output(cur_pos);
@@ -342,9 +481,11 @@ static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx,
         #endif
 
         if (cur_pos && end_pos) {
-            result = hmm(shapes_relevant, cur_pos, 1, end_pos);
+            result = hmm(shapes_relevant, cur_pos, mrl->shiftable, 1, end_pos);
         }
 
+        BFREE(mrl);
+        BFREE(mrr);
         for (size_t i = 0; i < SHAPES_PER_SIDE; i++) {
             bxs_free(shapes_relevant[i].text);
         }
@@ -479,55 +620,6 @@ static void free_shape_lines(shape_line_ctx_t **shape_lines)
 
 
 
-/**
- * Take a shape line and shorten it by cutting off blanks from both ends.
- * @param shape_line_ctx info record on the shape line to work on. Contains the original shape line, unshortened.
- * @param quality (IN/OUT) the current quality, here the value that was last tested. We will reduce this by one.
- * @param prefer_left if 1, first cut blanks from the start of the shape line, if 0, first cut at the end
- * @return the shortened shape line, in new memory, or NULL if further shortening was not possible
- */
-static uint32_t *shorten(shape_line_ctx_t *shape_line_ctx, size_t *quality, int prefer_left)
-{
-    uint32_t *s = shape_line_ctx->text->memory;
-    uint32_t *e = shape_line_ctx->text->memory + shape_line_ctx->text->num_chars;
-    size_t reduction_steps = shape_line_ctx->text->num_chars - *quality + 1;
-    for (size_t i = 0; i < reduction_steps; i++) {
-        if (prefer_left) {
-            if (is_blank(*s) && s < e) {
-                s++;
-            }
-            else if (is_blank(*(e - 1)) && e > s) {
-                e--;
-            }
-            else {
-                break;
-            }
-        }
-        else {
-            if (is_blank(*(e - 1)) && e > s) {
-                e--;
-            }
-            else if (is_blank(*s) && s < e) {
-                s++;
-            }
-            else {
-                break;
-            }
-        }
-    }
-
-    uint32_t *result = NULL;
-    size_t new_quality = e - s;
-    if (new_quality < *quality) {
-        result = u32_strdup(s);
-        set_char_at(result, new_quality, char_nul);
-        *quality = new_quality;
-    }
-    return result;
-}
-
-
-
 static void match_vertical_side(remove_ctx_t *ctx, int vside, shape_line_ctx_t **shape_lines, uint32_t *input_line,
     size_t line_idx, size_t input_length, size_t input_indent, size_t input_trailing)
 {
@@ -554,7 +646,7 @@ static void match_vertical_side(remove_ctx_t *ctx, int vside, shape_line_ctx_t *
             shape_text = NULL;
 
             if (p == NULL) {
-                shape_text = shorten(*shape_line_ctx, &quality, vside == BLEF);
+                shape_text = shorten(*shape_line_ctx, &quality, vside == BLEF, 1, 1);
                 to_free = shape_text;
             }
             else if (vside == BLEF && ((size_t) (p - input_line) <= input_indent + (max_quality - quality))) {

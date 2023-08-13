@@ -38,6 +38,20 @@ typedef struct _match_result_t {
 
 
 
+typedef struct _shape_line_ctx_t {
+    /** flag indicating whether the (entire!) shape is empty */
+    int empty;
+
+    /** one line of a shape, with invisible characters filtered according to the comparison type,
+     *  NULL when shape is empty */
+    bxstr_t *text;
+
+    /** flag indicating whether the shape to which this line belongs is elastic */
+    int elastic;
+} shape_line_ctx_t;
+
+
+
 /**
  * Remove box from input.
  * @return == 0: success;
@@ -56,4 +70,4 @@ void output_input(const int trim_only);
 
 #endif /*REMOVE_H*/
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

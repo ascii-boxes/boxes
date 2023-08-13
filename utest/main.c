@@ -193,7 +193,24 @@ int main(void)
         cmocka_unit_test_setup(test_match_outer_shape_right_shortened2, beforeTest),
         cmocka_unit_test_setup(test_match_outer_shape_right_not_found, beforeTest),
         cmocka_unit_test_setup(test_match_outer_shape_right_too_far_in, beforeTest),
-        cmocka_unit_test_setup(test_match_outer_shape_right_edge, beforeTest)
+        cmocka_unit_test_setup(test_match_outer_shape_right_edge, beforeTest),
+        cmocka_unit_test_setup(test_shorten_preferleft_allowall, beforeTest),
+        cmocka_unit_test_setup(test_shorten_preferleft_allowright, beforeTest),
+        cmocka_unit_test_setup(test_shorten_preferleft_allowleft, beforeTest),
+        cmocka_unit_test_setup(test_shorten_preferright_allowall, beforeTest),
+        cmocka_unit_test_setup(test_shorten_corner_cases, beforeTest),
+        cmocka_unit_test_setup(test_hmm_sunny_day, beforeTest),
+        cmocka_unit_test_setup(test_hmm_sunny_day_short, beforeTest),
+        cmocka_unit_test_setup(test_hmm_missing_elastic_nne, beforeTest),
+        cmocka_unit_test_setup(test_hmm_invalid_input, beforeTest),
+        cmocka_unit_test_setup(test_hmm_empty_shapes_success, beforeTest),
+        cmocka_unit_test_setup(test_hmm_backtracking, beforeTest),
+        cmocka_unit_test_setup(test_hmm_shiftable, beforeTest),
+        cmocka_unit_test_setup(test_hmm_shortened, beforeTest),
+        cmocka_unit_test_setup(test_hmm_shortened_right_fail, beforeTest),
+        cmocka_unit_test_setup(test_hmm_shortened_right, beforeTest),
+        cmocka_unit_test_setup(test_hmm_blank_shiftable, beforeTest),
+        cmocka_unit_test_setup(test_hmm_blank, beforeTest)
     };
 
 
