@@ -53,18 +53,16 @@ jobs:
 
             - name: add-packages
               run: |
-                  brew update
                   brew install flex bison libunistring pcre2 ncurses diffutils lcov cmocka
-                  brew upgrade
 
             - name: make cov
-              run: make cov
+              run: make cov LEX=/usr/local/opt/flex/bin/flex YACC=/usr/local/opt/bison/bin/bison
 
             - name: Run white-box tests
-              run: make utest
+              run: make utest LEX=/usr/local/opt/flex/bin/flex YACC=/usr/local/opt/bison/bin/bison
 
             - name: Run black-box tests
-              run: make covtest
+              run: make covtest LEX=/usr/local/opt/flex/bin/flex YACC=/usr/local/opt/bison/bin/bison
 
             - name: Coveralls
               uses: coverallsapp/github-action@v2
