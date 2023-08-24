@@ -29,12 +29,12 @@
 
 include $(TOPDIR)/rules.mk
 PKG_NAME:=boxes
-PKG_VERSION:=2.2.0
+PKG_VERSION:=2.2.1
 PKG_RELEASE:=1
 PKG_BUILD_DIR:=$(PKG_NAME)-$(PKG_VERSION).$(PKG_RELEASE)
 
 
-PKG_SOURCE:=v2.2.0.tar.gz
+PKG_SOURCE:=v2.2.1.tar.gz
 PKG_SOURCE_URL:=https://github.com/ascii-boxes/boxes/archive/refs/tags/
 
 include $(INCLUDE_DIR)/package.mk

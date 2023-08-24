@@ -16,7 +16,7 @@
 # The following line (GLOBALCONF) is the only line you should need to edit!
 GLOBALCONF = /usr/share/boxes
 GIT_STATUS = $(shell git describe --dirty --always 2>/dev/null || echo "n/a")
-BVERSION   = 2.2.0
+BVERSION   = 2.2.1
 
 ALL_FILES  = LICENSE README.md boxes-config
 DOC_FILES  = doc/boxes.1 doc/boxes.el
