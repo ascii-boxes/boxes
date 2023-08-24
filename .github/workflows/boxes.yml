@@ -45,3 +45,30 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   file: out/lcov-total.info
                   format: lcov
+
+    build-macos:
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: add-packages
+              run: |
+                  brew update
+                  brew install flex bison libunistring pcre2 ncurses diffutils lcov cmocka
+                  brew upgrade
+
+            - name: make cov
+              run: make cov
+
+            - name: Run white-box tests
+              run: make utest
+
+            - name: Run black-box tests
+              run: make covtest
+
+            - name: Coveralls
+              uses: coverallsapp/github-action@v2
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  file: out/lcov-total.info
+                  format: lcov
