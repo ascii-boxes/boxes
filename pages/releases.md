@@ -23,6 +23,13 @@ Click on the version numbers to view the release notes for each release.
   </thead>
   <tbody>
     <tr>
+      <th scope="row"><a href="{{ site.baseurl}}{% post_url 2023-08-24-boxes-v2.2.1-released %}">2.2.1</a></th>
+      <td>August&nbsp;24, 2023</td>
+      <td><a href="https://github.com/{{ site.github }}/tree/v2.2.1">link</a></td>
+      <td><a href="https://github.com/{{ site.github }}/releases/tag/v2.2.1">link</a></td>
+      <td class="d-none d-sm-table-cell">multiple small fixes</td>
+    </tr>
+    <tr>
       <th scope="row"><a href="{{ site.baseurl}}{% post_url 2022-09-21-boxes-v2.2.0-released %}">2.2.0</a></th>
       <td>September&nbsp;21, 2022</td>
       <td><a href="https://github.com/{{ site.github }}/tree/v2.2.0">link</a></td>
