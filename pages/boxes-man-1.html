@@ -13,7 +13,7 @@ last_modified_at: 2023-08-24 16:48:00 +0200
 {% assign thisVersion = site.currentVersion | prepend: 'v' -%}
 {% include version-select.html currentVersion=thisVersion contentPiece="boxes-man-1" %}
 
-<p>Section: User Commands  (1)<BR>Updated: September 20 2022</p>
+<p>Section: User Commands  (1)<BR>Updated: {{ page.last_modified_at | date: "%B %e %Y" }}</p>
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}

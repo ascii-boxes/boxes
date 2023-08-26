@@ -11,7 +11,7 @@ last_modified_at: 2021-02-16 22:23:00 +0100
 
 {% include version-select.html currentVersion=page.bxVersion contentPiece="boxes-man-1" %}
 
-<p>Section: User Commands  (1)<BR>Updated: February 16 2021</p>
+<p>Section: User Commands  (1)<BR>Updated: {{ page.last_modified_at | date: "%B %e %Y" }}</p>
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html

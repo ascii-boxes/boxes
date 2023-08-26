@@ -11,7 +11,7 @@ last_modified_at: 2022-09-20 20:19:00 +0200
 
 {% include version-select.html currentVersion=page.bxVersion contentPiece="boxes-man-1" %}
 
-<p>Section: User Commands  (1)<BR>Updated: September 20 2022</p>
+<p>Section: User Commands  (1)<BR>Updated: {{ page.last_modified_at | date: "%B %e %Y" }}</p>
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
