@@ -49,8 +49,6 @@ jobs:
     build-mac:
         runs-on: macos-latest
         env:
-          LANG: C
-          LC_ALL: C
           LEX: /usr/local/opt/flex/bin/flex
           YACC: /usr/local/opt/bison/bin/bison
         steps:
