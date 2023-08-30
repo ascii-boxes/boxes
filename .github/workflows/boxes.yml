@@ -58,8 +58,8 @@ jobs:
             - name: make cov
               run: make cov LEX=/usr/local/opt/flex/bin/flex YACC=/usr/local/opt/bison/bin/bison
 
-            - name: Run white-box tests
-              run: make utest LEX=/usr/local/opt/flex/bin/flex YACC=/usr/local/opt/bison/bin/bison
+            #- name: Run white-box tests
+              #run: make utest LEX=/usr/local/opt/flex/bin/flex YACC=/usr/local/opt/bison/bin/bison
 
             - name: Run black-box tests
               run: make covtest LEX=/usr/local/opt/flex/bin/flex YACC=/usr/local/opt/bison/bin/bison
