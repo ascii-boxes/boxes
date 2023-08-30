@@ -54,7 +54,7 @@ jobs:
             # We need to use GNU grep on macOS
             - name: add-packages
               run: |
-                  brew install git flex bison libunistring pcre2 ncurses diffutils lcov cmocka grep
+                  brew install flex bison diffutils lcov cmocka grep
                   echo '/usr/local/opt/grep/libexec/gnubin' >> $GITHUB_PATH
 
             - name: make cov
