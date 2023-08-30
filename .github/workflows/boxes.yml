@@ -51,15 +51,18 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
-            # We need to use GNU grep on macOS
+            # We need to use GNU grep and sed on macOS
             - name: add-packages
               run: |
-                  brew install flex bison diffutils lcov cmocka grep
+                  brew install flex bison diffutils lcov cmocka grep gnu-sed
                   echo '/usr/local/opt/grep/libexec/gnubin' >> $GITHUB_PATH
+                  echo '/usr/local/opt/gnu-sed/libexec/gnubin' >> $GITHUB_PATH
 
             - name: make cov
               run: make cov LEX=/usr/local/opt/flex/bin/flex YACC=/usr/local/opt/bison/bin/bison
 
+            # This uses ld --wrap to mock the cmocka functions but
+            # macOS ld does not support --wrap
             #- name: Run white-box tests
               #run: make utest LEX=/usr/local/opt/flex/bin/flex YACC=/usr/local/opt/bison/bin/bison
 
