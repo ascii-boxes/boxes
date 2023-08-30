@@ -23,6 +23,11 @@ DOC_FILES  = doc/boxes.1 doc/boxes.el
 PKG_NAME   = boxes-$(BVERSION)
 OUT_DIR    = out
 
+# Set some defaults for LEX and YACC but allow env
+# variables to override them.
+LEX  ?= flex
+YACC ?= bison
+
 PCRE2_VERSION          = 10.40
 PCRE2_DIR              = vendor/pcre2-$(PCRE2_VERSION)
 LIBUNISTRING_VERSION   = 1.0
@@ -44,7 +49,7 @@ WIN_CMOCKA_DIR         = vendor/cmocka-$(WIN_CMOCKA_VERSION)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 build cov debug: infomsg replaceinfos
-	$(MAKE) -C src BOXES_PLATFORM=unix LEX=flex YACC=bison $@
+	$(MAKE) -C src BOXES_PLATFORM=unix LEX=$(LEX) YACC=$(YACC) $@
 
 win32: infomsg replaceinfos
 	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(PCRE2_DIR)/src LDFLAGS=-L../$(PCRE2_DIR)/.libs \
@@ -124,7 +129,7 @@ $(LIBNCURSES_DIR)/lib/libncurses.a: vendor/libncurses-$(LIBNCURSES_VERSION).tar.
 	cd $(LIBNCURSES_DIR) ; ./configure --enable-static ; $(MAKE)
 
 static: infomsg replaceinfos $(LIBUNISTRING_DIR)/lib/.libs/libunistring.a $(PCRE2_DIR)/.libs/libpcre2-32.a $(LIBNCURSES_DIR)/lib/libncurses.a
-	$(MAKE) -C src BOXES_PLATFORM=static LEX=flex YACC=bison LIBUNISTRING_DIR=$(LIBUNISTRING_DIR) \
+	$(MAKE) -C src BOXES_PLATFORM=static LEX=$(LEX) YACC=$(YACC) LIBUNISTRING_DIR=$(LIBUNISTRING_DIR) \
 	    PCRE2_DIR=$(PCRE2_DIR) LIBNCURSES_DIR=$(LIBNCURSES_DIR) LIBNCURSES_WIN_INCLUDE=$(LIBNCURSES_WIN_INCLUDE) $@
 
 
