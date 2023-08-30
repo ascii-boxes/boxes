@@ -51,12 +51,13 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
-            # We need to use GNU grep and sed on macOS
+            # We need to use GNU grep, sed, and xargs on macOS
             - name: add-packages
               run: |
-                  brew install flex bison diffutils lcov cmocka grep gnu-sed
+                  brew install flex bison diffutils lcov cmocka grep gnu-sed findutils
                   echo '/usr/local/opt/grep/libexec/gnubin' >> $GITHUB_PATH
                   echo '/usr/local/opt/gnu-sed/libexec/gnubin' >> $GITHUB_PATH
+                  echo '/usr/local/opt/findutils/libexec/gnubin' >> $GITHUB_PATH
 
             - name: make cov
               run: make cov LEX=/usr/local/opt/flex/bin/flex YACC=/usr/local/opt/bison/bin/bison
