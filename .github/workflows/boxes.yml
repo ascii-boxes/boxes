@@ -46,14 +46,14 @@ jobs:
                   file: out/lcov-total.info
                   format: lcov
 
-    build-macos:
+    build-mac:
         runs-on: macos-latest
         steps:
             - uses: actions/checkout@v3
 
             - name: add-packages
               run: |
-                  brew install flex bison libunistring pcre2 ncurses diffutils lcov cmocka
+                  brew install git flex bison libunistring pcre2 ncurses diffutils lcov cmocka
 
             - name: make cov
               run: make cov LEX=/usr/local/opt/flex/bin/flex YACC=/usr/local/opt/bison/bin/bison
