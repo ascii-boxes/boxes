@@ -6,6 +6,7 @@
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/src/misc",
                 "${workspaceFolder}/out",
+                "${workspaceFolder}/vendor/libunistring-1.0/lib",
                 "${workspaceFolder}/vendor/pcre2-10.40/src",
                 "${workspaceFolder}/vendor/cmocka-1.1.0/include",
                 "C:/MinGW/include/ncurses"
@@ -20,7 +21,7 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "C:\\MinGW\\bin\\gcc.exe",
+            "compilerPath": "C:/MinGW/bin/gcc.exe",
             "cStandard": "c99",
             "cppStandard": "gnu++14",
             "intelliSenseMode": "windows-gcc-x86"
