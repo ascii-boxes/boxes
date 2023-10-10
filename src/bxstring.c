@@ -254,6 +254,31 @@ bxstr_t *bxs_trimdup(bxstr_t *pString, size_t start_idx, size_t end_idx)
 
 
 
+bxstr_t *bxs_substr(bxstr_t *pString, size_t start_idx, size_t end_idx)
+{
+    if (pString == NULL) {
+        return NULL;
+    }
+    if (start_idx > pString->num_chars_visible) {
+        start_idx = pString->num_chars_visible;
+    }
+    if (end_idx > pString->num_chars_visible) {
+        end_idx = pString->num_chars_visible;
+    }
+    if (end_idx < start_idx) {
+        bx_fprintf(stderr, "%s: internal error: end_idx before start_idx in bxs_substr()\n", PROJECT);
+        return NULL;
+    }
+
+    ucs4_t save = pString->memory[pString->first_char[end_idx]];
+    set_char_at(pString->memory, pString->first_char[end_idx], char_nul);
+    bxstr_t *result = bxs_from_unicode(pString->memory + pString->first_char[start_idx]);
+    set_char_at(pString->memory, pString->first_char[end_idx], save);
+    return result;
+}
+
+
+
 bxstr_t *bxs_strcat(bxstr_t *pString, uint32_t *pToAppend)
 {
     if (pToAppend == NULL) {
@@ -439,6 +464,54 @@ bxstr_t *bxs_rtrim(bxstr_t *pString)
     set_char_at(s, pString->first_char[pString->num_chars_visible - pString->trailing], char_nul);
     bxstr_t *result = bxs_from_unicode(s);
     BFREE(s);
+    return result;
+}
+
+
+
+bxstr_t *bxs_prepend_spaces(bxstr_t *pString, size_t n)
+{
+    bxstr_t *result = NULL;
+    if (n == 0) {
+        result = bxs_strdup(pString);
+    }
+    else if (pString == NULL) {
+        uint32_t *s = u32_nspaces(n);
+        result = bxs_from_unicode(s);
+        BFREE(s);
+    }
+    else {
+        result = (bxstr_t *) calloc(1, sizeof(bxstr_t));
+
+        result->memory = (uint32_t *) malloc((pString->num_chars + n + 1) * sizeof(uint32_t));
+        uint32_t *s = u32_nspaces(n);
+        u32_cpy(result->memory, s, n);
+        BFREE(s);
+        u32_cpy(result->memory + n, pString->memory, pString->num_chars);
+        set_char_at(result->memory, pString->num_chars + n, char_nul);
+
+        result->ascii = (char *) malloc((pString->num_columns + n + 1) * sizeof(char));
+        memset(result->ascii, ' ', n);
+        strcpy(result->ascii + n, pString->ascii);
+
+        result->indent = pString->indent + n;
+        result->num_columns = pString->num_columns + n;
+        result->num_chars = pString->num_chars + n;
+        result->num_chars_visible = pString->num_chars_visible + n;
+        result->num_chars_invisible = pString->num_chars_invisible;
+        result->trailing = pString->trailing;
+
+        result->first_char = (size_t *) malloc((pString->num_chars_visible + n + 1) * sizeof(size_t));
+        result->visible_char = (size_t *) malloc((pString->num_chars_visible + n + 1) * sizeof(size_t));
+        for (size_t i=0; i < n; i++) {
+            result->first_char[i] = i;
+            result->visible_char[i] = i;
+        }
+        for (size_t i=0; i <= pString->num_chars_visible; i++) {
+            result->first_char[i + n] = pString->first_char[i] + n;
+            result->visible_char[i + n] = pString->visible_char[i] + n;
+        }
+    }
     return result;
 }
 

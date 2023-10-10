@@ -104,11 +104,23 @@ bxstr_t *bxs_strdup(bxstr_t *pString);
  * Take a substring from the given string, trim leading and trailing space from it, and duplicate the result in a new
  * string. If invisible characters are included in the string, they are also duplicated.
  * @param pString the source string
- * @param start_idx the index of the first visible character of the substring
+ * @param start_idx the index of the first visible character of the substring, used as index into `first_char` and
+ *      `visible_char`
  * @param end_idx the index of the first visible character following the substring
  * @return the trimmed and duplicated substring, for which new memory was allocated
  */
 bxstr_t *bxs_trimdup(bxstr_t *pString, size_t start_idx, size_t end_idx);
+
+
+/**
+ * Take a substring from the given string.
+ * @param pString the source string
+ * @param start_idx the index of the first visible character of the substring, used as index into `first_char` and
+ *      `visible_char`
+ * @param end_idx the index of the first visible character following the substring
+ * @return the substring, in new memory
+ */
+bxstr_t *bxs_substr(bxstr_t *pString, size_t start_idx, size_t end_idx);
 
 
 /**
@@ -204,6 +216,15 @@ uint32_t *bxs_ltrim(bxstr_t *pString, size_t max);
  * @return a new, trimmed string
  */
 bxstr_t *bxs_rtrim(bxstr_t *pString);
+
+
+/**
+ * Prepend `n` spaces to the start of the given string. New memory is allocated for the result.
+ * @param pString the original string (will not be modified, can be NULL, in which case spaces only in result)
+ * @param n the number of spaces to prepend
+ * @returns spaces plus original string, in new memory. Will be NULL only of `pString` == NULL and `n` == 0.
+ */
+bxstr_t *bxs_prepend_spaces(bxstr_t *pString, size_t n);
 
 
 /**

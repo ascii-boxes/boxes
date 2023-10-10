@@ -45,7 +45,11 @@ void test_bxs_strdup(void **state);
 void test_bxs_cut_front(void **state);
 void test_bxs_cut_front_zero(void **state);
 
+void test_bxs_first_char_ptr_errors(void **state);
+
 void test_bxs_last_char_ptr(void **state);
+
+void test_bxs_unindent_ptr_null(void **state);
 
 void test_bxs_trimdup_null(void **state);
 void test_bxs_trimdup_invalid_startidx(void **state);
@@ -55,6 +59,8 @@ void test_bxs_trimdup_normal(void **state);
 void test_bxs_trimdup_vanish(void **state);
 void test_bxs_trimdup_ansi(void **state);
 void test_bxs_trimdup_ansi_same(void **state);
+
+void test_bxs_substr_errors(void **state);
 
 void test_bxs_strcat(void **state);
 void test_bxs_strcat_empty(void **state);
@@ -76,6 +82,8 @@ void test_bxs_ltrim_max(void **state);
 
 void test_bxs_rtrim(void **state);
 void test_bxs_rtrim_empty(void **state);
+
+void test_bxs_prepend_spaces_null(void **state);
 
 void test_bxs_append_spaces(void **state);
 

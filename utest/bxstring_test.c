@@ -487,6 +487,26 @@ void test_bxs_cut_front_zero(void **state)
 
 
 
+void test_bxs_first_char_ptr_errors(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *actual = bxs_first_char_ptr(NULL, 0);
+    assert_null(actual);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("ab\x1b[38;5;203mc\x1b[0m\x1b[38;5;198md\x1b[0me", "ASCII");
+    assert_non_null(ustr32);
+    bxstr_t *input = bxs_from_unicode(ustr32);
+    actual = bxs_first_char_ptr(input, 1000);
+    assert_non_null(actual);
+    assert_true(u32_is_blank(actual));
+
+    bxs_free(input);
+    BFREE(ustr32);
+}
+
+
+
 void test_bxs_last_char_ptr(void **state)
 {
     UNUSED(state);
@@ -503,6 +523,16 @@ void test_bxs_last_char_ptr(void **state)
 
     BFREE(ustr32);
     bxs_free(input);
+}
+
+
+
+void test_bxs_unindent_ptr_null(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *actual = bxs_unindent_ptr(NULL);
+    assert_null(actual);
 }
 
 
@@ -658,6 +688,39 @@ void test_bxs_trimdup_ansi_same(void **state)
     BFREE(ustr32);
     bxs_free(input);
     bxs_free(actual);
+}
+
+
+
+void test_bxs_substr_errors(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("ab\x1b[38;5;203mc\x1b[0m\x1b[38;5;198md\x1b[0me", "ASCII");
+    assert_non_null(ustr32);
+    bxstr_t *input = bxs_from_unicode(ustr32);
+
+    bxstr_t *actual = bxs_substr(NULL, 0, 0);
+    assert_null(actual);
+
+    actual = bxs_substr(input, 1000, input->num_chars);
+    assert_non_null(actual);
+    assert_true(bxs_is_empty(actual));
+    bxs_free(actual);
+
+    actual = bxs_substr(input, input->num_chars - 1, 1000);
+    assert_non_null(actual);
+    assert_string_equal("e", actual->ascii);
+    assert_int_equal(1, actual->num_chars);
+    bxs_free(actual);
+
+    actual = bxs_substr(input, 3, 0);   /* start_idx > end_idx */
+    assert_null(actual);
+    assert_int_equal(1, collect_err_size);
+    assert_string_equal("boxes: internal error: end_idx before start_idx in bxs_substr()\n", collect_err[0]);
+
+    BFREE(ustr32);
+    bxs_free(input);
 }
 
 
@@ -1082,6 +1145,22 @@ void test_bxs_rtrim_empty(void **state)
     BFREE(ustr32);
     bxs_free(actual);
     bxs_free(bxstr);
+}
+
+
+
+void test_bxs_prepend_spaces_null(void **state)
+{
+    UNUSED(state);
+
+    bxstr_t *actual = bxs_prepend_spaces(NULL, 2);
+    assert_non_null(actual);
+    assert_string_equal("  ", actual->ascii);
+    assert_int_equal(2, (int) actual->num_chars);
+    assert_int_equal(2, (int) actual->num_chars_visible);
+    assert_int_equal(0, (int) actual->num_chars_invisible);
+
+    bxs_free(actual);
 }
 
 
