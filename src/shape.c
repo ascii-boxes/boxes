@@ -307,58 +307,6 @@ size_t widest(const sentry_t *sarr, const int n, ...)
 
 
 
-shape_t leftmost(const int aside, const int cnt)
-/*
- *  Return leftmost existing shape in specification for side aside
- *  (BTOP or BBOT), skipping cnt shapes. Corners are not considered.
- *
- *  RETURNS:    shape       if shape was found
- *              NUM_SHAPES  on error (e.g. cnt too high)
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    int c = 0;
-    int s;
-
-    if (cnt < 0) {
-        return NUM_SHAPES;
-    }
-
-    if (aside == BTOP) {
-        s = 0;
-        do {
-            ++s;
-            while (s < SHAPES_PER_SIDE - 1 &&
-                    isempty(opt.design->shape + north_side[s])) {
-                        ++s;
-            }
-            if (s == SHAPES_PER_SIDE - 1) {
-                return NUM_SHAPES;
-            }
-        } while (c++ < cnt);
-        return north_side[s];
-    }
-
-    else if (aside == BBOT) {
-        s = SHAPES_PER_SIDE - 1;
-        do {
-            --s;
-            while (s && isempty(opt.design->shape + south_side[s])) {
-                --s;
-            }
-            if (!s) {
-                return NUM_SHAPES;
-            }
-        } while (c++ < cnt);
-        return south_side[s];
-    }
-
-    return NUM_SHAPES;
-}
-
-
-
 /**
  * Return true if the shapes on the given side consist entirely of spaces - and spaces only, tabs are considered
  * non-empty.

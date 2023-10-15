@@ -69,8 +69,6 @@ int isdeepempty (const sentry_t *shape);
 size_t highest (const sentry_t *sarr, const int n, ...);
 size_t widest (const sentry_t *sarr, const int n, ...);
 
-shape_t leftmost (const int aside, const int cnt);
-
 int empty_side (sentry_t *sarr, const int aside);
 
 
