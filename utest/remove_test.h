@@ -24,10 +24,12 @@
 #include "remove.h"
 
 
-/* defined here and not in remove.h because it's only visible for testing */
+/* defined here and not in remove.h because these functions are only visible for testing */
 match_result_t *match_outer_shape(int vside, bxstr_t *input_line, bxstr_t *shape_line);
-int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, int shiftable, size_t shape_idx, uint32_t *end_pos);
+int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, uint32_t *end_pos, int anchored_left,
+        int anchored_right);
 uint32_t *shorten(shape_line_ctx_t *shape_line_ctx, size_t *quality, int prefer_left, int allow_left, int allow_right);
+void toblank_mixed(bxstr_t *org_line, uint32_t **s, size_t from, size_t to);
 
 
 void test_match_outer_shape_null(void **state);

@@ -554,7 +554,7 @@ void test_hmm_sunny_day(void **state)
     uint32_t *cur_pos = input_line + 9;  /* '-' after WCORNER */
     uint32_t *end_pos = input_line + 25; /* 'E' of ECORNER */
 
-    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 1, 1);
 
     assert_int_equal(1, actual);
 
@@ -574,7 +574,7 @@ void test_hmm_sunny_day_short(void **state)
     uint32_t *cur_pos = input_line + 7;  /* '-' after WCORNER */
     uint32_t *end_pos = input_line + 15; /* NUL */
 
-    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 1, 0);
 
     assert_int_equal(1, actual);
 
@@ -594,7 +594,7 @@ void test_hmm_missing_elastic_nne(void **state)
     uint32_t *cur_pos = input_line + 7;  /* '-' after WCORNER */
     uint32_t *end_pos = input_line + 16; /* 'E' of ECORNER */
 
-    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 1, 1);
 
     assert_int_equal(0, actual); /* should fail because NNE shape is not present */
 
@@ -614,7 +614,7 @@ void test_hmm_invalid_input(void **state)
     uint32_t *cur_pos = input_line + 5;
     uint32_t *end_pos = input_line + 2; /* before cur_pos, which is an error */
 
-    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 1, 1);
 
     assert_int_equal(0, actual); /* should fail because cur_pos > end_pos */
 
@@ -657,7 +657,7 @@ void test_hmm_empty_shapes_success(void **state)
     uint32_t *cur_pos = input_line + 8;  /* first 'x' */
     uint32_t *end_pos = input_line + 16; /* NUL */
 
-    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 1, 1);
 
     assert_int_equal(1, actual); /* matches */
 
@@ -700,7 +700,7 @@ void test_hmm_backtracking(void **state)
     uint32_t *cur_pos = input_line + 8;  /* first '-' */
     uint32_t *end_pos = input_line + 24; /* NUL */
 
-    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 1, 1);
 
     assert_int_equal(1, actual); /* matches, elastic NNW doesn't eat part of N shape */
 
@@ -743,7 +743,7 @@ void test_hmm_shiftable(void **state)
     uint32_t *cur_pos = input_line;      /* first character */
     uint32_t *end_pos = input_line + 17; /* NUL */
 
-    int actual = hmm(shapes_relevant, cur_pos, 1, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 0, 0);
 
     assert_int_equal(1, actual); /* matches */
 
@@ -763,7 +763,7 @@ void test_hmm_shortened(void **state)
     uint32_t *cur_pos = input_line;      /* first character */
     uint32_t *end_pos = input_line + 5;  /* NUL */
 
-    int actual = hmm(shapes_relevant, cur_pos, 1, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 0, 0);
 
     assert_int_equal(1, actual); /* matches, because "  NORTH  " can be shortened because shiftable */
 
@@ -806,7 +806,7 @@ void test_hmm_shortened_right_fail(void **state)
     uint32_t *cur_pos = input_line;      /* first character */
     uint32_t *end_pos = input_line + 6;  /* 'E' of "ECORNER" */
 
-    int actual = hmm(shapes_relevant, cur_pos, 1, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 0, 1);
 
     assert_int_equal(0, actual); /* does not match */
                                  /* because "  NORTH  " cannot be shortened right b/c right not shiftable */
@@ -827,7 +827,7 @@ void test_hmm_shortened_right(void **state)
     uint32_t *cur_pos = input_line;      /* first character */
     uint32_t *end_pos = input_line + 7;  /* 'E' of "ECORNER" */
 
-    int actual = hmm(shapes_relevant, cur_pos, 1, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 0, 1);
 
     assert_int_equal(1, actual); /* matches */
                                  /* because "  NORTH  " can be shortened left, and ECORNER can be shortened right */
@@ -871,7 +871,7 @@ void test_hmm_blank_shiftable(void **state)
     uint32_t *cur_pos = input_line;      /* first character */
     uint32_t *end_pos = input_line + 6;  /* NUL */
 
-    int actual = hmm(shapes_relevant, cur_pos, 1, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 0, 0);
 
     assert_int_equal(1, actual); /* matches */
 
@@ -891,7 +891,7 @@ void test_hmm_blank(void **state)
     uint32_t *cur_pos = input_line + 7;   /* first blank */
     uint32_t *end_pos = input_line + 14;  /* 'E' of "ECORNER" */
 
-    int actual = hmm(shapes_relevant, cur_pos, 0, 1, end_pos);
+    int actual = hmm(shapes_relevant, cur_pos, 1, end_pos, 1, 1);
 
     assert_int_equal(1, actual); /* matches */
 

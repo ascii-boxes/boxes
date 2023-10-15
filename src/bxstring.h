@@ -115,9 +115,8 @@ bxstr_t *bxs_trimdup(bxstr_t *pString, size_t start_idx, size_t end_idx);
 /**
  * Take a substring from the given string.
  * @param pString the source string
- * @param start_idx the index of the first visible character of the substring, used as index into `first_char` and
- *      `visible_char`
- * @param end_idx the index of the first visible character following the substring
+ * @param start_idx the index of the first character (visible or invisible) of the substring, an index into `memory`
+ * @param end_idx the index of the first character (visible or invisible) following the substring
  * @return the substring, in new memory
  */
 bxstr_t *bxs_substr(bxstr_t *pString, size_t start_idx, size_t end_idx);

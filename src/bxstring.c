@@ -259,21 +259,21 @@ bxstr_t *bxs_substr(bxstr_t *pString, size_t start_idx, size_t end_idx)
     if (pString == NULL) {
         return NULL;
     }
-    if (start_idx > pString->num_chars_visible) {
-        start_idx = pString->num_chars_visible;
+    if (start_idx > pString->num_chars) {
+        start_idx = pString->num_chars;
     }
-    if (end_idx > pString->num_chars_visible) {
-        end_idx = pString->num_chars_visible;
+    if (end_idx > pString->num_chars) {
+        end_idx = pString->num_chars;
     }
     if (end_idx < start_idx) {
         bx_fprintf(stderr, "%s: internal error: end_idx before start_idx in bxs_substr()\n", PROJECT);
         return NULL;
     }
 
-    ucs4_t save = pString->memory[pString->first_char[end_idx]];
-    set_char_at(pString->memory, pString->first_char[end_idx], char_nul);
-    bxstr_t *result = bxs_from_unicode(pString->memory + pString->first_char[start_idx]);
-    set_char_at(pString->memory, pString->first_char[end_idx], save);
+    ucs4_t save = pString->memory[end_idx];
+    set_char_at(pString->memory, end_idx, char_nul);
+    bxstr_t *result = bxs_from_unicode(pString->memory + start_idx);
+    set_char_at(pString->memory, end_idx, save);
     return result;
 }
 
