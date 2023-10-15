@@ -492,7 +492,7 @@ match_result_t *match_outer_shape(int vside, bxstr_t *input_line, bxstr_t *shape
         uint32_t *s = u32_strdup(shape_line->memory);
         for (; slen == (int) shape_line->num_chars || is_blank(s[slen]); slen--) {
             s[slen] = char_nul;
-            uint32_t *p = u32_strnrstr(input_line->memory, s, slen, 0);
+            uint32_t *p = u32_strnrstr(input_line->memory, s, slen);
             size_t p_idx = p != NULL ? p - input_line->memory : 0;
             if (p == NULL || p_idx + slen
                     < input_line->first_char[input_line->num_chars_visible - input_line->trailing]) {
@@ -714,7 +714,7 @@ static void match_vertical_side(remove_ctx_t *ctx, int vside, shape_line_ctx_t *
                 p = u32_strstr(input_line, shape_text);
             }
             else {
-                p = u32_strnrstr(input_line, shape_text, quality, 0);
+                p = u32_strnrstr(input_line, shape_text, quality);
             }
             BFREE(to_free);
             shape_text = NULL;

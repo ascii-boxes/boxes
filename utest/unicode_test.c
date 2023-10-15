@@ -170,13 +170,10 @@ void test_u32_strnrstr(void **state)
     uint32_t *needle = u32_strconv_from_arg("found", "ASCII");
     assert_non_null(needle);
 
-    assert_null(u32_strnrstr(NULL, needle, u32_strlen(needle), 0));
-    assert_ptr_equal(haystack, u32_strnrstr(haystack, NULL, 0, 0));
+    assert_null(u32_strnrstr(NULL, needle, u32_strlen(needle)));
+    assert_ptr_equal(haystack, u32_strnrstr(haystack, NULL, 0));
 
-    uint32_t *actual = u32_strnrstr(haystack, needle, u32_strlen(needle), 1);
-    assert_ptr_equal(haystack + 6, actual);
-
-    actual = u32_strnrstr(haystack, needle, u32_strlen(needle), -1); /* -1 will be "fixed" to 0 */
+    uint32_t *actual = u32_strnrstr(haystack, needle, u32_strlen(needle));
     assert_ptr_equal(haystack + 12, actual);
 
     BFREE(haystack);

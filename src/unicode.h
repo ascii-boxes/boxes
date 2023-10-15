@@ -228,10 +228,9 @@ uint32_t *u32_nspaces(const size_t n);
  * @param haystack string to search
  * @param needle string to search for in `haystack`
  * @param needle_len length in characters of `needle`
- * @param skip number of finds to ignore before returning anything
  * @return pointer to last occurrence of string `needle` in string `haystack`; NULL if not found or error
  */
-uint32_t *u32_strnrstr(const uint32_t *haystack, const uint32_t *needle, const size_t needle_len, int skip);
+uint32_t *u32_strnrstr(const uint32_t *haystack, const uint32_t *needle, const size_t needle_len);
 
 
 /**
