@@ -207,41 +207,6 @@ uint32_t *advance_next32(const uint32_t *s, size_t *invis)
 
 
 
-uint32_t *advance32(uint32_t *s, const size_t offset)
-{
-    if (is_empty(s)) {
-        return new_empty_string32();
-    }
-    if (offset == 0) {
-        return s;
-    }
-
-    size_t count = 0;                 /* the count of visible characters */
-    int visible = 1;                  /* flag indicating whether the previous char was a visible char */
-    const uint32_t *last_esc = NULL;  /* pointer to the start of the last escape sequence encountered */
-    const uint32_t *rest = s;         /* pointer to the next character coming up */
-    size_t step_invis = 0;            /* unused, but required for advance_next32() call */
-
-    for (ucs4_t c = s[0]; c != char_nul; c = rest[0]) {
-        if (c == char_esc) {
-            last_esc = rest;
-            visible = 0;
-        } else {
-            if (count++ == offset) {
-                if (!visible && last_esc != NULL) {
-                    return (uint32_t *) last_esc;
-                }
-                break;
-            }
-            visible = 1;
-        }
-        rest = advance_next32(rest, &step_invis);
-    }
-    return (uint32_t *) rest;         /* may point to zero terminator when offset too large */
-}
-
-
-
 uint32_t *u32_strconv_from_input(const char *src)
 {
     return u32_strconv_from_arg(src, encoding);

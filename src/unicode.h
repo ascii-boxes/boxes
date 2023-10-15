@@ -153,20 +153,6 @@ uint32_t *advance_next32(const uint32_t *s, size_t *invis);
 
 
 /**
- * Determine a new position in the given string s with the given offset of visible characters.
- * If the character right in front of the target character is invisible, then the pointer is moved to the start of
- * that invisible sequence. The purpose is to catch any escape sequences which would for example color the character.
- * CHECK This is redundant, bxstrings can do this better.
- *
- * @param s The pointer to the start position. Is assumed to point either at the ESC at the start of an escape
- *      sequence, or to be positioned outside an escape sequence.
- * @param offset the number of visible character positions to advance the pointer
- * @return a pointer to the new position in s, or 0 if the end of the string was reached
- */
-uint32_t *advance32(uint32_t *s, const size_t offset);
-
-
-/**
  * Convert a string from the input/output encoding (`encoding` in this .h file) to UTF-32 internal representation.
  * Memory will be allocated for the converted string.
  *
