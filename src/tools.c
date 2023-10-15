@@ -148,71 +148,6 @@ int strisno(const char *s)
 
 
 
-void concat_strings(char *dst, int max_len, int count, ...)
-/*
- *  Concatenate a variable number of strings into a fixed-length buffer.
- *
- *      dst     Destination array
- *      max_len Maximum resulting string length (including terminating NULL).
- *      count   Number of source strings.
- *
- *  The concatenation process terminates when either the destination
- *  buffer is full or all 'count' strings are processed.  Null string
- *  pointers are treated as empty strings.
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    va_list va;
-    const char *src;
-
-    va_start(va, count);
-
-    /*
-     *  Sanity check.
-     */
-    if (max_len < 1) {
-        return;
-    }
-
-    if (max_len == 1 || count < 1) {
-        *dst = '\0';
-        return;
-    }
-
-    /*
-     *  Loop over all input strings.
-     */
-    while (count-- > 0 && max_len > 1) {
-        /*
-         * Grab an input string pointer.  If it's NULL, skip it (eg. treat
-         * it as empty.
-         */
-        src = va_arg(va, const char *);
-
-        if (src == NULL) {
-            continue;
-        }
-
-        /*
-         * Concatenate 'src' onto 'dst', as long as we have room.
-         */
-        while (*src && max_len > 1) {
-            *dst++ = *src++;
-            max_len--;
-        }
-    }
-
-    va_end(va);
-
-    /*
-     * Terminate the string with an ASCII NUL.
-     */
-    *dst = '\0';
-}
-
-
-
 char *concat_strings_alloc(size_t count, ...)
 {
     if (count < 1) {
@@ -400,59 +335,6 @@ void btrim32(uint32_t *text, size_t *len)
 
     set_char_at(text, (size_t) (last_char_pos + 1), char_nul);
     *len = (size_t) (last_char_pos + 1);
-}
-
-
-
-char *my_strnrstr(const char *s1, const char *s2, const size_t s2_len, int skip)
-/*
- *  Return pointer to last occurrence of string s2 in string s1.
- *
- *      s1       string to search
- *      s2       string to search for in s1
- *      s2_len   length in characters of s2
- *      skip     number of finds to ignore before returning anything
- *
- *  RETURNS: pointer to last occurrence of string s2 in string s1
- *           NULL if not found or error
- *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-{
-    char *p;
-    int comp;
-
-    if (!s2 || *s2 == '\0') {
-        return (char *) s1;
-    }
-    if (!s1 || *s1 == '\0') {
-        return NULL;
-    }
-    if (skip < 0) {
-        skip = 0;
-    }
-
-    p = strrchr(s1, s2[0]);
-    if (!p) {
-        return NULL;
-    }
-
-    while (p >= s1) {
-        comp = strncmp(p, s2, s2_len);
-        if (comp == 0) {
-            if (skip--) {
-                --p;
-            }
-            else {
-                return p;
-            }
-        }
-        else {
-            --p;
-        }
-    }
-
-    return NULL;
 }
 
 
