@@ -1,0 +1,26 @@
+:DESC
+In this test case, the box design is fully colored, but the input is monochrome.
+This tests the comparison mode 'ignore_invisible_shape'.
+
+:ARGS
+--config 18x_remove_box_ignore_invisible_all.cfg --design designA --remove
+:INPUT
+         .-"```"-.
+        /_______; \
+       (_________)\|
+       / / 👁 👁 \ \(_)
+      / ( \___/ ) \
+  _ooo\__\_____/__/____
+ /                     \
+|     Hello World!      |
+ \_________________ooo_/
+      /           \
+     /:.:.:.:.:.:.:\
+         |  |  |
+         \==|==/  jgs
+         /-'Y'-\
+        (__/ \__)
+:OUTPUT-FILTER
+:EXPECTED
+    Hello World!
+:EOF

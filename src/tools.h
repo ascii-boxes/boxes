@@ -156,10 +156,12 @@ size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, s
 
 
 /**
- * Determine whether the given sequence of characters is a CSI (also called "escape sequence") that resets all
- * modifications, typically `ESC[0m`.
- * @param csi a pointer into a zero-terminated UTF-32 string
- * @returns 1 if true, 0 if false
+ * Determine if `csi` points at a CSI which can be considered a "reset" sequence.
+ * https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+ * We recognize `\x1b[0m`, and also 10, 39, 49, 59, and 75 instead of 0 as "resets", because they all serve to reset
+ * the terminal to some default. Especially, lolcat uses `\x1b[39m` as reset CSI.
+ * @param csi a string which might or might not be a CSI "reset" sequence (zero-terminated UTF-32 string)
+ * @return 1 if it was a CSI "reset", 0 otherwise
  */
 int is_csi_reset(const uint32_t *csi);
 

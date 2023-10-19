@@ -24,6 +24,7 @@
 #include <unistd.h>
 
 #include "boxes.h"
+#include "bxstring.h"
 #include "cmdline.h"
 #include "discovery.h"
 #include "generate.h"

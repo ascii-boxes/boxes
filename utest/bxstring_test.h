@@ -35,6 +35,7 @@ void test_ansi_unicode_illegalchar(void **state);
 void test_ansi_unicode_tabs(void **state);
 void test_ansi_unicode_broken_escapes(void **state);
 void test_ansi_unicode_null(void **state);
+void test_ansi_unicode_tc183(void **state);
 
 void test_bxs_new_empty_string(void **state);
 

@@ -135,6 +135,7 @@ int main(void)
         cmocka_unit_test_setup(test_ansi_unicode_tabs, beforeTest),
         cmocka_unit_test_setup(test_ansi_unicode_broken_escapes, beforeTest),
         cmocka_unit_test_setup(test_ansi_unicode_null, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_tc183, beforeTest),
         cmocka_unit_test_setup(test_bxs_new_empty_string, beforeTest),
         cmocka_unit_test_setup(test_bxs_is_blank, beforeTest),
         cmocka_unit_test_setup(test_bxs_strdup, beforeTest),

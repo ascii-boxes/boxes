@@ -400,6 +400,9 @@ static int hmm_shiftable(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, s
                 if (p != NULL && p < end_pos && is_blank_between(cur_pos, p)) {
                     result = hmm(shapes_relevant, p + quality, i + (shapes_relevant[i].elastic ? 0 : 1),
                             end_pos, 1, anchored_right);
+                    if (result == 0 && shapes_relevant[i].elastic) {
+                        result = hmm(shapes_relevant, p + quality, i + 1, end_pos, 1, anchored_right);
+                    }
                     break;
                 }
                 if (can_shorten_right == -1) {
@@ -521,6 +524,9 @@ static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx,
             continue;
         }
         ctx->comp_type = comp_type;
+        #ifdef DEBUG
+            fprintf(stderr, "  Setting comparison type to: %s\n", comparison_name[comp_type]);
+        #endif
 
         shape_line_ctx_t *shapes_relevant = prepare_comp_shapes_horiz(hside, comp_type, shape_line_idx);
         debug_print_shapes_relevant(shapes_relevant);

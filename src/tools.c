@@ -566,6 +566,14 @@ int is_csi_reset(const uint32_t *csi)
                     if (puc >= 0x40 && puc <= 0x7e) {
                         return 1;
                     }
+                    else if ((puc == '1' && *rest == '0')
+                          || (puc == '3' && *rest == '9')
+                          || (puc == '4' && *rest == '9')
+                          || (puc == '5' && *rest == '9')
+                          || (puc == '7' && *rest == '5')) {
+                        rest = u32_next(&puc, rest);
+                        break;
+                    }
                     return 0;
                 }
                 break;

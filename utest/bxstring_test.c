@@ -353,6 +353,34 @@ void test_ansi_unicode_null(void **state)
 
 
 
+void test_ansi_unicode_tc183(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("\x1b[38;5;43m|\x1b[39m\x1b[38;5;49m \x1b[39m    X", "ASCII");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_string_equal("|     X", actual->ascii);
+    assert_int_equal(0, (int) actual->indent);
+    assert_int_equal(7, (int) actual->num_columns);
+    assert_int_equal(37, (int) actual->num_chars);
+    assert_int_equal(7, (int) actual->num_chars_visible);
+    assert_int_equal(30, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+    int expected_firstchar_idx[] = {0, 16, 32, 33, 34, 35, 36, 37};
+    assert_array_equal(expected_firstchar_idx, actual->first_char, 8);
+    int expected_vischar_idx[] = {10, 26, 32, 33, 34, 35, 36, 37};
+    assert_array_equal(expected_vischar_idx, actual->visible_char, 8);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
 void test_bxs_new_empty_string(void **state)
 {
     UNUSED(state);
