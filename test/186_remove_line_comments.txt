@@ -1,0 +1,28 @@
+:DESC
+Removes 'ada-cmt' line comments. Resulting three blank lines at top and bottom are not removed, because the default
+for 'killblank' is false when top and bottom box sides are open, as is the case here.
+
+:ARGS
+--design ada-cmt --remove
+:INPUT
+--
+--
+--
+-- foo
+-- bar
+-- boo
+--
+--
+--
+:OUTPUT-FILTER
+:EXPECTED
+
+
+
+foo
+bar
+boo
+
+
+
+:EOF

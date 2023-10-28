@@ -588,13 +588,15 @@ static size_t find_top_side(remove_ctx_t *ctx)
 {
     size_t result = ctx->top_start_idx;
     sentry_t *shapes = opt.design->shape;
-    for (size_t input_line_idx = ctx->top_start_idx, shape_line_count = 0;
-            input_line_idx < input.num_lines && shape_line_count < shapes[NE].height;
-            input_line_idx++, shape_line_count++)
+    for (size_t input_line_idx = ctx->top_start_idx;
+            input_line_idx < input.num_lines && input_line_idx < ctx->top_start_idx + shapes[NE].height;
+            input_line_idx++)
     {
         int matched = 0;
-        for (size_t shape_line_idx = input_line_idx - ctx->top_start_idx;;
-                shape_line_idx = (shape_line_idx + 1) % shapes[NE].height)
+        size_t shape_lines_tested = 0;
+        for (size_t shape_line_idx = (input_line_idx - ctx->top_start_idx) % shapes[NE].height;
+                shape_lines_tested < shapes[NE].height;
+                shape_line_idx = (shape_line_idx + 1) % shapes[NE].height, shape_lines_tested++)
         {
             if (match_horiz_line(ctx, BTOP, input_line_idx, shape_line_idx)) {
                 matched = 1;
@@ -613,15 +615,18 @@ static size_t find_top_side(remove_ctx_t *ctx)
 
 static size_t find_bottom_side(remove_ctx_t *ctx)
 {
-    size_t result = ctx->top_start_idx;
+    size_t result = ctx->bottom_end_idx;
     sentry_t *shapes = opt.design->shape;
-    for (long input_line_idx = (long) ctx->bottom_end_idx - 1, shape_line_count = (long) shapes[SE].height - 1;
-            input_line_idx >= 0 && shape_line_count >= 0;
-            input_line_idx--, shape_line_count--)
+    for (long input_line_idx = (long) ctx->bottom_end_idx - 1;
+            input_line_idx >= 0 && input_line_idx >= (long) ctx->bottom_end_idx - (long) shapes[SE].height;
+            input_line_idx--)
     {
         int matched = 0;
-        for (size_t shape_line_idx = shapes[SE].height - (ctx->bottom_end_idx - input_line_idx);;
-                shape_line_idx = (shape_line_idx + 1) % shapes[SE].height)
+        size_t shape_lines_tested = 0;
+        for (long shape_line_idx = shapes[SE].height - (ctx->bottom_end_idx - input_line_idx);
+                shape_line_idx >= 0 && shape_lines_tested < shapes[SE].height;
+                shape_lines_tested++,
+                shape_line_idx = shape_line_idx == 0 ? (long) (shapes[SE].height - 1) : (long) (shape_line_idx - 1))
         {
             if (match_horiz_line(ctx, BBOT, input_line_idx, shape_line_idx)) {
                 matched = 1;
@@ -1088,6 +1093,10 @@ int remove_box()
     else {
         ctx->top_end_idx = find_top_side(ctx);
     }
+    #ifdef DEBUG
+        fprintf(stderr, "ctx->top_start_idx = %d, ctx->top_end_idx = %d\n", (int) ctx->top_start_idx,
+                (int) ctx->top_end_idx);
+    #endif
 
     ctx->bottom_end_idx = find_last_line() + 1;
     if (ctx->empty_side[BBOT]) {
@@ -1095,9 +1104,13 @@ int remove_box()
     }
     else {
         ctx->bottom_start_idx = find_bottom_side(ctx);
-        if (ctx->bottom_start_idx > ctx->top_end_idx) {
-            ctx->body_num_lines = ctx->bottom_start_idx - ctx->top_end_idx;
-        }
+    }
+    #ifdef DEBUG
+        fprintf(stderr, "ctx->bottom_start_idx = %d, ctx->bottom_end_idx = %d\n", (int) ctx->bottom_start_idx,
+                (int) ctx->bottom_end_idx);
+    #endif
+    if (ctx->bottom_start_idx > ctx->top_end_idx) {
+        ctx->body_num_lines = ctx->bottom_start_idx - ctx->top_end_idx;
     }
 
     if (ctx->body_num_lines > 0) {

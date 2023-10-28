@@ -1,0 +1,21 @@
+:DESC
+Removes 'ada-cmt' line comments. Resulting three blank lines at top and bottom are removed ("killblank").
+
+:ARGS
+--design ada-cmt --remove --kill-blank
+:INPUT
+--
+--
+--
+-- foo
+-- bar
+-- boo
+--
+--
+--
+:OUTPUT-FILTER
+:EXPECTED
+foo
+bar
+boo
+:EOF

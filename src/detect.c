@@ -185,9 +185,16 @@ uint32_t *prepare_comp_shape(
 uint32_t *prepare_comp_input(size_t input_line_idx, int trim_left, comparison_t comp_type, size_t offset_right,
     size_t *out_indent, size_t *out_trailing)
 {
+    #ifdef DEBUG
+        fprintf(stderr, "prepare_comp_input(%d, %s, %s, %d, %p, %p)", (int) input_line_idx,
+                trim_left ? "true" : "false", comparison_name[comp_type], (int) offset_right, out_indent, out_trailing);
+    #endif
     if (input_line_idx >= input.num_lines) {
         bx_fprintf(stderr, "%s: prepare_comp_input(%d, %d, %s, %d): Index out of bounds\n", PROJECT,
                 (int) input_line_idx, trim_left, comparison_name[comp_type], (int) offset_right);
+        #ifdef DEBUG
+            fprintf(stderr, " -> (null)\n");
+        #endif
         return NULL;
     }
     bxstr_t *input_line = input.lines[input_line_idx].text;
@@ -237,6 +244,11 @@ uint32_t *prepare_comp_input(size_t input_line_idx, int trim_left, comparison_t 
                     - input_line->first_char[input_line->num_chars_visible - input_line->trailing];
         }
     }
+    #ifdef DEBUG
+        char *out_result = u32_strconv_to_output(result);
+        fprintf(stderr, " -> \"%s\"\n", out_result);
+        BFREE(out_result);
+    #endif
     return result;
 }
 
@@ -305,6 +317,9 @@ static size_t find_east_corner(design_t *current_design, comparison_t comp_type,
 {
     size_t hits = 0;
     if (empty[BRIG] || (empty[BTOP] && corner == NE) || (empty[BBOT] && corner == SE)) {
+        #ifdef DEBUG
+            fprintf(stderr, "Checking %s corner produced %d hits.\n", shape_name[corner], (int) hits);
+        #endif
         return hits;
     }
 
@@ -327,7 +342,7 @@ static size_t find_east_corner(design_t *current_design, comparison_t comp_type,
             }
 
             uint32_t *input_relevant = prepare_comp_input(a, 0, comp_type, length_relevant, NULL, NULL);
-            if (u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
+            if (input_relevant && (u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0)) {
                 ++hits; /* CHECK more hit points for longer matches, or simple boxes might match too easily */
             }
         }
@@ -355,7 +370,11 @@ static size_t find_horizontal_shape(design_t *current_design, comparison_t comp_
 {
     size_t hits = 0;
     if (empty[BTOP] || empty[BBOT]) {
-        return 0;   /* horizontal box part is empty */
+        /* horizontal box part is empty */
+        #ifdef DEBUG
+            fprintf(stderr, "Checking %-3s shape produced %d hits.\n", shape_name[hshape], (int) hits);
+        #endif
+        return hits;
     }
 
     for (size_t j = 0; j < current_design->shape[hshape].height; ++j) {
@@ -398,7 +417,7 @@ static size_t find_horizontal_shape(design_t *current_design, comparison_t comp_
     }
 
     #ifdef DEBUG
-        fprintf(stderr, "Checking %s shape produced %d hits.\n", shape_name[hshape], (int) hits);
+        fprintf(stderr, "Checking %-3s shape produced %d hits.\n", shape_name[hshape], (int) hits);
     #endif
     return hits;
 }
@@ -419,36 +438,37 @@ static size_t find_vertical_west(design_t *current_design, comparison_t comp_typ
     size_t hits = 0;
     if (((empty[BTOP] ? 0 : current_design->shape[NW].height) + (empty[BBOT] ? 0 : current_design->shape[SW].height))
             >= input.num_lines) {
-        return hits;
+        /* no hits */
     }
-    if (isempty(current_design->shape + vshape)) {
-        return hits;
+    else if (isempty(current_design->shape + vshape)) {
+        /* no hits */
     }
+    else {
+        for (size_t k = empty[BTOP] ? 0 : current_design->shape[NW].height;
+                k < input.num_lines - (empty[BBOT] ? 0 : current_design->shape[SW].height); ++k)
+        {
+            uint32_t *input_relevant = prepare_comp_input(k, 1, comp_type, 0, NULL, NULL);
 
-    for (size_t k = empty[BTOP] ? 0 : current_design->shape[NW].height;
-            k < input.num_lines - (empty[BBOT] ? 0 : current_design->shape[SW].height); ++k)
-    {
-        uint32_t *input_relevant = prepare_comp_input(k, 1, comp_type, 0, NULL, NULL);
+            for (size_t j = 0; j < current_design->shape[vshape].height; ++j) {
+                bxstr_t *shape_line = current_design->shape[vshape].mbcs[j];
+                if (bxs_is_blank(shape_line)) {
+                    continue;
+                }
 
-        for (size_t j = 0; j < current_design->shape[vshape].height; ++j) {
-            bxstr_t *shape_line = current_design->shape[vshape].mbcs[j];
-            if (bxs_is_blank(shape_line)) {
-                continue;
+                uint32_t *shape_relevant = prepare_comp_shape(current_design, vshape, j, comp_type, 1, 0);
+                size_t length_relevant = u32_strlen(shape_relevant);
+
+                if (u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
+                    ++hits;
+                    break;
+                }
+                BFREE(shape_relevant);
             }
-
-            uint32_t *shape_relevant = prepare_comp_shape(current_design, vshape, j, comp_type, 1, 0);
-            size_t length_relevant = u32_strlen(shape_relevant);
-
-            if (u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
-                ++hits;
-                break;
-            }
-            BFREE(shape_relevant);
         }
     }
 
     #ifdef DEBUG
-        fprintf(stderr, "Checking %s shape produced %d hits.\n", shape_name[vshape], (int) hits);
+        fprintf(stderr, "Checking %-3s shape produced %d hits.\n", shape_name[vshape], (int) hits);
     #endif
     return hits;
 }
@@ -469,35 +489,36 @@ static size_t find_vertical_east(design_t *current_design, comparison_t comp_typ
     size_t hits = 0;
     if (((empty[BTOP] ? 0 : current_design->shape[NW].height) + (empty[BBOT] ? 0 : current_design->shape[SW].height))
             >= input.num_lines) {
-        return hits;
+        /* no hits */
     }
-    if (isempty(current_design->shape + vshape)) {
-        return hits;
+    else if (isempty(current_design->shape + vshape)) {
+        /* no hits */
     }
-
-    for (size_t j = 0; j < current_design->shape[vshape].height; ++j) {
-        bxstr_t *shape_line = current_design->shape[vshape].mbcs[j];
-        if (bxs_is_blank(shape_line)) {
-            continue;
-        }
-
-        uint32_t *shape_relevant = prepare_comp_shape(current_design, vshape, j, comp_type, 1, 1);
-        size_t length_relevant = u32_strlen(shape_relevant);
-
-        for (size_t k = empty[BTOP] ? 0 : current_design->shape[NW].height;
-                k < input.num_lines - (empty[BBOT] ? 0 : current_design->shape[SW].height); ++k)
-        {
-            uint32_t *input_relevant = prepare_comp_input(k, 0, comp_type, length_relevant, NULL, NULL);
-            if (input_relevant != NULL && u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
-                ++hits;
-                break;
+    else {
+        for (size_t j = 0; j < current_design->shape[vshape].height; ++j) {
+            bxstr_t *shape_line = current_design->shape[vshape].mbcs[j];
+            if (bxs_is_blank(shape_line)) {
+                continue;
             }
+
+            uint32_t *shape_relevant = prepare_comp_shape(current_design, vshape, j, comp_type, 1, 1);
+            size_t length_relevant = u32_strlen(shape_relevant);
+
+            for (size_t k = empty[BTOP] ? 0 : current_design->shape[NW].height;
+                    k < input.num_lines - (empty[BBOT] ? 0 : current_design->shape[SW].height); ++k)
+            {
+                uint32_t *input_relevant = prepare_comp_input(k, 0, comp_type, length_relevant, NULL, NULL);
+                if (input_relevant != NULL && u32_strncmp(input_relevant, shape_relevant, length_relevant) == 0) {
+                    ++hits;
+                    break;
+                }
+            }
+            BFREE(shape_relevant);
         }
-        BFREE(shape_relevant);
     }
 
     #ifdef DEBUG
-        fprintf(stderr, "Checking %s shape produced %d hits.\n", shape_name[vshape], (int) hits);
+        fprintf(stderr, "Checking %-3s shape produced %d hits.\n", shape_name[vshape], (int) hits);
     #endif
     return hits;
 }
@@ -568,7 +589,7 @@ design_t *autodetect_design()
 
             #ifdef DEBUG
                 fprintf(stderr, "CONSIDERING DESIGN ---- \"%s\" ---------------\n", current_design->name);
-                fprintf(stderr, "    comparison_type = '%s'\n", comparison_name[comp_type]);
+                fprintf(stderr, "    comparison_type = %s\n", comparison_name[comp_type]);
             #endif
             long hits = match_design(current_design, comp_type);
             #ifdef DEBUG
