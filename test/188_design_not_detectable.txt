@@ -1,0 +1,11 @@
+:DESC
+Tests that a proper error message is produced when the box design cannot be detected.
+
+:ARGS
+-r
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: Box design autodetection failed. Use -d option.
+:EOF

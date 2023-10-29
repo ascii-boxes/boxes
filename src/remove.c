@@ -730,11 +730,13 @@ static void match_vertical_side(remove_ctx_t *ctx, int vside, shape_line_ctx_t *
             BFREE(to_free);
             shape_text = NULL;
 
-            if (p == NULL) {
+            if ((p == NULL)
+                    || (vside == BLEF && ((size_t) (p - input_line) > input_indent + (max_quality - quality)))
+                    || (vside == BRIG && ((size_t) (p - input_line) < input_length - input_trailing - quality))) {
                 shape_text = shorten(*shape_line_ctx, &quality, vside == BLEF, 1, 1);
                 to_free = shape_text;
             }
-            else if (vside == BLEF && ((size_t) (p - input_line) <= input_indent + (max_quality - quality))) {
+            else if (vside == BLEF) {
                 if (quality > line_ctx->west_quality) {
                     line_ctx->west_start = (size_t) (p - input_line);
                     line_ctx->west_end = line_ctx->west_start + quality;
@@ -744,7 +746,7 @@ static void match_vertical_side(remove_ctx_t *ctx, int vside, shape_line_ctx_t *
                     break;
                 }
             }
-            else if (vside == BRIG && ((size_t) (p - input_line) >= input_length - input_trailing - quality)) {
+            else if (vside == BRIG) {
                 if (quality > line_ctx->east_quality) {
                     line_ctx->east_start = (size_t) (p - input_line);
                     line_ctx->east_end = line_ctx->east_start + quality;

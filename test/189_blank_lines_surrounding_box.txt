@@ -1,0 +1,22 @@
+:DESC
+Blank lines above and below the box are retained when the box is removed.
+There are some spaces in the line just above the box.
+
+:ARGS
+-r -d jstone
+:INPUT
+
+   
+/*-------------+
+ | Lorem Ipsum |
+ +-------------*/
+
+
+:OUTPUT-FILTER
+:EXPECTED
+
+   
+Lorem Ipsum
+
+
+:EOF
