@@ -72,7 +72,7 @@ boxes.static: $(ALL_OBJ) | check_dir
 	if [ "$(STRIP)" = "true" ] ; then strip $(BOXES_EXECUTABLE_NAME) ; fi
 
 boxes.exe: $(ALL_OBJ) | check_dir
-	$(CC) $(LDFLAGS) $^ -o $@ -lkernel32 -l:libunistring.a -l:libpcre2-32.a -l:libiconv.a -l:libncurses.a
+	$(CC) $(LDFLAGS) $^ -o $@ -lkernel32 -l:libunistring.a -l:libpcre2-32.a -l:libiconv.a
 	if [ "$(STRIP)" = "true" ] ; then strip $@ ; fi
 
 
@@ -91,8 +91,8 @@ flags_static:
 	echo $(filter-out boxes.o,$(ALL_OBJ)) > $(OUT_DIR)/modules.txt
 
 flags_win32:
-	$(eval CFLAGS := -Os -s -m32 -I. -I$(SRC_DIR) -I$(LIBNCURSES_WIN_INCLUDE) -Wall -W $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := $(LDFLAGS) -s -m32)
+	$(eval CFLAGS := -Os -s -m32 -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS) -s -m32 $(LDFLAGS_ADDTL))
 	$(eval BOXES_EXECUTABLE_NAME := boxes.exe)
 	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
 	echo $(filter-out boxes.o,$(ALL_OBJ)) > $(OUT_DIR)/modules.txt

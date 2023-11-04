@@ -15,7 +15,9 @@
 
 #include "config.h"
 
+#ifndef __MINGW32__
 #include <ncurses.h>
+#endif
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -400,19 +402,30 @@ static void handle_remove_box()
 
 
 
-/* These two functions are actually declared in term.h, but for some reason, that can't be included. */
-extern NCURSES_EXPORT(int) setupterm (NCURSES_CONST char *, int, int *);
-extern NCURSES_EXPORT(int) tigetnum (NCURSES_CONST char *);
+#ifndef __MINGW32__
+    /* These two functions are actually declared in term.h, but for some reason, that can't be included. */
+    extern NCURSES_EXPORT(int) setupterm(NCURSES_CONST char *, int, int *);
+    extern NCURSES_EXPORT(int) tigetnum(NCURSES_CONST char *);
+#endif
 
 static int terminal_has_colors()
 {
     int result = 0;
     char *termtype = getenv("TERM");
-    if (termtype != NULL && setupterm(termtype, STDOUT_FILENO, NULL) == OK && tigetnum("colors") >= 8) {
-        result = 1;
-    }
+    #ifdef __MINGW32__
+        result = 1; /* On Windows, we always assume color capability. */
+        UNUSED(termtype);
+    #else
+        if (termtype != NULL && setupterm(termtype, STDOUT_FILENO, NULL) == OK && tigetnum("colors") >= 8) {
+            result = 1;
+        }
+    #endif
     #if defined(DEBUG)
-        int num_colors = result ? tigetnum("colors") : 0;
+        #ifdef __MINGW32__
+            int num_colors = 1;
+        #else
+            int num_colors = result ? tigetnum("colors") : 0;
+        #endif
         fprintf(stderr, "Terminal \"%s\" %s colors (number of colors = %d).\n", termtype != NULL ? termtype : "(null)",
                 result ? "has" : "does NOT have", num_colors);
     #endif

@@ -121,7 +121,7 @@ $(LIBUNISTRING_DIR)/lib/.libs/libunistring.a: vendor/libunistring-$(LIBUNISTRING
 	cd $(LIBUNISTRING_DIR) ; ./configure --enable-static ; $(MAKE)
 
 vendor/libncurses-$(LIBNCURSES_VERSION).tar.gz: | vendor
-	curl -L http://invisible-mirror.net/archives/ncurses/ncurses-$(LIBNCURSES_VERSION).tar.gz --output $@
+	curl -L https://invisible-mirror.net/archives/ncurses/ncurses-$(LIBNCURSES_VERSION).tar.gz --output $@
 
 $(LIBNCURSES_DIR)/lib/libncurses.a: vendor/libncurses-$(LIBNCURSES_VERSION).tar.gz
 	tar -C vendor -xzf vendor/libncurses-$(LIBNCURSES_VERSION).tar.gz
