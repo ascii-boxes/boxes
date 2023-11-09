@@ -672,12 +672,14 @@ opt_t *process_commandline(int argc, char *argv[])
 
             case 'a':
                 if (alignment(result, optarg) != 0) {
+                    BFREE(result);
                     return NULL;
                 }
                 break;
 
             case 'c':
                 if (command_line_design(result, optarg) != 0) {
+                    BFREE(result);
                     return NULL;
                 }
                 break;
@@ -692,12 +694,14 @@ opt_t *process_commandline(int argc, char *argv[])
 
             case 'd':
                 if (design_choice(result, optarg) != 0) {
+                    BFREE(result);
                     return NULL;
                 }
                 break;
 
             case 'e':
                 if (eol_override(result, optarg) != 0) {
+                    BFREE(result);
                     return NULL;
                 }
                 break;
@@ -712,12 +716,14 @@ opt_t *process_commandline(int argc, char *argv[])
 
             case 'i':
                 if (indentation_mode(result, optarg) != 0) {
+                    BFREE(result);
                     return NULL;
                 }
                 break;
 
             case 'k':
                 if (killblank(result, optarg) != 0) {
+                    BFREE(result);
                     return NULL;
                 }
                 break;
@@ -748,18 +754,21 @@ opt_t *process_commandline(int argc, char *argv[])
                 result->encoding = strdup(optarg);   /* character encoding */
                 if (result->encoding == NULL) {
                     perror(PROJECT);
+                    BFREE(result);
                     return NULL;
                 }
                 break;
 
             case 'p':
                 if (padding(result, optarg) != 0) {
+                    BFREE(result);
                     return NULL;
                 }
                 break;
 
             case 'q':
                 if (query(result, optarg) != 0) {
+                    BFREE(result);
                     return NULL;
                 }
                 break;
@@ -770,12 +779,14 @@ opt_t *process_commandline(int argc, char *argv[])
 
             case 's':
                 if (size_of_box(result, optarg) != 0) {
+                    BFREE(result);
                     return NULL;
                 }
                 break;
 
             case 't':
                 if (tab_handling(result, optarg) != 0) {
+                    BFREE(result);
                     return NULL;
                 }
                 break;
@@ -788,6 +799,7 @@ opt_t *process_commandline(int argc, char *argv[])
             case '?':
                 /* Missing argument or illegal option - do nothing else */
                 usage_short(stderr);
+                BFREE(result);
                 return NULL;
 
             case EOF:
@@ -796,11 +808,13 @@ opt_t *process_commandline(int argc, char *argv[])
 
             default:
                 bx_fprintf(stderr, "%s: internal error\n", PROJECT);
+                BFREE(result);
                 return NULL;
         }
     } while (oc != EOF);
 
     if (input_output_files(result, argv, optind) != 0) {
+        BFREE(result);
         return NULL;
     }
 
