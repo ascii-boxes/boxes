@@ -1,0 +1,13 @@
+[requires]
+libunistring/0.9.10  # https://conan.io/center/recipes/libunistring
+pcre2/10.42  # https://conan.io/center/recipes/pcre2
+ncurses/6.4  # https://github.com/valgur/conan-center-index/tree/migrate/ncurses/recipes/ncurses/all
+flex/2.6.4  # https://conan.io/center/recipes/flex
+
+[tool_requires]
+flex/2.6.4  # https://conan.io/center/recipes/flex
+bison/3.8.2  # https://conan.io/center/recipes/bison
+
+[generators]
+CMakeDeps
+CMakeToolchain
