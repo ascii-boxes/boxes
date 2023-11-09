@@ -1,0 +1,21 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+root = true
+
+[*]
+charset = utf-8
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{xml,json,yml,yaml}]
+indent_size = 2
+
+[*.{sh,bash,zsh}]
+end_of_line = lf
+[*.{cmd,bat,ps1}]
+end_of_line = crlf
+
+[*.md]
+trim_trailing_whitespace = false

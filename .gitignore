@@ -37,6 +37,7 @@
 *.o
 *.a
 /test/*.tmp
+/venv/
 /vendor/
 /datagen/
 /build/
@@ -66,8 +67,3 @@ CMakeUserPresets.json
 
 # Misc
 /vs
-
-# CMake / Conan
-build/
-/venv/
-CMakeUserPresets.json
