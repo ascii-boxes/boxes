@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.27)
 
+# Build options options
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option(DISABLE_TESTING "Disable test compilation" OFF)
+option(ENABLE_COVERAGE "Enable coverage measurement" OFF)
+
 # Project and generated target name.
 project(boxes LANGUAGES C)
+
+# =============================================================================
 
 # Boxes version, fallback in case not in a boxes Git repository.
 set(BVERSION "2.2.2-dev")
@@ -29,6 +36,7 @@ add_custom_command(
     COMMAND sed -e "s|--BVERSION--|${BVERSION}|; s|--GLOBALCONF--|${GLOBALCONF}|"
                 ${CMAKE_CURRENT_SOURCE_DIR}/src/boxes.in.h > ${CMAKE_CURRENT_BINARY_DIR}/boxes.h
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/boxes.in.h
+    COMMENT "Generating boxes.h"
     VERBATIM
 )
 
@@ -55,6 +63,7 @@ flex_target(boxes_scanner
 )
 add_flex_bison_dependency(boxes_scanner boxes_parser)
 
+# =============================================================================
 
 # The executable target name is the project name.
 # Note that a static library with the project name and suffix "_lib" is
@@ -105,6 +114,7 @@ set(SOURCES_EXE
     src/boxes.c
 )
 
+# -----------------------------------------------------------------------------
 
 # Build static library.
 add_library(${TARGET}_lib STATIC
@@ -131,7 +141,53 @@ target_link_libraries(${TARGET}
         ${LIBRARIES}
 )
 
+# -----------------------------------------------------------------------------
 
-# Enable and include unit tests.
-enable_testing()
-add_subdirectory(utest)
+# Check and include unit tests.
+if (NOT DISABLE_TESTING)
+    enable_testing()
+    add_subdirectory(utest)
+endif ()
+
+# =============================================================================
+
+# Create man page
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/boxes.1
+    COMMAND sed -e "s|--BVERSION--|${BVERSION}|; s|--GLOBALCONF--|${GLOBALCONF}|"
+                ${CMAKE_SOURCE_DIR}/doc/boxes.1.in > ${CMAKE_BINARY_DIR}/boxes.1
+    DEPENDS ${CMAKE_SOURCE_DIR}/doc/boxes.1.in
+    COMMENT "Generating man page"
+    VERBATIM
+)
+add_custom_target(
+    boxes_man_page ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/boxes.1
+)
+
+# -----------------------------------------------------------------------------
+
+# Installing
+install(
+    TARGETS ${TARGET}
+)
+install(
+    FILES ${CMAKE_BINARY_DIR}/boxes.1
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1
+)
+
+# Packaging
+set(CPACK_PACKAGE_NAME "boxes")
+set(CPACK_PACKAGE_VERSION ${BVERSION})
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Command line ASCII boxes")
+set(CPACK_PACKAGE_DESCRIPTION "Boxes is a command line program which draws, removes, and repairs ASCII art boxes.")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://boxes.thomasjensen.com")
+set(CPACK_PACKAGE_VENDOR "Thomas Jensen and the boxes contributors")
+set(CPACK_RESOURCE_FILE_README ${CMAKE_SOURCE_DIR}/README.md)
+set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
+set(CPACK_RESOURCE_FILE_INSTALL ${CMAKE_BINARY_DIR}/boxes.1)
+set(CPACK_SET_DESTDIR true)
+set(CPACK_GENERATOR "ZIP" "TGZ") # "DEB"
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Thomas Jensen and the boxes contributors")
+
+include(CPack)
