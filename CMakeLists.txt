@@ -5,6 +5,21 @@ project(boxes LANGUAGES C)
 
 set(BVERSION "2.2.2-dev")
 set(GLOBALCONF "/usr/share/boxes")
+
+find_package(Git)
+if (GIT_EXECUTABLE)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags --dirty --always
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_DESCRIBE_OUTPUT
+        RESULT_VARIABLE GIT_DESCRIBE_ERROR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(NOT GIT_DESCRIBE_ERROR)
+        set(BVERSION ${GIT_DESCRIBE_OUTPUT})
+    endif()
+endif ()
+
 add_custom_command(  # TODO: use configure_file?
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/boxes.h
     COMMAND sed -e "s|--BVERSION--|${BVERSION}|; s|--GLOBALCONF--|${GLOBALCONF}|"
