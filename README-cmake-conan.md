@@ -7,9 +7,10 @@ Building boxes requires two tools to be installed:
 - [Conan](https://conan.io), a package manager for C/C++, is used to resolve required library and tool dependencies
   - libunistring
   - pcre2
-  - ncurses
+  - ncurses (official Conan 2 version should be available soon)
   - flex (library and tool)
   - bison (tool)
+  - cmocka (for testing)
 - [CMake](https://cmake.org) is used for building.  
   Make sure that a C compiler and the tools for the underlying build environment (e.g., [GNU
   Make](https://www.gnu.org/software/make/) or [Ninja](https://ninja-build.org)) are installed.
@@ -23,19 +24,36 @@ conan profile detect
 
 ## Building boxes
 
-It is recommended to use the generated presets for building:
+It is recommended to use the generated presets for building. For a debug build, follow these steps:
 
 ```sh
 export BUILD_TYPE="Debug"
+export BUILD_PRESET="conan-debug"
 
 conan install . --output-folder=./build/${BUILD_TYPE} \
     --settings build_type=${BUILD_TYPE} \
     --build missing
 
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --preset conan-debug
-cmake --build --preset conan-debug
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --preset ${BUILD_PRESET}
+cmake --build --preset ${BUILD_PRESET}
 
-ctest --verbose --preset conan-debug
+ctest --verbose --preset ${BUILD_PRESET}
+```
+
+Release build is similar:
+
+```sh
+export BUILD_TYPE="Release"
+export BUILD_PRESET="conan-release"
+
+conan install . --output-folder=./build/${BUILD_TYPE} \
+    --settings build_type=${BUILD_TYPE} \
+    --build missing
+
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --preset ${BUILD_PRESET}
+cmake --build --preset ${BUILD_PRESET}
+
+ctest --verbose --preset ${BUILD_PRESET}
 ```
 
 Of course the "classic" way works, too:
