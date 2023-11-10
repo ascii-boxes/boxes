@@ -66,3 +66,7 @@ CMakeUserPresets.json
 
 # Misc
 /vs
+
+# CMake / Conan
+build/
+CMakeUserPresets.json
