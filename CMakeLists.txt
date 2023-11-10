@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.25)
 
 # Build options options
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
@@ -118,7 +118,7 @@ set(SOURCES_EXE
 # -----------------------------------------------------------------------------
 
 # Build static library.
-add_library(${TARGET}_lib STATIC
+add_library(${TARGET}_lib
     ${GENERATED_FILES}
     ${SOURCES_LIB}
 )
