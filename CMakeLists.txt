@@ -1,8 +1,10 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.23)
 
 # Build options options
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(DISABLE_TESTING "Disable test compilation" OFF)
+# TODO: Currently testing is only available on these platforms
+set(TESTING_PLATFORMS "Linux" "MSYS")
 option(ENABLE_COVERAGE "Enable coverage measurement" OFF)
 
 # Project and generated target name.
@@ -81,7 +83,6 @@ set(LIBRARIES
     libunistring::libunistring
     pcre2::pcre2
     Curses::Curses
-    ${FLEX_LIBRARIES}
 )
 
 # List all generated files.
@@ -121,6 +122,9 @@ add_library(${TARGET}_lib STATIC
     ${GENERATED_FILES}
     ${SOURCES_LIB}
 )
+target_compile_features(${TARGET}_lib
+    PUBLIC c_std_99
+)
 target_include_directories(${TARGET}_lib
     PUBLIC ${INCLUDES}
 )
@@ -132,8 +136,11 @@ target_link_libraries(${TARGET}_lib
 add_executable(${TARGET}
     ${SOURCES_EXE}
 )
+target_compile_features(${TARGET}_lib
+    PRIVATE c_std_99
+)
 target_include_directories(${TARGET}
-    PRIVATE ${INCLUDES}
+   PRIVATE ${INCLUDES}
 )
 target_link_libraries(${TARGET}
     PRIVATE
@@ -144,7 +151,7 @@ target_link_libraries(${TARGET}
 # -----------------------------------------------------------------------------
 
 # Check and include unit tests.
-if (NOT DISABLE_TESTING)
+if ((NOT DISABLE_TESTING) AND (CMAKE_SYSTEM_NAME IN_LIST TESTING_PLATFORMS))
     enable_testing()
     add_subdirectory(utest)
 endif ()

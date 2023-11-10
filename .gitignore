@@ -70,3 +70,4 @@ CMakeUserPresets.json
 
 # CMake / Conan
 dist/
+utest/dummy_out.txt
