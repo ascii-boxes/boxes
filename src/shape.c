@@ -24,9 +24,9 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include "boxes.h"
 #include "bxstring.h"
 #include "shape.h"
-#include "boxes.h"
 #include "tools.h"
 
 
@@ -331,6 +331,228 @@ int empty_side(sentry_t *sarr, const int aside)
     return 1;                            /* side is empty */
 }
 
+
+
+static int is_west(sentry_t *shape, int include_corners)
+{
+    size_t offset = include_corners ? 0 : 1;
+    for (size_t i = offset; i < SHAPES_PER_SIDE - offset; i++) {
+        if (west_side[i] == shape->name) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+
+static int is_east(sentry_t *shape, int include_corners)
+{
+    size_t offset = include_corners ? 0 : 1;
+    for (size_t i = offset; i < SHAPES_PER_SIDE - offset; i++) {
+        if (east_side[i] == shape->name) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+
+static int find_in_horiz(shape_t side[], shape_t shape_name)
+{
+    int result = -1;
+    for (size_t i = 0; i < SHAPES_PER_SIDE; i++) {
+        if (side[i] == shape_name) {
+            result = i;
+            break;
+        }
+    }
+    return result;
+}
+
+
+
+static int find_in_north(shape_t shape_name)
+{
+    return find_in_horiz(north_side, shape_name);
+}
+
+
+
+static int find_in_south(shape_t shape_name)
+{
+    return find_in_horiz(south_side_rev, shape_name);
+}
+
+
+
+static int *new_blankward_cache(const size_t shape_height)
+{
+    int *result = (int *) calloc(shape_height, sizeof(int));
+    for (size_t i = 0; i < shape_height; i++) {
+        result[i] = -1;
+    }
+    return result;
+}
+
+
+
+int is_blank_leftward(design_t *current_design, const shape_t shape, const size_t shape_line_idx)
+{
+    if (current_design == NULL) {
+        return 0;  /* this would be a bug */
+    }
+    sentry_t *shape_data = current_design->shape + shape;
+    if (shape_line_idx >= shape_data->height) {
+        return 0;  /* this would be a bug */
+    }
+    if (shape_data->blank_leftward != NULL && shape_data->blank_leftward[shape_line_idx] >= 0) {
+        return shape_data->blank_leftward[shape_line_idx];  /* cached value available */
+    }
+    if (shape_data->blank_leftward == NULL) {
+        shape_data->blank_leftward = new_blankward_cache(shape_data->height);
+    }
+
+    int result = -1;
+    if (is_west(shape_data, 1)) {
+        result = 1;
+    }
+    else if (is_east(shape_data, 0)) {
+        result = 0;
+    }
+    else {
+        shape_t *side = north_side;
+        int pos = find_in_north(shape);
+        if (pos < 0) {
+            side = south_side_rev;
+            pos = find_in_south(shape);
+        }
+        result = 1;
+        for (size_t i = 0; i < (size_t) pos; i++) {
+            sentry_t *tshape = current_design->shape + side[i];
+            if (tshape->mbcs != NULL && !bxs_is_blank(tshape->mbcs[shape_line_idx])) {
+                result = 0;
+                break;
+            }
+        }
+    }
+
+    shape_data->blank_leftward[shape_line_idx] = result;
+    return result;
+}
+
+
+// TODO HERE is_blank_rightward() and is_blank_leftward() are nearly identical -> consolidate
+int is_blank_rightward(design_t *current_design, const shape_t shape, const size_t shape_line_idx)
+{
+    if (current_design == NULL) {
+        return 0;  /* this would be a bug */
+    }
+    sentry_t *shape_data = current_design->shape + shape;
+    if (shape_line_idx >= shape_data->height) {
+        return 0;  /* this would be a bug */
+    }
+    if (shape_data->blank_rightward != NULL && shape_data->blank_rightward[shape_line_idx] >= 0) {
+        return shape_data->blank_rightward[shape_line_idx];  /* cached value available */
+    }
+    if (shape_data->blank_rightward == NULL) {
+        shape_data->blank_rightward = new_blankward_cache(shape_data->height);
+    }
+
+    int result = -1;
+    if (is_west(shape_data, 0)) {
+        result = 0;
+    }
+    else if (is_east(shape_data, 1)) {
+        result = 1;
+    }
+    else {
+        shape_t *side = north_side;
+        int pos = find_in_north(shape);
+        if (pos < 0) {
+            side = south_side_rev;
+            pos = find_in_south(shape);
+        }
+        result = 1;
+        for (size_t i = (size_t) pos + 1; i < SHAPES_PER_SIDE; i++) {
+            sentry_t *tshape = current_design->shape + side[i];
+            if (tshape->mbcs != NULL && !bxs_is_blank(tshape->mbcs[shape_line_idx])) {
+                result = 0;
+                break;
+            }
+        }
+    }
+
+    shape_data->blank_rightward[shape_line_idx] = result;
+    return result;
+}
+
+
+
+void debug_print_shape(sentry_t *shape)
+{
+    #ifdef DEBUG
+        if (shape == NULL) {
+            fprintf(stderr, "NULL\n");
+            return;
+        }
+        fprintf(stderr, "Shape %3s (%dx%d): elastic=%s, bl=",
+            shape_name[shape->name], (int) shape->width, (int) shape->height, shape->elastic ? "true" : "false");
+        if (shape->blank_leftward == NULL) {
+            fprintf(stderr, "NULL");
+        }
+        else {
+            fprintf(stderr, "[");
+            for (size_t i = 0; i < shape->height; i++) {
+                fprintf(stderr, "%d%s", shape->blank_leftward[i],
+                        shape->height > 0 && i < (shape->height - 1) ? ", " : "");
+            }
+            fprintf(stderr, "]");
+        }
+        fprintf(stderr, ", br=");
+        if (shape->blank_rightward == NULL) {
+            fprintf(stderr, "NULL");
+        }
+        else {
+            fprintf(stderr, "[");
+            for (size_t i = 0; i < shape->height; i++) {
+                fprintf(stderr, "%d%s", shape->blank_rightward[i],
+                        shape->height > 0 && i < (shape->height - 1) ? ", " : "");
+            }
+            fprintf(stderr, "]");
+        }
+        fprintf(stderr, ", ascii=");
+        if (shape->chars == NULL) {
+            fprintf(stderr, "NULL");
+        }
+        else {
+            fprintf(stderr, "[");
+            for (size_t i = 0; i < shape->height; i++) {
+                fprintf(stderr, "%s%s%s%s", shape->chars[i] != NULL ? "\"" : "", shape->chars[i],
+                        shape->chars[i] != NULL ? "\"" : "", (int) i < ((int) shape->height) - 1 ? ", " : "");
+            }
+            fprintf(stderr, "]");
+        }
+        fprintf(stderr, ", mbcs=");
+        if (shape->mbcs == NULL) {
+            fprintf(stderr, "NULL");
+        }
+        else {
+            fprintf(stderr, "[");
+            for (size_t i = 0; i < shape->height; i++) {
+                char *out_mbcs = bxs_to_output(shape->mbcs[i]);
+                fprintf(stderr, "%s%s%s%s", shape->mbcs[i] != NULL ? "\"" : "", out_mbcs,
+                        shape->mbcs[i] != NULL ? "\"" : "", shape->height > 0 && i < (shape->height - 1) ? ", " : "");
+                BFREE(out_mbcs);
+            }
+            fprintf(stderr, "]");
+        }
+        fprintf(stderr, "\n");
+    #else
+        UNUSED(shape);
+    #endif
+}
 
 
 /* vim: set sw=4: */

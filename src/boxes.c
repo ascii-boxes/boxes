@@ -108,6 +108,7 @@ static int build_design(design_t **adesigns, const char *cld)
     bxstr_t *cldW = bxs_from_unicode(cld_u32);
     BFREE(cld_u32);
 
+    dp->shape[W].name = W;
     dp->shape[W].height = 1;
     dp->shape[W].width = cldW->num_columns;
     dp->shape[W].elastic = 1;
@@ -154,6 +155,7 @@ static int build_design(design_t **adesigns, const char *cld)
                 fprintf(stderr, "%s: internal error\n", PROJECT);
                 return 1;                /* never happens ;-) */
         }
+        c->name = i;
 
         rc = genshape(c->width, c->height, &(c->chars), &(c->mbcs));
         if (rc) {

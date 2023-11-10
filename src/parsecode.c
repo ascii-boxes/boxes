@@ -602,6 +602,13 @@ int action_finalize_shapes(pass_to_bison *bison_args)
                 (int) curdes.minwidth, (int) curdes.minheight);
         fprintf(stderr, " Parser: Maximum shape height: %d\n", (int) curdes.maxshapeheight);
     #endif
+
+    /*
+     *  Set name of each shape
+     */
+    for (i = 0; i < NUM_SHAPES; ++i) {
+        curdes.shape[i].name = i;
+    }
     return RC_SUCCESS;
 }
 

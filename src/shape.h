@@ -46,14 +46,25 @@ extern shape_t *sides[NUM_SIDES];
 
 
 typedef struct {
+    shape_t   name;
     char    **chars;
     bxstr_t **mbcs;
     size_t    height;
     size_t    width;
-    int       elastic;          /* elastic is used only in original definition */
+
+    /** elastic is used only in original definition */
+    int       elastic;
+
+    /** For each shape line 0..height-1, a flag which is 1 if all shapes to the left of this shape are blank on the
+     *  same shape line. Always 1 if the shape is part of the left (west) box side. */
+    int      *blank_leftward;
+
+    /** For each shape line 0..height-1, a flag which is 1 if all shapes to the right of this shape are blank on the
+     *  same shape line. Always 1 if the shape is part of the right (east) box side. */
+    int      *blank_rightward;
 } sentry_t;
 
-#define SENTRY_INITIALIZER (sentry_t) {NULL, NULL, 0, 0, 0}
+#define SENTRY_INITIALIZER (sentry_t) {NW, NULL, NULL, 0, 0, 0, NULL, NULL}
 
 
 
@@ -70,6 +81,34 @@ size_t highest (const sentry_t *sarr, const int n, ...);
 size_t widest (const sentry_t *sarr, const int n, ...);
 
 int empty_side (sentry_t *sarr, const int aside);
+
+
+/**
+ * Determine if there are only blanks to the left of this shape on the given line. The result is cached in the shape.
+ * @param current_design the design whose shapes to use
+ * @param shape the shape for which to calculate "blank_leftward"
+ * @param shape_line_idx the index of the shape line to assess
+ * @return 1 if blank leftward, 0 otherwise. Will always return 1 if shape is part of the left (west) box side, and
+ *      always 0 if shape is an east side shape (not a corner)
+ */
+int is_blank_leftward(design_t *current_design, const shape_t shape, const size_t shape_line_idx);
+
+/**
+ * Determine if there are only blanks to the right of this shape on the given line. The result is cached in the shape.
+ * @param current_design the design whose shapes to use
+ * @param shape the shape for which to calculate "blank_rightward"
+ * @param shape_line_idx the index of the shape line to assess
+ * @return 1 if blank rightward, 0 otherwise. Will always return 1 if shape is part of the right (east) box side, and
+ *      always 0 if shape is a west side shape (not a corner)
+ */
+int is_blank_rightward(design_t *current_design, const shape_t shape, const size_t shape_line_idx);
+
+
+/**
+ * Print complete data about a shape to stderr for debugging.
+ * @param shape the shape whose data to print
+ */
+void debug_print_shape(sentry_t *shape);
 
 
 

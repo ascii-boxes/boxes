@@ -1,0 +1,27 @@
+:DESC
+Auto-detect the box design as 'capgirl', remove the box, and also remove the box indentation because `-i none`.
+The resulting text will still appear a bit indented, but those are the spaces from inside the box!
+Note that the NW corner is mostly blank (except its very bottom), which triggers some potential problems in the code.
+
+:ARGS
+--remove -i none
+:INPUT
+             .-"```"-.
+            /_______; \
+           (_________)\|
+           / / a a \ \(_)
+          / ( \___/ ) \
+      _ooo\__\_____/__/____
+     /                     \
+    |        foobar         |
+     \_________________ooo_/
+          /           \
+         /:.:.:.:.:.:.:\
+             |  |  |
+             \==|==/  jgs
+             /-'Y'-\
+            (__/ \__)
+:OUTPUT-FILTER
+:EXPECTED
+        foobar
+:EOF
