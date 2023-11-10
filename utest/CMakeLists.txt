@@ -2,9 +2,12 @@
 # Test project name.
 project(boxes_utest LANGUAGES C)
 
+# =============================================================================
+
 # Find required packages. If used from Conan, make sure to run "conan install" before.
 find_package(cmocka REQUIRED)
 
+# =============================================================================
 
 set(SUT boxes_lib)
 set(TARGET ${PROJECT_NAME})
@@ -20,16 +23,24 @@ set(SOURCES
     main.c
 )
 
+# -----------------------------------------------------------------------------
+
 add_executable(${TARGET}
     ${SOURCES}
 )
 target_link_libraries(${TARGET}
-    ${SUT}
-    cmocka::cmocka
+    PRIVATE
+        ${SUT}
+        cmocka::cmocka
+)
+target_link_options(${TARGET}
+    PRIVATE "-Wl,--wrap=bx_fprintf"
 )
 
+# =============================================================================
 
 add_test(
     NAME ${TARGET}
-    COMMAND ${TARGET}
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )

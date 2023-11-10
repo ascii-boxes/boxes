@@ -22,6 +22,8 @@ If Conan is used for the first time, start with the creation of a default
 conan profile detect
 ```
 
+**Note** that testing is currently only available in *Linux* or *MSYS*!
+
 ## Building boxes
 
 It is recommended to use the generated presets for building. For a debug build, follow these steps:
@@ -125,7 +127,34 @@ popd
 
 # Build the package
 conan create . --version 6.4 --settings build_type=Debug --build missing
-#conan create . --version 6.4 --settings build_type=Release --build missing
+conan create . --version 6.4 --settings build_type=Release --build missing
 
 popd
+```
+
+### Terminal issues
+
+There may occur terminal issues originating from ncurses. In case `boxes` is telling you something like `terminals
+database is inaccessible`, try to set the following environment variables:
+
+```sh
+# On Linux and MacOS
+export TERMINFO=/usr/share/terminfo
+# On WSL2 (Windows)
+export TERMINFO=/lib/terminfo
+
+# In case it is still not working, try (or another term like `xterm` or `xterm-color`)
+export TERM=xterm-256color
+```
+
+Finally, note that if `boxes: Can't find config file.` the configuration file must be provided in an environment
+variable or as command line parameter:
+
+```sh
+# boxes-config as parameter
+echo "hello, world" | boxes -f boxes-config
+
+# boxes-config as environment variable
+export BOXES=boxes-config
+echo "hello, world" | boxes
 ```
