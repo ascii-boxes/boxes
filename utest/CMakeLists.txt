@@ -2,6 +2,9 @@
 # Test project name.
 project(boxes_utest LANGUAGES C)
 
+include(CheckCCompilerFlag)
+check_c_compiler_flag(-Wno-stringop-overflow HAVE_STRINGOP_OVERFLOW)
+
 # =============================================================================
 
 # Find required packages. If used from Conan, make sure to run "conan install" before.
@@ -22,6 +25,12 @@ set(SOURCES
     utest_tools.c
     main.c
 )
+
+if (HAVE_STRINGOP_OVERFLOW)
+    target_compile_options(${TARGET}
+        PRIVATE -Wno-stringop-overflow
+    )
+endif (HAVE_STRINGOP_OVERFLOW)
 
 # -----------------------------------------------------------------------------
 
