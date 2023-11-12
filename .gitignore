@@ -38,6 +38,8 @@
 /test/*.tmp
 /vendor/
 /datagen/
+/build/
+CMakeUserPresets.json
 
 # Legacy locations of generated files (no longer in use)
 /src/boxes
