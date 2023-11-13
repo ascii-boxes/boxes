@@ -26,17 +26,18 @@ set(SOURCES
     main.c
 )
 
+# -----------------------------------------------------------------------------
+
+add_executable(${TARGET}
+    ${SOURCES}
+)
+
 if (HAVE_STRINGOP_OVERFLOW)
     target_compile_options(${TARGET}
         PRIVATE -Wno-stringop-overflow
     )
 endif (HAVE_STRINGOP_OVERFLOW)
 
-# -----------------------------------------------------------------------------
-
-add_executable(${TARGET}
-    ${SOURCES}
-)
 target_link_libraries(${TARGET}
     PRIVATE
         ${SUT}
