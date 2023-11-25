@@ -154,7 +154,7 @@ function consolidate_coverage()
     pushd ${OUT_DIR}/test-results || exit 1
     find . -name "*.info" | xargs printf -- '--add-tracefile %s\n' | xargs --exit \
         lcov --rc lcov_branch_coverage=1 --exclude '*/lex.yy.c' --exclude '*/parser.c' \
-             --output-file ../${COVERAGE_FILE} --add-tracefile ../${BASELINE_FILE}
+             --ignore-errors unused --output-file ../${COVERAGE_FILE} --add-tracefile ../${BASELINE_FILE}
     popd || exit 1
     echo ""
 }
