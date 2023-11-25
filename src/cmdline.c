@@ -33,6 +33,7 @@
 
 #include "boxes.h"
 #include "discovery.h"
+#include "logging.h"
 #include "query.h"
 #include "tools.h"
 #include "cmdline.h"
@@ -91,6 +92,7 @@ void usage_long(FILE *st)
                                          strcmp(EOL_DEFAULT, "\r\n") == 0 ? "CRLF" : "LF");
     fprintf(st, "  -f, --config <file>   Configuration file [default: %s]\n",
                                          config_file != NULL ? bxs_to_output(config_file) : "none");
+    /* fprintf(st, "  -g, --debug <areas>   Activate debug logging for specified log areas [default area: MAIN]");  // undocumented */
     fprintf(st, "  -h, --help            Print usage information\n");
     fprintf(st, "  -i, --indent <mode>   Indentation mode [default: box]\n");
     fprintf(st, "  -k <bool>             Leading/trailing blank line retention on removal\n");
@@ -121,6 +123,7 @@ static opt_t *create_new_opt()
         result->eol = "\n";      /* we must default to "\n" instead of EOL_DEFAULT as long as stdout is in text mode */
         result->tabexp = 'e';
         result->killblank = -1;
+        result->debug = (int *) calloc(NUM_LOG_AREAS, sizeof(int));
         for (int i = 0; i < NUM_SIDES; ++i) {
             result->padding[i] = -1;
         }
@@ -458,6 +461,51 @@ static int size_of_box(opt_t *result, char *optarg)
 
 
 
+static int debug_areas(opt_t *result, char *optarg)
+{
+    char *dup = NULL;
+    if (optarg != NULL) {
+        dup = strdup(optarg);   /* required because strtok() modifies its input */
+    }
+    else {
+        dup = strdup(log_area_names[MAIN]);
+    }
+
+    for (char *a = strtok(dup, ","); a != NULL; a = strtok(NULL, ","))
+    {
+        char *trimmed = trimdup(a, a + strlen(a) - 1);
+        if (strlen(trimmed) == 0) {
+            BFREE(trimmed);
+            continue;
+        }
+        int valid = 0;
+        for (size_t i = ALL; i < NUM_LOG_AREAS + 2; i++) {
+            if (strcasecmp(trimmed, log_area_names[i]) == 0) {
+                valid = 1;
+                if (i == ALL) {
+                    for (size_t i = 0; i < NUM_LOG_AREAS; i++) {
+                        result->debug[i] = 1;
+                    }
+                }
+                else {
+                    result->debug[i - 2] = 1;
+                }
+                break;
+            }
+        }
+        if (!valid) {
+            bx_fprintf(stderr, "%s: invalid debug area -- %s\n", PROJECT, trimmed);
+            BFREE(trimmed);
+            return 1;
+        }
+        BFREE(trimmed);
+    }
+    BFREE(dup);
+    return 0;
+}
+
+
+
 /**
  * Tab handling. Format is `n[eku]`.
  * @param result the options struct we are building
@@ -644,6 +692,7 @@ opt_t *process_commandline(int argc, char *argv[])
         { "create",        required_argument, NULL, 'c' },
         { "color",         no_argument,       NULL, OPT_COLOR },
         { "no-color",      no_argument,       NULL, OPT_NO_COLOR },
+        { "debug",         optional_argument, NULL, 'g' },
         { "design",        required_argument, NULL, 'd' },
         { "eol",           required_argument, NULL, 'e' },
         { "config",        required_argument, NULL, 'f' },
@@ -662,7 +711,7 @@ opt_t *process_commandline(int argc, char *argv[])
         { "version",       no_argument,       NULL, 'v' },
         { NULL,            0,                 NULL,  0  }
     };
-    const char *short_options = "a:c:d:e:f:hi:k:lmn:p:q:rs:t:v";
+    const char *short_options = "a:c:d:e:f:g::hi:k:lmn:p:q:rs:t:v";
 
     int oc;   /* option character */
     do {
@@ -708,6 +757,14 @@ opt_t *process_commandline(int argc, char *argv[])
 
             case 'f':
                 result->f = strdup(optarg);   /* input file */
+                break;
+            
+            case 'g':
+                if (debug_areas(result, optarg) != 0) {
+                    BFREE(result);
+                    return NULL;
+                }
+                activate_debug_logging(result->debug);
                 break;
 
             case 'h':
