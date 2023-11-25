@@ -23,7 +23,7 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             - name: add-packages
               run: |
@@ -52,7 +52,7 @@ jobs:
           LEX: /usr/local/opt/flex/bin/flex
           YACC: /usr/local/opt/bison/bin/bison
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             # We need to use GNU grep, sed, and xargs on macOS
             - name: add-packages
