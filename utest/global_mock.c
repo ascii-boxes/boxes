@@ -101,6 +101,7 @@ void setup_mocks()
     setlocale(LC_ALL, "");
     encoding = check_encoding("UTF-8", locale_charset());
     collect_reset();
+    set_bx_fprintf(__wrap_bx_fprintf);
 }
 
 
