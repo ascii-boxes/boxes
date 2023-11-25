@@ -140,7 +140,7 @@ function measure_coverage()
         mkdir -p "${testResultsDir}"
         cp ${OUT_DIR}/*.gc* "${testResultsDir}"
         lcov --capture --directory "${testResultsDir}" --base-directory ${SRC_DIR} --test-name "${tcBaseName}" --quiet \
-            --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc lcov_branch_coverage=1 \
+            --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc branch_coverage=1 \
             --output-file "${testResultsDir}/coverage.info"
         echo -n "    Coverage: "
         lcov --summary "${testResultsDir}/coverage.info" 2>&1 | grep 'lines...' | grep -oP '\d+\.\d*%'
