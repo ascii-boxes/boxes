@@ -42,6 +42,15 @@
 static pcre2_code *pattern_ascii_id = NULL;
 static pcre2_code *pattern_ascii_id_strict = NULL;
 
+/**
+ * Initialize the `bx_fprintf` function pointer to point to the original
+ * `bx_fprintf` function, now renamed `bx_fprintf_original`. During unit
+ * tests, this will be replaced with `__wrap_bx_fprintf`, which stores
+ * the result that would have been printed so the output can be validated.
+ * This is necessary for unit testing and CI to work with MacOS.
+ */
+bx_fprintf_t bx_fprintf = bx_fprintf_original;
+
 
 static pcre2_code *get_pattern_ascii_id(int strict)
 {
@@ -849,7 +858,7 @@ char *bx_strndup(const char *s, size_t n)
 
 
 
-void bx_fprintf(FILE *stream, const char *format, ...)
+void bx_fprintf_original(FILE *stream, const char *format, ...)
 {
     va_list va;
     va_start(va, format);
@@ -857,6 +866,10 @@ void bx_fprintf(FILE *stream, const char *format, ...)
     va_end(va);
 }
 
+
+void set_bx_fprintf(bx_fprintf_t bx_fprintf_function) {
+    bx_fprintf = bx_fprintf_function;
+}
 
 
 FILE *bx_fopens(bxstr_t *pathname, char *mode)

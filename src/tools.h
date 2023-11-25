@@ -40,6 +40,18 @@
 }
 
 
+/**
+ * Define type for a function pointer to specify which `bx_fprintf` function
+ * will be called. This enables unit testing on MacOS, since Apple's `ld`
+ * linker does not support the `--wrap` flag that GNU `ld` does.
+ */
+typedef void (*bx_fprintf_t)(FILE *stream, const char *format, ...);
+
+/**
+ * Declare function pointer to be changed when running unit tests
+ */
+extern bx_fprintf_t bx_fprintf;
+
 int empty_line(const line_t *line);
 
 
@@ -173,7 +185,7 @@ int tag_is_valid(char *tag);
 
 /**
  * Duplicate at most `n` bytes from the given string `s`.  Memory for the new string is obtained with `malloc()`, and
- * can be freed with `free()`. A terminating null byte is added. We include this implementation because the libc's 
+ * can be freed with `free()`. A terminating null byte is added. We include this implementation because the libc's
  * `strndup()` is not consistently available across all platforms.
  * @param s a string
  * @param n maximum number of characters to copy (excluding the null byte)
@@ -187,8 +199,13 @@ char *bx_strndup(const char *s, size_t n);
  * @param stream Where to print, for example `stderr`
  * @param format the format string, followed by the arguments of the format string
  */
-void bx_fprintf(FILE *stream, const char *format, ...);
+void bx_fprintf_original(FILE *stream, const char *format, ...);
 
+
+/**
+ * Set the bx_fprintf_ptr function pointer to point to a specific function
+ */
+void set_bx_fprintf(bx_fprintf_t func_to_use);
 
 /**
  * Determine if the given string is an "ASCII ID", which means:
