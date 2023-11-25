@@ -45,8 +45,10 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   file: out/lcov-total.info
                   format: lcov
+                  flag-name: run-linux
+                  parallel: true
 
-    build-mac:
+    build-macos:
         runs-on: macos-latest
         env:
           LEX: /usr/local/opt/flex/bin/flex
@@ -79,3 +81,16 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   file: out/lcov-total.info
                   format: lcov
+                  flag-name: run-macos
+                  parallel: true
+
+    finish:
+      needs: [build, build-macos]
+      if: ${{ always() }}
+      runs-on: ubuntu-latest
+      steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+          carryforward: "run-linux,run-macos"

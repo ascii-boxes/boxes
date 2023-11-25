@@ -159,14 +159,17 @@ function measure_coverage()
     fi
 }
 
-
+# NOTE: It is possible when the white box tests work that we can
+# remove the --ignore-errors unused option. But for now, we use it so
+# that the CI is "happy" and we can get a baseline.
 function consolidate_coverage()
 {
     echo -e "\nConsolidating test coverage ..."
     pushd ${OUT_DIR}/test-results || exit 1
     find . -name "*.info" | xargs printf -- '--add-tracefile %s\n' | xargs --exit \
-        lcov --rc lcov_branch_coverage=1 --exclude '*/lex.yy.c' --exclude '*/parser.c' \
-             --ignore-errors unused --output-file ../${COVERAGE_FILE} --add-tracefile ../${BASELINE_FILE}
+        lcov --rc branch_coverage=1 --exclude '*/lex.yy.c' --exclude '*/parser.c' \
+             --ignore-errors unused \
+             --output-file ../${COVERAGE_FILE} --add-tracefile ../${BASELINE_FILE}
     popd || exit 1
     echo ""
 }
