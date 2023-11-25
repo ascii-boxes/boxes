@@ -117,11 +117,23 @@ function execute_suite()
     local countExecuted=0
     local countFailed=0
     local tc
+
+    # Note we are getting an encoding error with test 111 which is
+    # unique and runs under ISO_8859-15. But this only happens on macOS.
+    # So, if we run test 111 on macOS, we should run with LC_ALL=C
     for tc in *.txt; do
         if [ ${opt_coverage} == true ]; then
-            $0 --coverage "${tc}"
+            if [[ $(uname) == "Darwin" ]] && [[ ${tc} == "111"* ]]; then
+                LC_ALL=C $0 --coverage "${tc}"
+            else
+                $0 --coverage "${tc}"
+            fi 
         else
-            $0 "${tc}"
+            if [[ $(uname) == "Darwin" ]] && [[ ${tc} == "111"* ]]; then
+                LC_ALL=C $0 "${tc}"
+            else
+                $0 "${tc}"
+            fi
         fi
         if [ $? -ne 0 ]; then
             overallResult=1
