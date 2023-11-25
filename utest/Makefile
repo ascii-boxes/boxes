@@ -23,7 +23,7 @@ UTEST_NORM = global_mock.c bxstring_test.o cmdline_test.c tools_test.c regulex_t
              utest_tools.o
 MOCKS      = bx_fprintf
 
-.PHONY: check_dir flags_unix flags_win32 flags_ utest
+.PHONY: check_dir flags_unix flags_darwin flags_win32 flags_ utest
 
 .NOTPARALLEL:
 
@@ -39,6 +39,12 @@ $(OUT_DIR):
 flags_unix:
 	$(eval CFLAGS := -I. -I$(SRC_DIR) -O -Wall -W -Wno-stringop-overflow $(CFLAGS_ADDTL))
 	$(eval LDFLAGS := $(LDFLAGS) $(foreach MOCK,$(MOCKS),-Wl,--wrap=$(MOCK)) --coverage $(LDFLAGS_ADDTL))
+	$(eval UTEST_EXECUTABLE_NAME := unittest)
+	$(eval UTEST_OBJ := $(UTEST_NORM:.c=.o))
+
+flags_darwin:
+	$(eval CFLAGS := -I. -I$(SRC_DIR) -O -Wall -W -Wno-stringop-overflow $(CFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS) --coverage $(LDFLAGS_ADDTL))
 	$(eval UTEST_EXECUTABLE_NAME := unittest)
 	$(eval UTEST_OBJ := $(UTEST_NORM:.c=.o))
 
