@@ -29,7 +29,7 @@ then
     mkdir -p ${testReportDir}
     cp ${OUT_DIR}/*.gc* ${testResultsDir}
     lcov --capture --directory ${testResultsDir} --base-directory ${SRC_DIR} --test-name ${tcBaseName} --quiet \
-        --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc lcov_branch_coverage=1 \
+        --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc branch_coverage=1 \
         --output-file ${testResultsDir}/coverage.info
     echo -n "[ Coverage ] "
     genhtml --title "Boxes / Unit Tests" --branch-coverage --legend --output-directory ${testReportDir} \
