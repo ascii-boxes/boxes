@@ -22,6 +22,9 @@ env:
 jobs:
     build:
         runs-on: ubuntu-latest
+        env:
+          LEX: flex
+          YACC: bison
         steps:
             - uses: actions/checkout@v4
 
