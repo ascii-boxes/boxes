@@ -67,10 +67,8 @@ jobs:
             - name: make cov
               run: make cov
 
-            # This uses ld --wrap to mock the cmocka functions but
-            # macOS ld does not support --wrap
-            #- name: Run white-box tests
-              #run: make utest
+            - name: Run white-box tests
+              run: make utest
 
             - name: Run black-box tests
               run: make covtest
