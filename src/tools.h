@@ -205,7 +205,7 @@ void bx_fprintf_original(FILE *stream, const char *format, ...);
 /**
  * Set the bx_fprintf_ptr function pointer to point to a specific function
  */
-void set_bx_fprintf(bx_fprintf_t func_to_use);
+void set_bx_fprintf(bx_fprintf_t bx_fprintf_function);
 
 /**
  * Determine if the given string is an "ASCII ID", which means:
