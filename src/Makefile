@@ -102,7 +102,7 @@ flags_:
 	exit 1
 
 parser.c parser.h: parser.y lex.yy.h | check_dir
-	$(YACC) -Wall --verbose --header=parser.h -o parser.c $<
+	$(YACC) -Wall --verbose --defines=parser.h -o parser.c $<
 
 lex.yy.c lex.yy.h: lexer.l | check_dir
 	$(LEX) --header-file=lex.yy.h $<
