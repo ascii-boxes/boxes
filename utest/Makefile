@@ -21,7 +21,7 @@ VPATH      = $(SRC_DIR):$(SRC_DIR)/misc:$(UTEST_DIR)
 
 UTEST_NORM = global_mock.c bxstring_test.o cmdline_test.c tools_test.c regulex_test.o main.o unicode_test.o \
              utest_tools.o
-MOCKS      = bx_fprintf
+MOCKS      = bx_fprintf_original
 
 .PHONY: check_dir flags_unix flags_darwin flags_win32 flags_ utest
 
