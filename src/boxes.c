@@ -35,6 +35,7 @@
 #include "parsing.h"
 #include "query.h"
 #include "remove.h"
+#include "shape.h"
 #include "tools.h"
 #include "unicode.h"
 

@@ -28,6 +28,7 @@
 
 #include "boxes.h"
 #include "unicode.h"
+#include "shape.h"
 #include "tools.h"
 #include "remove_test.h"
 #include "global_mock.h"

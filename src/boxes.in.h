@@ -20,7 +20,7 @@
 #ifndef BOXES_H
 #define BOXES_H
 
-#define DEBUG 1
+/* #define DEBUG 1 */
 /* #define REGEXP_DEBUG 1 */
 /* #define PARSER_DEBUG 1 */
 /* #define LEXER_DEBUG 1 */
@@ -31,7 +31,6 @@
 
 #include "bxstring.h"
 #include "regulex.h"
-#include "shape.h"
 
 
 
@@ -65,6 +64,37 @@
 #define BRIG 1
 #define BBOT 2
 #define BLEF 3
+
+
+typedef enum {
+    NW, NNW, N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW
+} shape_t;
+
+
+typedef struct {
+    shape_t   name;
+    char    **chars;
+    bxstr_t **mbcs;
+    size_t    height;
+    size_t    width;
+
+    /** elastic is used only in original definition */
+    int       elastic;
+
+    /** For each shape line 0..height-1, a flag which is 1 if all shapes to the left of this shape are blank on the
+     *  same shape line. Always 1 if the shape is part of the left (west) box side. */
+    int      *blank_leftward;
+
+    /** For each shape line 0..height-1, a flag which is 1 if all shapes to the right of this shape are blank on the
+     *  same shape line. Always 1 if the shape is part of the right (east) box side. */
+    int      *blank_rightward;
+} sentry_t;
+
+#define SENTRY_INITIALIZER (sentry_t) {NW, NULL, NULL, 0, 0, 0, NULL, NULL}
+
+#define NUM_SHAPES 16
+#define NUM_SIDES   4
+#define NUM_CORNERS 4
 
 
 typedef struct {

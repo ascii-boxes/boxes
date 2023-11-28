@@ -27,6 +27,7 @@
 #include "bxstring.h"
 #include "parsing.h"
 #include "query.h"
+#include "shape.h"
 #include "tools.h"
 #include "list.h"
 #include "unicode.h"

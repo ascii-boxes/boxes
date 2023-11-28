@@ -31,6 +31,7 @@
 #include "parsing.h"
 #include "query.h"
 #include "regulex.h"
+#include "shape.h"
 #include "tools.h"
 #include "unicode.h"
 
