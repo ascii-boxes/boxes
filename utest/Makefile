@@ -21,7 +21,6 @@ VPATH      = $(SRC_DIR):$(SRC_DIR)/misc:$(UTEST_DIR)
 
 UTEST_NORM = global_mock.c bxstring_test.o cmdline_test.c tools_test.c regulex_test.o main.o unicode_test.o \
              utest_tools.o
-MOCKS      = bx_fprintf_original
 
 .PHONY: check_dir flags_unix flags_darwin flags_win32 flags_ utest
 
@@ -38,7 +37,7 @@ $(OUT_DIR):
 
 flags_unix:
 	$(eval CFLAGS := -I. -I$(SRC_DIR) -O -Wall -W -Wno-stringop-overflow $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := $(LDFLAGS) $(foreach MOCK,$(MOCKS),-Wl,--wrap=$(MOCK)) --coverage $(LDFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS) --coverage $(LDFLAGS_ADDTL))
 	$(eval UTEST_EXECUTABLE_NAME := unittest)
 	$(eval UTEST_OBJ := $(UTEST_NORM:.c=.o))
 
@@ -50,7 +49,7 @@ flags_darwin:
 
 flags_win32:
 	$(eval CFLAGS := -Os -s -std=c99 -m32 -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := $(LDFLAGS) -s -std=c99 -m32 $(foreach MOCK,$(MOCKS),-Wl,--wrap=$(MOCK)) $(LDFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS) -s -std=c99 -m32 $(LDFLAGS_ADDTL))
 	$(eval UTEST_EXECUTABLE_NAME := unittest.exe)
 	$(eval UTEST_OBJ := $(UTEST_NORM:.c=.o))
 
