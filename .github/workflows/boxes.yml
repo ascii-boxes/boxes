@@ -51,8 +51,8 @@ jobs:
     build-macos:
         runs-on: macos-latest
         env:
-          LEX: /usr/local/opt/flex/bin/flex
-          YACC: /usr/local/opt/bison/bin/bison
+          BX_LEX: /usr/local/opt/flex/bin/flex
+          BX_YACC: /usr/local/opt/bison/bin/bison
         steps:
             - uses: actions/checkout@v4
 
