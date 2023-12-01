@@ -23,10 +23,9 @@ DOC_FILES  = doc/boxes.1 doc/boxes.el
 PKG_NAME   = boxes-$(BVERSION)
 OUT_DIR    = out
 
-# Set some defaults for LEX and YACC but allow env
-# variables to override them.
-LEX  ?= flex
-YACC ?= bison
+# Set some defaults for BX_LEX and BX_YACC but allow env variables to override them.
+BX_LEX  ?= flex
+BX_YACC ?= bison
 
 PCRE2_VERSION          = 10.40
 PCRE2_DIR              = vendor/pcre2-$(PCRE2_VERSION)
@@ -45,36 +44,19 @@ WIN_CMOCKA_DIR         = vendor/cmocka-$(WIN_CMOCKA_VERSION)
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#    Detect platform (Apple's linker does not support --wrap)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-BOXES_PLATFORM := ""
-ifeq ($(OS),Windows_NT)
-	BOXES_PLATFORM := win32
-else
-	UNAME_S := $(shell sh -c 'uname -s 2>/dev/null || echo Unknown')
-	ifeq ($(UNAME_S),Darwin)
-		BOXES_PLATFORM := darwin
-	else
-		BOXES_PLATFORM := unix
-	endif
-endif
-
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #    Build
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 build cov debug: infomsg replaceinfos
-	$(MAKE) -C src BOXES_PLATFORM=$(BOXES_PLATFORM) LEX=$(LEX) YACC=$(YACC) $@
+	$(MAKE) -C src BOXES_PLATFORM=unix LEX=$(BX_LEX) YACC=$(BX_YACC) $@
 
 win32: infomsg replaceinfos
-	$(MAKE) -C src BOXES_PLATFORM=$(BOXES_PLATFORM) C_INCLUDE_PATH=../$(PCRE2_DIR)/src LDFLAGS=-L../$(PCRE2_DIR)/.libs \
+	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(PCRE2_DIR)/src LDFLAGS=-L../$(PCRE2_DIR)/.libs \
 	    LEX=../$(WIN_FLEX_BISON_DIR)/win_flex.exe YACC=../$(WIN_FLEX_BISON_DIR)/win_bison.exe \
 	    LIBNCURSES_WIN_INCLUDE=$(LIBNCURSES_WIN_INCLUDE) build
 
 win32.debug: infomsg replaceinfos
-	$(MAKE) -C src BOXES_PLATFORM=$(BOXES_PLATFORM) C_INCLUDE_PATH=../$(PCRE2_DIR)/src LDFLAGS=-L../$(PCRE2_DIR)/.libs \
+	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(PCRE2_DIR)/src LDFLAGS=-L../$(PCRE2_DIR)/.libs \
 	    LEX=../$(WIN_FLEX_BISON_DIR)/win_flex.exe YACC=../$(WIN_FLEX_BISON_DIR)/win_bison.exe \
 	    LIBNCURSES_WIN_INCLUDE=$(LIBNCURSES_WIN_INCLUDE) debug
 
@@ -146,8 +128,8 @@ $(LIBNCURSES_DIR)/lib/libncurses.a: vendor/libncurses-$(LIBNCURSES_VERSION).tar.
 	cd $(LIBNCURSES_DIR) ; ./configure --enable-static ; $(MAKE)
 
 static: infomsg replaceinfos $(LIBUNISTRING_DIR)/lib/.libs/libunistring.a $(PCRE2_DIR)/.libs/libpcre2-32.a $(LIBNCURSES_DIR)/lib/libncurses.a
-	$(MAKE) -C src BOXES_PLATFORM=static LEX=$(LEX) YACC=$(YACC) LIBUNISTRING_DIR=$(LIBUNISTRING_DIR) \
-	    PCRE2_DIR=$(PCRE2_DIR) LIBNCURSES_DIR=$(LIBNCURSES_DIR) LIBNCURSES_WIN_INCLUDE=$(LIBNCURSES_WIN_INCLUDE) $@
+	$(MAKE) -C src BOXES_PLATFORM=static LEX=$(BX_LEX) YACC=$(BX_YACC) LIBUNISTRING_DIR=$(LIBUNISTRING_DIR) \
+        PCRE2_DIR=$(PCRE2_DIR) LIBNCURSES_DIR=$(LIBNCURSES_DIR) LIBNCURSES_WIN_INCLUDE=$(LIBNCURSES_WIN_INCLUDE) $@
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -176,7 +158,7 @@ $(OUT_DIR)/zip/$(PKG_NAME).zip:
 	@echo Windows ZIP file created at $(OUT_DIR)/zip/$(PKG_NAME).zip
 
 package: build
-	$(MAKE) BOXES_PLATFORM=$(BOXES_PLATFORM) $(PKG_NAME).tar.gz
+	$(MAKE) BOXES_PLATFORM=unix $(PKG_NAME).tar.gz
 
 win32.package: win32 $(OUT_DIR)/zip/$(PKG_NAME).zip
 
@@ -211,11 +193,11 @@ covtest:
 	cd test; ./testrunner.sh --suite --coverage
 
 utest:
-	$(MAKE) -C utest BOXES_PLATFORM=$(BOXES_PLATFORM) utest
+	$(MAKE) -C utest BOXES_PLATFORM=unix utest
 
 win32.utest: $(OUT_DIR)
 	cp $(WIN_CMOCKA_DIR)/bin/cmocka.dll $(OUT_DIR)/
-	$(MAKE) -C utest BOXES_PLATFORM=$(BOXES_PLATFORM) C_INCLUDE_PATH=../$(PCRE2_DIR)/src:../$(WIN_CMOCKA_DIR)/include \
+	$(MAKE) -C utest BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(PCRE2_DIR)/src:../$(WIN_CMOCKA_DIR)/include \
 	    LDFLAGS_ADDTL="-L../$(PCRE2_DIR)/.libs -L../$(WIN_CMOCKA_DIR)/lib" utest
 
 

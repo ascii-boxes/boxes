@@ -32,7 +32,7 @@ ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
 ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 
 
-.PHONY: boxes.static check_dir clean build cov debug package static flags_unix flags_darwin flags_static flags_win32 flags_
+.PHONY: boxes.static check_dir clean build cov debug package static flags_unix flags_static flags_win32 flags_
 
 .NOTPARALLEL:
 
@@ -76,7 +76,7 @@ boxes.exe: $(ALL_OBJ) | check_dir
 	if [ "$(STRIP)" = "true" ] ; then strip $@ ; fi
 
 
-flags_unix flags_darwin:
+flags_unix:
 	$(eval CFLAGS := -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
 	$(eval LDFLAGS := $(LDFLAGS) $(LDFLAGS_ADDTL))
 	$(eval BOXES_EXECUTABLE_NAME := boxes)
