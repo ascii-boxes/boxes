@@ -21,6 +21,11 @@ declare -r tcBaseName=unittest
 declare -r testResultsDir=${OUT_DIR}/test-results/${tcBaseName}
 declare -r testReportDir=${OUT_DIR}/report-utest
 
+declare branchCoverage=lcov_branch_coverage
+if [[ $(uname) == "Darwin" ]]; then
+    branchCoverage=branch_coverage
+fi
+
 if test -n "$(find ${OUT_DIR} -maxdepth 1 -name '*.gcda' -print -quit)" \
     && test -n "$(find ${OUT_DIR} -maxdepth 1 -name '*.gcno' -print -quit)" \
     && test -n "$(lcov --version)"
@@ -29,7 +34,7 @@ then
     mkdir -p ${testReportDir}
     cp ${OUT_DIR}/*.gc* ${testResultsDir}
     lcov --capture --directory ${testResultsDir} --base-directory ${SRC_DIR} --test-name ${tcBaseName} --quiet \
-        --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc branch_coverage=1 \
+        --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc "${branchCoverage}=1" \
         --output-file ${testResultsDir}/coverage.info
     echo -n "[ Coverage ] "
     genhtml --title "Boxes / Unit Tests" --branch-coverage --legend --output-directory ${testReportDir} \

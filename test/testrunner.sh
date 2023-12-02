@@ -152,19 +152,20 @@ function measure_coverage()
         mkdir -p "${testResultsDir}"
         cp ${OUT_DIR}/*.gc* "${testResultsDir}"
         lcov --capture --directory "${testResultsDir}" --base-directory ${SRC_DIR} --test-name "${tcBaseName}" --quiet \
-            --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc branch_coverage=1 \
+            --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc "${branchCoverage}=1" \
             --output-file "${testResultsDir}/coverage.info"
         echo -n "    Coverage: "
         lcov --summary "${testResultsDir}/coverage.info" 2>&1 | grep 'lines...' | grep -oP '\d+\.\d*%'
     fi
 }
 
+
 function consolidate_coverage()
 {
     echo -e "\nConsolidating test coverage ..."
     pushd ${OUT_DIR}/test-results || exit 1
     find . -name "*.info" | xargs printf -- '--add-tracefile %s\n' | xargs --exit \
-        lcov --rc branch_coverage=1 --exclude '*/lex.yy.c' --exclude '*/parser.c' \
+        lcov --rc "${branchCoverage}=1" --exclude '*/lex.yy.c' --exclude '*/parser.c' \
              --output-file ../${COVERAGE_FILE} --add-tracefile ../${BASELINE_FILE}
     popd || exit 1
     echo ""
@@ -264,6 +265,11 @@ function assert_outcome()
 parse_arguments "$@"
 check_prereqs
 cov_baseline
+
+declare branchCoverage=lcov_branch_coverage
+if [[ $(uname) == "Darwin" ]]; then
+    branchCoverage=branch_coverage
+fi
 
 # Execute the entire test suite
 if [ ${opt_suite} == true ]; then
