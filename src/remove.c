@@ -1009,10 +1009,18 @@ static void remove_vertical_from_input(remove_ctx_t *ctx)
         #endif
 
         bxstr_t *temp2 = bxs_substr(org_line, s_idx, e_idx);
-        bxstr_t *temp = bxs_prepend_spaces(temp2, input.indent);
-        free_line_text(input.lines + input_line_idx);
-        input.lines[input_line_idx].text = temp;
-        bxs_free(temp2);
+        if (opt.indentmode == 'b' || opt.indentmode == '\0') {
+            /* restore indentation */
+            bxstr_t *temp = bxs_prepend_spaces(temp2, input.indent);
+            free_line_text(input.lines + input_line_idx);
+            input.lines[input_line_idx].text = temp;
+            bxs_free(temp2);
+        }
+        else {
+            /* remove indentation */
+            free_line_text(input.lines + input_line_idx);
+            input.lines[input_line_idx].text = temp2;
+        }
     }
 }
 

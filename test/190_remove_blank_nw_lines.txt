@@ -23,5 +23,5 @@ Note that the NW corner is mostly blank (except its very bottom), which triggers
             (__/ \__)
 :OUTPUT-FILTER
 :EXPECTED
-        foobar
+       foobar
 :EOF
