@@ -384,8 +384,8 @@ static size_t find_horizontal_shape(design_t *current_design, comparison_t comp_
         }
 
         uint32_t *shape_relevant = prepare_comp_shape(current_design, hshape, j, comp_type,
-                is_blank_leftward(current_design, hshape, j),
-                is_blank_rightward(current_design, hshape, j));
+                is_blankward(current_design, hshape, j, 1),
+                is_blankward(current_design, hshape, j, 0));
         size_t length_relevant = u32_strlen(shape_relevant);
 
         for (size_t k = 0; k < current_design->shape[hshape].height; ++k) {

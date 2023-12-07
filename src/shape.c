@@ -176,6 +176,8 @@ void freeshape(sentry_t *shape)
     }
     BFREE (shape->chars);
     BFREE (shape->mbcs);
+    BFREE (shape->blank_leftward);
+    BFREE (shape->blank_rightward);
 
     *shape = SENTRY_INITIALIZER;
 }
@@ -398,28 +400,16 @@ static int *new_blankward_cache(const size_t shape_height)
 
 
 
-int is_blank_leftward(design_t *current_design, const shape_t shape, const size_t shape_line_idx)
+static int is_blankward_calc(
+        design_t *current_design, const shape_t shape, const size_t shape_line_idx, const int is_leftward)
 {
-    if (current_design == NULL) {
-        return 0;  /* this would be a bug */
-    }
-    sentry_t *shape_data = current_design->shape + shape;
-    if (shape_line_idx >= shape_data->height) {
-        return 0;  /* this would be a bug */
-    }
-    if (shape_data->blank_leftward != NULL && shape_data->blank_leftward[shape_line_idx] >= 0) {
-        return shape_data->blank_leftward[shape_line_idx];  /* cached value available */
-    }
-    if (shape_data->blank_leftward == NULL) {
-        shape_data->blank_leftward = new_blankward_cache(shape_data->height);
-    }
-
     int result = -1;
-    if (is_west(shape_data, 1)) {
-        result = 1;
+    sentry_t *shape_data = current_design->shape + shape;
+    if (is_west(shape_data, is_leftward ? 1 : 0)) {
+        result = is_leftward ? 1 : 0;
     }
-    else if (is_east(shape_data, 0)) {
-        result = 0;
+    else if (is_east(shape_data, is_leftward ? 0 : 1)) {
+        result = is_leftward ? 0 : 1;
     }
     else {
         shape_t *side = north_side;
@@ -429,7 +419,13 @@ int is_blank_leftward(design_t *current_design, const shape_t shape, const size_
             pos = find_in_south(shape);
         }
         result = 1;
-        for (size_t i = 0; i < (size_t) pos; i++) {
+        size_t loop_init = (size_t) pos + 1;
+        size_t loop_end = SHAPES_PER_SIDE;
+        if (is_leftward) {
+            loop_init = 0;
+            loop_end = (size_t) pos;
+        }
+        for (size_t i = loop_init; i < loop_end; i++) {
             sentry_t *tshape = current_design->shape + side[i];
             if (tshape->mbcs != NULL && !bxs_is_blank(tshape->mbcs[shape_line_idx])) {
                 result = 0;
@@ -437,14 +433,12 @@ int is_blank_leftward(design_t *current_design, const shape_t shape, const size_
             }
         }
     }
-
-    shape_data->blank_leftward[shape_line_idx] = result;
     return result;
 }
 
 
-// TODO HERE is_blank_rightward() and is_blank_leftward() are nearly identical -> consolidate
-int is_blank_rightward(design_t *current_design, const shape_t shape, const size_t shape_line_idx)
+
+int is_blankward(design_t *current_design, const shape_t shape, const size_t shape_line_idx, const int is_leftward)
 {
     if (current_design == NULL) {
         return 0;  /* this would be a bug */
@@ -453,38 +447,22 @@ int is_blank_rightward(design_t *current_design, const shape_t shape, const size
     if (shape_line_idx >= shape_data->height) {
         return 0;  /* this would be a bug */
     }
-    if (shape_data->blank_rightward != NULL && shape_data->blank_rightward[shape_line_idx] >= 0) {
-        return shape_data->blank_rightward[shape_line_idx];  /* cached value available */
+    int *blankward_cache = is_leftward ? shape_data->blank_leftward : shape_data->blank_rightward;
+    if (blankward_cache != NULL && blankward_cache[shape_line_idx] >= 0) {
+        return blankward_cache[shape_line_idx];  /* cached value available */
     }
-    if (shape_data->blank_rightward == NULL) {
-        shape_data->blank_rightward = new_blankward_cache(shape_data->height);
-    }
-
-    int result = -1;
-    if (is_west(shape_data, 0)) {
-        result = 0;
-    }
-    else if (is_east(shape_data, 1)) {
-        result = 1;
-    }
-    else {
-        shape_t *side = north_side;
-        int pos = find_in_north(shape);
-        if (pos < 0) {
-            side = south_side_rev;
-            pos = find_in_south(shape);
+    if (blankward_cache == NULL) {
+        blankward_cache = new_blankward_cache(shape_data->height);
+        if (is_leftward) {
+            shape_data->blank_leftward = blankward_cache;
         }
-        result = 1;
-        for (size_t i = (size_t) pos + 1; i < SHAPES_PER_SIDE; i++) {
-            sentry_t *tshape = current_design->shape + side[i];
-            if (tshape->mbcs != NULL && !bxs_is_blank(tshape->mbcs[shape_line_idx])) {
-                result = 0;
-                break;
-            }
+        else {
+            shape_data->blank_rightward = blankward_cache;
         }
     }
 
-    shape_data->blank_rightward[shape_line_idx] = result;
+    int result = is_blankward_calc(current_design, shape, shape_line_idx, is_leftward);
+    blankward_cache[shape_line_idx] = result;
     return result;
 }
 

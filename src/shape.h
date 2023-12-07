@@ -54,24 +54,16 @@ int empty_side (sentry_t *sarr, const int aside);
 
 
 /**
- * Determine if there are only blanks to the left of this shape on the given line. The result is cached in the shape.
+ * Determine if there are only blanks to the left (or right) of this shape on the given line. The result is cached in
+ * the shape.
  * @param current_design the design whose shapes to use
- * @param shape the shape for which to calculate "blank_leftward"
+ * @param shape the shape for which to calculate the result
  * @param shape_line_idx the index of the shape line to assess
- * @return 1 if blank leftward, 0 otherwise. Will always return 1 if shape is part of the left (west) box side, and
- *      always 0 if shape is an east side shape (not a corner)
+ * @param is_leftward 1 to check on the left, 0 to check on the right
+ * @return 1 if blank, 0 otherwise. Box contents is always counted as "not blank" (because it could be), and the outside
+ *      of a box counts as blank.
  */
-int is_blank_leftward(design_t *current_design, const shape_t shape, const size_t shape_line_idx);
-
-/**
- * Determine if there are only blanks to the right of this shape on the given line. The result is cached in the shape.
- * @param current_design the design whose shapes to use
- * @param shape the shape for which to calculate "blank_rightward"
- * @param shape_line_idx the index of the shape line to assess
- * @return 1 if blank rightward, 0 otherwise. Will always return 1 if shape is part of the right (east) box side, and
- *      always 0 if shape is a west side shape (not a corner)
- */
-int is_blank_rightward(design_t *current_design, const shape_t shape, const size_t shape_line_idx);
+int is_blankward(design_t *current_design, const shape_t shape, const size_t shape_line_idx, const int is_leftward);
 
 
 /**
