@@ -1,0 +1,7 @@
+┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐
+┊ (includes some Unicode characters)                       ┊
+┊ Lorem ipsum dolör sit ämet, consetetur sadipscing elitr, ┊
+┊ sed diam nonumy éirmod tempor invidunt ut labore         ┊
+┊ et dolore magna aliquyam erat, sed diam voluptua.        ┊
+┊ At vero eos et accusam et justo duo dolores et ea rebum. ┊
+└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘

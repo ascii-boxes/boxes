@@ -1,0 +1,8 @@
+ __^__                                                          __^__
+( ___ )--------------------------------------------------------( ___ )
+ | / | (includes some Unicode characters)                       | \ |
+ | / | Lorem ipsum dolör sit ämet, consetetur sadipscing elitr, | \ |
+ | / | sed diam nonumy éirmod tempor invidunt ut labore         | \ |
+ | / | et dolore magna aliquyam erat, sed diam voluptua.        | \ |
+ |___| At vero eos et accusam et justo duo dolores et ea rebum. |___|
+(_____)--------------------------------------------------------(_____)

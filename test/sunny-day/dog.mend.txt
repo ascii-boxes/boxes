@@ -1,0 +1,16 @@
+                           __   _,--="=--,_   __
+                          /  \."    .-.    "./  \
+                         /  ,/  _   : :   _  \/` \
+                         \  `| /o\  :_:  /o\ |\__/
+                          `-'| :="~` _ `~"=: |
+                             \`     (_)     `/ jgs
+                      .-"-.   \      |      /   .-"-.
+.--------------------{     }--|  /,.-'-.,\  |--{     }-------------------.
+ )                   (_)_)_)  \_/`~-===-~`\_/  (_(_(_)                  (
+(  (includes some Unicode characters)                                    )
+ ) Lorem ipsum dolör sit ämet, consetetur sadipscing elitr,             (
+(  sed diam nonumy éirmod tempor invidunt ut labore                      )
+ ) __ET__ dolore magna aliquyam erat, sed diam voluptua.                (
+(  At vero eos __ET__ accusam __ET__ justo duo dolores __ET__ ea rebum.  )
+ )                                                                      (
+'------------------------------------------------------------------------'

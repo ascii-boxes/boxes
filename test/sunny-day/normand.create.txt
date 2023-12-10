@@ -1,0 +1,21 @@
+        __,:,__               __,:,__               __,:,__    Normand    __,:,__
+     ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,
+   ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba
+ ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b,
+,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,
+:(["               ``":"''               ``":"''               ``":"''               "]):
+`Y88ba,                                                                           ,ad88P'
+ `88888ba      (includes some Unicode characters)                               ad88888'
+  `Y88888b,    Lorem ipsum dolör sit ämet, consetetur sadipscing elitr,       ,d88888P'
+    `"Y888b,   sed diam nonumy éirmod tempor invidunt ut labore              ,d888P"'
+        "]):   et dolore magna aliquyam erat, sed diam voluptua.             :(["
+     ,ad88P'   At vero eos et accusam et justo duo dolores et ea rebum.      `Y88ba,
+   ad88888'                                                                   `88888ba
+ ,d88888P'                                                                     `Y88888b,
+,d888P"'                                                                         `"Y888b,
+:(["               __,:,__               __,:,__               __,:,__               "]):
+`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P`Y88ba,         ,ad88P'
+ `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888' `88888ba     ad88888'
+  `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'   `Y88888b, ,d88888P'
+    `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'       `"Y888b,d888P"'
+        ``":"''               ``":"''               ``":"''   Veilleux    ``":"''

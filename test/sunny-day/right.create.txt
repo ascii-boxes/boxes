@@ -1,0 +1,5 @@
+(includes some Unicode characters)                          /* XX */
+Lorem ipsum dolör sit ämet, consetetur sadipscing elitr,    /* XX */
+sed diam nonumy éirmod tempor invidunt ut labore            /* XX */
+et dolore magna aliquyam erat, sed diam voluptua.           /* XX */
+At vero eos et accusam et justo duo dolores et ea rebum.    /* XX */

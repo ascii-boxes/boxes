@@ -1,0 +1,7 @@
+/*********************************************************************************************************************/
+/*  ( i n c l u d e s   s o m e   U n i c o d e   c h a r a c t e r s )                                              */
+/*  L o r e m   i p s u m   d o l ö r   s i t   ä m e t ,   c o n s e t e t u r   s a d i p s c i n g   e l i t r ,  */
+/*  s e d   d i a m   n o n u m y   é i r m o d   t e m p o r   i n v i d u n t   u t   l a b o r e                  */
+/*  e t   d o l o r e   m a g n a   a l i q u y a m   e r a t ,   s e d   d i a m   v o l u p t u a .                */
+/*  A t   v e r o   e o s   e t   a c c u s a m   e t   j u s t o   d u o   d o l o r e s   e t   e a   r e b u m .  */
+/*********************************************************************************************************************/
