@@ -148,8 +148,8 @@ BOX whirly
 
 author   "Thomas Jensen"
 created  "March 17, 1999 (Wednesday, 15:40h)"
-revdate  "March 17, 1999 (Wednesday, 15:40h)"
-revision "1.0"
+revdate  "December 10, 2023 (Sunday, 14:20h)"
+revision "1.1"
 tags     "artwork, box"
 
 sample
@@ -175,6 +175,10 @@ shapes {
     se  ("\" ")
 }
 
+padding {
+    horizontal 2
+    vertical 1
+}
 elastic (n, w, s, e)
 
 END whirly
@@ -691,8 +695,8 @@ BOX sunset
 
 author   "Thomas Jensen"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.1"
-revdate  "February 13, 2021 (Saturday, 14:00h)"
+revision "1.2"
+revdate  "December 10, 2023 (Sunday, 14:20h)"
 created  "March 30, 1999 (Tuesday, 17:10h)"
 tags     "artwork, box"
 
@@ -728,6 +732,10 @@ shapes {
        ":::::::`.......`:::::::")
 }
 
+padding {
+    horizontal 2
+    vertical 1
+}
 elastic (nne,nnw, s, e, w)
 
 END sunset
@@ -868,8 +876,8 @@ BOX xes
 
 author   "Thomas Jensen"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.2"
-revdate  "February 13, 2021 (Saturday, 14:00h)"
+revision "1.3"
+revdate  "December 10, 2023 (Sunday, 22:00h)"
 created  "April 09, 1999 (Friday, 20:05h)"
 tags     "artwork, box"
 
@@ -909,6 +917,9 @@ shapes {
     ene ("<\/> ", "</\> ")
 }
 
+padding {
+    horizontal 1
+}
 elastic (n, e, s, w)
 
 END xes
@@ -1233,8 +1244,8 @@ BOX stark2
 
 author   "Thomas Jensen"
 designer "Joan G. Stark <spunk1111@juno.com>"
-revision "1.1"
-revdate  "February 13, 2021 (Saturday, 14:00h)"
+revision "1.2"
+revdate  "December 10, 2023 (Sunday, 14:20h)"
 created  "April 05, 1999 (Monday, 21:55h)"
 tags     "artwork, box"
 
@@ -1267,6 +1278,10 @@ shapes {
     se  ("@-:. jgs", "@-:.    ")
 }
 
+padding {
+    horizontal 2
+    vertical 1
+}
 elastic (n,s,e, w)
 
 END stark2
@@ -1317,8 +1332,8 @@ END stark1
 BOX peek
 
 author   "Thomas Jensen"
-revision "1.0"
-revdate  "April 12, 1999 (Monday, 12:52h)"
+revision "1.1"
+revdate  "December 10, 2023 (Sunday, 14:20h)"
 created  "April 12, 1999 (Monday, 12:52h)"
 tags     "programming, box"
 
@@ -1351,6 +1366,7 @@ shapes {
 replace "\\*\\/" with "*\\\\/"               # quote closing comment tags
 reverse "\\*\\\\/" to "*\\/"
 
+padding {h 1}
 elastic (n,e,s,w)
 
 END peek
