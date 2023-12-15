@@ -3342,5 +3342,302 @@ padding {
 END critical
 
 
+# ============================================================================
+
+
+BOX ansi
+
+author   "chorpler"
+designer "(public domain)"
+created  "November 21, 2023 (Tuesday, 20:32h)"
+revision "1.0"
+revdate  "November 21, 2023 (Tuesday, 20:32h)"
+tags     "box, simple, unicode"
+
+sample
+    ┌──────────────────────┐
+    │                      │
+    │                      │
+    │                      │
+    │                      │
+    │                      │
+    │                      │
+    │                      │
+    └──────────────────────┘
+ends
+
+shapes {
+    nw  ("┌")
+    n   ("─")
+    ne ("┐")
+    e   ("│")
+    se  ("┘")
+    s   ("─")
+    sw  ("└")
+    w   ("│")
+}
+
+padding { horiz 1 }
+
+elastic (n,e,s,W)
+
+END ansi
+
+
+# ============================================================================
+
+
+BOX ansi-rounded
+
+author   "chorpler"
+designer "(public domain)"
+created  "November 21, 2023 (Tuesday, 20:32h)"
+revision "1.0"
+revdate  "November 21, 2023 (Tuesday, 20:32h)"
+tags     "box, simple, unicode"
+
+sample
+    ╭──────────────────────╮
+    │                      │
+    │                      │
+    │                      │
+    │                      │
+    │                      │
+    │                      │
+    │                      │
+    ╰──────────────────────╯
+ends
+
+shapes {
+    nw  ("╭")
+    n   ("─")
+    ne ("╮")
+    e   ("│")
+    se  ("╯")
+    s   ("─")
+    sw  ("╰")
+    w   ("│")
+}
+
+padding { horiz 1 }
+
+elastic (n,e,s,W)
+
+END ansi-rounded
+
+
+# ============================================================================
+
+
+BOX ansi-double
+
+author   "chorpler"
+designer "(public domain)"
+created  "November 21, 2023 (Tuesday, 20:32h)"
+revision "1.0"
+revdate  "November 21, 2023 (Tuesday, 20:32h)"
+tags     "box, simple, unicode"
+
+sample
+    ╔══════════════════════╗
+    ║                      ║
+    ║                      ║
+    ║                      ║
+    ║                      ║
+    ║                      ║
+    ║                      ║
+    ║                      ║
+    ╚══════════════════════╝
+ends
+
+shapes {
+    nw  ("╔")
+    n   ("═")
+    ne ("╗")
+    e   ("║")
+    se  ("╝")
+    s   ("═")
+    sw  ("╚")
+    w   ("║")
+}
+
+padding { horiz 1 }
+
+elastic (n,e,s,W)
+
+END ansi-double
+
+
+# ============================================================================
+
+
+BOX ansi-heavy
+
+author   "chorpler"
+designer "(public domain)"
+created  "November 21, 2023 (Tuesday, 20:32h)"
+revision "1.0"
+revdate  "November 21, 2023 (Tuesday, 20:32h)"
+tags     "box, simple, unicode"
+
+sample
+    ┏━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃                      ┃
+    ┃                      ┃
+    ┃                      ┃
+    ┃                      ┃
+    ┃                      ┃
+    ┃                      ┃
+    ┃                      ┃
+    ┗━━━━━━━━━━━━━━━━━━━━━━┛
+ends
+
+shapes {
+    nw  ("┏")
+    n   ("━")
+    ne ("┓")
+    e   ("┃")
+    se  ("┛")
+    s   ("━")
+    sw  ("┗")
+    w   ("┃")
+}
+
+padding { horiz 1 }
+
+elastic (n,e,s,W)
+
+END ansi-heavy
+
+
+# ============================================================================
+
+
+BOX ansi-heavy-dashed
+
+author   "chorpler"
+designer "(public domain)"
+created  "November 21, 2023 (Tuesday, 20:32h)"
+revision "1.0"
+revdate  "November 21, 2023 (Tuesday, 20:32h)"
+tags     "box, simple, unicode"
+
+sample
+    ┏╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍┓
+    ┋                      ┋
+    ┋                      ┋
+    ┋                      ┋
+    ┋                      ┋
+    ┋                      ┋
+    ┋                      ┋
+    ┋                      ┋
+    ┗╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍┛
+ends
+
+shapes {
+    nw  ("┏")
+    n   ("╍")
+    ne ("┓")
+    e   ("┋")
+    se  ("┛")
+    s   ("╍")
+    sw  ("┗")
+    w   ("┋")
+}
+
+padding { horiz 1 }
+
+elastic (n,e,s,W)
+
+END ansi-heavy-dashed
+
+
+# ============================================================================
+
+
+BOX ansi-dashed
+
+author   "chorpler"
+designer "(public domain)"
+created  "November 21, 2023 (Tuesday, 20:32h)"
+revision "1.0"
+revdate  "November 21, 2023 (Tuesday, 20:32h)"
+tags     "box, simple, unicode"
+
+sample
+    ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐
+    ┊                      ┊
+    ┊                      ┊
+    ┊                      ┊
+    ┊                      ┊
+    ┊                      ┊
+    ┊                      ┊
+    ┊                      ┊
+    └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘
+ends
+
+shapes {
+    nw  ("┌")
+    n   ("╌")
+    ne ("┐")
+    e   ("┊")
+    se  ("┘")
+    s   ("╌")
+    sw  ("└")
+    w   ("┊")
+}
+
+padding { horiz 1 }
+
+elastic (n,e,s,W)
+
+END ansi-dashed
+
+
+# ============================================================================
+
+
+BOX ansi-rounded-dashed
+
+author   "chorpler"
+designer "(public domain)"
+created  "November 21, 2023 (Tuesday, 20:32h)"
+revision "1.0"
+revdate  "November 21, 2023 (Tuesday, 20:32h)"
+tags     "box, simple, unicode"
+
+sample
+    ╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+    ┊                      ┊
+    ┊                      ┊
+    ┊                      ┊
+    ┊                      ┊
+    ┊                      ┊
+    ┊                      ┊
+    ┊                      ┊
+    ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+ends
+
+shapes {
+    nw  ("╭")
+    n   ("╌")
+    ne ("╮")
+    e   ("┊")
+    se  ("╯")
+    s   ("╌")
+    sw  ("╰")
+    w   ("┊")
+}
+
+padding { horiz 1 }
+
+elastic (n,e,s,W)
+
+END ansi-rounded-dashed
+
+
+# ============================================================================
+
+
 
 #EOF                                     vim: set ai sw=4 expandtab syn=boxes:
