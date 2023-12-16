@@ -895,17 +895,28 @@ static void free_line(line_t *line)
 
 static void killblank(remove_ctx_t *ctx)
 {
-    while (ctx->top_end_idx < ctx->bottom_start_idx && empty_line(input.lines + ctx->top_end_idx)) {
+    size_t lines_removed = 0;
+    size_t max_lines_removable = opt.mend && !opt.killblank ? (size_t) BMAX(opt.design->padding[BTOP], 0) : SIZE_MAX;
+    while (ctx->top_end_idx < ctx->bottom_start_idx && lines_removed < max_lines_removable
+            && empty_line(input.lines + ctx->top_end_idx))
+    {
         #ifdef DEBUG
             fprintf(stderr, "Killing leading blank line in box body.\n");
         #endif
         ++(ctx->top_end_idx);
+        ++lines_removed;
     }
-    while (ctx->bottom_start_idx > ctx->top_end_idx && empty_line(input.lines + ctx->bottom_start_idx - 1)) {
+
+    lines_removed = 0;
+    max_lines_removable = opt.mend && !opt.killblank ? (size_t) BMAX(opt.design->padding[BBOT], 0) : SIZE_MAX;
+    while (ctx->bottom_start_idx > ctx->top_end_idx && lines_removed < max_lines_removable
+            && empty_line(input.lines + ctx->bottom_start_idx - 1))
+    {
         #ifdef DEBUG
             fprintf(stderr, "Killing trailing blank line in box body.\n");
         #endif
         --(ctx->bottom_start_idx);
+        ++lines_removed;
     }
 }
 
@@ -1046,7 +1057,7 @@ static void apply_results_to_input(remove_ctx_t *ctx)
 {
     remove_vertical_from_input(ctx);
 
-    if (opt.killblank) {
+    if (opt.killblank || opt.mend) {
         killblank(ctx);
     }
     remove_bottom_from_input(ctx);
