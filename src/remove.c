@@ -772,9 +772,18 @@ static int sufficient_body_quality(remove_ctx_t *ctx)
         total_quality += line_ctx.east_quality + line_ctx.west_quality;
     }
 
-    size_t max_quality = (opt.design->shape[NW].width + opt.design->shape[NE].width) * num_body_lines;
+    size_t max_quality = 0;
+    if (!ctx->empty_side[BLEF]) {
+        max_quality += opt.design->shape[NW].width;
+    }
+    if (!ctx->empty_side[BRIG]) {
+        max_quality += opt.design->shape[NE].width;
+    }
+    max_quality = max_quality * num_body_lines;
+
     /* If we manage to match 50%, then it is unlikely to improve with a different comparison mode. */
-    int sufficient = total_quality > 0.5 * max_quality;
+    int sufficient = (max_quality == 0 && total_quality == 0)
+            || (max_quality > 0 && (total_quality > 0.5 * max_quality));
     #ifdef DEBUG
         fprintf(stderr, "sufficient_body_quality() found body match quality of %d/%d (%s).\n",
                 (int) total_quality, (int) max_quality, sufficient ? "sufficient" : "NOT sufficient");
@@ -809,6 +818,10 @@ static void find_vertical_shapes(remove_ctx_t *ctx)
             continue;
         }
         ctx->comp_type = comp_type;
+        #ifdef DEBUG
+            fprintf(stderr, "find_vertical_shapes(): comp_type = %s\n", comparison_name[comp_type]);
+        #endif
+        reset_body(ctx);
 
         shape_line_ctx_t **shape_lines_west = NULL;
         if (!west_empty) {
@@ -841,7 +854,6 @@ static void find_vertical_shapes(remove_ctx_t *ctx)
         if (sufficient_body_quality(ctx)) {
             break;
         }
-        reset_body(ctx);
     }
 }
 
