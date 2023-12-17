@@ -412,7 +412,8 @@ char *nspaces(const size_t n)
 #if defined(DEBUG) || 0
 
 /**
- *  Debugging Code: Display contents of input structure
+ * Debugging Code: Display contents of input structure
+ * @param heading a heading to show for identification of the printed lines
  */
 void print_input_lines(const char *heading)
 {

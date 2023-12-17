@@ -213,6 +213,7 @@ static int is_shape_line_empty(shape_line_ctx_t *shapes_relevant, size_t shape_i
 
 static int non_empty_shapes_after(shape_line_ctx_t *shapes_relevant, size_t shape_idx)
 {
+    /* CHECK Can we use shape->is_blank_rightward? */
     for (size_t i = shape_idx + 1; i < SHAPES_PER_SIDE - 1; i++) {
         if (!is_shape_line_empty(shapes_relevant, i)) {
             return 1;
@@ -333,8 +334,9 @@ int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, 
     }
     else if (cur_pos == end_pos) {
         /* we are at the end, which is fine if there is nothing else to match */
-        result = (shapes_relevant[shape_idx].empty || bxs_is_blank(shapes_relevant[shape_idx].text))
-                && !non_empty_shapes_after(shapes_relevant, shape_idx) ? 1 : 0;
+        result = (shape_idx == (SHAPES_PER_SIDE - 1) && anchored_right)
+                || ((shapes_relevant[shape_idx].empty || bxs_is_blank(shapes_relevant[shape_idx].text))
+                    && !non_empty_shapes_after(shapes_relevant, shape_idx) ? 1 : 0);
     }
     else if (shape_idx >= SHAPES_PER_SIDE - 1) {
         /* no more shapes to try, which is fine if the rest of the line is blank */
@@ -347,7 +349,7 @@ int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, 
     else {
         uint32_t *shape_line = u32_strdup(shapes_relevant[shape_idx].text->memory);
         size_t quality = shapes_relevant[shape_idx].text->num_chars;
-        while (shape_line != NULL) {
+        while (shape_line != NULL && quality > 0) {
             if (u32_strncmp(cur_pos, shape_line, quality) == 0) {
                 BFREE(shape_line);
                 cur_pos = cur_pos + quality;
@@ -369,6 +371,11 @@ int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, 
             }
             else if (!anchored_right) {
                 shape_line = shorten(shapes_relevant + shape_idx, &quality, 0, 0, 1);
+                #ifdef DEBUG
+                    char *out_shape_line = u32_strconv_to_output(shape_line);
+                    fprintf(stderr, "hmm() - shape_line shortened to %d (\"%s\")\n", (int) quality, out_shape_line);
+                    BFREE(out_shape_line);
+                #endif
             }
             else {
                 BFREE(shape_line);
@@ -531,24 +538,32 @@ static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx,
         shape_line_ctx_t *shapes_relevant = prepare_comp_shapes_horiz(hside, comp_type, shape_line_idx);
         debug_print_shapes_relevant(shapes_relevant);
 
-        uint32_t *cur_pos = NULL;
         bxstr_t *input_prepped1 = bxs_from_unicode(prepare_comp_input(input_line_idx, 0, comp_type, 0, NULL, NULL));
         bxstr_t *input_prepped = bxs_rtrim(input_prepped1);
+        bxs_append_spaces(input_prepped, opt.design->shape[NW].width + opt.design->shape[NE].width);
         bxs_free(input_prepped1);
         #ifdef DEBUG
             char *out_input_prepped = bxs_to_output(input_prepped);
             fprintf(stderr, "  input_prepped = \"%s\"\n", out_input_prepped);
             BFREE(out_input_prepped);
         #endif
-        match_result_t *mrl = match_outer_shape(BLEF, input_prepped, shapes_relevant[0].text);
-        if (mrl != NULL) {
-            cur_pos = mrl->p + mrl->len;
+
+        uint32_t *cur_pos = input_prepped->memory;
+        match_result_t *mrl = NULL;
+        if (!ctx->empty_side[BLEF]) {
+            mrl = match_outer_shape(BLEF, input_prepped, shapes_relevant[0].text);
+            if (mrl != NULL) {
+                cur_pos = mrl->p + mrl->len;
+            }
         }
 
-        uint32_t *end_pos = NULL;
-        match_result_t *mrr = match_outer_shape(BRIG, input_prepped, shapes_relevant[SHAPES_PER_SIDE - 1].text);
-        if (mrr != NULL) {
-            end_pos = mrr->p;
+        uint32_t *end_pos = bxs_last_char_ptr(input_prepped);
+        match_result_t *mrr = NULL;
+        if (!ctx->empty_side[BRIG]) {
+            mrr = match_outer_shape(BRIG, input_prepped, shapes_relevant[SHAPES_PER_SIDE - 1].text);
+            if (mrr != NULL) {
+                end_pos = mrr->p;
+            }
         }
         #ifdef DEBUG
             char *out_cur_pos = u32_strconv_to_output(cur_pos);
@@ -559,9 +574,8 @@ static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx,
             BFREE(out_end_pos);
         #endif
 
-        if (cur_pos && end_pos) {
-            result = hmm(shapes_relevant, cur_pos, 1, end_pos, mrl->shiftable ? 0 : 1, mrr->shiftable ? 0 : 1);
-        }
+        result = hmm(shapes_relevant, cur_pos, 1, end_pos, (mrl == NULL) || mrl->shiftable ? 0 : 1,
+                (mrr == NULL) || mrr->shiftable ? 0 : 1);
 
         BFREE(mrl);
         BFREE(mrr);
@@ -916,6 +930,7 @@ static void killblank(remove_ctx_t *ctx)
             fprintf(stderr, "Killing leading blank line in box body.\n");
         #endif
         ++(ctx->top_end_idx);
+        --(ctx->body_num_lines);
         ++lines_removed;
     }
 
@@ -928,6 +943,7 @@ static void killblank(remove_ctx_t *ctx)
             fprintf(stderr, "Killing trailing blank line in box body.\n");
         #endif
         --(ctx->bottom_start_idx);
+        --(ctx->body_num_lines);
         ++lines_removed;
     }
 }
@@ -975,10 +991,7 @@ static void remove_top_from_input(remove_ctx_t *ctx)
         }
         memmove(input.lines + ctx->top_start_idx, input.lines + ctx->top_end_idx,
                 (input.num_lines - ctx->top_end_idx) * sizeof(line_t));
-        size_t num_lines_removed = ctx->top_end_idx - ctx->top_start_idx;
-        input.num_lines -= num_lines_removed;
-        ctx->bottom_start_idx -= num_lines_removed;
-        ctx->bottom_end_idx -= num_lines_removed;
+        input.num_lines -= ctx->top_end_idx - ctx->top_start_idx;
     }
 }
 
@@ -1065,6 +1078,22 @@ static void remove_bottom_from_input(remove_ctx_t *ctx)
 
 
 
+static void remove_default_padding(remove_ctx_t *ctx, int num_blanks)
+{
+    if (num_blanks > 0) {
+        for (size_t body_line_idx = 0; body_line_idx < ctx->body_num_lines; body_line_idx++) {
+            size_t input_line_idx = ctx->top_start_idx + body_line_idx; /* top_start_idx, because top was removed! */
+            bxstr_t *temp = bxs_cut_front(input.lines[input_line_idx].text, (size_t) num_blanks);
+            free_line_text(input.lines + input_line_idx);
+            input.lines[input_line_idx].text = temp;
+        }
+        input.indent -= (size_t) num_blanks;
+        input.maxline -= (size_t) num_blanks;
+    }
+}
+
+
+
 static void apply_results_to_input(remove_ctx_t *ctx)
 {
     remove_vertical_from_input(ctx);
@@ -1084,6 +1113,10 @@ static void apply_results_to_input(remove_ctx_t *ctx)
         if (input.lines[j].text->indent < input.indent) {
             input.indent = input.lines[j].text->indent;
         }
+    }
+    if (ctx->empty_side[BLEF]) {
+        /* If the side were not open, default padding would have been removed when the side was removed. */
+        remove_default_padding(ctx, BMIN((int) input.indent, opt.design->padding[BLEF]));
     }
 
     size_t num_lines_removed = BMAX(ctx->top_end_idx - ctx->top_start_idx, (size_t) 0)
