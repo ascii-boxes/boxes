@@ -4,7 +4,6 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/src",
-                "${workspaceFolder}/src/misc",
                 "${workspaceFolder}/out",
                 "${workspaceFolder}/vendor/libunistring-1.0/lib",
                 "${workspaceFolder}/vendor/pcre2-10.40/src",

@@ -22,7 +22,8 @@
         "**/cmake-build-debug": true,
         "**/coverage": true,
         "**/out": true,
-        "**/vendor": true
+        "**/vendor": true,
+        "**/venv": true
     },
 
     "todo-tree.highlights.defaultHighlight": {
@@ -36,7 +37,8 @@
         "**/.github/**",
         "**/_site/**",
         "**/_support/**",
-        "**/vendor/**"
+        "**/vendor/**",
+        "**/venv/**"
     ],
     "todo-tree.general.statusBar": "total",
     "todo-tree.general.tags": ["TODO", "FIXME", "CHECK"],
@@ -44,9 +46,6 @@
     "todo-tree.tree.expanded": true,
     "todo-tree.tree.showCountsInTree": true,
 
-    "[lex]": {
-        "files.encoding": "iso885915"
-    },
     "[makefile]": {
         "editor.insertSpaces": false,
         "editor.detectIndentation": false,

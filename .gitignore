@@ -69,4 +69,5 @@ CMakeUserPresets.json
 
 # CMake / Conan
 build/
+/venv/
 CMakeUserPresets.json
