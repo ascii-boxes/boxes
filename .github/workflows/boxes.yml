@@ -20,7 +20,7 @@ env:
     TERM: xterm-color
 
 jobs:
-    build:
+    build-linux:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -35,6 +35,9 @@ jobs:
 
             - name: Run white-box tests
               run: make utest
+
+            - name: Run sunny-day tests
+              run: make covtest-sunny
 
             - name: Run black-box tests
               run: make covtest
@@ -70,6 +73,9 @@ jobs:
             - name: Run white-box tests
               run: make utest
 
+            - name: Run sunny-day tests
+              run: make covtest-sunny
+
             - name: Run black-box tests
               run: make covtest
 
@@ -83,7 +89,7 @@ jobs:
                   parallel: true
 
     finish:
-      needs: [build, build-macos]
+      needs: [build-linux, build-macos]
       if: ${{ always() }}
       runs-on: ubuntu-latest
       steps:

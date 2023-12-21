@@ -200,6 +200,12 @@ win32.utest: $(OUT_DIR)
 	$(MAKE) -C utest BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(PCRE2_DIR)/src:../$(WIN_CMOCKA_DIR)/include \
 	    LDFLAGS_ADDTL="-L../$(PCRE2_DIR)/.libs -L../$(WIN_CMOCKA_DIR)/lib" utest
 
+test-sunny:
+	cd test; ./test-sunny-days-all.sh
+
+covtest-sunny:
+	cd test; ./test-sunny-days-all.sh --coverage
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #    Cleanup
