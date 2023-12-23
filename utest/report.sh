@@ -26,18 +26,18 @@ if [[ $(uname) == "Darwin" ]]; then
     branchCoverage=branch_coverage
 fi
 
-if test -n "$(find ${OUT_DIR} -maxdepth 1 -name '*.gcda' -print -quit)" \
-    && test -n "$(find ${OUT_DIR} -maxdepth 1 -name '*.gcno' -print -quit)" \
+if test -n "$(find "${OUT_DIR}" -maxdepth 1 -name '*.gcda' -print -quit)" \
+    && test -n "$(find "${OUT_DIR}" -maxdepth 1 -name '*.gcno' -print -quit)" \
     && test -n "$(lcov --version)"
 then
-    mkdir -p ${testResultsDir}
-    mkdir -p ${testReportDir}
-    cp ${OUT_DIR}/*.gc* ${testResultsDir}
-    lcov --capture --directory ${testResultsDir} --base-directory ${SRC_DIR} --test-name ${tcBaseName} --quiet \
+    mkdir -p "${testResultsDir}"
+    mkdir -p "${testReportDir}"
+    cp "${OUT_DIR}"/*.gc* "${testResultsDir}"
+    lcov --capture --directory "${testResultsDir}" --base-directory "${SRC_DIR}" --test-name ${tcBaseName} --quiet \
         --exclude '*/lex.yy.c' --exclude '*/parser.c' --rc "${branchCoverage}=1" \
-        --output-file ${testResultsDir}/coverage.info
+        --output-file "${testResultsDir}/coverage.info"
     echo -n "[ Coverage ] "
-    genhtml --title "Boxes / Unit Tests" --branch-coverage --legend --output-directory ${testReportDir} \
-        ${testResultsDir}/coverage.info | grep 'lines...' | grep -oP '\d+\.\d*%'
+    genhtml --title "Boxes / Unit Tests" --branch-coverage --legend --output-directory "${testReportDir}" \
+        "${testResultsDir}/coverage.info" | grep 'lines...' | grep -oP '\d+\.\d*%'
     echo "[  Report  ] Unit test coverage report available at ${testReportDir}/index.html"
 fi
