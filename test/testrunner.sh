@@ -25,13 +25,14 @@ declare -r COVERAGE_FILE=${OUT_DIR}/lcov-total.info
 
 # Command Line Options
 declare opt_coverage=false
+declare opt_coverage_per_test=false
 declare opt_suite=false
 declare opt_testCase=""
 
 
 function print_usage()
 {
-    echo 'Usage: testrunner.sh [--coverage] {--suite | <opt_testCase>}'
+    echo 'Usage: testrunner.sh [--coverage] [--coverage-per-test] {--suite | <opt_testCase>}'
     echo '       Returns 0 for success, else non-zero'
 }
 
@@ -48,6 +49,10 @@ function parse_arguments()
             --coverage)
                 opt_coverage=true
                 shift
+                ;;
+            --coverage-per-test)
+                opt_coverage_per_test=true
+                opt_coverage=true
                 ;;
             --suite)
                 opt_suite=true
@@ -112,6 +117,16 @@ function cov_baseline()
 }
 
 
+function cov_args()
+{
+    if [ ${opt_coverage_per_test} == true ]; then
+        echo '--coverage-per-test'
+    elif [ ${opt_coverage} == true ]; then
+        echo '--coverage'
+    fi
+}
+
+
 function execute_suite()
 {
     local countExecuted=0
@@ -122,18 +137,10 @@ function execute_suite()
     # unique and runs under ISO_8859-15. But this only happens on macOS.
     # So, if we run test 111 on macOS, we should run with LC_ALL=C
     for tc in *.txt; do
-        if [ ${opt_coverage} == true ]; then
-            if [[ $(uname) == "Darwin" ]] && [[ ${tc} == "111"* ]]; then
-                LC_ALL=C $0 --coverage "${tc}"
-            else
-                $0 --coverage "${tc}"
-            fi 
+        if [[ $(uname) == "Darwin" ]] && [[ ${tc} == "111"* ]]; then
+            LC_ALL=C $0 "$(cov_args)" "${tc}"
         else
-            if [[ $(uname) == "Darwin" ]] && [[ ${tc} == "111"* ]]; then
-                LC_ALL=C $0 "${tc}"
-            else
-                $0 "${tc}"
-            fi
+            $0 "$(cov_args)" "${tc}"
         fi
         if [ $? -ne 0 ]; then
             overallResult=1
@@ -147,8 +154,8 @@ function execute_suite()
 
 function measure_coverage()
 {
-    local testResultsDir=${OUT_DIR}/test-results/${tcBaseName}
     if [ ${opt_coverage} == true ]; then
+        local testResultsDir=${OUT_DIR}/test-results/${tcBaseName}
         mkdir -p "${testResultsDir}"
         cp ${OUT_DIR}/*.gc* "${testResultsDir}"
         lcov --capture --directory "${testResultsDir}" --base-directory ${SRC_DIR} --test-name "${tcBaseName}" --quiet \
@@ -162,13 +169,15 @@ function measure_coverage()
 
 function consolidate_coverage()
 {
-    echo -e "\nConsolidating test coverage ..."
-    pushd ${OUT_DIR}/test-results || exit 1
-    find . -name "*.info" | xargs printf -- '--add-tracefile %s\n' | xargs --exit \
-        lcov --rc "${branchCoverage}=1" --exclude '*/lex.yy.c' --exclude '*/parser.c' \
-             --output-file ../${COVERAGE_FILE} --add-tracefile ../${BASELINE_FILE}
-    popd || exit 1
-    echo ""
+    if [[ ${opt_coverage} == true ]]; then
+        echo -e "\nConsolidating test coverage ..."
+        pushd ${OUT_DIR}/test-results || exit 1
+        find . -name "*.info" | xargs printf -- '--add-tracefile %s\n' | xargs --exit \
+            lcov --rc "${branchCoverage}=1" --exclude '*/lex.yy.c' --exclude '*/parser.c' \
+                --output-file ../${COVERAGE_FILE} --add-tracefile ../${BASELINE_FILE}
+        popd || exit 1
+        echo ""
+    fi
 }
 
 
@@ -205,8 +214,8 @@ function check_mandatory_sections()
 function arrange_environment()
 {
     local boxesEnv=""
-    if [ $(grep -c "^:ENV" ${opt_testCase}) -eq 1 ]; then
-        boxesEnv=$(cat ${opt_testCase} | sed -n '/^:ENV/,/^:ARGS/p;' | sed '1d;$d' | tr -d '\r')
+    if [[ $(grep -c "^:ENV" "${opt_testCase}") -eq 1 ]]; then
+        boxesEnv=$(sed -n '/^:ENV/,/^:ARGS/p;' < "${opt_testCase}" | sed '1d;$d' | tr -d '\r')
     fi
     if [ -n "$boxesEnv" ]; then
         echo "$boxesEnv" | sed -e 's/export/\n    export/g' | sed '1d'
@@ -221,12 +230,12 @@ function arrange_environment()
 function arrange_test_fixtures()
 {
     if [ $(grep -c "^:EXPECTED-ERROR " ${opt_testCase}) -eq 1 ]; then
-        expectedReturnCode=$(grep "^:EXPECTED-ERROR " ${opt_testCase} | sed -e 's/:EXPECTED-ERROR //')
+        expectedReturnCode=$(grep "^:EXPECTED-ERROR " "${opt_testCase}" | sed -e 's/:EXPECTED-ERROR //')
     fi
 
-    cat ${opt_testCase} | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d '\r' > "${testInputFile}"
-    cat ${opt_testCase} | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > "${testFilterFile}"
-    cat ${opt_testCase} | sed -n '/^:EXPECTED/,/^:EOF/p;' | sed '1d;$d' | tr -d '\r' > "${testExpectationFile}"
+    cat "${opt_testCase}" | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d '\r' > "${testInputFile}"
+    cat "${opt_testCase}" | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > "${testFilterFile}"
+    cat "${opt_testCase}" | sed -n '/^:EXPECTED/,/^:EOF/p;' | sed '1d;$d' | tr -d '\r' > "${testExpectationFile}"
 }
 
 
@@ -266,6 +275,7 @@ parse_arguments "$@"
 check_prereqs
 cov_baseline
 
+declare tcBaseName=${opt_testCase%.txt}
 declare branchCoverage=lcov_branch_coverage
 if [[ $(uname) == "Darwin" ]]; then
     branchCoverage=branch_coverage
@@ -274,8 +284,13 @@ fi
 # Execute the entire test suite
 if [ ${opt_suite} == true ]; then
     declare -i overallResult=0
+    clear_gcda_traces
     execute_suite
 
+    if [ ${opt_coverage_per_test} == false ]; then
+        tcBaseName=black-box-all
+        measure_coverage
+    fi
     if [ ${opt_coverage} == true ]; then
         consolidate_coverage
         report_coverage
@@ -285,8 +300,9 @@ fi
 
 # Execute only a single test
 echo "Running test case: ${opt_testCase}"
-declare -r tcBaseName=${opt_testCase%.txt}
-clear_gcda_traces
+if [ ${opt_coverage_per_test} == true ]; then
+    clear_gcda_traces
+fi
 
 check_mandatory_sections
 
@@ -295,21 +311,23 @@ declare -r testInputFile=${opt_testCase/%.txt/.input.tmp}
 declare -r testExpectationFile=${opt_testCase/%.txt/.expected.tmp}
 declare -r testFilterFile=${opt_testCase/%.txt/.sed.tmp}
 declare -r testOutputFile=${opt_testCase/%.txt/.out.tmp}
-declare -r boxesArgs=$(cat ${opt_testCase} | sed -n '/^:ARGS/,+1p' | grep -v ^:INPUT | sed '1d' | tr -d '\r')
+declare -r boxesArgs=$(sed -n '/^:ARGS/,+1p' < "${opt_testCase}" | grep -v ^:INPUT | sed '1d' | tr -d '\r')
 
 arrange_environment
 arrange_test_fixtures
 
 declare -i actualReturnCode=100
 run_boxes
-measure_coverage
 
+if [ ${opt_coverage_per_test} == true ]; then
+    measure_coverage
+fi
 assert_outcome
 
-rm ${testInputFile}
-rm ${testFilterFile}
-rm ${testExpectationFile}
-rm ${testOutputFile}
+rm "${testInputFile}"
+rm "${testFilterFile}"
+rm "${testExpectationFile}"
+rm "${testOutputFile}"
 
 echo "    OK"
 exit 0
