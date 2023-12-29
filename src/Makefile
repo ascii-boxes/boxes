@@ -94,7 +94,9 @@ flags_win32:
 	$(eval CFLAGS := -Os -s -m32 -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
 	$(eval LDFLAGS := $(LDFLAGS) -s -m32 $(LDFLAGS_ADDTL))
 	$(eval BOXES_EXECUTABLE_NAME := boxes.exe)
-	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
+# TODO Here, one can manually remove files for testing. In the end, the line should be generated as per the commented one below.
+	$(eval ALL_OBJ := parser.o lex.yy.o bxstring.o cmdline.o detect.o discovery.o generate.o input.o list.o parsecode.o parsing.o query.o regulex.o remove.o shape.o tools.o unicode.o)
+#	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
 	echo $(filter-out boxes.o,$(ALL_OBJ)) > $(OUT_DIR)/modules.txt
 
 flags_:
