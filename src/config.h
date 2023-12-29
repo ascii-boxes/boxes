@@ -41,6 +41,10 @@
 /* enable strdup() declaration in string.h: */
 #define __MISC_VISIBLE 1
 
+#ifdef _POSIX_TIMERS
+#undef _POSIX_TIMERS
+#endif
+
 #ifndef _POSIX_SOURCE
 #define _POSIX_SOURCE
 #endif
