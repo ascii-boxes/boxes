@@ -20,7 +20,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-
 #if defined(__linux__) || defined(__GLIBC__) || defined(__GNU__)
 
 #define _GNU_SOURCE
@@ -39,6 +38,7 @@
 
 #elif defined(__MINGW32__)
 
+/* enable strdup() declaration in string.h: */
 #define __MISC_VISIBLE 1
 
 #ifndef _POSIX_SOURCE
@@ -46,6 +46,9 @@
 #endif
 
 #else
+
+/* enable strdup() declaration in string.h: */
+#define __MISC_VISIBLE 1
 
 #ifndef _POSIX_SOURCE
 #define _POSIX_SOURCE
