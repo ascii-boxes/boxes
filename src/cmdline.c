@@ -40,8 +40,10 @@
 #include "cmdline.h"
 
 
+#if !defined(__MINGW32__)
 extern char *optarg;   /* for getopt() */
 extern int optind;     /* for getopt() */
+#endif
 
 
 /* default tab stop distance (part of -t) */
