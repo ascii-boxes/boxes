@@ -32,14 +32,17 @@
 #endif
 
 #include "boxes.h"
+#include "bxstring.h"
 #include "discovery.h"
 #include "query.h"
 #include "tools.h"
 #include "cmdline.h"
 
 
+#if !defined(__MINGW32__)
 extern char *optarg;   /* for getopt() */
 extern int optind;     /* for getopt() */
+#endif
 
 
 /* default tab stop distance (part of -t) */
