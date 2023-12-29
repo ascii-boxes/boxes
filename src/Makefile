@@ -91,7 +91,7 @@ flags_static:
 	echo $(filter-out boxes.o,$(ALL_OBJ)) > $(OUT_DIR)/modules.txt
 
 flags_win32:
-	$(eval CFLAGS := -Os -s -m32 -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
+	$(eval CFLAGS := -Os -s -m32 -D__MINGW32__ -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
 	$(eval LDFLAGS := $(LDFLAGS) -s -m32 $(LDFLAGS_ADDTL))
 	$(eval BOXES_EXECUTABLE_NAME := boxes.exe)
 # TODO Here, one can manually remove files for testing. In the end, the line should be generated as per the commented one below.
