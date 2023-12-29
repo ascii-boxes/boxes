@@ -20,81 +20,153 @@ env:
     TERM: xterm-color
 
 jobs:
-    build-linux:
-        runs-on: ubuntu-latest
+    # build-linux:
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #         - uses: actions/checkout@v4
+
+    #         - name: add-packages
+    #           run: |
+    #               sudo apt-get update -y
+    #               sudo apt-get install -y git flex bison libunistring-dev libpcre2-dev libncurses-dev diffutils vim-common lcov libcmocka-dev
+
+    #         - name: make cov
+    #           run: make cov
+
+    #         - name: Run white-box tests
+    #           run: make utest
+
+    #         - name: Run sunny-day tests
+    #           run: make covtest-sunny
+
+    #         - name: Run black-box tests
+    #           run: make covtest
+
+    #         - name: Coveralls
+    #           uses: coverallsapp/github-action@v2
+    #           with:
+    #               github-token: ${{ secrets.GITHUB_TOKEN }}
+    #               file: out/lcov-total.info
+    #               format: lcov
+    #               flag-name: run-linux
+    #               parallel: true
+
+    build-windows:
+        runs-on: windows-latest
+        defaults:
+            run:
+                shell: msys2 {0}
         steps:
             - uses: actions/checkout@v4
 
             - name: add-packages
-              run: |
-                  sudo apt-get update -y
-                  sudo apt-get install -y git flex bison libunistring-dev libpcre2-dev libncurses-dev diffutils vim-common lcov libcmocka-dev
+              uses: msys2/setup-msys2@v2
+              with:
+                  update: true
+                  msystem: MINGW32
+                  install: >-
+                      base-devel
+                      bison
+                      diffutils
+                      dos2unix
+                      flex
+                      gcc
+                      git
+                      libiconv-devel
+                      libunistring-devel
+                      make
+                      ncurses-devel
+                      pcre2-devel
+                      unzip
+                      vim
+                      zip
+                  pacboy: >-
+                      cmocka:p
 
-            - name: make cov
-              run: make cov
+            # - name: Provide win32 prerequisites
+            #   run: |
+            #       echo gcc Include path:
+            #       echo -------------------------------------------------------------------------------------------
+            #       echo | gcc -E -Wp,-v -
+            #       echo -------------------------------------------------------------------------------------------
+            #       pwd
+            #       zip -r usr-include.zip /usr/include
+            #       ls -lF / > ls-root.txt
+            #       cat ls-root.txt
+            #       find /bin /etc /home /opt -print > files1.txt
+            #       find /usr -print > files2.txt
+            #       find /clang32 /clang64 /mingw32 /mingw64 /ucrt64 -print > files3.txt
+
+            - name: make win32.ci
+              run: make win32.ci
+
+            - name: TEMP upload artifacts
+              if: always()
+              uses: actions/upload-artifact@v3
+              with:
+                name: files
+                path: |
+                    out
+                # path: |
+                #     ls-root.txt
+                #     files*.txt
+                #     usr-include.zip
+                #     out
+                #     D:/a/_temp/msys64/mingw64/lib
+                retention-days: 2
 
             - name: Run white-box tests
-              run: make utest
+              run: make win32.utest
 
             - name: Run sunny-day tests
-              run: make covtest-sunny
+              run: make test-sunny
 
             - name: Run black-box tests
-              run: make covtest
+              run: make test
 
-            - name: Coveralls
-              uses: coverallsapp/github-action@v2
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  file: out/lcov-total.info
-                  format: lcov
-                  flag-name: run-linux
-                  parallel: true
+    # build-macos:
+    #     runs-on: macos-13
+    #     env:
+    #       BX_LEX: /usr/local/opt/flex/bin/flex
+    #       BX_YACC: /usr/local/opt/bison/bin/bison
+    #     steps:
+    #         - uses: actions/checkout@v4
+    #         # We need to use GNU grep, sed, and xargs on macOS
+    #         - name: add-packages
+    #           run: |
+    #               brew install flex bison diffutils lcov cmocka grep gnu-sed findutils
+    #               echo '/usr/local/opt/grep/libexec/gnubin' >> $GITHUB_PATH
+    #               echo '/usr/local/opt/gnu-sed/libexec/gnubin' >> $GITHUB_PATH
+    #               echo '/usr/local/opt/findutils/libexec/gnubin' >> $GITHUB_PATH
 
-    build-macos:
-        runs-on: macos-13
-        env:
-          BX_LEX: /usr/local/opt/flex/bin/flex
-          BX_YACC: /usr/local/opt/bison/bin/bison
-        steps:
-            - uses: actions/checkout@v4
+    #         - name: make cov
+    #           run: make cov
 
-            # We need to use GNU grep, sed, and xargs on macOS
-            - name: add-packages
-              run: |
-                  brew install flex bison diffutils lcov cmocka grep gnu-sed findutils
-                  echo '/usr/local/opt/grep/libexec/gnubin' >> $GITHUB_PATH
-                  echo '/usr/local/opt/gnu-sed/libexec/gnubin' >> $GITHUB_PATH
-                  echo '/usr/local/opt/findutils/libexec/gnubin' >> $GITHUB_PATH
+    #         - name: Run white-box tests
+    #           run: make utest
 
-            - name: make cov
-              run: make cov
+    #         - name: Run sunny-day tests
+    #           run: make covtest-sunny
 
-            - name: Run white-box tests
-              run: make utest
+    #         - name: Run black-box tests
+    #           run: make covtest
 
-            - name: Run sunny-day tests
-              run: make covtest-sunny
+    #         - name: Coveralls
+    #           uses: coverallsapp/github-action@v2
+    #           with:
+    #               github-token: ${{ secrets.GITHUB_TOKEN }}
+    #               file: out/lcov-total.info
+    #               format: lcov
+    #               flag-name: run-macos
+    #               parallel: true
 
-            - name: Run black-box tests
-              run: make covtest
-
-            - name: Coveralls
-              uses: coverallsapp/github-action@v2
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  file: out/lcov-total.info
-                  format: lcov
-                  flag-name: run-macos
-                  parallel: true
-
-    finish:
-      needs: [build-linux, build-macos]
-      if: ${{ always() }}
-      runs-on: ubuntu-latest
-      steps:
-      - name: Coveralls Finished
-        uses: coverallsapp/github-action@v2
-        with:
-          parallel-finished: true
-          carryforward: "run-linux,run-macos"
+    # finish:
+    #   needs: [build-linux, build-macos]
+    #   if: ${{ always() }}
+    #   runs-on: ubuntu-latest
+    #   steps:
+    #   - name: Coveralls Finished
+    #     uses: coverallsapp/github-action@v2
+    #     with:
+    #       parallel-finished: true
+    #       carryforward: "run-linux,run-macos"
