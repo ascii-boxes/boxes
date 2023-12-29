@@ -81,6 +81,9 @@ win32: infomsg replaceinfos
 	    LEX=../$(WIN_FLEX_BISON_DIR)/win_flex.exe YACC=../$(WIN_FLEX_BISON_DIR)/win_bison.exe \
 	    LIBNCURSES_WIN_INCLUDE=$(LIBNCURSES_WIN_INCLUDE) build
 
+win32.ci: infomsg replaceinfos
+	$(MAKE) -C src BOXES_PLATFORM=win32 LEX=$(BX_LEX) YACC=$(BX_YACC) build
+
 win32.debug: infomsg replaceinfos
 	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=../$(PCRE2_DIR)/src LDFLAGS=-L../$(PCRE2_DIR)/.libs \
 	    LEX=../$(WIN_FLEX_BISON_DIR)/win_flex.exe YACC=../$(WIN_FLEX_BISON_DIR)/win_bison.exe \
