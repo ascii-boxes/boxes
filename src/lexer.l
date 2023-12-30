@@ -137,7 +137,7 @@ PFILENAME [^\r\n]+
 
 <DELIMSPEC>[^ \t\r\n]+ {
     /*
-     * String delimiter spec - like WORD, but allow any character
+     * String delimiter spec - like BXWORD, but allow any character
      */
     yylval->s = bxs_from_ascii("IGNORED");
     char *str = (char *) strdup(yytext);
@@ -415,10 +415,10 @@ PFILENAME [^\r\n]+
         exit (EXIT_FAILURE);
     }
     #ifdef LEXER_DEBUG
-        fprintf (stderr, "   WORD: %s\n", u32_strconv_to_output(utf8));
+        fprintf (stderr, " BXWORD: %s\n", u32_strconv_to_output(utf8));
     #endif
     BFREE(utf8);
-    return WORD;
+    return BXWORD;
 }
 
 

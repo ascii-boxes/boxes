@@ -741,9 +741,10 @@ FILE *bx_fopen(char *pathname, char *mode)
     /*
      * On Linux/UNIX and OS X (Mac), one can access files with non-ASCII file names by passing them to fopen() as UTF-8.
      * On Windows, a different function must be called. (Info: https://stackoverflow.com/a/35065142/1005481)
+     * On newer Windows, we're good:
+     * https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/setlocale-wsetlocale#utf-8-support
      */
     FILE *f = fopen(pathname, mode);
-    // TODO Windows
     return f;
 }
 

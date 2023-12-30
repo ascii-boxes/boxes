@@ -24,6 +24,9 @@
 #include <string.h>
 #include <uniconv.h>
 #include <unistd.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 #include "boxes.h"
 #include "bxstring.h"
@@ -103,7 +106,8 @@ static int build_design(design_t **adesigns, const char *cld)
     dp->tags = (char **) calloc(2, sizeof(char *));
     dp->tags[0] = "transient";
 
-    uint32_t *cld_u32 = u32_strconv_from_arg(cld, "UTF-8");  /* CHECK wrong on Windows (UTF-16) or different IME */
+    /* We always use UTF-8, which is correct for Linux and MacOS, and for modern Windows configured for UTF-8. */
+    uint32_t *cld_u32 = u32_strconv_from_arg(cld, "UTF-8");
     bxstr_t *cldW = bxs_from_unicode(cld_u32);
     BFREE(cld_u32);
 
@@ -453,6 +457,22 @@ static int check_color_support(int opt_color)
 
 
 
+/**
+ * Switch from default "C" encoding to system encoding.
+ */
+static void activateSystemEncoding()
+{
+    #ifdef _WIN32
+        SetConsoleOutputCP(CP_ACP);
+        SetConsoleCP(CP_ACP);  
+        /* If it should one day turn out that this doesn't have the desired effect, try setlocale(LC_ALL, ".UTF8"). */
+    #else
+        setlocale(LC_ALL, "");
+    #endif
+}
+
+
+
 /*       _\|/_
          (o o)
  +----oOO-{_}-OOo------------------------------------------------------------+
@@ -470,7 +490,7 @@ int main(int argc, char *argv[])
     #endif
 
     /* Temporarily set the system encoding, for proper output of --help text etc. */
-    setlocale(LC_ALL, "");    /* switch from default "C" encoding to system encoding */
+    activateSystemEncoding();
     encoding = locale_charset();
 
     handle_command_line(argc, argv);

@@ -127,7 +127,7 @@ typedef struct {
 %token YPARENT YSHAPES YELASTIC YPADDING YSAMPLE YENDSAMPLE YBOX YEND YUNREC
 %token YREPLACE YREVERSE YTO YWITH YCHGDEL YTAGS
 %token <ascii> KEYWORD
-%token <s> WORD
+%token <s> BXWORD
 %token <ascii> ASCII_ID
 %token <s> STRING
 %token <s> FILENAME
@@ -224,7 +224,7 @@ alias_list: alias | alias_list ',' alias;
 
 design_id: ASCII_ID | ASCII_ID ',' alias_list
 
-| WORD
+| BXWORD
     {
         yyerror(bison_args, "box design name must consist of printable standard ASCII characters.");
         YYERROR;
@@ -282,7 +282,7 @@ entry: KEYWORD STRING
 
 | YTAGS '(' tag_list ')' | YTAGS tag_entry
 
-| WORD STRING | ASCII_ID STRING
+| BXWORD STRING | ASCII_ID STRING
     {
         #ifdef PARSER_DEBUG
             fprintf (stderr, " Parser: Discarding entry [%s = %s].\n", $1, bxs_to_output($2));

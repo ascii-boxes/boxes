@@ -196,6 +196,7 @@ void test_u32_insert_space_at(void **state)
     u32_insert_space_at(&s, 1, 1);
     u32_insert_space_at(&s, 10000, 2);
 
+    assert_non_null(s);
     assert_int_equal(0, u32_strcmp(expected, s));
 
     BFREE(s);
