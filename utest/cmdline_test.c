@@ -434,7 +434,7 @@ void test_inputfiles_actual_success(void **state)
 {
     UNUSED(state);
 
-    opt_t *actual = act(2, "../utest/dummy_in.txt", "dummy_out.txt");
+    opt_t *actual = act(2, "../utest/dummy_in.txt", "../out/dummy_out.txt");
 
     assert_non_null(actual);
     assert_non_null(actual->infile);
