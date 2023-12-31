@@ -43,6 +43,32 @@ WIN_CMOCKA_DIR         = vendor/cmocka-$(WIN_CMOCKA_VERSION)
         package win32.package package_common utest win32.utest static
 
 
+define TERMINFO_SCRIPT
+#!/usr/bin/env bash
+
+# Script to determine a value for TERMINFO and echo it on stdout
+
+declare -r TERMINFO_FALLBACK=/mnt/c/MinGW/lib/terminfo
+
+if [[ -n $${TERMINFO} && -d $${TERMINFO}/78 ]]; then
+    echo "Modern terminfo database found." >&2
+    echo $${TERMINFO}
+else
+    echo "WARNING: Terminfo database not found or outdated." >&2
+    if [[ -d $${TERMINFO_FALLBACK}/78 ]]; then
+        echo "Using $${TERMINFO_FALLBACK} as fallback." >&2
+        echo $${TERMINFO_FALLBACK}
+    else
+        echo "ERROR: Fallback unavailable. " >&2
+        echo -n "Find a terminfo database that uses a hashed structure " >&2
+        echo "(hexadecimal numbers as directories, not single letters). " >&2
+        echo "Set its path in the TERMINFO_FALLBACK variable near the top of the root Makefile." >&2
+        exit 1
+    fi
+fi
+endef
+
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #    Build
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -124,10 +150,17 @@ vendor/libncurses-$(LIBNCURSES_VERSION).tar.gz: | vendor
 	curl -L https://invisible-mirror.net/archives/ncurses/ncurses-$(LIBNCURSES_VERSION).tar.gz --output $@
 
 $(LIBNCURSES_DIR)/lib/libncurses.a: vendor/libncurses-$(LIBNCURSES_VERSION).tar.gz
+	@echo TERMINFO=${TERMINFO}
 	tar -C vendor -xzf vendor/libncurses-$(LIBNCURSES_VERSION).tar.gz
-	cd $(LIBNCURSES_DIR) ; ./configure --enable-static ; $(MAKE)
+	cd $(LIBNCURSES_DIR) ; ./configure --enable-static --enable-termcap; $(MAKE)
 
-static: infomsg replaceinfos $(LIBUNISTRING_DIR)/lib/.libs/libunistring.a $(PCRE2_DIR)/.libs/libpcre2-32.a $(LIBNCURSES_DIR)/lib/libncurses.a
+export TERMINFO_SCRIPT
+$(OUT_DIR)/terminfo-check.sh: | $(OUT_DIR)
+	echo "$$TERMINFO_SCRIPT" > $@ 
+
+static: infomsg replaceinfos $(LIBUNISTRING_DIR)/lib/.libs/libunistring.a $(PCRE2_DIR)/.libs/libpcre2-32.a $(OUT_DIR)/terminfo-check.sh
+	TERMINFO=`$(OUT_DIR)/terminfo-check.sh` \
+	    $(MAKE) LIBNCURSES_DIR=$(LIBNCURSES_DIR) LIBNCURSES_VERSION=$(LIBNCURSES_VERSION) $(LIBNCURSES_DIR)/lib/libncurses.a
 	$(MAKE) -C src BOXES_PLATFORM=static LEX=$(BX_LEX) YACC=$(BX_YACC) LIBUNISTRING_DIR=$(LIBUNISTRING_DIR) \
         PCRE2_DIR=$(PCRE2_DIR) LIBNCURSES_DIR=$(LIBNCURSES_DIR) LIBNCURSES_WIN_INCLUDE=$(LIBNCURSES_WIN_INCLUDE) $@
 
