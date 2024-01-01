@@ -239,12 +239,12 @@ static void print_design_details(design_t *d)
     }
 
     fprintf(opt.outfile, "Replacement Rules:      ");
-    if (d->anz_reprules > 0) {
-        for (int i = 0; i < (int) d->anz_reprules; ++i) {
+    if (d->num_reprules > 0) {
+        for (int i = 0; i < (int) d->num_reprules; ++i) {
             fprintf(opt.outfile, "%d. (%s) \"%s\" WITH \"%s\"%s", i + 1,
                     d->reprules[i].mode == 'g' ? "glob" : "once",
                     bxs_to_output(d->reprules[i].search), bxs_to_output(d->reprules[i].repstr), opt.eol);
-            if (i < (int) d->anz_reprules - 1) {
+            if (i < (int) d->num_reprules - 1) {
                 fprintf(opt.outfile, "                        ");
             }
         }
@@ -253,12 +253,12 @@ static void print_design_details(design_t *d)
         fprintf(opt.outfile, "none%s", opt.eol);
     }
     fprintf(opt.outfile, "Reversion Rules:        ");
-    if (d->anz_revrules > 0) {
-        for (int i = 0; i < (int) d->anz_revrules; ++i) {
+    if (d->num_revrules > 0) {
+        for (int i = 0; i < (int) d->num_revrules; ++i) {
             fprintf(opt.outfile, "%d. (%s) \"%s\" TO \"%s\"%s", i + 1,
                     d->revrules[i].mode == 'g' ? "glob" : "once",
                     bxs_to_output(d->revrules[i].search), bxs_to_output(d->revrules[i].repstr), opt.eol);
-            if (i < (int) d->anz_revrules - 1) {
+            if (i < (int) d->num_revrules - 1) {
                 fprintf(opt.outfile, "                        ");
             }
         }

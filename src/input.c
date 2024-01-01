@@ -95,7 +95,7 @@ static int get_indent(const line_t *lines, const size_t lines_size)
 
 int apply_substitutions(input_t *result, const int mode)
 {
-    size_t anz_rules;
+    size_t num_rules;
     reprule_t *rules;
     size_t j, k;
 
@@ -104,11 +104,11 @@ int apply_substitutions(input_t *result, const int mode)
     }
 
     if (mode == 0) {
-        anz_rules = opt.design->anz_reprules;
+        num_rules = opt.design->num_reprules;
         rules = opt.design->reprules;
     }
     else if (mode == 1) {
-        anz_rules = opt.design->anz_revrules;
+        num_rules = opt.design->num_revrules;
         rules = opt.design->revrules;
     }
     else {
@@ -120,11 +120,11 @@ int apply_substitutions(input_t *result, const int mode)
      *  Compile regular expressions
      */
     #ifdef REGEXP_DEBUG
-        fprintf(stderr, "Compiling %d %s rule patterns\n", (int) anz_rules, mode ? "reversion" : "replacement");
+        fprintf(stderr, "Compiling %d %s rule patterns\n", (int) num_rules, mode ? "reversion" : "replacement");
     #endif
     errno = 0;
     opt.design->current_rule = rules;
-    for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
+    for (j = 0; j < num_rules; ++j, ++(opt.design->current_rule)) {
         rules[j].prog = u32_compile_pattern(rules[j].search->memory);
         if (rules[j].prog == NULL) {
             return 5;
@@ -140,7 +140,7 @@ int apply_substitutions(input_t *result, const int mode)
      */
     for (k = 0; k < result->num_lines; ++k) {
         opt.design->current_rule = rules;
-        for (j = 0; j < anz_rules; ++j, ++(opt.design->current_rule)) {
+        for (j = 0; j < num_rules; ++j, ++(opt.design->current_rule)) {
             #ifdef REGEXP_DEBUG
                 char *outtext = bxs_to_output(result->lines[k].text);
                 char *outrepstr = bxs_to_output(rules[j].repstr);

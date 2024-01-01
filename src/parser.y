@@ -313,12 +313,12 @@ block: YSAMPLE STRING YENDSAMPLE
 
 | YREPLACE rflag STRING YWITH STRING
     {
-        invoke_action(action_add_regex_rule(bison_args, "rep", &curdes.reprules, &curdes.anz_reprules, $3, $5, $2));
+        invoke_action(action_add_regex_rule(bison_args, "rep", &curdes.reprules, &curdes.num_reprules, $3, $5, $2));
     }
 
 | YREVERSE rflag STRING YTO STRING
     {
-        invoke_action(action_add_regex_rule(bison_args, "rev", &curdes.revrules, &curdes.anz_revrules, $3, $5, $2));
+        invoke_action(action_add_regex_rule(bison_args, "rev", &curdes.revrules, &curdes.num_revrules, $3, $5, $2));
     }
 
 | YPADDING '{' wlist '}'

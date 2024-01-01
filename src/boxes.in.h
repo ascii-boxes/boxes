@@ -126,9 +126,9 @@ typedef struct {
 
     reprule_t *current_rule;
     reprule_t *reprules;             /* applied when drawing a box */
-    size_t     anz_reprules;
+    size_t     num_reprules;
     reprule_t *revrules;             /* applied upon removal of a box */
-    size_t     anz_revrules;
+    size_t     num_revrules;
 } design_t;
 
 extern design_t *designs;
