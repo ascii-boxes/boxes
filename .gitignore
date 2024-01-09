@@ -50,7 +50,7 @@ CMakeUserPresets.json
 *.swp
 /datagen/dist/
 /datagen/venv/
-/datagen/*.egg-info/
+/datagen/**/*.egg-info/
 /datagen/**/__pycache__/
 
 

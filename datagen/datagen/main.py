@@ -11,6 +11,7 @@
 # If not, see <https://www.gnu.org/licenses/>.
 #
 
+from ansi2html import Ansi2HTMLConverter
 from typing import Optional
 import click
 import itertools
@@ -112,9 +113,21 @@ def remove_email(attribution: str) -> str:
     return re.sub(re.compile(' <[^>]+>$'), '', attribution)
 
 
+def color2html(design: Design) -> None:
+    if design.sample:
+        converter = Ansi2HTMLConverter(
+            inline=True,     # do not use templates or CSS, just inline the color styles
+            line_wrap=True,  # wrap lines as in input
+            output_encoding='utf-8',
+            scheme='xterm')
+        ansi = design.sample
+        html = converter.convert(ansi, full=False)
+        design.sample = Sample(html)
+
+
 def add_design_details(config: str, executable: str, design: Design) -> None:
     process = subprocess.run([executable, '-f', config, '-q', '(undoc)', '-d', design.name, '-l'], stdout=subprocess.PIPE)
-    lines = process.stdout.decode('ascii').splitlines()
+    lines = process.stdout.decode('utf-8').splitlines()
     p_orgd = re.compile('^Original Designer:\\s+(.*)')
     p_auth = re.compile('^Author:\\s+(.*)')
     p_tags = re.compile('^Tags:\\s+(.*)')
@@ -145,6 +158,9 @@ def add_design_details(config: str, executable: str, design: Design) -> None:
     if len(sample_lines) > 0:
         sample = '\n'.join(remove_indent(sample_lines)).rstrip()
         design.sample = Sample(sample)
+    
+    if design.tags and 'color' in design.tags:
+        color2html(design)
 
 
 def write_yaml(design_data: list[Design], output: str) -> None:
@@ -157,12 +173,12 @@ def write_yaml(design_data: list[Design], output: str) -> None:
     yaml.add_representer(Quoted, quoted_presenter)
     yaml.add_representer(Sample, block_presenter)
 
-    yaml_str = yaml.dump(design_data, sort_keys=False)
+    yaml_str = yaml.dump(design_data, allow_unicode=True, sort_keys=False)
     yaml_str = yaml_str.replace('!!python/object:datagen.main.Design\n  ', '')
     yaml_str = yaml_str.replace('\n  -', '\n    -')
     yaml_str = re.sub(re.compile('\n  [a-z]+: null\n'), '\n', yaml_str)
 
-    with open(output, 'w') as outfile:
+    with open(output, 'w', encoding='utf-8') as outfile:
         outfile.write(yaml_str)
     click.echo('Output file created: ' + output)
 

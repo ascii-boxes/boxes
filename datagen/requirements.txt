@@ -1,4 +1,0 @@
-build
-setuptools==65.4.1
-twine
-wheel

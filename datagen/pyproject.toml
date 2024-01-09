@@ -11,11 +11,37 @@
 # If not, see <https://www.gnu.org/licenses/>.
 #
 
+[project]
+name = "datagen"
+description = "Convert boxes config to Jekyll data file for the website's design explorer"
+version = "0.1.0"
+authors = [ { name = "Thomas Jensen", email = "boxes@thomasjensen.com"} ]
+maintainers = [ { name = "Thomas Jensen", email = "boxes@thomasjensen.com" } ]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+]
+requires-python = ">= 3.10"
+dependencies = [
+    "ansi2html ==1.9.1",
+    "Click ==8.1.7",
+    "PyYAML ==6.0.1"
+]
+
+[project.scripts]
+convert = "datagen.main:main"
+
+
 [build-system]
 requires = [
-    "build",
-    "setuptools>=65",
-    "twine",
-    "wheel"
+    "setuptools >= 69.0.3"
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["datagen"]
