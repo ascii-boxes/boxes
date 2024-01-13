@@ -389,7 +389,7 @@ Please see the <I>boxes</I> website for the most current email address.
     level=2 slug="VERSION"
     text="VERSION" %}
 
-This is <I>boxes</I> {{ page.bxVersion }}.
+This is <I>boxes</I> version {{ page.bxVersion | slice: 1, page.bxVersion.size }}.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
