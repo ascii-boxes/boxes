@@ -1,10 +1,10 @@
 ---
 title: Manpage of boxes(1)
-permalink: /v2.2.1/boxes-man-1.html
+permalink: /v2.3.0/boxes-man-1.html
 longContent: true
-bxVersion: v2.2.1
+bxVersion: v2.3.0
 created_at: 1999-04-06
-last_modified_at: 2023-08-24 16:48:00 +0200
+last_modified_at: 2024-02-17 14:00:00 +0100
 ---
 
 <h1>boxes</h1>
@@ -29,10 +29,7 @@ mode box and comment drawing filter</p>
     text="SYNOPSIS" %}
 
 <p style="margin-left:11%; margin-top: 1em"><b>boxes</b>
-[-hlmrv] [-a&nbsp;format] [-d&nbsp;design] [-e&nbsp;eol]
-[-f&nbsp;file] [-i&nbsp;indent] [-k&nbsp;bool]
-[-n&nbsp;encoding] [-p&nbsp;pad] [-q&nbsp;query] [-s&nbsp;size]
-[-t&nbsp;tabopts] [infile [outfile]]</p>
+[options] [infile [outfile]]</p>
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
@@ -68,7 +65,7 @@ text editors: <br>
 by <i>boxes</i> are the following:</p>
 
 <p style="margin-left:11%;">
-<a name="opt-a"><b>-a</b> <i>format</i></a></p>
+<a name="opt-a"><b>-a</b> <i>format</i></a>, <b>--align</b>=<i>format</i></p>
 
 <p style="margin-left:20%;">Alignment/positioning of text
 inside box. This option takes a format string argument which
@@ -105,7 +102,8 @@ notations (can be combined with the above arguments):
 <p style="margin-left:20%; margin-top: 1em">The default for
 <code>-a</code> is <code>hlvt</code>.</p>
 
-<p style="margin-left:11%;"><a name="opt-c"><b>-c</b> <i>string</i></a></p>
+<p style="margin-left:11%;"><a name="opt-c"><b>-c</b> <i>string</i></a>,
+<b>--create</b>=<i>string</i></p>
 
 <p style="margin-left:20%;">Command line design definition
 for simple cases. The argument of this option is the
@@ -124,14 +122,39 @@ config file. <b>-c</b> may of course be used in conjunction
 with any of the other options. By default, <b>-c</b> is not
 specified.</p>
 
-<p style="margin-left:11%;"><a name="opt-d"><b>-d</b> <i>string</i></a></p>
+<p style="margin-left:11%;"><a name="opt-color"><b>--color</b></a>,
+<a name="opt-nocolor"><b>--no-color</b></a></p>
+
+<p style="margin-left:20%;">Printing of color codes. Box
+designs and the text inside a box may contain ANSI color
+codes, sometimes called &quot;escape sequences&quot;. In
+this way, boxes and text can be colored. <br>
+Whether these escape sequences are printed by <i>boxes</i>
+is normally determined by the terminal capabilities
+(default). Using <b>--color</b>, <i>boxes</i> can be told to
+always output escape sequences even if it thinks the
+terminal may not understand them. Using <b>--no-color</b>,
+escape sequences will never be printed.</p>
+
+<p style="margin-left:20%; margin-top: 1em">Of course, even
+with <b>--color</b>, a box will only appear colored if it is
+already defined with colors. In case you want to auto-color
+some text that isn&rsquo;t yet, take a look at
+<i>lolcat</i>. <br>
+These options consider all escape sequences to be color
+codes. Any other escape sequences present will be printed or
+removed along with the color codes.</p>
+
+<p style="margin-left:11%;"><a name="opt-d"><b>-d</b> <i>string</i></a>,
+<b>--design</b>=<i>string</i></p>
 
 <p style="margin-left:20%;">Design selection. The one
 argument of this option is the name of the design to use,
 which may either be a design&rsquo;s primary name or any of
 its alias names.</p>
 
-<p style="margin-left:11%;"><a name="opt-e"><b>-e</b> <i>eol</i></a></p>
+<p style="margin-left:11%;"><a name="opt-e"><b>-e</b> <i>eol</i></a>,
+<b>--eol</b>=<i>eol</i></p>
 
 <p style="margin-left:20%;">Override line terminator.
 <i>eol</i> can be <code>CR</code>, <code>LF</code>, or <code>CRLF</code>. The
@@ -144,7 +167,8 @@ future version of <i>boxes</i>. Let us know in
 <a href="https://github.com/{{ site.github }}/issues/60">https://github.com/{{ site.github }}/issues/60</a>
 if you think we should keep it.</p>
 
-<p style="margin-left:11%;"><a name="opt-f"><b>-f</b> <i>string</i></a></p>
+<p style="margin-left:11%;"><a name="opt-f"><b>-f</b> <i>string</i></a>,
+<b>--config</b>=<i>string</i></p>
 
 <p style="margin-left:20%;">Use alternate config file. The
 one argument of this option is the name of a valid
@@ -157,7 +181,8 @@ section.</p>
 
 <p style="margin-left:20%;">Print usage information.</p>
 
-<p style="margin-left:11%;"><a name="opt-i"><b>-i</b> <i>string</i></a></p>
+<p style="margin-left:11%;"><a name="opt-i"><b>-i</b> <i>string</i></a>,
+<b>--indent</b>=<i>string</i></p>
 
 <p style="margin-left:20%;">Indentation mode. Possible values for
 <i>string</i> are:</p>
@@ -168,7 +193,8 @@ section.</p>
 </ul>
 <p style="margin-left:20%;">Arguments may be abbreviated. The default is <code>box</code>.</p>
 
-<p style="margin-left:11%;"><a name="opt-k"><b>-k</b> <i>bool</i></a></p>
+<p style="margin-left:11%;"><a name="opt-k"><b>-k</b> <i>bool</i></a>,
+<b>--kill-blank</b>, <b>--no-kill-blank</b></p>
 
 <p style="margin-left:20%;">Kill leading/trailing blank
 lines on removal. The value of <i>bool</i> is either
@@ -181,7 +207,7 @@ the bottom part of the box are open, as is the case with
 most regional comments. If the box&rsquo;s design defines a
 top part or a bottom part, the default is <i>true</i>.</p>
 
-<p style="margin-left:11%;"><a name="opt-l"><b>-l</b></a></p>
+<p style="margin-left:11%;"><a name="opt-l"><b>-l</b></a>, <b>--list</b></p>
 
 <p style="margin-left:20%;">List designs. Produces a
 listing of all available box designs in the config file,
@@ -190,7 +216,7 @@ Also checks the syntax of the entire config file. If used in
 conjunction with <b>-d</b>, displays detailed information
 about the specified design.</p>
 
-<p style="margin-left:11%;"><a name="opt-m"><b>-m</b></a></p>
+<p style="margin-left:11%;"><a name="opt-m"><b>-m</b>,</a> <b>--mend</b></p>
 
 <p style="margin-left:20%;">Mend box. This removes a
 (potentially broken) box as with <b>-r</b>, and redraws it
@@ -199,7 +225,8 @@ given. This may be important to know when it comes to
 restoring padding, indentation, etc. for the mended box.
 Implies <b>-k</b> <i>false</i>.</p>
 
-<p style="margin-left:11%;"><a name="opt-n"><b>-n</b> <i>encoding</i></a></p>
+<p style="margin-left:11%;"><a name="opt-n"><b>-n</b> <i>encoding</i></a>,
+<b>--encoding</b>=<i>encoding</i></p>
 
 <p style="margin-left:20%;">Character encoding. Overrides
 the character encoding of the input and output text. Choose
@@ -209,7 +236,8 @@ as a fallback. The default is to use the system encoding,
 which is normally the best course of action. So don&rsquo;t
 specify this option unless you have to.</p>
 
-<p style="margin-left:11%;"><a name="opt-p"><b>-p</b> <i>string</i></a></p>
+<p style="margin-left:11%;"><a name="opt-p"><b>-p</b> <i>string</i></a>,
+<b>--padding</b>=<i>string</i></p>
 
 <p style="margin-left:20%;">Padding. Specify padding in
 spaces around the input text block for all sides of the box.
@@ -236,7 +264,8 @@ The default for this option is determined by the box design
 used. If the design does not specify anything, no default
 padding is used.</p>
 
-<p style="margin-left:11%;"><a name="opt-q"><b>-q</b> <i>query</i></a></p>
+<p style="margin-left:11%;"><a name="opt-q"><b>-q</b> <i>query</i></a>,
+<b>--tag-query</b>=<i>query</i></p>
 
 <p style="margin-left:20%;">Query designs by tag. In
 contrast to <b>-l</b>, this will only print the matching
@@ -255,7 +284,7 @@ printed below their primary design name, and postfixed with
 <code>(alias)</code>. <br>
 Example: <code>boxes -q programming,-comment</code></p>
 
-<p style="margin-left:11%;"><a name="opt-r"><b>-r</b></a></p>
+<p style="margin-left:11%;"><a name="opt-r"><b>-r</b></a>, <b>--remove</b></p>
 
 <p style="margin-left:20%;">Remove an existing box. Which
 design to use is detected automatically. In order to save
@@ -263,7 +292,8 @@ time or in case the detection does not decide correctly,
 combine with <b>-d</b> to specify the design.</p>
 
 <p style="margin-left:11%;"><a name="opt-s"><b>-s</b>
-<i>width</i><b>x</b><i>height</i></a></p>
+<i>width</i><b>x</b><i>height</i></a>,
+<b>--size</b>=<i>width</i><b>x</b><i>height</i></p>
 
 <p style="margin-left:20%;">Box size. This option specifies
 the desired box size in units of columns (for width) and
@@ -277,7 +307,8 @@ as <b>-p</b>). <br>
 By default, the smallest possible box is created around the
 text.</p>
 
-<p style="margin-left:11%;"><a name="opt-t"><b>-t</b> <i>tabopts</i></a></p>
+<p style="margin-left:11%;"><a name="opt-t"><b>-t</b> <i>tabopts</i></a>,
+<b>--tabs</b>=<i>tabopts</i></p>
 
 <p style="margin-left:20%;">Tab handling. This option
 controls how tab characters in the input text are handled.
@@ -305,7 +336,7 @@ your leading tabs unexpanded. In the box content, tabs are
 always converted into spaces. The tab distance in this
 example is 4.</p>
 
-<p style="margin-left:11%;"><a name="opt-v"><b>-v</b></a></p>
+<p style="margin-left:11%;"><a name="opt-v"><b>-v</b></a>, <b>--version</b></p>
 
 <p style="margin-left:20%;">Print out current version
 number.</p>

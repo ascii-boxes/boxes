@@ -4,7 +4,7 @@ permalink: /v2.2.1/config-syntax.html
 longContent: true
 bxVersion: v2.2.1
 created_at: 1999-04-06
-last_modified_at: 2022-09-22 21:48:00 +0200
+last_modified_at: 2023-08-24 21:40:00 +0200
 ---
 
 # Config File Syntax

@@ -85,8 +85,8 @@ redirect_from:
     json: false
 
 # boxes custom variables
-currentVersion: '2.2.1'
-link_license: 'https://raw.githubusercontent.com/ascii-boxes/boxes/v2.2.1/LICENSE'
+currentVersion: '2.3.0'
+link_license: 'https://raw.githubusercontent.com/ascii-boxes/boxes/v2.3.0/LICENSE'
 
 # Page frontmatter defaults
 defaults:

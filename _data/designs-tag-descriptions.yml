@@ -2,6 +2,13 @@
 tag_descriptions:
     artwork: 'are the complex ASCII art boxes.'
     box: 'go around the input text.'
+    color: |-
+        feature box shapes colored by ANSI escape codes.
+        <div class="alert alert-info">
+            <strong>Note:</strong> In order to color the text, <i>boxes</i> will output ANSI escape codes. Usually,
+            your terminal will interpret them properly. However, many text editors cannot do that, and you may see
+            gibberish. In that case, consider using a different design or the <code>--no-color</code> option.
+        </div>
     comment: 'are regional comments in some programming language.'
     large: 'are intended for large content, like figlet fonts, or just lots of text. They want to be big!'
     programming: >
@@ -11,3 +18,4 @@ tag_descriptions:
     sign: 'depict an ASCII art figure holding or showing a sign which contains the input text.'
     simple: 'are plain boxes, typically excluding <code>artwork</code>.'
     speech: 'include a speech bubble.'
+    unicode: 'are in UTF-8 encoding. The others are ASCII.'
