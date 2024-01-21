@@ -3,7 +3,7 @@ title: Building from Source
 permalink: /build.html
 longContent: true
 created_at: 2015-03-17 15:41:27 +0100
-last_modified_at: 2023-03-04 21:30:00 +0100
+last_modified_at: 2024-01-21 22:34:00 +0100
 ---
 
 # Building from Source
@@ -29,9 +29,10 @@ In order to build on Linux:
    The following command is for Debian (APT), but those packages have the same names across most distros.
 
        sudo apt-get update
-       sudo apt-get install -y build-essential diffutils flex bison libunistring-dev libpcre2-dev libcmocka-dev git vim-common
+       sudo apt-get install -y bison build-essential diffutils flex git libcmocka-dev libncurses-dev libpcre2-dev libunistring-dev terminfo vim-common
 
-   Of those, only [libunistring](https://www.gnu.org/software/libunistring/) and [PCRE2](http://www.pcre.org/) are
+   Of those, only [libncurses](https://invisible-island.net/ncurses/),
+   [libunistring](https://www.gnu.org/software/libunistring/), and [PCRE2](http://www.pcre.org/) are
    libraries that are used at runtime. Everything else is just for building, including
    [Flex](https://github.com/westes/flex){:target="_blank"} and
    [Bison](http://www.gnu.org/software/bison/){:target="_blank"}. `vim-common` provides the *xxd* tool, which is used
@@ -46,11 +47,12 @@ In order to build on Linux:
 
        make
        make utest
+       make test-sunny
        make test
 
-   This will build the project and execute the unit tests (`utest`) and the black-box tests (`test`).
-   Find the resulting binary in the *out* folder. In case of
-   problems, check the [compilation faq]({{ site.baseurl }}/faq.html#q5).
+   This will build the project and execute the unit tests (`utest`), the sunny-day tests (`test-sunny`), and
+   the black-box tests (`test`). Find the resulting binary in the *out* folder. In case of problems, check the
+   [compilation faq]({{ site.baseurl }}/faq.html#q5).
 
 That should be all. *Boxes* is built so that this works almost everywhere.
 
