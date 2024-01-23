@@ -48,17 +48,18 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
+  - build/
   - cmake-build-debug/
   - coverage/
   - datagen/
   - doc/
-  - flex_bison_2.5.24/
   - js.bat
   - node_modules/
   - out/
-  - pcre2-10.36/
   - src/
+  - vendor/
   - vs
+  - venv/
 
 include:
   - pages/
