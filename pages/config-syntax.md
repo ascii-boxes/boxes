@@ -15,8 +15,9 @@ last_modified_at: 2022-09-22 21:48:00 +0200
 {%- include version-select.html currentVersion=thisVersion contentPiece="config-syntax" %}
 
 The *boxes* config file is a succession of box design definitions.
-Everything following a pound sign (`#`) is considered a **comment** (unless, of course, the pound sign is part of a
-string or something).
+
+Its character encoding is UTF-8. Versions of *boxes* prior to v2.3.0 used ASCII-encoded config files.
+
 *Boxes* config files are case insensitive, i.e. upper/lower case does not matter.
 
 
@@ -40,7 +41,19 @@ After the `END` statement, only the primary design name is specified. There is n
 alias names. Every primary design name and alias name must be unique across the entire config file, including any
 parent config files.
 
+Design names and alias names can consist of the ASCII letters `a-z` (both lower- and upper-case, although lower-case is
+highly recommended), digits, underscores (`_`), or dashes (`-`). The first character must be a letter.
+
 Every box design definition must have at least a `SHAPE` block, an `ELASTIC` list, and a `SAMPLE` block.
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=3
+   text="Comments" %}
+
+Everything following a pound sign (`#`) is considered a comment, as long as the pound sign isn't part of a string
+or something.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
@@ -62,6 +75,19 @@ indented by this value, which simply looks better on the design list.
 The `ENDS` statement must stand on a line of its own, although it may be indented. Such a line cannot occur as part of
 the sample itself.\\
 The `SAMPLE` block is a required entry in every box design definition.
+
+
+{% include heading.html level=4 text="Colored Samples" %}
+
+<small class="text-muted">(advanced topic)</small>
+
+If a box design uses [colored shapes](#colored-shapes), the sample must also be colored. This may make it less
+easily readable in a regular text editor, which is why you are encouraged to add a comment below the sample block
+which shows the box without coloring. Just put `# Monochrome sample:` and the uncolored sample below (example: the
+box design `warning`).
+
+Colored samples are shown also when displaying the design list, or on the
+[design list]({{ site.baseurl }}/{{ thisVersion }}/box-designs-color.html) on the website.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
@@ -92,14 +118,51 @@ In Vim, for example, this can be achieved by marking the block, and then typing:
 
 Here are a few examples of valid entries in a `SHAPE` block:
 
-    ne ("+++", "+ +", "+++")
+    ne  ("+++",
+         "+ +",
+         "+++")
     SSE ("///", "\\\\\\")
-    ene ()
-    s ("\"")
+    s   ("\"")
 
 The [`delimiter` statement](#delim) can be used to redefine the string delimiting character and the escape character,
 thus eliminating the above backslash problem.
 The `SHAPE` block is a required entry in every box design definition.
+
+
+{% include heading.html level=4 text="Colored Shapes" %}
+
+<small class="text-muted">(advanced topic)</small>
+
+If you don't mind getting technical, it is possible, with some effort, to add ANSI color codes to shapes so that the
+created boxes look colorful. One can even design them so that the contents of the box is colored (like in our
+`critical` design). These color codes do not count toward shape width.
+
+The color codes are added as explained in this [stackoverflow post](https://stackoverflow.com/a/75985833/1005481).
+Just be sure to use only codes that change the text or background color, and not other codes which move the cursor
+or clear the screen. *Boxes* will assume that all escape codes are for coloring.
+
+Example:
+
+```
+ne ("This is ␛[31mRED␛[0m and ␛[94mBLUE␛[0m text.")
+```
+
+eventually gives
+
+<pre><code>This is <span style="color:red;">RED</span> and <span style="color:blue;">BLUE</span> text.
+</code></pre>
+
+The "escape" character is an actual escape character (ASCII code 27 (0x1b)). Other ways of expressing this, such as
+`\033`, are currently not supported, because it is too likely to conflict with patterns found in ASCII art. If needed,
+you can copy&amp;paste an escape character from the *boxes* config file, e.g. from the `warning` design. Do not
+copy&amp;paste escape characters from this web page, because we need to use *visible* escape characters here, which are
+different code.
+
+It is important to properly terminate the effects, for example by using `␛[0m`. Ideally, this should be done for
+each colored character, because that makes it easiest to copy&amp;paste, truncate a shape line or otherwise modify it.
+At the very least, any coloring effects must be terminated at the end of a shape line. This aids robustness when a
+box gets damaged by editing or removed, in order to make sure users are not left with leaking colors. The only
+exception to this rule is when your box makes use of colored box content.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
@@ -264,13 +327,9 @@ Since *boxes* v2.1.0:
 
 <PRE><b>TAGS</b> (&quot;<i>tag1</i>&quot;, &quot;<i>tag2</i>&quot;, &quot;<i>tag3</i>&quot;)</PRE>
 
-or, in all versions of *boxes*:
+or, in all versions of *boxes* (deprecated):
 
 <PRE><b>TAGS</b> &quot;<i>tag1</i>, <i>tag2</i>, <i>tag3</i>&quot;</PRE>
-
-The legacy notation has the advantage of being backwards compatible with all versions of *boxes*, which is why we use
-it exclusively in the official config file. But once we're reasonably sure that all the world is at least on v2.1.0,
-we can upgrade that.
 
 The `tags` statement applies one or more tags to the box design which can later be used to find and select the design
 in a tag query. A tag can only contain the lower-case letters `a-z`, digits, or a dash (`-`). It must not start with
@@ -281,7 +340,7 @@ complete with counts of how often the tag was encountered.
 
 A *tag query* can be issued by invoking `boxes -q`. *Boxes* will then print the names of all matching box designs.
 Details about tag queries can be found in the
-[manual page]({{ site.baseurl }}/boxes-man-1.html#OPTIONS) for the `-q` option.
+[manual page]({{ site.baseurl }}/boxes-man-1.html#opt-q) for the `-q` option.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
@@ -292,10 +351,7 @@ Details about tag queries can be found in the
 <PRE><b>keyword</b> &quot;<i>string_value</i>&quot;</PRE>
 
 In addition to the author entry, there may be any number of other entries of the above form, giving any kind of
-information. The [boxes config file](https://github.com/{{ site.github }}/blob/master/boxes-config){:target="_blank"}
-includes the entries `CREATED`, `REVISION`, and `REVDATE`, to indicate the creation timestamp, revision number, and
-timestamp of the latest revision, respectively. These other entries are not yet used by *boxes*, though, and will
-simply be ignored.
+information. These entries are not used by *boxes*, though, and will simply be ignored.
 
 -----
 
@@ -305,8 +361,8 @@ simply be ignored.
    level=2 slug="parent"
    text="Config File Inheritance" %}
 
-A config file may specify one or more other config files as a "parents" (since *boxes* v2.1.0). This means that after
-the config file is read, *boxes* will also read all the parent configs (in order). If a design is found which we don't
+A config file may specify one or more other config files as "parents" (since *boxes* v2.1.0). This means that after
+the config file is read, *boxes* will also read all the parent configs in order. If a design is found which we don't
 know yet, it is added to the list. In other words, all box designs are "inherited" from the parents, and can be
 overwritten.
 
@@ -317,8 +373,9 @@ The syntax is
 <PRE><b>PARENT</b> <i>path_to_parent_config</i></PRE>
 
 The path to the parent config should be an absolute pathname specifying a config file (not a directory). Spaces are
-permitted in this path, and no quotes are used. A parent reference can only occur outside of any box design definitions.
-The special keyword `:global:` is used to refer to the *boxes* global config file.
+permitted in this path, and no quotes are used. The file name may contain UTF-8 characters. A parent reference can
+only occur outside of any box design definitions. The special keyword `:global:` is used to refer to the *boxes*
+global config file.
 
 This syntax implies that there cannot be a comment in the same line as the `parent` reference - it would be considered
 part of the file name. Instead, put comments in the line above.
@@ -327,5 +384,40 @@ For example, a user wants to add or change a design from the global config. So s
 and places a `parent :global:` statement at the top to inherit the global config. The local / personal config file
 contains only the changes / additions.
 
+-----
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2 slug="valid-characters"
+   text="Appendix A: Valid Characters" %}
+
+<small class="text-muted">(advanced topic)</small>
+
+This appendix summarizes which types of characters may occur in various places of the config file. This is really
+detail information. Refer to this only in case of problems. Normally, this is a fine section to skip.
+
+| &nbsp;       | A | ü | SP | ESC | TAB             | CR/LF | BEL |
+|:-------------|:-:|:-:|:--:|:---:|:---------------:|:-----:|:---:|
+| **Shape**    | ✓ | ✓ | ✓  |  ✓  | (-)<sup>†</sup> |   -   |  -  |
+| **Sample**   | ✓ | ✓ | ✓  |  ✓  | (-)<sup>†</sup> |   ✓   |  -  |
+| **Filename** | ✓ | ✓ | ✓  |  -  |  ✓              |   -   |  -  |
+| **Key**      | ✓ | ✓ | -  |  -  |  -              |   -   |  -  |
+| **Value**    | ✓ | ✓ | ✓  |  -  |  ✓              |   -   |  -  |
+{:.bxCharTable .table .table-striped}
+
+The column `A` represents regular ASCII characters, `ü` stands for non-ASCII Unicode characters, and `BEL` represents
+all non-printable control characters except ESC.
+
+*†*{:.h-h} For historical reasons, tabs can be used in shapes and samples, where they count as one space (but will not
+work as one, of course). This is deprecated behavior. In a future version of *boxes*, we will probably disallow the use
+of tabs altogether. We do not want tabs in shapes, but currently don't prevent them either.
+{: .bxHanging }
+
+The "Shape" row shows which types of characters may occur as part of a box shape. "Sample" refers to the sample
+block. "Filename" means the file name given as a [PARENT config](#parent). "Key" is the key of the key/value pairs
+that every box design has, such as `author`. "Value" is its value as a string.
+
+<p><br></p>
 
 Read on in the next part: [A New Box Design Step By Step]({{ site.baseurl }}/config-step.html)

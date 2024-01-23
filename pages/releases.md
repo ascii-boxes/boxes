@@ -111,11 +111,3 @@ Click on the version numbers to view the release notes for each release.
 
 (For versions 1.1.1 and older, the precise release notes are not preserved, and would need to be extracted from the
 Git commit history.)
-
-
-<div class="alert alert-primary my-5">
-    <strong>Pro Tip:</strong> You can always copy the
-    <a href="https://github.com/{{ site.github }}/blob/master/boxes-config">latest box designs</a>
-    from GitHub to replace your older <i>boxes-config</i> (Unix) or <i>boxes.cfg</i> (Windows) - the designs
-    are backwards compatible.
-</div>

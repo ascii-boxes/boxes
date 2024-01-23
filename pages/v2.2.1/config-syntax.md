@@ -11,10 +11,10 @@ last_modified_at: 2022-09-22 21:48:00 +0200
 
 {% include version-select.html currentVersion=page.bxVersion contentPiece="config-syntax" %}
 
-
 The *boxes* config file is a succession of box design definitions.
-Everything following a pound sign (`#`) is considered a **comment** (unless, of course, the pound sign is part of a
-string or something).
+
+Its character encoding is ASCII.
+
 *Boxes* config files are case insensitive, i.e. upper/lower case does not matter.
 
 
@@ -39,6 +39,15 @@ alias names. Every primary design name and alias name must be unique across the 
 parent config files.
 
 Every box design definition must have at least a `SHAPE` block, an `ELASTIC` list, and a `SAMPLE` block.
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=3
+   text="Comments" %}
+
+Everything following a pound sign (`#`) is considered a comment, as long as the pound sign isn't part of a string
+or something.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
@@ -279,7 +288,7 @@ complete with counts of how often the tag was encountered.
 
 A *tag query* can be issued by invoking `boxes -q`. *Boxes* will then print the names of all matching box designs.
 Details about tag queries can be found in the
-[manual page]({{ site.baseurl }}/{{ page.bxVersion }}/boxes-man-1.html#OPTIONS) for the `-q` option.
+[manual page]({{ site.baseurl }}/{{ page.bxVersion }}/boxes-man-1.html#opt-q) for the `-q` option.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}

@@ -65,6 +65,14 @@ th {
 table.table-striped tr:last-child {
     border-bottom: 1px solid $table-border-color;
 }
+table {
+    @extend .table;
+    @extend .table-striped;
+}
+table.bxCharTable th {
+    padding-left: 0;
+    padding-right: 0;
+}
 
 
 /*
@@ -129,6 +137,9 @@ code {
     padding: 2px 3px;
     white-space: pre-wrap;
     word-wrap: normal;
+}
+.alert code {
+    color: $body-color;
 }
 
 
@@ -392,3 +403,22 @@ div.bxEmbedContainer {
         }
     }
 }
+
+
+/*
+ * Paragraphs With Hanging Indent
+ */
+p.bxHanging {
+    --tab_size: 0.8rem;
+    font-size: $font-size-sm;
+    padding-left: calc( var(--tab_size) * 2);
+    text-indent: (calc( var(--tab_size) * -1.4));
+}
+
+/* span style for the ordinal */
+p.bxHanging .h-h {
+    display: inline-block;
+    text-indent: 0;
+    width: calc( var(--tab_size) * 1);
+    font-style: normal; /* undoes the emphasis needed to define the span element */
+}  
