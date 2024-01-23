@@ -88,7 +88,7 @@ layout: default
 
     {%- comment -%}<!-- --- Heading -->{%- endcomment -%}
 
-    {%- assign heading_text = record.name -%}
+    {% assign heading_text = record.name %}
     {% if record.alias and record.alias.size %}
         {% capture heading_text %}{{ record.alias | join: ', ' | prepend: ' (' | prepend: record.name | append: ')' }}{% endcapture %}
         {% for alias in record.alias -%}
@@ -102,12 +102,18 @@ layout: default
     {% if record.tags -%}<p>
         {%- for tag in record.tags -%}
         <a href="{{ site.baseurl }}/{{ boxesVersion }}/box-designs-{{ tag }}.html"><button type="button" class="btn btn-outline-primary btn-sm">{{ tag }}</button></a>
-        {% endfor -%}</p>
+        {% endfor %}</p>
     {% endif %}
 
     {%- comment -%}<!-- --- Sample -->{%- endcomment -%}
 
-    <pre><code>{{ record.sample | escape }}</code></pre>
+    {%- if record.tags and record.tags contains "color" -%}
+        <pre class="bxBgToggle" id="{{ record.name }}-sample"><code>{{ record.sample }}</code><div
+            onmouseover="this.parentNode.classList.add('bxDark');" 
+            onmouseout="this.parentNode.classList.remove('bxDark');">{%- include moon.svg -%}</div></pre>
+    {%- else -%}
+        <pre><code>{{ record.sample | escape }}</code></pre>
+    {% endif %}
 
     {%- comment -%}<!-- --- Attribution -->{%- endcomment -%}
     <p>

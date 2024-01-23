@@ -144,6 +144,35 @@ code {
 
 
 /*
+ * Light/Dark Background Toggle in Design Explorer
+ */
+pre.bxBgToggle {
+    position: relative;
+    div {
+        position: absolute;
+        right: $spacer/2;
+        top: $spacer/2;
+        svg {
+            fill: $headings-color !important;
+        }
+        &:hover {
+            cursor: pointer;
+            svg {
+                fill: $primary !important;
+            }
+        }
+    }
+    &.bxDark {
+        background-color: $dark;
+        color: $light;
+        code {
+            background-color: $dark;
+        }
+    }
+}
+
+
+/*
  * Images
  */
 .img-shad {
