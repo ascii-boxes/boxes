@@ -100,6 +100,7 @@ Then invoke these targets:
 
     make clean cov
     make utest
+    make covtest-sunny
     make covtest
 
 The results will be logged in the console and also recorded in *out/lcov-total.info*.
@@ -109,13 +110,12 @@ The results will be logged in the console and also recorded in *out/lcov-total.i
 {% include heading.html level=3
    text="Static Binary" %}
 
-Sometimes, you may want to run *boxes* on a system where the required libunistring and pcre libraries are not
-available as shared libraries. In such cases, linking all the dependencies into the *boxes* binary can be
-helpful. This is achieved by
+Sometimes, you may want to run *boxes* on a system where the required libraries are not available as shared libraries.
+In such cases, linking all the dependencies into the *boxes* binary can be helpful. This is achieved by
 
     make clean static
 
-This will download and compile libunistring and PCRE, and then produce a static binary with everything on board.
+This will download and compile the dependencies, and then produce a static binary with everything on board.
 
 <p><br></p>
 <hr>
