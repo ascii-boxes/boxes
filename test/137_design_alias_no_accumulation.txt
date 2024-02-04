@@ -11,8 +11,6 @@ Complete Design Information for "design3":
 Alias Names:            alias3a, alias3b
 Author:                 (unknown author)
 Original Designer:      (unknown artist)
-Creation Date:          (unknown)
-Current Revision:       (unknown)
 Configuration File:     137_design_alias_no_accumulation.cfg
 Indentation Mode:       box (indent box)
 Replacement Rules:      none

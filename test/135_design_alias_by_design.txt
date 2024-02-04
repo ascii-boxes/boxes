@@ -11,8 +11,6 @@ Complete Design Information for "design":
 Alias Names:            alias1, alias2
 Author:                 (unknown author)
 Original Designer:      (unknown artist)
-Creation Date:          (unknown)
-Current Revision:       (unknown)
 Configuration File:     135_design_alias_by_design.cfg
 Indentation Mode:       box (indent box)
 Replacement Rules:      none

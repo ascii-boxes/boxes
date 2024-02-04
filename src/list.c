@@ -215,14 +215,6 @@ static void print_design_details(design_t *d)
             d->author ? bxs_to_output(d->author) : "(unknown author)", opt.eol);
     fprintf(opt.outfile, "Original Designer:      %s%s",
             d->designer ? bxs_to_output(d->designer) : "(unknown artist)", opt.eol);
-    fprintf(opt.outfile, "Creation Date:          %s%s",
-            d->created ? bxs_to_output(d->created) : "(unknown)", opt.eol);
-
-    fprintf(opt.outfile, "Current Revision:       %s%s%s%s",
-            d->revision ? d->revision : "",
-            d->revision && d->revdate ? " as of " : "",
-            d->revdate ? bxs_to_output(d->revdate) : (d->revision ? "" : "(unknown)"), opt.eol);
-
     fprintf(opt.outfile, "Configuration File:     %s%s", bxs_to_output(d->defined_in), opt.eol);
 
     fprintf(opt.outfile, "Indentation Mode:       ");

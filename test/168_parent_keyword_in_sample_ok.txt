@@ -12,8 +12,6 @@ Complete Design Information for "designB":
 Alias Names:            none
 Author:                 (unknown author)
 Original Designer:      (unknown artist)
-Creation Date:          (unknown)
-Current Revision:       (unknown)
 Configuration File:     168_parent_keyword_in_sample_ok.cfg
 Indentation Mode:       box (indent box)
 Replacement Rules:      none

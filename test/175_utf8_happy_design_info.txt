@@ -8,8 +8,6 @@ Complete Design Information for "designA":
 Alias Names:            none
 Author:                 沐宸
 Original Designer:      John Doe
-Creation Date:          (unknown)
-Current Revision:       (unknown)
 Configuration File:     175_utf8_happy_design_info.cfg
 Indentation Mode:       box (indent box)
 Replacement Rules:      1. (glob) "ä" WITH "ö"

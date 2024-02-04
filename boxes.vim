@@ -40,7 +40,7 @@ syntax iskeyword a-z,A-Z
 "
 "  Key Words
 "
-syntax keyword boxesClassicKeywords author designer revision created revdate tags indent
+syntax keyword boxesClassicKeywords author designer tags indent
 syntax keyword boxesBlocks          elastic replace reverse padding shapes
 syntax keyword boxesRegStuff        with to once global
 syntax keyword boxesParent          parent skipwhite nextgroup=boxesParentPath,boxesParentGlobal

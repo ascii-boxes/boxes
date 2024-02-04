@@ -364,7 +364,7 @@ PFILENAME [^\r\n]+
 }
 
 
-<BOX>author|designer|created|revision|revdate|indent {
+<BOX>author|designer|indent {
     /*
      * general key words
      */

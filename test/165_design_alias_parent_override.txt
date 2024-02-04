@@ -12,8 +12,6 @@ Complete Design Information for "designA":
 Alias Names:            alias1, alias3
 Author:                 (unknown author)
 Original Designer:      (unknown artist)
-Creation Date:          (unknown)
-Current Revision:       (unknown)
 Configuration File:     165_design_alias_parent_override.cfg
 Indentation Mode:       box (indent box)
 Replacement Rules:      none

@@ -42,8 +42,6 @@
 
 static pcre2_code *eol_pattern = NULL;
 
-static pcre2_code *semver_pattern = NULL;
-
 
 
 static int check_sizes(pass_to_bison *bison_args)
@@ -277,9 +275,6 @@ void recover(pass_to_bison *bison_args)
     BFREE(curdes.author);
     BFREE(curdes.aliases);
     BFREE(curdes.designer);
-    BFREE(curdes.created);
-    BFREE(curdes.revision);
-    BFREE(curdes.revdate);
     BFREE(curdes.sample);
     BFREE(curdes.tags);
     init_design(bison_args, &(curdes));
@@ -750,18 +745,6 @@ int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char
 
 
 
-static int is_semantic_version(char *version)
-{
-    if (semver_pattern == NULL) {
-        /* Not a strict semver, "1" or "1.0" are accepted. */
-        semver_pattern = compile_pattern(
-            "^(0|[1-9]\\d*)(?:\\.(0|[1-9]\\d*))?(?:\\.(0|[1-9]\\d*))?(?:[+-][a-zA-Z0-9\\.+-]+)?$");
-    }
-    return regex_match(semver_pattern, version);
-}
-
-
-
 int action_record_keyword(pass_to_bison *bison_args, char *keyword, bxstr_t *value)
 {
     #ifdef PARSER_DEBUG
@@ -784,33 +767,6 @@ int action_record_keyword(pass_to_bison *bison_args, char *keyword, bxstr_t *val
     else if (strcasecmp(keyword, "designer") == 0) {
         curdes.designer = bxs_strdup(value);
         if (curdes.designer == NULL) {
-            perror(PROJECT);
-            return RC_ABORT;
-        }
-    }
-    else if (strcasecmp(keyword, "revision") == 0) {
-        if (is_semantic_version(value->ascii)) {
-            curdes.revision = (char *) strdup(value->ascii);
-            if (curdes.revision == NULL) {
-                perror(PROJECT);
-                return RC_ABORT;
-            }
-        }
-        else {
-            yyerror(bison_args, "revision is not a version number in line %d of %s", __LINE__, __FILE__);
-            return RC_ERROR;
-        }
-    }
-    else if (strcasecmp(keyword, "created") == 0) {
-        curdes.created = bxs_strdup(value);
-        if (curdes.created == NULL) {
-            perror(PROJECT);
-            return RC_ABORT;
-        }
-    }
-    else if (strcasecmp(keyword, "revdate") == 0) {
-        curdes.revdate = bxs_strdup(value);
-        if (curdes.revdate == NULL) {
             perror(PROJECT);
             return RC_ABORT;
         }

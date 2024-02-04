@@ -95,8 +95,6 @@ static int build_design(design_t **adesigns, const char *cld)
 
     dp->name = "<Command Line Definition>";
     dp->aliases = (char **) calloc(1, sizeof(char *));
-    dp->created = bxs_from_ascii("now");
-    dp->revision = "1.0";
     dp->sample = bxs_from_ascii("n/a");
     dp->indentmode = DEF_INDENTMODE;
     dp->padding[BLEF] = 1;

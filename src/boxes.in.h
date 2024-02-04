@@ -111,9 +111,6 @@ typedef struct {
     char     **aliases;              /* zero-terminated array of alias names of the design */
     bxstr_t   *author;               /* creator of the configuration file entry */
     bxstr_t   *designer;             /* creator of the original ASCII artwork */
-    bxstr_t   *created;              /* date created, free format */
-    char      *revision;             /* revision number of design */
-    bxstr_t   *revdate;              /* date of current revision */
     bxstr_t   *sample;               /* the complete sample block in one string */
     char       indentmode;           /* 'b', 't', or 'n' */
     sentry_t   shape[NUM_SHAPES];
