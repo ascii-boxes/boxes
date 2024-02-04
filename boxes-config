@@ -20,12 +20,12 @@
 
 BOX c
 
-author "Thomas Jensen"
+author   "Thomas Jensen"
 designer "(public domain)"
 revision "1.0"
-revdate "March 18, 1999 (Thursday, 15:25h)"
-created "March 18, 1999 (Thursday, 15:25h)"
-tags    "simple, programming, box"
+revdate  "March 18, 1999 (Thursday, 15:25h)"
+created  "March 18, 1999 (Thursday, 15:25h)"
+tags     ("simple", "programming", "box")
 
 sample
     /*************/
@@ -62,7 +62,7 @@ author   "Thomas Jensen"
 created  "March 12, 1999 (Friday, 17:05h)"
 revision "1.0"
 revdate  "March 12, 1999 (Friday, 17:05h)"
-tags     "artwork, box, scroll"
+tags     ("artwork", "box", "scroll")
 
 sample
      ________________________
@@ -106,7 +106,7 @@ author   "Thomas Jensen"
 revision "1.1"
 revdate  "July 20, 1999 (Tuesday, 21:06h)"
 created  "March 17, 1999 (Wednesday, 15:27h)"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 sample
      __^__                 __^__
@@ -150,7 +150,7 @@ author   "Thomas Jensen"
 created  "March 17, 1999 (Wednesday, 15:40h)"
 revdate  "December 10, 2023 (Sunday, 14:20h)"
 revision "1.1"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 sample
      .+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.+"+.
@@ -193,7 +193,7 @@ author   "Thomas Jensen"
 revision "1.2"
 revdate  "August 18, 1999 (Wednesday, 17:00h)"
 created  "March 17, 1999 (Wednesday, 17:04h)"
-tags     "artwork, box, scroll, large"
+tags     ("artwork", "box", "scroll", "large")
 
 SAMPLE
      / ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \
@@ -254,7 +254,7 @@ designer "(public domain)"
 revision "1.1"
 revdate  "August 22, 1999 (Sunday, 12:44h)"
 created  "March 18, 1999 (Thursday, 15:24h)"
-tags     "simple, box"
+tags     ("simple", "box")
 
 sample
     *************
@@ -284,7 +284,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     /*                               */
@@ -318,7 +318,7 @@ designer "(public domain)"
 revision "1.1"
 revdate  "August 18, 1999 (Wednesday, 17:01h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     /*
@@ -354,7 +354,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "October 25, 1999 (Monday 10:16h)"
 created  "October 25, 1999 (Monday 10:16h)"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     /**
@@ -390,7 +390,7 @@ designer "(public domain)"
 revision "1.2"
 revdate  "October 19, 2012 (Friday, 17:32h)"
 created  "March 18, 1999 (Thursday, 15:26h)"
-tags     "simple, programming, box"
+tags     ("simple", "programming", "box")
 
 sample
     <!-- - - - - - - - - - - -->
@@ -427,7 +427,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     <!--                                     -->
@@ -461,7 +461,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "March 18, 1999 (Thursday, 15:27h)"
 created  "March 18, 1999 (Thursday, 15:27h)"
-tags     "simple, programming, box"
+tags     ("simple", "programming", "box")
 
 sample
     #############
@@ -494,7 +494,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "August 22, 1999 (Sunday, 12:51h)"
 created  "March 30, 1999 (Tuesday, 15:55h)"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 sample
                             _ ._  _ , _ ._
@@ -547,7 +547,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.2"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "March 30, 1999 (Tuesday, 15:59h)"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 Sample
            /\          /\          /\          /\
@@ -632,7 +632,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.2"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "March 18, 1999 (Thursday, 15:27h)"
-tags     "artwork, box, sign"
+tags     ("artwork", "box", "sign")
 
 sample
                 .--,       .--,
@@ -698,7 +698,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.2"
 revdate  "December 10, 2023 (Sunday, 14:20h)"
 created  "March 30, 1999 (Tuesday, 17:10h)"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 sample
                                .
@@ -751,7 +751,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.2"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 02, 1999 (Friday, 15:02h)"
-tags     "artwork, box, sign"
+tags     ("artwork", "box", "sign")
 
 sample
                     .-"""-.
@@ -817,7 +817,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 02, 1999 (Friday, 19:13h)"
-tags     "artwork, box, sign"
+tags     ("artwork", "box", "sign")
 
 sample
                     .-"""-.
@@ -879,7 +879,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.3"
 revdate  "December 10, 2023 (Sunday, 22:00h)"
 created  "April 09, 1999 (Friday, 20:05h)"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 sample
             <\/><\/><\/>
@@ -935,7 +935,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 09, 1999 (Friday, 19:45h)"
-tags     "artwork, box, sign"
+tags     ("artwork", "box", "sign")
 
 sample
                 __   _,--="=--,_   __
@@ -990,7 +990,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 09, 1999 (Friday, 19:45h)"
-tags     "artwork, box, sign"
+tags     ("artwork", "box", "sign")
 
 sample
                   /\             /\
@@ -1047,7 +1047,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 09, 1999 (Friday, 19:24h)"
-tags     "artwork, box, sign"
+tags     ("artwork", "box", "sign")
 
 sample
                     .-"```"-.
@@ -1111,7 +1111,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.0"
 revdate  "April 09, 1999 (Friday, 19:24h)"
 created  "April 09, 1999 (Friday, 19:24h)"
-tags     "artwork, box, sign"
+tags     ("artwork", "box", "sign")
 
 sample
                      .-"``"-.
@@ -1176,7 +1176,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "August 18, 1999 (Wednesday, 17:05h)"
 created  "April 09, 1999 (Friday, 15:53h)"
-tags     "artwork"
+tags     ("artwork")
 
 sample
           ,
@@ -1247,7 +1247,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.2"
 revdate  "December 10, 2023 (Sunday, 14:20h)"
 created  "April 05, 1999 (Monday, 21:55h)"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 sample
     .:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@.:-@-:.
@@ -1297,7 +1297,7 @@ designer "Joan G. Stark <spunk1111@juno.com>"
 revision "1.1"
 revdate  "February 13, 2021 (Saturday, 14:00h)"
 created  "April 05, 1999 (Monday, 21:55h)"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 sample
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -1335,7 +1335,7 @@ author   "Thomas Jensen"
 revision "1.1"
 revdate  "December 10, 2023 (Sunday, 14:20h)"
 created  "April 12, 1999 (Monday, 12:52h)"
-tags     "programming, box"
+tags     ("programming", "box")
 
 sample
     /*       _\|/_
@@ -1382,7 +1382,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     //
@@ -1412,7 +1412,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     #
@@ -1441,7 +1441,7 @@ designer "Bram Moolenaar"
 revision "1.0"
 revdate  "June 17, 1999 (Thursday, 19:59h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     "
@@ -1472,7 +1472,7 @@ designer "Thomas Jensen"
 revision "1.1"
 revdate  "April 3, 2021 (Saturday, 21:13h)"
 created  "June 17, 1999 (Thursday, 19:59h)"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     This can be used for marking code changes with your initials
@@ -1506,7 +1506,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "March 15, 2000 (Wednesday 12:17h)"
 created  "March 15, 2000 (Wednesday 12:17h)"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     --
@@ -1538,7 +1538,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "March 15, 2000 (Wednesday 12:24h)"
 created  "March 15, 2000 (Wednesday 12:24h)"
-tags     "simple, programming, box"
+tags     ("simple", "programming", "box")
 
 sample
     ---------------
@@ -1572,7 +1572,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "December 01, 2016 (Thursday 15:20h)"
 created  "December 01, 2016 (Thursday 15:20h)"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     %
@@ -1602,7 +1602,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "December 01, 2016 (Thursday 15:21h)"
 created  "December 01, 2016 (Thursday 15:21h)"
-tags     "simple, programming, box"
+tags     ("simple", "programming", "box")
 
 sample
     %=============%
@@ -1636,7 +1636,7 @@ designer "Christian Molls <CMolls@gmx.net>"
 revdate  "Tue Aug 15 23:02:02 CEST 2000"
 created  "Tue Aug 15 23:01:50 CEST 2000"
 revision "1.0"
-tags     "simple, artwork"
+tags     ("simple", "artwork")
 
 sample
     ,----[ mp3-wav ]
@@ -1673,7 +1673,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "Tue Sep 19 12:06:51 CEST 2000"
 created  "Tue Sep 19 12:06:51 CEST 2000"
-tags     "simple, programming, box"
+tags     ("simple", "programming", "box")
 
 sample
     /****************
@@ -1710,7 +1710,7 @@ author   "Fredrik Steen <fsteen@stone.nu>"
 designer "Fredrik Steen <fsteen@stone.nu>"
 revision "1.0"
 created  "April 25, 2001 (Wed 11:00)"
-tags     "simple, artwork, box"
+tags     ("simple", "artwork", "box")
 
 sample
     +-------------+
@@ -1743,7 +1743,7 @@ designer "Thomas Jensen"
 revision "1.3"
 revdate  "February 09, 2021 (Tuesday, 22:00h)"
 created  "March 18, 1999 (Thursday, 15:25h)"
-tags     "programming, box"
+tags     ("programming", "box")
 
 sample
     /*************/
@@ -1785,7 +1785,7 @@ designer "(public domain)"
 revision "1.0"
 revdate  "February 20, 2006 (Monday, 20:36h)"
 created  "February 20, 2006 (Monday, 20:36h)"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     ;;
@@ -1812,7 +1812,7 @@ BOX underline
 author   "Elmar Loos <elInfo@gmx.net>"
 designer "Elmar Loos <elInfo@gmx.net>"
 revision "1.0"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     // Bla, foo bar!
@@ -1837,7 +1837,7 @@ BOX ian_jones
 author   "Karl E. Jorgensen <karl@jorgensen.com>"
 created  "Fri Jul 20 16:52:39 BST 2001"
 revision "0.1"
-tags     "artwork, box, sign"
+tags     ("artwork", "box", "sign")
 
 sample
                                 \\\///
@@ -1926,7 +1926,7 @@ author   "Mike Meyer <boxes@meyer.fm>"
 revision "1.1"
 revdate  "November 08, 2014 (Saturday, 11:08h)"
 created  "September 02, 2013 (Monday, 14:43h)"
-tags     "artwork, speech"
+tags     ("artwork", "speech")
 
 sample
      _________________________________
@@ -2012,7 +2012,7 @@ author   "Mike Meyer <boxes@meyer.fm>"
 revision "1.2"
 revdate  "February 21, 2019 (Thursday, 18:45h)"
 created  "September 02, 2013 (Monday, 14:43h)"
-tags     "artwork, speech"
+tags     ("artwork", "speech")
 
 sample
      _________________________________
@@ -2099,7 +2099,7 @@ designer "Michael Tiernan <Michael.Tiernan@gMail.com>"
 revision "1.5"
 revdate  "Wed May 14 11:41:27 EDT 2014"
 created  "Wed May 14 11:41:27 EDT 2014"
-tags     "simple, artwork, box"
+tags     ("simple", "artwork", "box")
 
 sample
     (*************)
@@ -2139,7 +2139,7 @@ designer "Michael Naylor <mnaylor@math.fsu.edu>"
 revision "1.0"
 created  "Saturday, 02-Jan-16 12:42:31 UTC+1"
 revdate  "Saturday, 02-Jan-16 12:42:31 UTC+1"
-tags     "artwork, box, large"
+tags     ("artwork", "box", "large")
 
 sample
     ._____. ._____. .________________________________________. ._____. ._____.
@@ -2282,7 +2282,7 @@ author   "Tristano Ajmone <tajmone@gmail.com>"
 designer "akn"
 created  "Saturday, 02-Jan-16 03:34:03 UTC+1"
 revision "1.0"
-tags     "artwork, box, scroll"
+tags     ("artwork", "box", "scroll")
 
 sample
      /"\/\_..---------------------------------._/\/"\
@@ -2330,7 +2330,7 @@ author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 created  "2014-02-13 08:41:11"
 revision "1.0"
-tags     "artwork, box, large"
+tags     ("artwork", "box", "large")
 
 sample
      .--(0)    (0)--.
@@ -2375,7 +2375,7 @@ designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 created  "2017-04-10"
 revision "1.0"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 sample
      /\ /\ /\ /\ /\
@@ -2425,7 +2425,7 @@ designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 created  "2017-04-10"
 revision "1.0"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 sample
      /\ !!!!!!!!!!! /\
@@ -2468,7 +2468,7 @@ designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 created  "2017-04-10"
 revision "1.0"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 sample
      /\  /\ !!!!!!!!!!!! /\  /\
@@ -2515,7 +2515,7 @@ designer "Dmitry Bolshakov <bdimych@protonmail.com>"
 author   "Dmitry Bolshakov <bdimych@protonmail.com>"
 created  "2017-04-10"
 revision "1.0"
-tags     "artwork, box"
+tags     ("artwork", "box")
 
 sample
      /\  /\  /\ !!!!!!!!!!!! /\  /\  /\
@@ -2568,7 +2568,7 @@ author   "Matt Thompson <fortran(at)gmail(dot)com>"
 designer "(public domain)"
 revision "1.0"
 created  "2018-02-08"
-tags     "simple, programming, box"
+tags     ("simple", "programming", "box")
 
 sample
     !!!!!!!!!!!!!
@@ -2600,7 +2600,7 @@ author   "Matt Thompson <fortran(at)gmail(dot)com>"
 designer "(public domain)"
 revision "1.0"
 created  "2018-02-08"
-tags     "simple, programming, comment"
+tags     ("simple", "programming", "comment")
 
 sample
     !
@@ -2628,7 +2628,7 @@ designer "Hayley Jane Wakenshaw"
 author   "Thomas Jensen"
 created  "2019-03-31"
 revision "1.0"
-tags     "artwork, box, sign, large"
+tags     ("artwork", "box", "sign", "large")
 
 sample
                          ,---.           ,---.
@@ -2722,7 +2722,7 @@ designer "schallee_@_darkmist.net"
 revision "1.0"
 revdate  "3 Oct 2019"
 created  "3 Oct 2019"
-tags     "simple, programming, box"
+tags     ("simple", "programming", "box")
 
 sample
     /*----------------+
@@ -2758,7 +2758,7 @@ author   "Ricky Anderson <ricky.anderson2696@gmail.com>"
 designer "(public domain)"
 revision "1.0"
 created  "2019-11-17"
-tags     "simple, programming, box"
+tags     ("simple", "programming", "box")
 
 sample
     """""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -2792,7 +2792,7 @@ author   "Thomas Jensen"
 designer "dc"
 revision "1.0"
 created  "2021-06-13"
-tags     "artwork, box, large"
+tags     ("artwork", "box", "large")
 
 sample
               _       _       _       _       _       _       _       _       _       _       _
@@ -2896,7 +2896,7 @@ author   "Thomas Jensen"
 designer "Normand Veilleux"
 revision "1.0"
 created  "2021-06-13"
-tags     "artwork, box, large"
+tags     ("artwork", "box", "large")
 
 sample
             __,:,__               __,:,__               __,:,__    Normand    __,:,__
@@ -3015,7 +3015,7 @@ author   "David Yang <davidyang6us@gmail.com>"
 designer "Tony Monroe"
 revision "1.0"
 created  "2021-08-16"
-tags     "artwork, speech"
+tags     ("artwork", "speech")
 
 sample
      _____________________________
@@ -3096,7 +3096,7 @@ author   "David Yang <davidyang6us@gmail.com>"
 designer "Tony Monroe"
 revision "1.0"
 created  "2021-08-16"
-tags     "artwork, speech"
+tags     ("artwork", "speech")
 
 sample
      _________________
@@ -3201,7 +3201,7 @@ author   "Thomas Jensen"
 designer "Thomas Jensen"
 revision "1.0"
 created  "2023-10-24"
-tags     "box, color, simple, unicode"
+tags     ("box", "color", "simple", "unicode")
 
 sample
     [34m▄▄[0m[37;44m INFO [0;34m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄[0m
@@ -3251,7 +3251,7 @@ author   "Thomas Jensen"
 designer "Thomas Jensen"
 revision "1.0"
 created  "2023-10-24"
-tags     "box, color, simple, unicode"
+tags     ("box", "color", "simple", "unicode")
 
 sample
     [33m▄▄[0m[30;43m WARNING [0;33m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄[0m
@@ -3301,7 +3301,7 @@ author   "Thomas Jensen"
 designer "Thomas Jensen"
 revision "1.0"
 created  "2023-10-24"
-tags     "box, color, simple, unicode"
+tags     ("box", "color", "simple", "unicode")
 
 sample
     [31m▄▄[0m[37;41m CRITICAL [0;31m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄[0m
@@ -3352,7 +3352,7 @@ designer "(public domain)"
 created  "November 21, 2023 (Tuesday, 20:32h)"
 revision "1.0"
 revdate  "November 21, 2023 (Tuesday, 20:32h)"
-tags     "box, simple, unicode"
+tags     ("box", "simple", "unicode")
 
 sample
     ┌──────────────────────┐
@@ -3394,7 +3394,7 @@ designer "(public domain)"
 created  "November 21, 2023 (Tuesday, 20:32h)"
 revision "1.0"
 revdate  "November 21, 2023 (Tuesday, 20:32h)"
-tags     "box, simple, unicode"
+tags     ("box", "simple", "unicode")
 
 sample
     ╭──────────────────────╮
@@ -3436,7 +3436,7 @@ designer "(public domain)"
 created  "November 21, 2023 (Tuesday, 20:32h)"
 revision "1.0"
 revdate  "November 21, 2023 (Tuesday, 20:32h)"
-tags     "box, simple, unicode"
+tags     ("box", "simple", "unicode")
 
 sample
     ╔══════════════════════╗
@@ -3478,7 +3478,7 @@ designer "(public domain)"
 created  "November 21, 2023 (Tuesday, 20:32h)"
 revision "1.0"
 revdate  "November 21, 2023 (Tuesday, 20:32h)"
-tags     "box, simple, unicode"
+tags     ("box", "simple", "unicode")
 
 sample
     ┏━━━━━━━━━━━━━━━━━━━━━━┓
@@ -3520,7 +3520,7 @@ designer "(public domain)"
 created  "November 21, 2023 (Tuesday, 20:32h)"
 revision "1.0"
 revdate  "November 21, 2023 (Tuesday, 20:32h)"
-tags     "box, simple, unicode"
+tags     ("box", "simple", "unicode")
 
 sample
     ┏╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍┓
@@ -3562,7 +3562,7 @@ designer "(public domain)"
 created  "November 21, 2023 (Tuesday, 20:32h)"
 revision "1.0"
 revdate  "November 21, 2023 (Tuesday, 20:32h)"
-tags     "box, simple, unicode"
+tags     ("box", "simple", "unicode")
 
 sample
     ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐
@@ -3604,7 +3604,7 @@ designer "(public domain)"
 created  "November 21, 2023 (Tuesday, 20:32h)"
 revision "1.0"
 revdate  "November 21, 2023 (Tuesday, 20:32h)"
-tags     "box, simple, unicode"
+tags     ("box", "simple", "unicode")
 
 sample
     ╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
@@ -3646,7 +3646,7 @@ designer "Glory Py Yip (Glory Moon)"
 revdate  "Sun Dec 17 20:35:00 CET 2023"
 created  "Sun Dec 17 20:35:00 CET 2023"
 revision "1.0"
-tags     "artwork"
+tags     ("artwork")
 
 sample
            ,                                                     .  ,
