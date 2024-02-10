@@ -1,0 +1,13 @@
+:DESC
+Reference a design from a parent config defined in a config file with a UTF-8 file name.
+
+:ARGS
+-f 191_data/main.cfg -d designB -p l1 -s x3 -a vc
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+BBB
+BBB foo
+BBB
+:EOF
