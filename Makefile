@@ -207,7 +207,7 @@ tools/LICENSE.txt: LICENSE
 	unix2dos -n LICENSE tools/LICENSE.txt
 
 tools/boxes.cfg: boxes-config
-	unix2dos -n boxes-config tools/boxes.cfg
+	unix2dos -n --force boxes-config tools/boxes.cfg
 
 tools/boxes.exe: $(OUT_DIR)/boxes.exe
 	cp $(OUT_DIR)/boxes.exe tools/
