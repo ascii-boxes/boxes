@@ -181,7 +181,7 @@ $(OUT_DIR)/$(PKG_NAME).tar.gz:
 $(OUT_DIR)/zip/$(PKG_NAME).zip:
 	mkdir -p $(OUT_DIR)/zip/$(PKG_NAME)
 	unix2dos -n LICENSE $(OUT_DIR)/zip/$(PKG_NAME)/LICENSE.txt
-	unix2dos -n boxes-config $(OUT_DIR)/zip/$(PKG_NAME)/boxes.cfg
+	unix2dos -n --force boxes-config $(OUT_DIR)/zip/$(PKG_NAME)/boxes.cfg
 	unix2dos -n README.md $(OUT_DIR)/zip/$(PKG_NAME)/README.md
 	unix2dos -n README.Win32.md $(OUT_DIR)/zip/$(PKG_NAME)/README.Win32.md
 	unix2dos -n doc/boxes.1 $(OUT_DIR)/zip/$(PKG_NAME)/boxes.1
