@@ -43,8 +43,10 @@ plugins:
 # Which paths are processed by Jekyll to appear under _site/
 exclude:
   - .sass-cache/
+  - .idea/
   - .jekyll-cache/
   - CNAME
+  - CMakeUserPresets.json
   - Gemfile
   - Gemfile.lock
   - README.md
