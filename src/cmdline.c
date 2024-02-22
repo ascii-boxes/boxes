@@ -102,7 +102,7 @@ void usage_long(FILE *st)
     fprintf(st, "  -m, --mend            Mend (repair) box\n");
     fprintf(st, "  -n, --encoding <enc>  Character encoding of input and output [default: %s]\n", locale_charset());
     fprintf(st, "  -p, --padding <fmt>   Padding [default: none]\n");
-    fprintf(st, "  -q, --tag-query <qry> Query the list of designs by tag\n"); /* with "(undoc)" as query, trigger undocumented webui stuff instead */
+    fprintf(st, "  -q, --tag-query <qry> Query the list of designs by tag\n"); /* with "(undoc)" as query, trigger undocumented behavior instead */
     fprintf(st, "  -r, --remove          Remove box\n");
     fprintf(st, "  -s, --size <wxh>      Box size (width w and/or height h)\n");
     fprintf(st, "  -t, --tabs <str>      Tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
@@ -631,36 +631,47 @@ static int input_output_files(opt_t *result, char *argv[], int optind)
 
 static void print_debug_info(opt_t *result)
 {
-    if (result != NULL) {
-        #if defined(DEBUG)
-            fprintf (stderr, "Command line option settings (excerpt):\n");
-            fprintf (stderr, "- Alignment (-a): horiz %c, vert %c\n",
-                    result->halign ? result->halign : '?', result->valign ? result->valign : '?');
-            fprintf (stderr, "- Line justification (-a): \'%c\'\n", result->justify ? result->justify : '?');
-            fprintf (stderr, "- Design Definition W shape (-c): %s\n", result->cld ? result->cld : "n/a");
-            fprintf (stderr, "- Color mode: %d\n", result->color);
-            fprintf (stderr, "- Line terminator used (-e): %s\n",
-                strcmp(result->eol, "\r\n") == 0 ? "CRLF" : (strcmp(result->eol, "\r") == 0 ? "CR" : "LF"));
-            fprintf (stderr, "- Explicit config file (-f): %s\n", result->f ? result->f : "no");
-            fprintf (stderr, "- Indentmode (-i): \'%c\'\n", result->indentmode ? result->indentmode : '?');
-            fprintf (stderr, "- Kill blank lines (-k): %d\n", result->killblank);
-            fprintf (stderr, "- Mend box (-m): %d\n", result->mend);
-            fprintf (stderr, "- Padding (-p): l:%d t:%d r:%d b:%d\n",
-                    result->padding[BLEF], result->padding[BTOP], result->padding[BRIG], result->padding[BBOT]);
-            fprintf (stderr, "- Tag Query / Special handling for Web UI (-q): ");
-            if (result->query != NULL) {
-                for (size_t qidx = 0; result->query[qidx] != NULL; ++qidx) {
-                    fprintf(stderr, "%s%s", qidx > 0 ? ", " : "", result->query[qidx]);
-                }
-            } else {
-                fprintf (stderr, "(none)");
+    if (result != NULL && is_debug_logging(MAIN)) {
+        log_debug(__FILE__, MAIN, "Command line option settings (excerpt):\n");
+        log_debug(__FILE__, MAIN, "  - Alignment (-a): horiz %c, vert %c\n",
+                result->halign ? result->halign : '?', result->valign ? result->valign : '?');
+        log_debug(__FILE__, MAIN, "  - Line justification (-a): \'%c\'\n", result->justify ? result->justify : '?');
+        log_debug(__FILE__, MAIN, "  - Design Definition W shape (-c): %s\n", result->cld ? result->cld : "n/a");
+        log_debug(__FILE__, MAIN, "  - Color mode: %d\n", result->color);
+
+        log_debug(__FILE__, MAIN, "  - Debug areas: ");
+        int dbgfirst = 1;
+        for (size_t i = 0; i < NUM_LOG_AREAS; i++) {
+            if (result->debug[i]) {
+                log_debug_cont(MAIN, "%s%s", dbgfirst ? "" : ", ", log_area_names[i + 2]);
+                dbgfirst = 0;
             }
-            fprintf (stderr, "\n");
-            fprintf (stderr, "- Remove box (-r): %d\n", result->r);
-            fprintf (stderr, "- Requested box size (-s): %ldx%ld\n", result->reqwidth, result->reqheight);
-            fprintf (stderr, "- Tabstop distance (-t): %d\n", result->tabstop);
-            fprintf (stderr, "- Tab handling (-t): \'%c\'\n", result->tabexp);
-        #endif
+        }
+        log_debug_cont(MAIN, "%s\n", dbgfirst ? "(off)" : "");
+
+        log_debug(__FILE__, MAIN, "  - Line terminator used (-e): %s\n",
+            strcmp(result->eol, "\r\n") == 0 ? "CRLF" : (strcmp(result->eol, "\r") == 0 ? "CR" : "LF"));
+        log_debug(__FILE__, MAIN, "  - Explicit config file (-f): %s\n", result->f ? result->f : "no");
+        log_debug(__FILE__, MAIN, "  - Indentmode (-i): \'%c\'\n", result->indentmode ? result->indentmode : '?');
+        log_debug(__FILE__, MAIN, "  - Kill blank lines (-k): %d\n", result->killblank);
+        log_debug(__FILE__, MAIN, "  - Mend box (-m): %d\n", result->mend);
+        log_debug(__FILE__, MAIN, "  - Padding (-p): l:%d t:%d r:%d b:%d\n",
+                result->padding[BLEF], result->padding[BTOP], result->padding[BRIG], result->padding[BBOT]);
+
+        log_debug(__FILE__, MAIN, "  - Tag Query / Special handling for Web UI (-q): ");
+        if (result->query != NULL) {
+            for (size_t qidx = 0; result->query[qidx] != NULL; ++qidx) {
+                log_debug_cont(MAIN, "%s%s", qidx > 0 ? ", " : "", result->query[qidx]);
+            }
+        } else {
+            log_debug_cont(MAIN, "(none)");
+        }
+        log_debug_cont(MAIN, "\n");
+
+        log_debug(__FILE__, MAIN, "  - Remove box (-r): %d\n", result->r);
+        log_debug(__FILE__, MAIN, "  - Requested box size (-s): %ldx%ld\n", result->reqwidth, result->reqheight);
+        log_debug(__FILE__, MAIN, "  - Tabstop distance (-t): %d\n", result->tabstop);
+        log_debug(__FILE__, MAIN, "  - Tab handling (-t): \'%c\'\n", result->tabexp);
     }
 }
 
