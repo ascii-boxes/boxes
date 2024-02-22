@@ -28,6 +28,7 @@
 #include "global_mock.h"
 #include "bxstring_test.h"
 #include "cmdline_test.h"
+#include "logging_test.h"
 #include "tools_test.h"
 #include "regulex_test.h"
 #include "remove_test.h"
@@ -218,6 +219,24 @@ int main(void)
         cmocka_unit_test_setup(test_hmm_blank, beforeTest)
     };
 
+    const struct CMUnitTest logging_tests[] = {
+        cmocka_unit_test_setup(test_debug_shorten_nopath, beforeTest),
+        cmocka_unit_test_setup(test_debug_shorten_minimal, beforeTest),
+        cmocka_unit_test_setup(test_debug_shorten_null, beforeTest),
+        cmocka_unit_test_setup(test_debug_shorten_backslash, beforeTest),
+        cmocka_unit_test_setup(test_debug_shorten_slash, beforeTest),
+        cmocka_unit_test_setup(test_debug_shorten_nosuffix, beforeTest),
+        cmocka_unit_test_setup(test_debug_shorten_wrongdot, beforeTest),
+        cmocka_unit_test_setup(test_debug_shorten_empty, beforeTest),
+        cmocka_unit_test_setup(test_debug_inactive_area, beforeTest),
+        cmocka_unit_test_setup(test_debug_continue, beforeTest),
+        cmocka_unit_test_setup(test_debug_continue_inactive, beforeTest),
+        cmocka_unit_test_setup(test_debug_area_too_big, beforeTest),
+        cmocka_unit_test_setup(test_debug_area_reserved, beforeTest),
+        cmocka_unit_test_setup(test_debug_area_all, beforeTest),
+        cmocka_unit_test_setup(test_debug_deactivated, beforeTest),
+        cmocka_unit_test_setup(test_debug_all_active, beforeTest)
+    };
 
     int num_failed = 0;
     num_failed += cmocka_run_group_tests(cmdline_tests, NULL, NULL);
@@ -226,6 +245,7 @@ int main(void)
     num_failed += cmocka_run_group_tests(unicode_tests, NULL, NULL);
     num_failed += cmocka_run_group_tests(bxstring_tests, NULL, NULL);
     num_failed += cmocka_run_group_tests(remove_tests, NULL, NULL);
+    num_failed += cmocka_run_group_tests(logging_tests, logging_setup, logging_teardown);
 
     teardown();
     return num_failed;
