@@ -19,8 +19,8 @@ SRC_DIR    = ../src
 UTEST_DIR  = ../utest
 VPATH      = $(SRC_DIR):$(SRC_DIR)/misc:$(UTEST_DIR)
 
-UTEST_NORM = global_mock.c bxstring_test.o cmdline_test.c tools_test.c regulex_test.o remove_test.o main.o \
-             unicode_test.o utest_tools.o
+UTEST_NORM = global_mock.c bxstring_test.o cmdline_test.c logging_test.c tools_test.c regulex_test.o remove_test.o \
+             main.o unicode_test.o utest_tools.o
 
 .PHONY: check_dir flags_unix flags_win32 flags_ utest
 
@@ -69,6 +69,7 @@ unittest.exe: $(UTEST_OBJ) | check_dir
 global_mock.o:   global_mock.c global_mock.h boxes.h unicode.h tools.h config.h | check_dir
 bxstring_test.o: bxstring_test.c bxstring_test.h boxes.h bxstring.h global_mock.h tools.h unicode.h utest_tools.h config.h | check_dir
 cmdline_test.o:  cmdline_test.c cmdline_test.h boxes.h cmdline.h global_mock.h tools.h config.h | check_dir
+logging_test.o:  logging_test.c logging_test.h boxes.h global_mock.h logging.h tools.h config.h | check_dir
 tools_test.o:    tools_test.c tools_test.h tools.h unicode.h config.h | check_dir
 regulex_test.o:  regulex_test.c regulex_test.h boxes.h global_mock.h regulex.h config.h | check_dir
 remove_test.o:   remove_test.c remove_test.h boxes.h remove.h shape.h tools.h unicode.h global_mock.h utest_tools.h config.h | check_dir
