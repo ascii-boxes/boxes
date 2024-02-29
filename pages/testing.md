@@ -56,9 +56,16 @@ New unit tests can be added in the *utest* folder. We use [cmocka](https://cmock
 Sunny-day tests are a suite of tests which simply creates, mends, and removes every box from our official config file.
 This is to make sure that regular operations work with all of our box designs.
 
-In order to invoke the sunny-day test suite, simply call `make test-sunny`. This is valid for all operating systems.
-Calling `make covtest-sunny` will also calculate test coverage, but this requires that the binary was instrumented
-before, as per `make cov`.
+In order to run the sunny-day test suite, make sure the `TERM` and `LANG` environment variables are set to indicate a
+color-capable terminal and a system encoding of UTF-8. For example:
+
+```
+export TERM=xterm-color
+export LANG=en_US.UTF-8
+```
+
+Then, simply call `make test-sunny`. This is valid for all operating systems.
+Calling `make cov && make covtest-sunny` instead will do the same, but also calculate test coverage.
 
 <div class="alert alert-info">
     For every new box design, a corresponding sunny-day test must be created.
@@ -94,8 +101,16 @@ be created:
 Black-box tests invoke boxes with all kinds of different arguments, inputs, and configurations in order to test the
 application as a whole.
 
-In order to invoke the black-box test suite, simply call `make && make test` from the top level directory. This is
-valid for all operating systems. Calling `make cov && make covtest` will also calculate test coverage.
+In order to run the black-box test suite, make sure the `TERM` and `LANG` environment variables are set to indicate a
+color-capable terminal and a system encoding of UTF-8. For example:
+
+```
+export TERM=xterm-color
+export LANG=en_US.UTF-8
+```
+
+Then, simply call `make && make test` from the top level directory. This is valid for all operating systems. Calling
+`make cov && make covtest` instead will do the same, but also calculate test coverage.
 
 Run an individual test by calling `./testrunner.sh testcase.txt` from the *test* directory.
 
