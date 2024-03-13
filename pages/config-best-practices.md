@@ -28,6 +28,7 @@ through this list.
   - `artwork` - It's an ASCII art box, not a simple thing like a box of asterisks or hash characters. When in doubt,
     don't use this tag.
   - `box` - It's a box that goes around the input text, i.e. at most one open side.
+  - `color` - At least one box shape contains invisible ANSI escape codes for coloring.
   - `comment` - A regional comment in a programming language.
   - `large` - A box intended for large content, like figlet fonts, or just lots of text. It wants to be big!
   - `programming` - All comments in a programming language, including boxes which are valid comments. Anything tagged
@@ -35,6 +36,7 @@ through this list.
   - `sign` - An ASCII art figure holding or showing a sign which contains the input text.
   - `simple` - A simple box, normally excluding `artwork`.
   - `speech` - A box which includes a speech bubble.
+  - `unicode` - At least one box shape contains a non-ASCII character.
 
 - **Give Credit Where Credit is Due** – This point is really important. If your box is based on someone else's artwork,
   the original artist must be credited in a `designer` entry, and you must make sure that the person allowed you to

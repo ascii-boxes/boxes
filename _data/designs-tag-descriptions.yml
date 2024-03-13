@@ -4,6 +4,7 @@ tag_descriptions:
     box: 'go around the input text.'
     color: |-
         feature box shapes colored by ANSI escape codes.
+        <p>Hover with your mouse cursor over the moon icon to see a dark background.</p>
         <div class="alert alert-info">
             <strong>Note:</strong> In order to color the text, <i>boxes</i> will output ANSI escape codes. Usually,
             your terminal will interpret them properly. However, many text editors cannot do that, and you may see
