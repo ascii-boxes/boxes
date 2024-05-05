@@ -52,7 +52,7 @@ jobs:
                   parallel: true
 
     build-macos:
-        runs-on: macos-latest
+        runs-on: macos-13
         env:
           BX_LEX: /usr/local/opt/flex/bin/flex
           BX_YACC: /usr/local/opt/bison/bin/bison
