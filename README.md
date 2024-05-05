@@ -43,10 +43,6 @@ has been made to run on a wide range of platforms, from Windows PCs to Netgear r
 *Boxes* has matured, and is thusly no longer being actively developed. But contributors can be sure
 that their pull requests are promptly reviewed and merged into the main code base.
 
-Update 2021: In 2021, the original author has turned to *boxes* again in order to implement all
-open issues, including full multi-byte character set support. This is still ongoing, but there
-have already been two new releases with significant new functionality.
-
 ## Development
 
 The website has information on [building from source](https://boxes.thomasjensen.com/build.html),
@@ -57,13 +53,14 @@ over the years, and continues to benefit greatly from contributions. Many thanks
 
 ## Custom box designs
 
-You can define [your own box designs](https://boxes.thomasjensen.com/config-general.html)!
+In addition to the [pre-defined box designs](https://boxes.thomasjensen.com/box-designs.html),
+you can define [your own box designs](https://boxes.thomasjensen.com/config-general.html)!
 
 We appreciate the creative new box designs that you craft for *boxes*.
 If you think that others should have your box designs, please feel free to submit them in the
 form of pull requests on
 [boxes-config](https://github.com/ascii-boxes/boxes/blob/master/boxes-config),
-and they may make it into the next release!
+and they may make it into the next release.
 
 ## License
 
@@ -71,10 +68,11 @@ Boxes is free software under the GNU General Public License, version 3
 ([GPLv3](https://www.gnu.org/licenses/gpl-3.0.html)).
 
 ```
- _________________________
-/\                        \
-\_|    Thank you for      |
-  |    using Boxes!       |
-  |  _____________________|_
-  \_/______________________/
+ _________________________________
+/\                                \
+\_|    May your days with Boxes    |
+  |    be filled with discovery    |
+  |    and delight!                |
+  |  ______________________________|_
+  \_/_______________________________/
 ```
