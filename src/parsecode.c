@@ -874,7 +874,7 @@ int action_add_alias(pass_to_bison *bison_args, char *alias_name)
 static bxstr_t *adjust_eols(uint32_t *sample)
 {
     if (eol_pattern == NULL) {
-        eol_pattern = compile_pattern("(?(?=\r)(\r\n?)|(\n))");
+        eol_pattern = compile_pattern("(?:(\r\n?)|(\n))");
     }
     uint32_t *replaced = regex_replace(eol_pattern, opt.eol, sample, u32_strlen(sample), 1);
     bxstr_t *result = bxs_from_unicode(replaced);
