@@ -2596,7 +2596,7 @@ END jstone
 BOX vim-box
 
 author   "Ricky Anderson <ricky.anderson2696@gmail.com>"
-designer "(public domain)"
+designer "Bram Moolenaar"
 tags     ("simple", "programming", "box")
 
 sample
