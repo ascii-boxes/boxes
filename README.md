@@ -65,14 +65,14 @@ and they may make it into the next release.
 ## License
 
 Boxes is free software under the GNU General Public License, version 3
-([GPLv3](https://www.gnu.org/licenses/gpl-3.0.html)).
+([GPL-3.0-only](https://www.gnu.org/licenses/gpl-3.0.html)).
 
 ```
- _________________________________
-/\                                \
+ __________________________________
+/\                                 \
 \_|    May your days with Boxes    |
   |    be filled with discovery    |
   |    and delight!                |
-  |  ______________________________|_
-  \_/_______________________________/
+  |   _____________________________|_
+   \_/_______________________________/
 ```
