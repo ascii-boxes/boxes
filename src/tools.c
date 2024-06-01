@@ -32,6 +32,7 @@
 #include <uniwidth.h>
 
 #include "boxes.h"
+#include "logging.h"
 #include "regulex.h"
 #include "shape.h"
 #include "tools.h"
@@ -409,66 +410,64 @@ char *nspaces(const size_t n)
 
 
 
-#if defined(DEBUG) || 0
-
 /**
  * Debugging Code: Display contents of input structure
  * @param heading a heading to show for identification of the printed lines
  */
 void print_input_lines(const char *heading)
 {
-    fprintf(stderr, "%d Input Lines%s:\n", (int) input.num_lines, heading != NULL ? heading : "");
-    fprintf(stderr, "     [num_chars] \"real text\" [num_cols] \"ascii_text\"\n");
-    for (size_t i = 0; i < input.num_lines; ++i) {
-        char *outtext = bxs_to_output(input.lines[i].text);
-        fprintf(stderr, "%4d [%02d] \"%s\"  [%02d] \"%s\"", (int) i,
-                (int) input.lines[i].text->num_chars, outtext,
-                (int) input.lines[i].text->num_columns, input.lines[i].text->ascii);
-        BFREE(outtext);
-        fprintf(stderr, "\tTabs: [");
-        if (input.lines[i].tabpos != NULL) {
-            for (size_t j = 0; j < input.lines[i].tabpos_len; ++j) {
-                fprintf(stderr, "%d", (int) input.lines[i].tabpos[j]);
-                if (j < input.lines[i].tabpos_len - 1) {
-                    fprintf(stderr, ", ");
+    if (is_debug_logging(MAIN)) {
+        log_debug(__FILE__, MAIN, "%d Input Lines%s:\n", (int) input.num_lines, heading != NULL ? heading : "");
+        log_debug(__FILE__, MAIN, "     [num_chars] \"real text\" [num_cols] \"ascii_text\"\n");
+        for (size_t i = 0; i < input.num_lines; ++i) {
+            char *outtext = bxs_to_output(input.lines[i].text);
+            log_debug(__FILE__, MAIN, "%4d [%02d] \"%s\"  [%02d] \"%s\"", (int) i,
+                    (int) input.lines[i].text->num_chars, outtext,
+                    (int) input.lines[i].text->num_columns, input.lines[i].text->ascii);
+            BFREE(outtext);
+            log_debug_cont(MAIN, "\tTabs: [");
+            if (input.lines[i].tabpos != NULL) {
+                for (size_t j = 0; j < input.lines[i].tabpos_len; ++j) {
+                    log_debug_cont(MAIN, "%d", (int) input.lines[i].tabpos[j]);
+                    if (j < input.lines[i].tabpos_len - 1) {
+                        log_debug_cont(MAIN, ", ");
+                    }
                 }
             }
-        }
-        fprintf(stderr, "] (%d)", (int) input.lines[i].tabpos_len);
-        fprintf(stderr, "\tinvisible=%d\n", (int) input.lines[i].text->num_chars_invisible);
+            log_debug_cont(MAIN, "] (%d)", (int) input.lines[i].tabpos_len);
+            log_debug_cont(MAIN, "\tinvisible=%d\n", (int) input.lines[i].text->num_chars_invisible);
 
-        fprintf(stderr, "    visible_char=");
-        if (input.lines[i].text->visible_char != NULL) {
-            fprintf(stderr, "[");
-            for (size_t j = 0; j < input.lines[i].text->num_chars_visible; j++) {
-                fprintf(stderr, "%d%s", (int) input.lines[i].text->visible_char[j],
-                    j == (input.lines[i].text->num_chars_visible - 1) ? "" : ", ");
+            log_debug(__FILE__, MAIN, "    visible_char=");
+            if (input.lines[i].text->visible_char != NULL) {
+                log_debug_cont(MAIN, "[");
+                for (size_t j = 0; j < input.lines[i].text->num_chars_visible; j++) {
+                    log_debug_cont(MAIN, "%d%s", (int) input.lines[i].text->visible_char[j],
+                        j == (input.lines[i].text->num_chars_visible - 1) ? "" : ", ");
+                }
+                log_debug_cont(MAIN, "]\n");
             }
-            fprintf(stderr, "]\n");
-        }
-        else {
-            fprintf(stderr, "null\n");
-        }
+            else {
+                log_debug_cont(MAIN, "null\n");
+            }
 
-        fprintf(stderr, "      first_char=");
-        if (input.lines[i].text->first_char != NULL) {
-            fprintf(stderr, "[");
-            for (size_t j = 0; j < input.lines[i].text->num_chars_visible; j++) {
-                fprintf(stderr, "%d%s", (int) input.lines[i].text->first_char[j],
-                    j == (input.lines[i].text->num_chars_visible - 1) ? "" : ", ");
+            log_debug(__FILE__, MAIN, "      first_char=");
+            if (input.lines[i].text->first_char != NULL) {
+                log_debug_cont(MAIN, "[");
+                for (size_t j = 0; j < input.lines[i].text->num_chars_visible; j++) {
+                    log_debug_cont(MAIN, "%d%s", (int) input.lines[i].text->first_char[j],
+                        j == (input.lines[i].text->num_chars_visible - 1) ? "" : ", ");
+                }
+                log_debug_cont(MAIN, "]\n");
             }
-            fprintf(stderr, "]\n");
+            else {
+                log_debug_cont(MAIN, "null\n");
+            }
         }
-        else {
-            fprintf(stderr, "null\n");
-        }
+        log_debug(__FILE__, MAIN, " Longest line: %d columns\n", (int) input.maxline);
+        log_debug(__FILE__, MAIN, "  Indentation: %2d spaces\n", (int) input.indent);
+        log_debug(__FILE__, MAIN, "Final newline: %s\n", input.final_newline ? "yes" : "no");
     }
-    fprintf(stderr, " Longest line: %d columns\n", (int) input.maxline);
-    fprintf(stderr, "  Indentation: %2d spaces\n", (int) input.indent);
-    fprintf(stderr, "Final newline: %s\n", input.final_newline ? "yes" : "no");
 }
-
-#endif
 
 
 

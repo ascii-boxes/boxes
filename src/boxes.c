@@ -35,6 +35,7 @@
 #include "generate.h"
 #include "input.h"
 #include "list.h"
+#include "logging.h"
 #include "parsing.h"
 #include "query.h"
 #include "remove.h"
@@ -156,7 +157,7 @@ static int build_design(design_t **adesigns, const char *cld)
 
             default:
                 fprintf(stderr, "%s: internal error\n", PROJECT);
-                return 1;                /* never happens ;-) */
+                return 1;
         }
         c->name = i;
 
@@ -180,9 +181,8 @@ static int build_design(design_t **adesigns, const char *cld)
  */
 static void handle_command_line(int argc, char *argv[])
 {
-    #ifdef DEBUG
-        fprintf (stderr, "Processing Command Line ...\n");
-    #endif
+    log_debug(__FILE__, MAIN, "Processing Command Line ...\n");
+
     opt_t *parsed_opts = process_commandline(argc, argv);
     if (parsed_opts == NULL) {
         exit(EXIT_FAILURE);
@@ -269,9 +269,8 @@ static void apply_expected_size()
  */
 static void handle_input()
 {
-    #ifdef DEBUG
-        fprintf (stderr, "Reading all input ...\n");
-    #endif
+    log_debug(__FILE__, MAIN, "Reading all input ...\n");
+
     input_t *raw_input = NULL;
     if (opt.mend != 0) {
         raw_input = read_all_input();
@@ -287,10 +286,10 @@ static void handle_input()
         BFREE(raw_input);
     }
 
-    #ifdef DEBUG
-        fprintf(stderr, "Effective encoding: %s\n", encoding);
+    if (is_debug_logging(MAIN)) {
+        log_debug(__FILE__, MAIN, "Effective encoding: %s\n", encoding);
         print_input_lines(NULL);
-    #endif
+    }
     if (input.num_lines == 0) {
         exit(EXIT_SUCCESS);
     }
@@ -362,9 +361,8 @@ static void adjust_size_and_padding()
  */
 static void handle_generate_box()
 {
-    #ifdef DEBUG
-        fprintf (stderr, "Generating Box ...\n");
-    #endif
+    log_debug(__FILE__, MAIN, "Generating Box ...\n");
+
     sentry_t *thebox = (sentry_t *) calloc(NUM_SIDES, sizeof(sentry_t));
     if (thebox == NULL) {
         perror(PROJECT);
@@ -384,9 +382,8 @@ static void handle_generate_box()
  */
 static void handle_remove_box()
 {
-    #ifdef DEBUG
-        fprintf (stderr, "Removing Box ...\n");
-    #endif
+    log_debug(__FILE__, MAIN, "Removing Box ...\n");
+
     if (opt.killblank == -1) {
         if (empty_side(opt.design->shape, BTOP) && empty_side(opt.design->shape, BBOT)) {
             opt.killblank = 0;
@@ -425,15 +422,16 @@ static int terminal_has_colors()
             result = 1;
         }
     #endif
-    #if defined(DEBUG)
+
+    if (is_debug_logging(MAIN)) {
         #ifdef __MINGW32__
             int num_colors = 1;
         #else
             int num_colors = result ? tigetnum("colors") : 0;
         #endif
-        fprintf(stderr, "Terminal \"%s\" %s colors (number of colors = %d).\n", termtype != NULL ? termtype : "(null)",
-                result ? "has" : "does NOT have", num_colors);
-    #endif
+        log_debug(__FILE__, MAIN, "Terminal \"%s\" %s colors (number of colors = %d).\n",
+                termtype != NULL ? termtype : "(null)", result ? "has" : "does NOT have", num_colors);
+    }
     return result;
 }
 
@@ -449,9 +447,7 @@ static int check_color_support(int opt_color)
         result = terminal_has_colors();
     }
 
-    #if defined(DEBUG)
-        fprintf(stderr, "%s: Color support %sabled\n", PROJECT, result ? "\x1b[92mEN\x1b[0m" : "DIS");
-    #endif
+    log_debug(__FILE__, MAIN, "Color support %sabled\n", result ? "\x1b[92mEN\x1b[0m" : "DIS");
     return result;
 }
 
@@ -485,9 +481,7 @@ int main(int argc, char *argv[])
     int saved_designwidth;            /* opt.design->minwith backup, used for mending */
     int saved_designheight;           /* opt.design->minheight backup, used for mending */
 
-    #ifdef DEBUG
-        fprintf (stderr, "BOXES STARTING ...\n");
-    #endif
+    log_debug(__FILE__, MAIN, "BOXES STARTING ...\n"); /* TODO This line will never execute, because debug not on yet */
 
     /* Temporarily set the system encoding, for proper output of --help text etc. */
     activateSystemEncoding();
@@ -497,9 +491,7 @@ int main(int argc, char *argv[])
 
     /* Store system character encoding */
     encoding = check_encoding(opt.encoding, locale_charset());
-    #ifdef DEBUG
-        fprintf (stderr, "Character Encoding = %s\n", encoding);
-    #endif
+    log_debug(__FILE__, MAIN, "Character Encoding = %s\n", encoding);
 
     color_output_enabled = check_color_support(opt.color);
 
