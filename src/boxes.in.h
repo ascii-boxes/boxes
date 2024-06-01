@@ -143,7 +143,6 @@ typedef struct {                     /* Command line options: */
     char     *eol;                   /** `-e`: line break to use. Never NULL, default to "\n". */
     int       eol_overridden;        /** `-e`: 0: value in `eol` is the default; 1: value in `eol` specified via `-e` */
     char     *f;                     /** `-f`: config file path */
-    int      *debug;                 /** `-g`: activate debug logging for given debug log areas */
     int       help;                  /** `-h`: flags if help argument was specified */
     char      indentmode;            /** `-i`: 'b', 't', 'n', or '\0' */
     int       killblank;             /** `-k`: kill blank lines, -1 if not set */
@@ -158,6 +157,8 @@ typedef struct {                     /* Command line options: */
     int       tabstop;               /** `-t`: tab stop distance */
     char      tabexp;                /** `-t`: tab expansion mode (for leading tabs) */
     int       version_requested;     /** `-v`: request to show version number */
+    int      *debug;                 /** `-x debug:`: activate debug logging for given debug log areas */
+    int       qundoc;                /** `-x (undoc)`: flag if "(undoc)" was specified, put directly before "debug:" */
     FILE     *infile;
     FILE     *outfile;
 } opt_t;

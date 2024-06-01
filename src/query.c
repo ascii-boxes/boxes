@@ -30,13 +30,12 @@
 
 
 #define QUERY_ALL "(all)"
-#define QUERY_UNDOC "(undoc)"
 
 
 
 static int validate_tag(char *tag)
 {
-    if (strcmp(tag, QUERY_ALL) == 0 || strcmp(tag, QUERY_UNDOC) == 0) {
+    if (strcmp(tag, QUERY_ALL) == 0) {
         return 1;
     }
     return tag_is_valid(tag);
@@ -113,13 +112,6 @@ char **parse_query(char *optarg)
     }
 
     return query;
-}
-
-
-
-int query_is_undoc()
-{
-    return opt.query != NULL && strcmp(opt.query[0], QUERY_UNDOC) == 0 && opt.query[1] == NULL;
 }
 
 

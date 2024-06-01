@@ -512,7 +512,7 @@ int main(int argc, char *argv[])
     }
 
     /* If "-q" option was given, print results of tag query and exit. */
-    if (opt.query != NULL && opt.query[0] != NULL && !query_is_undoc()) {
+    if (opt.query != NULL && opt.query[0] != NULL) {
         rc = query_by_tag();
         exit(rc);
     }

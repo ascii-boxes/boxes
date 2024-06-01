@@ -321,7 +321,7 @@ static void print_design_details(design_t *d)
     /*
      *  Display all shapes
      */
-    if (query_is_undoc()) {
+    if (opt.qundoc) {
         fprintf(opt.outfile, "Sample:%s%s%s", opt.eol, bxs_to_output(d->sample), opt.eol);
     }
     else {
