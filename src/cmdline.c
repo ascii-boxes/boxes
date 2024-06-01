@@ -731,14 +731,13 @@ static void print_debug_info(opt_t *result)
 
 opt_t *process_commandline(int argc, char *argv[])
 {
-    #ifdef DEBUG
-        fprintf(stderr, "argc = %d\n", argc);
-        fprintf(stderr, "argv = [");
+    if (is_debug_logging(MAIN)) {
+        log_debug(__FILE__, MAIN, "argc = %d\n", argc);
+        log_debug(__FILE__, MAIN, "argv = [");
         for(int i=0; i<=argc; i++) {
-            fprintf(stderr, "%s%s", argv[i], i < argc ? ", " : "");
+            log_debug_cont(MAIN, "%s%s", argv[i], i < argc ? ", " : "]\n");
         }
-        fprintf(stderr, "]\n");
-    #endif
+    }
 
     opt_t *result = create_new_opt();
 

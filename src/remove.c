@@ -28,6 +28,7 @@
 
 #include "boxes.h"
 #include "detect.h"
+#include "logging.h"
 #include "remove.h"
 #include "shape.h"
 #include "tools.h"
@@ -101,74 +102,69 @@ typedef struct _remove_ctx_t {
 
 static void debug_print_remove_ctx(remove_ctx_t *ctx, char *heading)
 {
-    #ifdef DEBUG
-        fprintf(stderr, "Remove Context %s:\n", heading);
-        fprintf(stderr, "    - empty_side[BTOP] = %s\n", ctx->empty_side[BTOP] ? "true" : "false");
-        fprintf(stderr, "    - empty_side[BRIG] = %s\n", ctx->empty_side[BRIG] ? "true" : "false");
-        fprintf(stderr, "    - empty_side[BBOT] = %s\n", ctx->empty_side[BBOT] ? "true" : "false");
-        fprintf(stderr, "    - empty_side[BLEF] = %s\n", ctx->empty_side[BLEF] ? "true" : "false");
-        fprintf(stderr, "    - design_is_mono = %s\n", ctx->design_is_mono ? "true" : "false");
-        fprintf(stderr, "    - input_is_mono = %s\n", ctx->input_is_mono ? "true" : "false");
-        fprintf(stderr, "    - top_start_idx = %d\n", (int) ctx->top_start_idx);
-        fprintf(stderr, "    - top_end_idx = %d\n", (int) ctx->top_end_idx);
-        fprintf(stderr, "    - bottom_start_idx = %d\n", (int) ctx->bottom_start_idx);
-        fprintf(stderr, "    - bottom_end_idx = %d\n", (int) ctx->bottom_end_idx);
-        fprintf(stderr, "    - comp_type = %s\n", comparison_name[ctx->comp_type]);
-        fprintf(stderr, "    - body (%d lines):\n", (int) ctx->body_num_lines);
+    if (is_debug_logging(MAIN)) {
+        log_debug(__FILE__, MAIN, "Remove Context %s:\n", heading);
+        log_debug(__FILE__, MAIN, "    - empty_side[BTOP] = %s\n", ctx->empty_side[BTOP] ? "true" : "false");
+        log_debug(__FILE__, MAIN, "    - empty_side[BRIG] = %s\n", ctx->empty_side[BRIG] ? "true" : "false");
+        log_debug(__FILE__, MAIN, "    - empty_side[BBOT] = %s\n", ctx->empty_side[BBOT] ? "true" : "false");
+        log_debug(__FILE__, MAIN, "    - empty_side[BLEF] = %s\n", ctx->empty_side[BLEF] ? "true" : "false");
+        log_debug(__FILE__, MAIN, "    - design_is_mono = %s\n", ctx->design_is_mono ? "true" : "false");
+        log_debug(__FILE__, MAIN, "    - input_is_mono = %s\n", ctx->input_is_mono ? "true" : "false");
+        log_debug(__FILE__, MAIN, "    - top_start_idx = %d\n", (int) ctx->top_start_idx);
+        log_debug(__FILE__, MAIN, "    - top_end_idx = %d\n", (int) ctx->top_end_idx);
+        log_debug(__FILE__, MAIN, "    - bottom_start_idx = %d\n", (int) ctx->bottom_start_idx);
+        log_debug(__FILE__, MAIN, "    - bottom_end_idx = %d\n", (int) ctx->bottom_end_idx);
+        log_debug(__FILE__, MAIN, "    - comp_type = %s\n", comparison_name[ctx->comp_type]);
+        log_debug(__FILE__, MAIN, "    - body (%d lines):\n", (int) ctx->body_num_lines);
         for (size_t i = 0; i < ctx->body_num_lines; i++) {
             if (ctx->body[i].input_line_used != NULL) {
                 char *out_input_line_used = u32_strconv_to_output(ctx->body[i].input_line_used);
-                fprintf(stderr, "        - lctx: \"%s\" (%d characters)\n", out_input_line_used,
+                log_debug(__FILE__, MAIN, "        - lctx: \"%s\" (%d characters)\n", out_input_line_used,
                     (int) u32_strlen(ctx->body[i].input_line_used));
                 BFREE(out_input_line_used);
             }
             else {
-                fprintf(stderr, "        - lctx: (null)\n");
+                log_debug(__FILE__, MAIN, "        - lctx: (null)\n");
             }
             bxstr_t *orgline = input.lines[ctx->top_end_idx + i].text;
             if (orgline != NULL) {
                 char *out_orgline = bxs_to_output(orgline);
-                fprintf(stderr, "          orgl: \"%s\" (%d characters, %d columns)\n", out_orgline,
+                log_debug(__FILE__, MAIN, "          orgl: \"%s\" (%d characters, %d columns)\n", out_orgline,
                     (int) orgline->num_chars, (int) orgline->num_columns);
                 BFREE(out_orgline);
             }
             else {
-                fprintf(stderr, "          orgl: (null)\n");
+                log_debug(__FILE__, MAIN, "          orgl: (null)\n");
             }
-            fprintf(stderr, "                west: %d-%d (quality: %d), east: %d-%d (quality: %d)\n",
+            log_debug(__FILE__, MAIN, "                west: %d-%d (quality: %d), east: %d-%d (quality: %d)\n",
                 (int) ctx->body[i].west_start, (int) ctx->body[i].west_end, (int) ctx->body[i].west_quality,
                 (int) ctx->body[i].east_start, (int) ctx->body[i].east_end, (int) ctx->body[i].east_quality);
         }
-    #else
-        UNUSED(ctx);
-        UNUSED(heading);
-    #endif
+    }
 }
 
 
 
 static void debug_print_shapes_relevant(shape_line_ctx_t *shapes_relevant)
 {
-    #ifdef DEBUG
-        fprintf(stderr, "  shapes_relevant = {");
+    if (is_debug_logging(MAIN)) {
+        log_debug(__FILE__, MAIN, "  shapes_relevant = {");
         for (size_t ds = 0; ds < SHAPES_PER_SIDE; ds++) {
             if (shapes_relevant[ds].empty) {
-                fprintf(stderr, "-");
+                log_debug_cont(MAIN, "-");
             }
             else {
                 char *out_shp_text = bxs_to_output(shapes_relevant[ds].text);
-                fprintf(stderr, "\"%s\"(%d%s)", out_shp_text, (int) shapes_relevant[ds].text->num_chars,
+                log_debug_cont(MAIN, "\"%s\"(%d%s)", out_shp_text, (int) shapes_relevant[ds].text->num_chars,
                     shapes_relevant[ds].elastic ? "E" : "");
                 BFREE(out_shp_text);
             }
             if (ds < SHAPES_PER_SIDE - 1) {
-                fprintf(stderr, ", ");
+                log_debug_cont(MAIN, ", ");
             }
         }
-        fprintf(stderr, "}\n");
-    #else
-        UNUSED(shapes_relevant);
-    #endif
+        log_debug_cont(MAIN, "}\n");
+    }
 }
 
 
@@ -315,14 +311,14 @@ static int hmm_shiftable(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, s
 int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, uint32_t *end_pos, int anchored_left,
         int anchored_right)
 {
-    #ifdef DEBUG
+    if (is_debug_logging(MAIN)) {
         char *out_cur_pos = u32_strconv_to_output(cur_pos);
         char *out_end_pos = u32_strconv_to_output(end_pos);
-        fprintf(stderr, "hmm(shapes_relevant, \"%s\", %d, \"%s\", %s, %s) - enter\n", out_cur_pos,
+        log_debug(__FILE__, MAIN, "hmm(shapes_relevant, \"%s\", %d, \"%s\", %s, %s) - enter\n", out_cur_pos,
                 (int) shape_idx, out_end_pos, anchored_left ? "true" : "false", anchored_right ? "true" : "false");
         BFREE(out_cur_pos);
         BFREE(out_end_pos);
-    #endif
+    }
 
     int result = 0;
     if (!anchored_left) {
@@ -371,11 +367,12 @@ int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, 
             }
             else if (!anchored_right) {
                 shape_line = shorten(shapes_relevant + shape_idx, &quality, 0, 0, 1);
-                #ifdef DEBUG
+                if (is_debug_logging(MAIN)) {
                     char *out_shape_line = u32_strconv_to_output(shape_line);
-                    fprintf(stderr, "hmm() - shape_line shortened to %d (\"%s\")\n", (int) quality, out_shape_line);
+                    log_debug(__FILE__, MAIN, "hmm() - shape_line shortened to %d (\"%s\")\n",
+                            (int) quality, out_shape_line);
                     BFREE(out_shape_line);
-                #endif
+                }
             }
             else {
                 BFREE(shape_line);
@@ -383,9 +380,7 @@ int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, 
         }
     }
 
-    #ifdef DEBUG
-        fprintf(stderr, "hmm() - exit, result = %d\n", result);
-    #endif
+    log_debug(__FILE__, MAIN, "hmm() - exit, result = %d\n", result);
     return result;
 }
 
@@ -520,10 +515,8 @@ match_result_t *match_outer_shape(int vside, bxstr_t *input_line, bxstr_t *shape
 
 static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx, size_t shape_line_idx)
 {
-    #ifdef DEBUG
-        fprintf(stderr, "match_horiz_line(ctx, %s, %d, %d)\n",
+    log_debug(__FILE__, MAIN, "match_horiz_line(ctx, %s, %d, %d)\n",
                 hside == BTOP ? "BTOP" : "BBOT", (int) input_line_idx, (int) shape_line_idx);
-    #endif
 
     int result = 0;
     for (comparison_t comp_type = 0; comp_type < NUM_COMPARISON_TYPES; comp_type++) {
@@ -531,9 +524,7 @@ static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx,
             continue;
         }
         ctx->comp_type = comp_type;
-        #ifdef DEBUG
-            fprintf(stderr, "  Setting comparison type to: %s\n", comparison_name[comp_type]);
-        #endif
+        log_debug(__FILE__, MAIN, "  Setting comparison type to: %s\n", comparison_name[comp_type]);
 
         shape_line_ctx_t *shapes_relevant = prepare_comp_shapes_horiz(hside, comp_type, shape_line_idx);
         debug_print_shapes_relevant(shapes_relevant);
@@ -542,11 +533,11 @@ static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx,
         bxstr_t *input_prepped = bxs_rtrim(input_prepped1);
         bxs_append_spaces(input_prepped, opt.design->shape[NW].width + opt.design->shape[NE].width);
         bxs_free(input_prepped1);
-        #ifdef DEBUG
+        if (is_debug_logging(MAIN)) {
             char *out_input_prepped = bxs_to_output(input_prepped);
-            fprintf(stderr, "  input_prepped = \"%s\"\n", out_input_prepped);
+            log_debug(__FILE__, MAIN, "  input_prepped = \"%s\"\n", out_input_prepped);
             BFREE(out_input_prepped);
-        #endif
+        }
 
         uint32_t *cur_pos = input_prepped->memory;
         match_result_t *mrl = NULL;
@@ -565,14 +556,16 @@ static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx,
                 end_pos = mrr->p;
             }
         }
-        #ifdef DEBUG
+        if (is_debug_logging(MAIN)) {
             char *out_cur_pos = u32_strconv_to_output(cur_pos);
             char *out_end_pos = u32_strconv_to_output(end_pos);
-            fprintf(stderr, "  cur_pos = \"%s\" (index %d)\n", out_cur_pos, (int) BMAX(cur_pos - input_prepped->memory, 0));
-            fprintf(stderr, "  end_pos = \"%s\" (index %d)\n", out_end_pos, (int) BMAX(end_pos - input_prepped->memory, 0));
+            log_debug(__FILE__, MAIN, "  cur_pos = \"%s\" (index %d)\n",
+                    out_cur_pos, (int) BMAX(cur_pos - input_prepped->memory, 0));
+            log_debug(__FILE__, MAIN, "  end_pos = \"%s\" (index %d)\n",
+                    out_end_pos, (int) BMAX(end_pos - input_prepped->memory, 0));
             BFREE(out_cur_pos);
             BFREE(out_end_pos);
-        #endif
+        }
 
         result = hmm(shapes_relevant, cur_pos, 1, end_pos, (mrl == NULL) || mrl->shiftable ? 0 : 1,
                 (mrr == NULL) || mrr->shiftable ? 0 : 1);
@@ -585,10 +578,8 @@ static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx,
         BFREE(shapes_relevant);
 
         if (result) {
-            #ifdef DEBUG
-                fprintf(stderr, "Matched %s side line using comp_type=%s and shape_line_idx=%d\n",
+            log_debug(__FILE__, MAIN, "Matched %s side line using comp_type=%s and shape_line_idx=%d\n",
                     hside == BTOP ? "top" : "bottom", comparison_name[comp_type], (int) shape_line_idx);
-            #endif
             break;
         }
     }
@@ -798,10 +789,9 @@ static int sufficient_body_quality(remove_ctx_t *ctx)
     /* If we manage to match 50%, then it is unlikely to improve with a different comparison mode. */
     int sufficient = (max_quality == 0 && total_quality == 0)
             || (max_quality > 0 && (total_quality > 0.5 * max_quality));
-    #ifdef DEBUG
-        fprintf(stderr, "sufficient_body_quality() found body match quality of %d/%d (%s).\n",
-                (int) total_quality, (int) max_quality, sufficient ? "sufficient" : "NOT sufficient");
-    #endif
+    log_debug(__FILE__, MAIN, "sufficient_body_quality() found body match quality of %d/%d (%s).\n",
+            (int) total_quality, (int) max_quality, sufficient ? "sufficient" : "NOT sufficient");
+
     return sufficient;
 }
 
@@ -832,9 +822,7 @@ static void find_vertical_shapes(remove_ctx_t *ctx)
             continue;
         }
         ctx->comp_type = comp_type;
-        #ifdef DEBUG
-            fprintf(stderr, "find_vertical_shapes(): comp_type = %s\n", comparison_name[comp_type]);
-        #endif
+        log_debug(__FILE__, MAIN, "find_vertical_shapes(): comp_type = %s\n", comparison_name[comp_type]);
         reset_body(ctx);
 
         shape_line_ctx_t **shape_lines_west = NULL;
@@ -883,20 +871,16 @@ static void detect_design_if_needed()
         design_t *tmp = autodetect_design();
         if (tmp) {
             opt.design = tmp;
-            #ifdef DEBUG
-                fprintf(stderr, "Design autodetection: Removing box of design \"%s\".\n", opt.design->name);
-            #endif
+            log_debug(__FILE__, MAIN, "Design autodetection: Removing box of design \"%s\".\n", opt.design->name);
         }
         else {
             fprintf(stderr, "%s: Box design autodetection failed. Use -d option.\n", PROJECT);
             exit(EXIT_FAILURE);
         }
     }
-    #ifdef DEBUG
     else {
-        fprintf(stderr, "Design was chosen by user: %s\n", opt.design->name);
+        log_debug(__FILE__, MAIN, "Design was chosen by user: %s\n", opt.design->name);
     }
-    #endif
 }
 
 
@@ -926,9 +910,7 @@ static void killblank(remove_ctx_t *ctx)
     while (ctx->top_end_idx < ctx->bottom_start_idx && lines_removed < max_lines_removable
             && empty_line(input.lines + ctx->top_end_idx))
     {
-        #ifdef DEBUG
-            fprintf(stderr, "Killing leading blank line in box body.\n");
-        #endif
+        log_debug(__FILE__, MAIN, "Killing leading blank line in box body.\n");
         ++(ctx->top_end_idx);
         --(ctx->body_num_lines);
         ++lines_removed;
@@ -939,9 +921,7 @@ static void killblank(remove_ctx_t *ctx)
     while (ctx->bottom_start_idx > ctx->top_end_idx && lines_removed < max_lines_removable
             && empty_line(input.lines + ctx->bottom_start_idx - 1))
     {
-        #ifdef DEBUG
-            fprintf(stderr, "Killing trailing blank line in box body.\n");
-        #endif
+        log_debug(__FILE__, MAIN, "Killing trailing blank line in box body.\n");
         --(ctx->bottom_start_idx);
         --(ctx->body_num_lines);
         ++lines_removed;
@@ -1038,11 +1018,9 @@ static void remove_vertical_from_input(remove_ctx_t *ctx)
         bxstr_t *org_line = input.lines[input_line_idx].text;
         size_t s_idx = calculate_start_idx(ctx, body_line_idx);
         size_t e_idx = calculate_end_idx(ctx, body_line_idx);
-        #ifdef DEBUG
-            fprintf(stderr, "remove_vertical_from_input(): body_line_idx=%d, input_line_idx=%d, s_idx=%d, e_idx=%d, "
-                    "input.indent=%d\n", (int) body_line_idx, (int) input_line_idx, (int) s_idx, (int) e_idx,
-                    (int) input.indent);
-        #endif
+        log_debug(__FILE__, MAIN, "remove_vertical_from_input(): body_line_idx=%d, input_line_idx=%d, s_idx=%d, "
+                "e_idx=%d, input.indent=%d\n", (int) body_line_idx, (int) input_line_idx, (int) s_idx, (int) e_idx,
+                (int) input.indent);
 
         bxstr_t *temp2 = bxs_substr(org_line, s_idx, e_idx);
         if (opt.indentmode == 'b' || opt.indentmode == '\0') {
@@ -1123,10 +1101,10 @@ static void apply_results_to_input(remove_ctx_t *ctx)
             + BMAX(ctx->bottom_end_idx - ctx->bottom_start_idx, (size_t) 0);
     memset(input.lines + input.num_lines, 0, num_lines_removed * sizeof(line_t));
 
-    #ifdef DEBUG
+    if (is_debug_logging(MAIN)) {
         print_input_lines(" (remove_box) after box removal");
-        fprintf(stderr, "Number of lines shrunk by %d.\n", (int) num_lines_removed);
-    #endif
+        log_debug(__FILE__, MAIN, "Number of lines shrunk by %d.\n", (int) num_lines_removed);
+    }
 }
 
 
@@ -1140,10 +1118,8 @@ int remove_box()
     ctx->empty_side[BRIG] = empty_side(opt.design->shape, BRIG);
     ctx->empty_side[BBOT] = empty_side(opt.design->shape, BBOT);
     ctx->empty_side[BLEF] = empty_side(opt.design->shape, BLEF);
-    #ifdef DEBUG
-        fprintf(stderr, "Empty sides? Top: %d, Right: %d, Bottom: %d, Left: %d\n",
-                ctx->empty_side[BTOP], ctx->empty_side[BRIG], ctx->empty_side[BBOT], ctx->empty_side[BLEF]);
-    #endif
+    log_debug(__FILE__, MAIN, "Empty sides? Top: %d, Right: %d, Bottom: %d, Left: %d\n",
+            ctx->empty_side[BTOP], ctx->empty_side[BRIG], ctx->empty_side[BBOT], ctx->empty_side[BLEF]);
 
     ctx->design_is_mono = design_is_mono(opt.design);
     ctx->input_is_mono = input_is_mono();
@@ -1159,10 +1135,8 @@ int remove_box()
     else {
         ctx->top_end_idx = find_top_side(ctx);
     }
-    #ifdef DEBUG
-        fprintf(stderr, "ctx->top_start_idx = %d, ctx->top_end_idx = %d\n", (int) ctx->top_start_idx,
-                (int) ctx->top_end_idx);
-    #endif
+    log_debug(__FILE__, MAIN, "ctx->top_start_idx = %d, ctx->top_end_idx = %d\n", (int) ctx->top_start_idx,
+            (int) ctx->top_end_idx);
 
     ctx->bottom_end_idx = find_last_line() + 1;
     if (ctx->empty_side[BBOT]) {
@@ -1171,10 +1145,8 @@ int remove_box()
     else {
         ctx->bottom_start_idx = find_bottom_side(ctx);
     }
-    #ifdef DEBUG
-        fprintf(stderr, "ctx->bottom_start_idx = %d, ctx->bottom_end_idx = %d\n", (int) ctx->bottom_start_idx,
-                (int) ctx->bottom_end_idx);
-    #endif
+    log_debug(__FILE__, MAIN, "ctx->bottom_start_idx = %d, ctx->bottom_end_idx = %d\n", (int) ctx->bottom_start_idx,
+            (int) ctx->bottom_end_idx);
     if (ctx->bottom_start_idx > ctx->top_end_idx) {
         ctx->body_num_lines = ctx->bottom_start_idx - ctx->top_end_idx;
     }
@@ -1204,9 +1176,8 @@ void output_input(const int trim_only)
     size_t indent;
     int ntabs, nspcs;
 
-    #ifdef DEBUG
-        fprintf(stderr, "output_input() - enter (trim_only=%d)\n", trim_only);
-    #endif
+    log_debug(__FILE__, MAIN, "output_input() - enter (trim_only=%d)\n", trim_only);
+
     for (size_t j = 0; j < input.num_lines; ++j) {
         if (input.lines[j].text == NULL) {
             continue;

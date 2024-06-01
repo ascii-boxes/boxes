@@ -107,24 +107,24 @@ parser.c parser.h: parser.y lex.yy.h | check_dir
 lex.yy.c lex.yy.h: lexer.l | check_dir
 	$(LEX) --header-file=lex.yy.h $<
 
-boxes.o:     boxes.c boxes.h cmdline.h discovery.h generate.h input.h list.h parsing.h query.h remove.h shape.h tools.h unicode.h config.h | check_dir
+boxes.o:     boxes.c boxes.h cmdline.h discovery.h generate.h input.h list.h logging.h parsing.h query.h remove.h shape.h tools.h unicode.h config.h | check_dir
 bxstring.o:  bxstring.c bxstring.h tools.h unicode.h config.h | check_dir
-cmdline.o:   cmdline.c cmdline.h boxes.h discovery.h query.h tools.h config.h | check_dir
-detect.o:    detect.c detect.h boxes.h bxstring.h shape.h tools.h config.h | check_dir
-discovery.o: discovery.c discovery.h boxes.h tools.h unicode.h config.h | check_dir
-generate.o:  generate.c generate.h boxes.h shape.h tools.h unicode.h config.h | check_dir
-input.o:     input.c boxes.h input.h regulex.h tools.h unicode.h config.h | check_dir
-lex.yy.o:    lex.yy.c parser.h boxes.h parsing.h tools.h shape.h unicode.h config.h | check_dir
+cmdline.o:   cmdline.c cmdline.h boxes.h discovery.h logging.h query.h tools.h config.h | check_dir
+detect.o:    detect.c detect.h boxes.h bxstring.h logging.h shape.h tools.h config.h | check_dir
+discovery.o: discovery.c discovery.h boxes.h logging.h tools.h unicode.h config.h | check_dir
+generate.o:  generate.c generate.h boxes.h logging.h shape.h tools.h unicode.h config.h | check_dir
+input.o:     input.c boxes.h input.h logging.h regulex.h tools.h unicode.h config.h | check_dir
+lex.yy.o:    lex.yy.c parser.h boxes.h logging.h parsing.h tools.h shape.h unicode.h config.h | check_dir
 list.o:      list.c list.h boxes.h bxstring.h parsing.h query.h shape.h tools.h unicode.h config.h | check_dir
 logging.o:   logging.c logging.h tools.h config.h | check_dir
-parsecode.o: parsecode.c parsecode.h discovery.h lex.yy.h parsing.h parser.h query.h regulex.h shape.h tools.h unicode.h config.h | check_dir
-parser.o:    parser.c boxes.h bxstring.h lex.yy.h parsecode.h parser.h parsing.h shape.h tools.h unicode.h config.h | check_dir
-parsing.o:   parsing.c parsing.h bxstring.h parser.h lex.yy.h boxes.h tools.h config.h | check_dir
-query.o:     query.c query.h boxes.h list.h tools.h config.h | check_dir
-regulex.o:   regulex.c regulex.h boxes.h tools.h unicode.h config.h | check_dir
-remove.o:    remove.c remove.h boxes.h detect.h shape.h tools.h unicode.h config.h | check_dir
-shape.o:     shape.c shape.h boxes.h bxstring.h tools.h config.h | check_dir
-tools.o:     tools.c tools.h boxes.h regulex.h shape.h unicode.h config.h | check_dir
+parsecode.o: parsecode.c parsecode.h discovery.h lex.yy.h logging.h parsing.h parser.h query.h regulex.h shape.h tools.h unicode.h config.h | check_dir
+parser.o:    parser.c boxes.h bxstring.h lex.yy.h logging.h parsecode.h parser.h parsing.h shape.h tools.h unicode.h config.h | check_dir
+parsing.o:   parsing.c parsing.h bxstring.h parser.h lex.yy.h boxes.h logging.h tools.h config.h | check_dir
+query.o:     query.c query.h boxes.h list.h logging.h tools.h config.h | check_dir
+regulex.o:   regulex.c regulex.h boxes.h logging.h tools.h unicode.h config.h | check_dir
+remove.o:    remove.c remove.h boxes.h detect.h logging.h shape.h tools.h unicode.h config.h | check_dir
+shape.o:     shape.c shape.h boxes.h bxstring.h logging.h tools.h config.h | check_dir
+tools.o:     tools.c tools.h boxes.h logging.h regulex.h shape.h unicode.h config.h | check_dir
 unicode.o:   unicode.c unicode.h boxes.h tools.h config.h | check_dir
 
 

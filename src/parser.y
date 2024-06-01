@@ -75,6 +75,7 @@ typedef struct {
 #include <stdlib.h>
 #include <unictype.h>
 
+#include "logging.h"
 #include "shape.h"
 #include "tools.h"
 #include "parsing.h"
@@ -199,10 +200,8 @@ config_file: config_file design_or_error | design_or_error | config_file parent_
 design_or_error: design | error
     {
         /* reset alias list, as those are collected even when speedmode is on */
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, " Parser: Discarding token [skipping=%s, speeding=%s]\n",
+        log_debug(__FILE__, PARSER, " Parser: Discarding token [skipping=%s, speeding=%s]\n",
                 bison_args->skipping ? "true" : "false", bison_args->speeding ? "true" : "false");
-        #endif
         if (curdes.aliases[0] != NULL) {
             BFREE(curdes.aliases);
             curdes.aliases = (char **) calloc(1, sizeof(char *));
@@ -268,10 +267,10 @@ entry: KEYWORD STRING
             yyerror(bison_args, "string expected");
             YYERROR;
         }
-        else {
-            #ifdef PARSER_DEBUG
-                fprintf (stderr, " Parser: Discarding entry [%s = %s].\n", "parent", bxs_to_output(filename));
-            #endif
+        else if (is_debug_logging(PARSER)) {
+            char *out_filename = bxs_to_output(filename);
+            log_debug(__FILE__, PARSER, " Parser: Discarding entry [%s = %s].\n", "parent", out_filename);
+            BFREE(out_filename);
         }
     }
 
@@ -284,9 +283,11 @@ entry: KEYWORD STRING
 
 | BXWORD STRING | ASCII_ID STRING
     {
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, " Parser: Discarding entry [%s = %s].\n", $1, bxs_to_output($2));
-        #endif
+        if (is_debug_logging(PARSER)) {
+            char *out_string = bxs_to_output($2);
+            log_debug(__FILE__, PARSER, " Parser: Discarding entry [%s = %s].\n", $1, out_string);
+            BFREE(out_string);
+        }
     }
 ;
 
@@ -323,10 +324,8 @@ block: YSAMPLE STRING YENDSAMPLE
 
 | YPADDING '{' wlist '}'
     {
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Padding set to (l%d o%d r%d u%d)\n",
+        log_debug(__FILE__, PARSER, "Padding set to (l%d o%d r%d u%d)\n",
                 curdes.padding[BLEF], curdes.padding[BTOP], curdes.padding[BRIG], curdes.padding[BBOT]);
-        #endif
     }
 ;
 
@@ -347,9 +346,7 @@ elist: elist ',' elist_entry | elist_entry;
 
 elist_entry: SHAPE
     {
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Marked \'%s\' shape as elastic\n", shape_name[(int) $1]);
-        #endif
+        log_debug(__FILE__, PARSER, "Marked \'%s\' shape as elastic\n", shape_name[(int) $1]);
         curdes.shape[$1].elastic = 1;
     }
 ;
@@ -360,10 +357,8 @@ slist: slist slist_entry | slist_entry;
 
 slist_entry: SHAPE shape_def
     {
-        #ifdef PARSER_DEBUG
-            fprintf (stderr, "Adding shape spec for \'%s\' (width %d "
-                    "height %d)\n", shape_name[$1], (int) $2.width, (int) $2.height);
-        #endif
+        log_debug(__FILE__, PARSER, "Adding shape spec for \'%s\' (width %d height %d)\n",
+                shape_name[$1], (int) $2.width, (int) $2.height);
 
         if (isempty (curdes.shape + $1)) {
             curdes.shape[$1] = $2;

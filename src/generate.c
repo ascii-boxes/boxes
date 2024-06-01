@@ -27,6 +27,7 @@
 
 #include "shape.h"
 #include "boxes.h"
+#include "logging.h"
 #include "tools.h"
 #include "unicode.h"
 #include "generate.h"
@@ -92,12 +93,12 @@ static int horiz_precalc(const sentry_t *sarr,
         }
     }
 
-#ifdef DEBUG
-    fprintf (stderr, "in horiz_precalc:\n    ");
-    fprintf (stderr, "opt.design->minwidth %d, input.maxline %d, target_width"
+    if (is_debug_logging(MAIN)) {
+        log_debug(__FILE__, MAIN, "in horiz_precalc:\n");
+        log_debug(__FILE__, MAIN, "    opt.design->minwidth %d, input.maxline %d, target_width"
             " %d, tnumsh %d, bnumsh %d\n", (int) opt.design->minwidth,
              (int) input.maxline, (int) target_width, tnumsh, bnumsh);
-#endif
+    }
 
     twidth = 0;
     bwidth = 0;
@@ -212,7 +213,7 @@ static int horiz_precalc(const sentry_t *sarr,
                 break;
 
             default:
-                fprintf(stderr, "%s: internal error in horiz_precalc()\n", PROJECT);
+                bx_fprintf(stderr, "%s: internal error in horiz_precalc()\n", PROJECT);
                 return 1;
         }
     } while (twidth != bwidth || twidth < target_width || bwidth < target_width);
@@ -396,7 +397,7 @@ static int vert_precalc(const sentry_t *sarr,
                 break;
 
             default:
-                fprintf(stderr, "%s: internal error in vert_precalc()\n", PROJECT);
+                bx_fprintf(stderr, "%s: internal error in vert_precalc()\n", PROJECT);
                 return 1;
         }
     } while (lheight != rheight || lheight < target_height || rheight < target_height);
@@ -446,9 +447,8 @@ static size_t horiz_chars_required(const sentry_t *sarr, const shape_t *side, si
 
     BFREE(lens);
     BFREE(iltf_copy);
-    #ifdef DEBUG
-        fprintf (stderr, "%s side required characters: %d\n", (side == north_side) ? "Top": "Bottom", (int) result);
-    #endif
+    log_debug(__FILE__, MAIN, "%s side required characters: %d\n",
+        (side == north_side) ? "Top": "Bottom", (int) result);
     return result;
 }
 
@@ -584,20 +584,20 @@ static int horiz_generate(sentry_t *tresult, sentry_t *bresult)
     }
     bresult->width = tresult->width;
 
-    #ifdef DEBUG
-        fprintf (stderr, "Top side box rect width %d, height %d.\n",
+    if (is_debug_logging(MAIN)) {
+        log_debug(__FILE__, MAIN, "Top side box rect width %d, height %d.\n",
                 (int) tresult->width, (int) tresult->height);
-        fprintf (stderr, "Top columns to fill: %s %d, %s %d, %s %d.\n",
+        log_debug(__FILE__, MAIN, "Top columns to fill: %s %d, %s %d, %s %d.\n",
                 shape_name[north_side[1]], (int) tiltf[0],
                 shape_name[north_side[2]], (int) tiltf[1],
                 shape_name[north_side[3]], (int) tiltf[2]);
-        fprintf (stderr, "Bottom side box rect width %d, height %d.\n",
+        log_debug(__FILE__, MAIN, "Bottom side box rect width %d, height %d.\n",
                 (int) bresult->width, (int) bresult->height);
-        fprintf (stderr, "Bottom columns to fill: %s %d, %s %d, %s %d.\n",
+        log_debug(__FILE__, MAIN, "Bottom columns to fill: %s %d, %s %d, %s %d.\n",
                 shape_name[south_side[1]], (int) biltf[0],
                 shape_name[south_side[2]], (int) biltf[1],
                 shape_name[south_side[3]], (int) biltf[2]);
-    #endif
+    }
 
     tresult->chars = (char **) calloc(tresult->height, sizeof(char *));
     tresult->mbcs = (bxstr_t **) calloc(tresult->height, sizeof(bxstr_t *));
@@ -616,25 +616,24 @@ static int horiz_generate(sentry_t *tresult, sentry_t *bresult)
         return rc;
     }
 
-    #ifdef DEBUG
-    {
-        /*
-         *  Debugging code - Output horizontal sides of box
-         */
+    /*
+     *  Debugging code - Output horizontal sides of box
+     */
+    if (is_debug_logging(MAIN)) {
         size_t j;
-        fprintf(stderr, "TOP SIDE:\n");
+        log_debug(__FILE__, MAIN, "TOP SIDE:\n");
         for (j = 0; j < tresult->height; ++j) {
-            fprintf(stderr, "  %2d: \'%s\' - \'%s\'\n", (int) j,
-                            bxs_to_output(tresult->mbcs[j]), tresult->chars[j]);
+            char *out_sl = bxs_to_output(tresult->mbcs[j]);
+            log_debug(__FILE__, MAIN, "  %2d: \'%s\' - \'%s\'\n", (int) j, out_sl, tresult->chars[j]);
+            BFREE(out_sl);
         }
-        fprintf(stderr, "BOTTOM SIDE:\n");
+        log_debug(__FILE__, MAIN, "BOTTOM SIDE:\n");
         for (j = 0; j < bresult->height; ++j) {
-            fprintf(stderr, "  %2d: \'%s\' - '%s'\n", (int) j,
-                            bxs_to_output(bresult->mbcs[j]), bresult->chars[j]);
+            char *out_sl = bxs_to_output(bresult->mbcs[j]);
+            log_debug(__FILE__, MAIN, "  %2d: \'%s\' - '%s'\n", (int) j, out_sl, bresult->chars[j]);
+            BFREE(out_sl);
         }
     }
-    #endif
-
     return 0;                            /* all clear */
 }
 
@@ -670,20 +669,20 @@ static int vert_generate(sentry_t *lresult, sentry_t *rresult)
     rresult->height = vspace +
             opt.design->shape[NE].height + opt.design->shape[SE].height;
 
-    #ifdef DEBUG
-        fprintf(stderr, "Left side box rect width %d, height %d, vspace %d.\n",
+    if (is_debug_logging(MAIN)) {
+        log_debug(__FILE__, MAIN, "Left side box rect width %d, height %d, vspace %d.\n",
                 (int) lresult->width, (int) lresult->height, (int) vspace);
-        fprintf(stderr, "Left lines to fill: %s %d, %s %d, %s %d.\n",
+        log_debug(__FILE__, MAIN, "Left lines to fill: %s %d, %s %d, %s %d.\n",
                 shape_name[west_side[1]], (int) leftiltf[0],
                 shape_name[west_side[2]], (int) leftiltf[1],
                 shape_name[west_side[3]], (int) leftiltf[2]);
-        fprintf(stderr, "Right side box rect width %d, height %d, vspace %d.\n",
+        log_debug(__FILE__, MAIN, "Right side box rect width %d, height %d, vspace %d.\n",
                 (int) rresult->width, (int) rresult->height, (int) vspace);
-        fprintf(stderr, "Right lines to fill: %s %d, %s %d, %s %d.\n",
+        log_debug(__FILE__, MAIN, "Right lines to fill: %s %d, %s %d, %s %d.\n",
                 shape_name[east_side[1]], (int) rightiltf[0],
                 shape_name[east_side[2]], (int) rightiltf[1],
                 shape_name[east_side[3]], (int) rightiltf[2]);
-    #endif
+    }
 
     lresult->chars = (char **) calloc(lresult->height, sizeof(char *));
     if (lresult->chars == NULL) {
@@ -705,25 +704,24 @@ static int vert_generate(sentry_t *lresult, sentry_t *rresult)
     horiz_assemble(opt.design->shape, west_side, leftiltf, lresult);
     horiz_assemble(opt.design->shape, east_side, rightiltf, rresult);
 
-    #if defined(DEBUG) && 1
-        {
-            /*
-            *  Debugging code - Output left and right side of box
-            */
-            size_t j;
-            fprintf(stderr, "LEFT SIDE:\n");
-            for (j = 0; j < lresult->height; ++j) {
-                fprintf(stderr, "  %2d: \'%s\' - \'%s\'\n", (int) j,
-                                bxs_to_output(lresult->mbcs[j]), lresult->chars[j]);
-            }
-            fprintf(stderr, "RIGHT SIDE:\n");
-            for (j = 0; j < rresult->height; ++j) {
-                fprintf(stderr, "  %2d: \'%s\' - \'%s\'\n", (int) j,
-                                bxs_to_output(rresult->mbcs[j]), rresult->chars[j]);
-            }
+    /*
+     *  Debugging code - Output left and right side of box
+     */
+    if (is_debug_logging(MAIN)) {
+        size_t j;
+        log_debug(__FILE__, MAIN, "LEFT SIDE:\n");
+        for (j = 0; j < lresult->height; ++j) {
+            char *out_sl = bxs_to_output(lresult->mbcs[j]);
+            log_debug(__FILE__, MAIN, "  %2d: \'%s\' - \'%s\'\n", (int) j, out_sl, lresult->chars[j]);
+            BFREE(out_sl);
         }
-    #endif
-
+        log_debug(__FILE__, MAIN, "RIGHT SIDE:\n");
+        for (j = 0; j < rresult->height; ++j) {
+            char *out_sl = bxs_to_output(rresult->mbcs[j]);
+            log_debug(__FILE__, MAIN, "  %2d: \'%s\' - \'%s\'\n", (int) j, out_sl, rresult->chars[j]);
+            BFREE(out_sl);
+        }
+    }
     return 0;                            /* all clear */
 }
 
@@ -788,13 +786,14 @@ static int justify_line(line_t *line, int skew)
         return 0;
     }
 
-    #if defined(DEBUG) || 0
+    if (is_debug_logging(MAIN)) {
         char *outtext = bxs_to_output(line->text);
-        fprintf(stderr, "justify_line(%c):  Input: real: (%02d) \"%s\", text: (%02d) \"%s\", invisible=%d, skew=%d",
-                opt.justify ? opt.justify : '0', (int) line->text->num_chars, outtext, (int) line->text->num_columns,
-                line->text->ascii, (int) line->text->num_chars_invisible, skew);
+        log_debug(__FILE__, MAIN,
+            "justify_line(%c):  Input: real: (%02d) \"%s\", text: (%02d) \"%s\", invisible=%d, skew=%d",
+            opt.justify ? opt.justify : '0', (int) line->text->num_chars, outtext, (int) line->text->num_columns,
+            line->text->ascii, (int) line->text->num_chars_invisible, skew);
         BFREE(outtext);
-    #endif
+    }
 
     int result = 0;
     size_t initial_space_size = line->text->indent;
@@ -837,13 +836,11 @@ static int justify_line(line_t *line, int skew)
             break;
 
         default:
-            fprintf(stderr, "%s: internal error (unknown justify option: %c)\n", PROJECT, opt.justify);
+            bx_fprintf(stderr, "%s: internal error (unknown justify option: %c)\n", PROJECT, opt.justify);
             result = 0;
     }
 
-    #if defined(DEBUG) || 0
-        fprintf (stderr, " -> %d\n", result);
-    #endif
+    log_debug_cont(MAIN, " -> %d\n", result);
     return result;
 }
 
@@ -873,11 +870,9 @@ int output_box(const sentry_t *thebox)
     size_t skip_left;                   /* true if left box part is to be skipped */
     size_t ntabs, nspcs;                /* needed for unexpand of tabs */
 
-    #ifdef DEBUG
-        fprintf (stderr, "Padding used: left %d, top %d, right %d, bottom %d\n",
-                opt.design->padding[BLEF], opt.design->padding[BTOP],
-                opt.design->padding[BRIG], opt.design->padding[BBOT]);
-    #endif
+    log_debug(__FILE__, MAIN, "Padding used: left %d, top %d, right %d, bottom %d\n",
+        opt.design->padding[BLEF], opt.design->padding[BTOP],
+        opt.design->padding[BRIG], opt.design->padding[BBOT]);
 
     /*
      *  Create string of spaces for indentation
@@ -985,12 +980,18 @@ int output_box(const sentry_t *thebox)
     set_char_at(hfill1, hpl, char_nul);
     set_char_at(hfill2, hpr, char_nul);
 
-    #if defined(DEBUG)
-        fprintf(stderr, "Alignment: hfill %d hpl %d hpr %d, vfill %d vfill1 %d vfill2 %d.\n",
+    if (is_debug_logging(MAIN)) {
+        log_debug(__FILE__, MAIN, "Alignment: hfill %d hpl %d hpr %d, vfill %d vfill1 %d vfill2 %d.\n",
                 (int) hfill, (int) hpl, (int) hpr, (int) vfill, (int) vfill1, (int) vfill2);
-        fprintf(stderr, "           hfill1 = \"%s\";  hfill2 = \"%s\";  indentspc = \"%s\";\n",
-                u32_strconv_to_output(hfill1), u32_strconv_to_output(hfill2), u32_strconv_to_output(indentspc));
-    #endif
+        char *out_hfill1 = u32_strconv_to_output(hfill1);
+        char *out_hfill2 = u32_strconv_to_output(hfill2);
+        char *out_indentspc = u32_strconv_to_output(indentspc);
+        log_debug(__FILE__, MAIN, "           hfill1 = \"%s\";  hfill2 = \"%s\";  indentspc = \"%s\";\n",
+                out_hfill1, out_hfill2, out_indentspc);
+        BFREE(out_indentspc);
+        BFREE(out_hfill2);
+        BFREE(out_hfill1);
+    }
 
     /*
      *  Find out if and how many leading or trailing blank lines must be
@@ -1008,10 +1009,8 @@ int output_box(const sentry_t *thebox)
     if (empty_side(opt.design->shape, BLEF)) {
         skip_left = opt.design->shape[NW].width;
     } /* could simply be 1, though */
-    #if defined(DEBUG)
-        fprintf(stderr, "skip_start = %d;  skip_end = %d;  skip_left = %d;  nol = %d;\n",
-                (int) skip_start, (int) skip_end, (int) skip_left, (int) nol);
-    #endif
+    log_debug(__FILE__, MAIN, "skip_start = %d;  skip_end = %d;  skip_left = %d;  nol = %d;\n",
+            (int) skip_start, (int) skip_end, (int) skip_left, (int) nol);
 
     /*
      *  Generate actual output

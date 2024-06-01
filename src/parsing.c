@@ -27,6 +27,7 @@
 
 #include "boxes.h"
 #include "bxstring.h"
+#include "logging.h"
 #include "parsing.h"
 #include "tools.h"
 
@@ -161,9 +162,11 @@ static pass_to_flex new_flex_extra_data()
 
 static pass_to_bison parse_config_file(bxstr_t *config_file, design_t *child_configs, size_t num_child_configs)
 {
-    #ifdef DEBUG
-        fprintf (stderr, "Parsing Config File %s ...\n", bxs_to_output(config_file));
-    #endif
+    if (is_debug_logging(MAIN)) {
+        char *out_config_file = bxs_to_output(config_file);
+        log_debug(__FILE__, MAIN, "Parsing Config File %s ...\n", out_config_file);
+        BFREE(out_config_file);
+    }
 
     pass_to_bison bison_args = new_bison_args(config_file);
     bison_args.child_configs = child_configs;
@@ -187,9 +190,7 @@ static pass_to_bison parse_config_file(bxstr_t *config_file, design_t *child_con
     }
 
     if (rc) {
-        #ifdef DEBUG
-            fprintf (stderr, "yyparse() returned %d\n", rc);
-        #endif
+        log_debug(__FILE__, MAIN, "yyparse() returned %d\n", rc);
         return new_bison_args(config_file);
     }
     return bison_args;
@@ -264,7 +265,7 @@ static int copy_designs(pass_to_bison *bison_args, design_t **r_result, size_t *
 
 design_t *parse_config_files(bxstr_t *p_first_config_file, size_t *r_num_designs)
 {
-    size_t parents_parsed = -1;      /** how many parent config files have already been parsed */
+    size_t parents_parsed = -1;      /* how many parent config files have already been parsed */
 
     design_t *result = NULL;
     *r_num_designs = 0;
@@ -274,12 +275,10 @@ design_t *parse_config_files(bxstr_t *p_first_config_file, size_t *r_num_designs
     do {
         pass_to_bison bison_args = parse_config_file(config_file, result, *r_num_designs);
         ++parents_parsed;
-        #ifdef DEBUG
-            fprintf (stderr, "bison_args returned: "
+        log_debug(__FILE__, MAIN, "bison_args returned: "
                 ".num_parent_configs=%d, .parent_configs=%p, .num_designs=%d, .designs=%p\n",
                 (int) bison_args.num_parent_configs, bison_args.parent_configs,
                 (int) bison_args.num_designs, bison_args.designs);
-        #endif
 
         if (record_parent_config_files(&bison_args) != 0) {
             perror(PROJECT);
@@ -289,9 +288,7 @@ design_t *parse_config_files(bxstr_t *p_first_config_file, size_t *r_num_designs
             return NULL;
         }
 
-        #ifdef DEBUG
-            fprintf (stderr, "design count raised to: %d\n", (int) *r_num_designs);
-        #endif
+        log_debug(__FILE__, MAIN, "design count raised to: %d\n", (int) *r_num_designs);
         if (parents_parsed < num_parent_configs) {
             config_file = parent_configs[parents_parsed];
         }
@@ -312,4 +309,4 @@ design_t *parse_config_files(bxstr_t *p_first_config_file, size_t *r_num_designs
 }
 
 
-/*EOF*/                                                  /* vim: set sw=4: */
+/* vim: set sw=4: */

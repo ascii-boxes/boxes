@@ -26,6 +26,7 @@
 
 #include "boxes.h"
 #include "input.h"
+#include "logging.h"
 #include "regulex.h"
 #include "tools.h"
 #include "unicode.h"
@@ -45,9 +46,7 @@ static int has_linebreak(const uint32_t *s, const int len)
     if (s != NULL && len > 0) {
         ucs4_t the_last = s[len - 1];
         result = u32_cmp(&char_cr, &the_last, 1) == 0 || u32_cmp(&char_newline, &the_last, 1) == 0;
-        #if defined(DEBUG)
-            fprintf(stderr, "has_linebreak: (%#010x) %d\n", (int) the_last, result);
-        #endif
+        log_debug(__FILE__, MAIN, "has_linebreak: (%#010x) %d\n", (int) the_last, result);
     }
     return result;
 }
@@ -66,7 +65,7 @@ static int get_indent(const line_t *lines, const size_t lines_size)
     int nonblank = 0;         /* true if one non-blank line found */
 
     if (lines == NULL) {
-        fprintf(stderr, "%s: internal error\n", PROJECT);
+        bx_fprintf(stderr, "%s: internal error\n", PROJECT);
         return -1;
     }
     if (lines_size == 0) {
@@ -112,16 +111,14 @@ int apply_substitutions(input_t *result, const int mode)
         rules = opt.design->revrules;
     }
     else {
-        fprintf(stderr, "%s: internal error\n", PROJECT);
+        bx_fprintf(stderr, "%s: internal error\n", PROJECT);
         return 2;
     }
 
     /*
      *  Compile regular expressions
      */
-    #ifdef REGEXP_DEBUG
-        fprintf(stderr, "Compiling %d %s rule patterns\n", (int) num_rules, mode ? "reversion" : "replacement");
-    #endif
+    log_debug(__FILE__, REGEXP, "Compiling %d %s rule patterns\n", (int) num_rules, mode ? "reversion" : "replacement");
     errno = 0;
     opt.design->current_rule = rules;
     for (j = 0; j < num_rules; ++j, ++(opt.design->current_rule)) {
@@ -141,21 +138,21 @@ int apply_substitutions(input_t *result, const int mode)
     for (k = 0; k < result->num_lines; ++k) {
         opt.design->current_rule = rules;
         for (j = 0; j < num_rules; ++j, ++(opt.design->current_rule)) {
-            #ifdef REGEXP_DEBUG
+            if (is_debug_logging(REGEXP)) {
                 char *outtext = bxs_to_output(result->lines[k].text);
                 char *outrepstr = bxs_to_output(rules[j].repstr);
-                fprintf(stderr, "regex_replace(0x%p, \"%s\", \"%s\", %d, \'%c\') == ", rules[j].prog, outrepstr,
-                    outtext, (int) result->lines[k].text->num_chars, rules[j].mode);
+                log_debug(__FILE__, REGEXP, "regex_replace(0x%p, \"%s\", \"%s\", %d, \'%c\') == ", rules[j].prog,
+                    outrepstr, outtext, (int) result->lines[k].text->num_chars, rules[j].mode);
                 BFREE(outtext);
                 BFREE(outrepstr);
-            #endif
+            }
             uint32_t *newtext = u32_regex_replace(rules[j].prog, rules[j].repstr->memory, result->lines[k].text->memory,
                     result->lines[k].text->num_chars, rules[j].mode == 'g');
-            #ifdef REGEXP_DEBUG
+            if (is_debug_logging(REGEXP)) {
                 char *outnewtext = newtext ? u32_strconv_to_output(newtext) : strdup("NULL");
-                fprintf(stderr, "\"%s\"\n", outnewtext);
+                log_debug_cont(REGEXP, "\"%s\"\n", outnewtext);
                 BFREE(outnewtext);
-            #endif
+            }
             if (newtext == NULL) {
                 return 1;
             }
@@ -165,12 +162,12 @@ int apply_substitutions(input_t *result, const int mode)
 
             analyze_line_ascii(result, result->lines + k);   /* update maxline value */
 
-            #ifdef REGEXP_DEBUG
+            if (is_debug_logging(REGEXP)) {
                 char *outtext2 = bxs_to_output(result->lines[k].text);
-                fprintf(stderr, "result->lines[%d] == {%d, \"%s\"}\n", (int) k, (int) result->lines[k].text->num_chars,
-                    outtext2);
+                log_debug(__FILE__, REGEXP, "result->lines[%d] == {%d, \"%s\"}\n",
+                    (int) k, (int) result->lines[k].text->num_chars, outtext2);
                 BFREE(outtext2);
-            #endif
+            }
         }
         opt.design->current_rule = NULL;
     }
@@ -321,15 +318,15 @@ int analyze_input(input_t *result)
                 bxs_free(result->lines[i].text);
                 result->lines[i].text = unindented;
             }
-            #ifdef DEBUG
+            if (is_debug_logging(MAIN)) {
                 char *outtext = bxs_to_output(result->lines[i].text);
-                fprintf(stderr, "%2d: text = \"%s\" (%d chars, %d visible, %d invisible, %d columns)\n"
-                                "    ascii = \"%s\"\n", (int) i, outtext,
+                log_debug(__FILE__, MAIN, "%2d: text = \"%s\" (%d chars, %d visible, %d invisible, %d columns)\n",
+                    (int) i, outtext,
                     (int) result->lines[i].text->num_chars, (int) result->lines[i].text->num_chars_visible,
-                    (int) result->lines[i].text->num_chars_invisible, (int) result->lines[i].text->num_columns,
-                    result->lines[i].text->ascii);
+                    (int) result->lines[i].text->num_chars_invisible, (int) result->lines[i].text->num_columns);
+                log_debug(__FILE__, MAIN, "    ascii = \"%s\"\n", result->lines[i].text->ascii);
                 BFREE(outtext);
-            #endif
+            }
         }
         result->maxline -= result->indent;
     }

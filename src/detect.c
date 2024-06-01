@@ -45,6 +45,7 @@
 
 #include "boxes.h"
 #include "bxstring.h"
+#include "logging.h"
 #include "shape.h"
 #include "tools.h"
 #include "unicode.h"
@@ -67,9 +68,7 @@ int input_is_mono()
             break;
         }
     }
-    #ifdef DEBUG
-        fprintf(stderr, "Input is %s\n", result ? "mono" : "potentially colored");
-    #endif
+    log_debug(__FILE__, MAIN, "Input is %s\n", result ? "mono" : "potentially colored");
     return result;
 }
 
@@ -84,16 +83,12 @@ int design_is_mono(design_t *design)
         for (size_t line_no = 0; line_no < design->shape[scnt].height; line_no++) {
             bxstr_t *shape_line = design->shape[scnt].mbcs[line_no];
             if (shape_line->num_chars_invisible > 0) {
-                #ifdef DEBUG
-                    fprintf(stderr, "Design is potentially colored\n");
-                #endif
+                log_debug(__FILE__, MAIN, "Design is potentially colored\n");
                 return 0;
             }
         }
     }
-    #ifdef DEBUG
-        fprintf(stderr, "Design is mono\n");
-    #endif
+    log_debug(__FILE__, MAIN, "Design is mono\n");
     return 1;
 }
 
@@ -121,10 +116,8 @@ static int *determine_empty_sides(design_t *current_design)
     for (size_t j = 0; j < NUM_SIDES; ++j) {
         result[j] = empty_side(current_design->shape, j);
     }
-    #ifdef DEBUG
-        fprintf (stderr, "Empty sides: TOP %d, LEFT %d, BOTTOM %d, RIGHT %d\n",
+    log_debug(__FILE__, MAIN, "Empty sides: TOP %d, LEFT %d, BOTTOM %d, RIGHT %d\n",
             result[BTOP], result[BLEF], result[BBOT], result[BRIG]);
-    #endif
     return result;
 }
 
@@ -185,16 +178,13 @@ uint32_t *prepare_comp_shape(
 uint32_t *prepare_comp_input(size_t input_line_idx, int trim_left, comparison_t comp_type, size_t offset_right,
     size_t *out_indent, size_t *out_trailing)
 {
-    #ifdef DEBUG
-        fprintf(stderr, "prepare_comp_input(%d, %s, %s, %d, %p, %p)", (int) input_line_idx,
+    log_debug(__FILE__, MAIN, "prepare_comp_input(%d, %s, %s, %d, %p, %p)", (int) input_line_idx,
                 trim_left ? "true" : "false", comparison_name[comp_type], (int) offset_right, out_indent, out_trailing);
-    #endif
+
     if (input_line_idx >= input.num_lines) {
         bx_fprintf(stderr, "%s: prepare_comp_input(%d, %d, %s, %d): Index out of bounds\n", PROJECT,
                 (int) input_line_idx, trim_left, comparison_name[comp_type], (int) offset_right);
-        #ifdef DEBUG
-            fprintf(stderr, " -> (null)\n");
-        #endif
+        log_debug_cont(MAIN, " -> (null)\n");
         return NULL;
     }
     bxstr_t *input_line = input.lines[input_line_idx].text;
@@ -244,11 +234,12 @@ uint32_t *prepare_comp_input(size_t input_line_idx, int trim_left, comparison_t 
                     - input_line->first_char[input_line->num_chars_visible - input_line->trailing];
         }
     }
-    #ifdef DEBUG
+
+    if (is_debug_logging(MAIN)) {
         char *out_result = u32_strconv_to_output(result);
-        fprintf(stderr, " -> \"%s\"\n", out_result);
+        log_debug_cont(MAIN, " -> \"%s\"\n", out_result);
         BFREE(out_result);
-    #endif
+    }
     return result;
 }
 
@@ -296,9 +287,7 @@ static size_t find_west_corner(design_t *current_design, comparison_t comp_type,
         BFREE(shape_relevant);
     }
 
-    #ifdef DEBUG
-        fprintf(stderr, "Checking %s corner produced %d hits.\n", shape_name[corner], (int) hits);
-    #endif
+    log_debug(__FILE__, MAIN, "Checking %s corner produced %d hits.\n", shape_name[corner], (int) hits);
     return hits;
 }
 
@@ -317,9 +306,7 @@ static size_t find_east_corner(design_t *current_design, comparison_t comp_type,
 {
     size_t hits = 0;
     if (empty[BRIG] || (empty[BTOP] && corner == NE) || (empty[BBOT] && corner == SE)) {
-        #ifdef DEBUG
-            fprintf(stderr, "Checking %s corner produced %d hits.\n", shape_name[corner], (int) hits);
-        #endif
+        log_debug(__FILE__, MAIN, "Checking %s corner produced %d hits.\n", shape_name[corner], (int) hits);
         return hits;
     }
 
@@ -349,9 +336,7 @@ static size_t find_east_corner(design_t *current_design, comparison_t comp_type,
         BFREE(shape_relevant);
     }
 
-    #ifdef DEBUG
-        fprintf(stderr, "Checking %s corner produced %d hits.\n", shape_name[corner], (int) hits);
-    #endif
+    log_debug(__FILE__, MAIN, "Checking %s corner produced %d hits.\n", shape_name[corner], (int) hits);
     return hits;
 }
 
@@ -371,9 +356,7 @@ static size_t find_horizontal_shape(design_t *current_design, comparison_t comp_
     size_t hits = 0;
     if (empty[BTOP] || empty[BBOT]) {
         /* horizontal box part is empty */
-        #ifdef DEBUG
-            fprintf(stderr, "Checking %-3s shape produced %d hits.\n", shape_name[hshape], (int) hits);
-        #endif
+        log_debug(__FILE__, MAIN, "Checking %-3s shape produced %d hits.\n", shape_name[hshape], (int) hits);
         return hits;
     }
 
@@ -417,9 +400,7 @@ static size_t find_horizontal_shape(design_t *current_design, comparison_t comp_
         BFREE(shape_relevant);
     }
 
-    #ifdef DEBUG
-        fprintf(stderr, "Checking %-3s shape produced %d hits.\n", shape_name[hshape], (int) hits);
-    #endif
+    log_debug(__FILE__, MAIN, "Checking %-3s shape produced %d hits.\n", shape_name[hshape], (int) hits);
     return hits;
 }
 
@@ -468,9 +449,7 @@ static size_t find_vertical_west(design_t *current_design, comparison_t comp_typ
         }
     }
 
-    #ifdef DEBUG
-        fprintf(stderr, "Checking %-3s shape produced %d hits.\n", shape_name[vshape], (int) hits);
-    #endif
+    log_debug(__FILE__, MAIN, "Checking %-3s shape produced %d hits.\n", shape_name[vshape], (int) hits);
     return hits;
 }
 
@@ -518,9 +497,7 @@ static size_t find_vertical_east(design_t *current_design, comparison_t comp_typ
         }
     }
 
-    #ifdef DEBUG
-        fprintf(stderr, "Checking %-3s shape produced %d hits.\n", shape_name[vshape], (int) hits);
-    #endif
+    log_debug(__FILE__, MAIN, "Checking %-3s shape produced %d hits.\n", shape_name[vshape], (int) hits);
     return hits;
 }
 
@@ -581,21 +558,16 @@ design_t *autodetect_design()
         for (size_t dcnt = 0; ((int) dcnt) < num_designs; ++dcnt, ++current_design) {
             int mono_design = design_is_mono(current_design);
             if (!comp_type_is_viable(comp_type, mono_input, mono_design)) {
-                #ifdef DEBUG
-                    fprintf(stderr, "Design \"%s\" skipped for comparison type '%s' because mono_input=%d and "
+                log_debug(__FILE__, MAIN, "Design \"%s\" skipped for comparison type '%s' because mono_input=%d and "
                         "mono_design=%d\n", current_design->name, comparison_name[comp_type], mono_input, mono_design);
-                #endif
                 continue;
             }
 
-            #ifdef DEBUG
-                fprintf(stderr, "CONSIDERING DESIGN ---- \"%s\" ---------------\n", current_design->name);
-                fprintf(stderr, "    comparison_type = %s\n", comparison_name[comp_type]);
-            #endif
+            log_debug(__FILE__, MAIN, "CONSIDERING DESIGN ---- \"%s\" ---------------\n", current_design->name);
+            log_debug(__FILE__, MAIN, "    comparison_type = %s\n", comparison_name[comp_type]);
+
             long hits = match_design(current_design, comp_type);
-            #ifdef DEBUG
-                fprintf(stderr, "Design \"%s\" scored %ld points\n", current_design->name, hits);
-            #endif
+            log_debug(__FILE__, MAIN, "Design \"%s\" scored %ld points\n", current_design->name, hits);
             if (hits > maxhits) {
                 maxhits = hits;
                 result = current_design;
@@ -606,14 +578,14 @@ design_t *autodetect_design()
         }
     }
 
-    #ifdef DEBUG
+    if (is_debug_logging(MAIN)) {
         if (result) {
-            fprintf(stderr, "CHOOSING \"%s\" design (%ld hits).\n", result->name, maxhits);
+            log_debug(__FILE__, MAIN, "CHOOSING \"%s\" design (%ld hits).\n", result->name, maxhits);
         }
         else {
-            fprintf(stderr, "NO DESIGN FOUND WITH EVEN ONE HIT POINT!\n");
+            log_debug(__FILE__, MAIN, "NO DESIGN FOUND WITH EVEN ONE HIT POINT!\n");
         }
-    #endif
+    }
     return result;
 }
 

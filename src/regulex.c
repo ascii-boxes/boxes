@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "boxes.h"
+#include "logging.h"
 #include "regulex.h"
 #include "tools.h"
 #include "unicode.h"
@@ -135,9 +136,7 @@ uint32_t *u32_regex_replace(pcre2_code *search, uint32_t *replace, uint32_t *inp
             done = 1;
         }
         else {
-            #ifdef REGEXP_DEBUG
-                fprintf(stderr, "Reallocating output buffer from %ld to %ld UTF-32 chars\n", bufsize, outlen);
-            #endif
+            log_debug(__FILE__, REGEXP, "Reallocating output buffer from %ld to %ld UTF-32 chars\n", bufsize, outlen);
             bufsize = outlen;
             output = (uint32_t *) realloc(output, sizeof(uint32_t) * bufsize);
         }

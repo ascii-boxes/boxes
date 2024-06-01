@@ -24,6 +24,7 @@
 
 #include "boxes.h"
 #include "list.h"
+#include "logging.h"
 #include "tools.h"
 #include "query.h"
 
@@ -118,12 +119,12 @@ char **parse_query(char *optarg)
 
 static int filter_by_tag(char **tags)
 {
-    #ifdef DEBUG
-        fprintf(stderr, "filter_by_tag(");
+    if (is_debug_logging(MAIN)) {
+        log_debug(__FILE__, MAIN, "filter_by_tag(");
         for (size_t tidx = 0; tags[tidx] != NULL; ++tidx) {
-            fprintf(stderr, "%s%s", tidx > 0 ? ", " : "", tags[tidx]);
+            log_debug_cont(MAIN, "%s%s", tidx > 0 ? ", " : "", tags[tidx]);
         }
-    #endif
+    }
 
     int result = array_contains0(opt.query, QUERY_ALL);
     if (opt.query != NULL) {
@@ -146,9 +147,7 @@ static int filter_by_tag(char **tags)
         }
     }
 
-    #ifdef DEBUG
-        fprintf(stderr, ") -> %d\n", result);
-    #endif
+    log_debug_cont(MAIN, ") -> %d\n", result);
     return result;
 }
 

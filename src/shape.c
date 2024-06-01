@@ -26,6 +26,7 @@
 
 #include "boxes.h"
 #include "bxstring.h"
+#include "logging.h"
 #include "shape.h"
 #include "tools.h"
 
@@ -248,10 +249,6 @@ size_t highest(const sentry_t *sarr, const int n, ...)
     int i;
     size_t max = 0;                      /* current maximum height */
 
-    #if defined(DEBUG) && 0
-    fprintf (stderr, "highest (%d, ...)\n", n);
-    #endif
-
     va_start (ap, n);
 
     for (i = 0; i < n; ++i) {
@@ -286,10 +283,6 @@ size_t widest(const sentry_t *sarr, const int n, ...)
     va_list ap;
     int i;
     size_t max = 0;                      /* current maximum width */
-
-    #if defined(DEBUG) && 0
-    fprintf (stderr, "widest (%d, ...)\n", n);
-    #endif
 
     va_start (ap, n);
 
@@ -470,66 +463,64 @@ int is_blankward(design_t *current_design, const shape_t shape, const size_t sha
 
 void debug_print_shape(sentry_t *shape)
 {
-    #ifdef DEBUG
+    if (is_debug_logging(MAIN)) {
         if (shape == NULL) {
-            fprintf(stderr, "NULL\n");
+            log_debug(__FILE__, MAIN, "NULL\n");
             return;
         }
-        fprintf(stderr, "Shape %3s (%dx%d): elastic=%s, bl=",
+        log_debug(__FILE__, MAIN, "Shape %3s (%dx%d): elastic=%s, bl=",
             shape_name[shape->name], (int) shape->width, (int) shape->height, shape->elastic ? "true" : "false");
         if (shape->blank_leftward == NULL) {
-            fprintf(stderr, "NULL");
+            log_debug_cont(MAIN, "NULL");
         }
         else {
-            fprintf(stderr, "[");
+            log_debug_cont(MAIN, "[");
             for (size_t i = 0; i < shape->height; i++) {
-                fprintf(stderr, "%d%s", shape->blank_leftward[i],
+                log_debug_cont(MAIN, "%d%s", shape->blank_leftward[i],
                         shape->height > 0 && i < (shape->height - 1) ? ", " : "");
             }
-            fprintf(stderr, "]");
+            log_debug_cont(MAIN, "]");
         }
-        fprintf(stderr, ", br=");
+        log_debug_cont(MAIN, ", br=");
         if (shape->blank_rightward == NULL) {
-            fprintf(stderr, "NULL");
+            log_debug_cont(MAIN, "NULL");
         }
         else {
-            fprintf(stderr, "[");
+            log_debug_cont(MAIN, "[");
             for (size_t i = 0; i < shape->height; i++) {
-                fprintf(stderr, "%d%s", shape->blank_rightward[i],
+                log_debug_cont(MAIN, "%d%s", shape->blank_rightward[i],
                         shape->height > 0 && i < (shape->height - 1) ? ", " : "");
             }
-            fprintf(stderr, "]");
+            log_debug_cont(MAIN, "]");
         }
-        fprintf(stderr, ", ascii=");
+        log_debug_cont(MAIN, ", ascii=");
         if (shape->chars == NULL) {
-            fprintf(stderr, "NULL");
+            log_debug_cont(MAIN, "NULL");
         }
         else {
-            fprintf(stderr, "[");
+            log_debug_cont(MAIN, "[");
             for (size_t i = 0; i < shape->height; i++) {
-                fprintf(stderr, "%s%s%s%s", shape->chars[i] != NULL ? "\"" : "", shape->chars[i],
+                log_debug_cont(MAIN, "%s%s%s%s", shape->chars[i] != NULL ? "\"" : "", shape->chars[i],
                         shape->chars[i] != NULL ? "\"" : "", (int) i < ((int) shape->height) - 1 ? ", " : "");
             }
-            fprintf(stderr, "]");
+            log_debug_cont(MAIN, "]");
         }
-        fprintf(stderr, ", mbcs=");
+        log_debug_cont(MAIN, ", mbcs=");
         if (shape->mbcs == NULL) {
-            fprintf(stderr, "NULL");
+            log_debug_cont(MAIN, "NULL");
         }
         else {
-            fprintf(stderr, "[");
+            log_debug_cont(MAIN, "[");
             for (size_t i = 0; i < shape->height; i++) {
                 char *out_mbcs = bxs_to_output(shape->mbcs[i]);
-                fprintf(stderr, "%s%s%s%s", shape->mbcs[i] != NULL ? "\"" : "", out_mbcs,
+                log_debug_cont(MAIN, "%s%s%s%s", shape->mbcs[i] != NULL ? "\"" : "", out_mbcs,
                         shape->mbcs[i] != NULL ? "\"" : "", shape->height > 0 && i < (shape->height - 1) ? ", " : "");
                 BFREE(out_mbcs);
             }
-            fprintf(stderr, "]");
+            log_debug_cont(MAIN, "]");
         }
-        fprintf(stderr, "\n");
-    #else
-        UNUSED(shape);
-    #endif
+        log_debug_cont(MAIN, "\n");
+    }
 }
 
 

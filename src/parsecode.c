@@ -27,6 +27,7 @@
 #include <unistr.h>
 
 #include "discovery.h"
+#include "logging.h"
 #include "parsecode.h"
 #include "parsing.h"
 #include "query.h"
@@ -57,9 +58,7 @@ static int check_sizes(pass_to_bison *bison_args)
 {
     int i, j, k;
 
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, " Parser: check_sizes()\n");
-    #endif
+    log_debug(__FILE__, PARSER, " Parser: check_sizes()\n");
 
     for (i = 0; i < NUM_SIDES; ++i) {
         if (i == 0 || i == 2) {
@@ -125,9 +124,7 @@ static int corner_check(pass_to_bison *bison_args)
 {
     int c;
 
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, " Parser: corner_check()\n");
-    #endif
+    log_debug(__FILE__, PARSER, " Parser: corner_check()\n");
 
     for (c = 0; c < NUM_CORNERS; ++c) {
         if (curdes.shape[corners[c]].elastic) {
@@ -145,9 +142,7 @@ static shape_t non_existent_elastics(pass_to_bison *bison_args)
 {
     shape_t i;
 
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, " Parser: non_existent_elastics()\n");
-    #endif
+    log_debug(__FILE__, PARSER, " Parser: non_existent_elastics()\n");
 
     for (i = 0; i < NUM_SHAPES; ++i) {
         if (curdes.shape[i].elastic && isempty(curdes.shape + i)) {
@@ -164,9 +159,7 @@ static int insufficient_elasticity(pass_to_bison *bison_args)
 {
     int i, j, ef;
 
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, " Parser: insufficient_elasticity()\n");
-    #endif
+    log_debug(__FILE__, PARSER, " Parser: insufficient_elasticity()\n");
 
     for (i = 0; i < NUM_SIDES; ++i) {
         for (j = 1, ef = 0; j < 4; ++j) {
@@ -188,9 +181,7 @@ static int adjoining_elastics(pass_to_bison *bison_args)
 {
     int i, j, ef;
 
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, " Parser: adjoining_elastics()\n");
-    #endif
+    log_debug(__FILE__, PARSER, " Parser: adjoining_elastics()\n");
 
     for (i = 0; i < NUM_SIDES; ++i) {
         ef = 0;
@@ -316,9 +307,7 @@ static int full_parse_required()
     if (!opt.design_choice_by_user) {
         result = opt.r || opt.l || (opt.query != NULL && !opt.qundoc);
     }
-    #ifdef DEBUG
-        fprintf(stderr, " Parser: full_parse_required() -> %s\n", result ? "true" : "false");
-    #endif
+    log_debug(__FILE__, MAIN, " Parser: full_parse_required() -> %s\n", result ? "true" : "false");
     return result;
 }
 
@@ -593,11 +582,9 @@ int action_finalize_shapes(pass_to_bison *bison_args)
             curdes.maxshapeheight = curdes.shape[i].height;
         }
     }
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, " Parser: Minimum box dimensions: width %d height %d\n",
+    log_debug(__FILE__, PARSER, " Parser: Minimum box dimensions: width %d height %d\n",
                 (int) curdes.minwidth, (int) curdes.minheight);
-        fprintf(stderr, " Parser: Maximum shape height: %d\n", (int) curdes.maxshapeheight);
-    #endif
+    log_debug(__FILE__, PARSER, " Parser: Maximum shape height: %d\n", (int) curdes.maxshapeheight);
 
     /*
      *  Set name of each shape
@@ -631,9 +618,7 @@ int action_start_parsing_design(pass_to_bison *bison_args, char *design_name)
 
     if (!design_needed(bison_args)) {
         bison_args->speeding = 1;
-        #ifdef PARSER_DEBUG
-                fprintf(stderr, " Parser: Skipping to next design (lexer doesn't know!)\n");
-        #endif
+        log_debug(__FILE__, PARSER, " Parser: Skipping to next design (lexer doesn't know!)\n");
         return RC_ERROR; /* trigger the parser's `error` rule, which will skip to the next design */
     }
     return RC_SUCCESS;
@@ -643,9 +628,12 @@ int action_start_parsing_design(pass_to_bison *bison_args, char *design_name)
 
 int action_parent_config(pass_to_bison *bison_args, bxstr_t *filepath)
 {
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, " Parser: parent config file specified: [%s]\n", bxs_to_output(filepath));
-    #endif
+    if (is_debug_logging(PARSER)) {
+        char *out_filepath = bxs_to_output(filepath);
+        log_debug(__FILE__, PARSER, " Parser: parent config file specified: [%s]\n", out_filepath);
+        BFREE(out_filepath);
+    }
+
     if (bxs_is_empty(filepath)) {
         bison_args->skipping = 1;
         yyerror(bison_args, "parent reference is empty");
@@ -674,9 +662,11 @@ int action_parent_config(pass_to_bison *bison_args, bxstr_t *filepath)
             fclose(f);
         }
     }
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, " Parser: parent config file path resolved: [%s]\n", bxs_to_output(filepath));
-    #endif
+    if (is_debug_logging(PARSER)) {
+        char *out_filepath = bxs_to_output(filepath);
+        log_debug(__FILE__, PARSER, " Parser: parent config file path resolved: [%s]\n", out_filepath);
+        BFREE(out_filepath);
+    }
 
     int is_new = !array_contains_bxs(bison_args->parent_configs, bison_args->num_parent_configs, filepath);
     if (is_new) {
@@ -685,10 +675,10 @@ int action_parent_config(pass_to_bison *bison_args, bxstr_t *filepath)
         bison_args->parent_configs[bison_args->num_parent_configs] = filepath;
         ++(bison_args->num_parent_configs);
     }
-    else {
-        #ifdef PARSER_DEBUG
-            fprintf(stderr, " Parser: duplicate parent / cycle: [%s]\n", bxs_to_output(filepath));
-        #endif
+    else if (is_debug_logging(PARSER)) {
+        char *out_filepath = bxs_to_output(filepath);
+        log_debug(__FILE__, PARSER, " Parser: duplicate parent / cycle: [%s]\n", out_filepath);
+        BFREE(out_filepath);
     }
     return RC_SUCCESS;
 }
@@ -699,9 +689,7 @@ int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char
 {
     design_t *tmp;
 
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, "--------- ADDING DESIGN \"%s\".\n", design_primary_name);
-    #endif
+    log_debug(__FILE__, PARSER, "--------- ADDING DESIGN \"%s\".\n", design_primary_name);
 
     if (strcasecmp(design_primary_name, name_at_end)) {
         yyerror(bison_args, "box design name differs at BOX and END");
@@ -747,9 +735,11 @@ int action_add_design(pass_to_bison *bison_args, char *design_primary_name, char
 
 int action_record_keyword(pass_to_bison *bison_args, char *keyword, bxstr_t *value)
 {
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, " Parser: entry rule fulfilled [%s = %s]\n", keyword, bxs_to_output(value));
-    #endif
+    if (is_debug_logging(PARSER)) {
+        char *out_value = bxs_to_output(value);
+        log_debug(__FILE__, PARSER, " Parser: entry rule fulfilled [%s = %s]\n", keyword, out_value);
+        BFREE(out_value);
+    }
 
     size_t error_pos = 0;
     if (!bxs_valid_in_kv_string(value, &error_pos)) {
@@ -856,9 +846,7 @@ int action_add_alias(pass_to_bison *bison_args, char *alias_name)
         return RC_ERROR;
     }
     if (alias_exists_in_child_configs(bison_args, alias_name)) {
-        #ifdef PARSER_DEBUG
-            fprintf(stderr, " Parser: alias already used by child config, dropping: %s\n", alias_name);
-        #endif
+        log_debug(__FILE__, PARSER, " Parser: alias already used by child config, dropping: %s\n", alias_name);
     }
     else {
         size_t num_aliases = array_count0(curdes.aliases);
@@ -906,9 +894,7 @@ static uint32_t *find_first_nonblank_line(bxstr_t *sample)
 
 int action_sample_block(pass_to_bison *bison_args, bxstr_t *sample)
 {
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, " Parser: SAMPLE block rule satisfied\n");
-    #endif
+    log_debug(__FILE__, PARSER, " Parser: SAMPLE block rule satisfied\n");
 
     if (curdes.sample) {
         yyerror(bison_args, "duplicate SAMPLE block");
@@ -944,12 +930,14 @@ int action_add_regex_rule(pass_to_bison *bison_args, char *type, reprule_t **rul
 {
     size_t n = *rule_list_len;
 
-    UNUSED(type); /* used only in PARSER_DEBUG mode */
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, "Adding %s rule: \"%s\" with \"%s\" (%c)\n",
-                strcmp(type, "rep") == 0 ? "replacement" : "reversion",
-                bxs_to_output(search), bxs_to_output(replace), mode);
-    #endif
+    if (is_debug_logging(PARSER)) {
+        char *out_search = bxs_to_output(search);
+        char *out_replace = bxs_to_output(replace);
+        log_debug(__FILE__, PARSER, "Adding %s rule: \"%s\" with \"%s\" (%c)\n",
+                strcmp(type, "rep") == 0 ? "replacement" : "reversion", out_search, out_replace, mode);
+        BFREE(out_replace);
+        BFREE(out_search);
+    }
 
     *rule_list = (reprule_t *) realloc(*rule_list, (n + 1) * sizeof(reprule_t));
     if (*rule_list == NULL) {
@@ -975,9 +963,7 @@ int action_first_shape_line(pass_to_bison *bison_args, bxstr_t *line, sentry_t *
 {
     sentry_t rval = SENTRY_INITIALIZER;
 
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, "Initializing a shape entry with first line\n");
-    #endif
+    log_debug(__FILE__, PARSER, "Initializing a shape entry with first line\n");
 
     size_t error_pos = 0;
     if (!bxs_valid_in_shape(line, &error_pos)) {
@@ -1018,9 +1004,7 @@ int action_first_shape_line(pass_to_bison *bison_args, bxstr_t *line, sentry_t *
 
 int action_add_shape_line(pass_to_bison *bison_args, sentry_t *shape, bxstr_t *line)
 {
-    #ifdef PARSER_DEBUG
-        fprintf(stderr, "Extending a shape entry\n");
-    #endif
+    log_debug(__FILE__, PARSER, "Extending a shape entry\n");
 
     size_t slen = line->num_columns;
     if (slen != shape->width) {
