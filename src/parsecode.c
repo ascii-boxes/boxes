@@ -314,7 +314,7 @@ static int full_parse_required()
 {
     int result = 0;
     if (!opt.design_choice_by_user) {
-        result = opt.r || opt.l || (opt.query != NULL && !query_is_undoc());
+        result = opt.r || opt.l || (opt.query != NULL && !opt.qundoc);
     }
     #ifdef DEBUG
         fprintf(stderr, " Parser: full_parse_required() -> %s\n", result ? "true" : "false");

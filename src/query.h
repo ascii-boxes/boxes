@@ -30,13 +30,6 @@ char **parse_query(char *optarg);
 
 
 /**
- * Check if -q "(undoc)" was specified.
- * @returns flag
- */
-int query_is_undoc();
-
-
-/**
  * Perform the tag query based on the global design list and the query from the global `opt` struct.
  * @returns 0 if successful; anything else on error (then the program should exit)
  */

@@ -32,6 +32,7 @@
 #endif
 
 #include "boxes.h"
+#include "bxstring.h"
 #include "discovery.h"
 #include "logging.h"
 #include "query.h"
@@ -57,6 +58,9 @@ extern int optind;     /* for getopt() */
 #else
     #define EOL_DEFAULT "\n"
 #endif
+
+#define EXTRA_UNDOC "(undoc)"
+#define EXTRA_DEBUG "debug"
 
 
 
@@ -92,7 +96,6 @@ void usage_long(FILE *st)
                                          strcmp(EOL_DEFAULT, "\r\n") == 0 ? "CRLF" : "LF");
     fprintf(st, "  -f, --config <file>   Configuration file [default: %s]\n",
                                          config_file != NULL ? bxs_to_output(config_file) : "none");
-    /* fprintf(st, "  -g, --debug <areas>   Activate debug logging for specified log areas [default area: MAIN]");  // undocumented */
     fprintf(st, "  -h, --help            Print usage information\n");
     fprintf(st, "  -i, --indent <mode>   Indentation mode [default: box]\n");
     fprintf(st, "  -k <bool>             Leading/trailing blank line retention on removal\n");
@@ -102,11 +105,14 @@ void usage_long(FILE *st)
     fprintf(st, "  -m, --mend            Mend (repair) box\n");
     fprintf(st, "  -n, --encoding <enc>  Character encoding of input and output [default: %s]\n", locale_charset());
     fprintf(st, "  -p, --padding <fmt>   Padding [default: none]\n");
-    fprintf(st, "  -q, --tag-query <qry> Query the list of designs by tag\n"); /* with "(undoc)" as query, trigger undocumented behavior instead */
+    fprintf(st, "  -q, --tag-query <qry> Query the list of designs by tag\n");
     fprintf(st, "  -r, --remove          Remove box\n");
     fprintf(st, "  -s, --size <wxh>      Box size (width w and/or height h)\n");
     fprintf(st, "  -t, --tabs <str>      Tab stop distance and expansion [default: %de]\n", DEF_TABSTOP);
     fprintf(st, "  -v, --version         Print version information\n");
+    /* fprintf(st, "  -x, --extra <arg>     If <arg> starts with "debug:", activate debug logging for specified log
+                areas which follow in a comma-separated list [default area: MAIN]. If <arg> is "(undoc)", trigger
+                undocumented behavior of design detail lister.");  // undocumented */
 
     bxs_free(config_file);
 }
@@ -494,7 +500,10 @@ static int debug_areas(opt_t *result, char *optarg)
             }
         }
         if (!valid) {
-            bx_fprintf(stderr, "%s: invalid debug area -- %s\n", PROJECT, trimmed);
+            bx_fprintf(stderr, "%s: invalid debug area -- %s. Valid values: ", PROJECT, trimmed);
+            for (size_t i = 1; i < NUM_LOG_AREAS + 2; i++) {
+                bx_fprintf(stderr, "%s%s", log_area_names[i], i < (NUM_LOG_AREAS + 2 - 1) ? ", " : "\n");
+            }
             BFREE(trimmed);
             return 1;
         }
@@ -547,6 +556,48 @@ static int tab_handling(opt_t *result, char *optarg)
     if (errfl) {
         bx_fprintf(stderr, "%s: invalid tab handling specification - %s\n", PROJECT, optarg);
         return 1;
+    }
+    return 0;
+}
+
+
+
+/**
+ * Handle undocumented options (-x).
+ * @param result the options struct we are building
+ * @param optarg the argument to `-x` on the command line
+ * @returns 0 on success, anything else on error
+ */
+static int undocumented_options(opt_t *result, char *optarg)
+{
+    char *s = optarg;
+
+    if (strncmp(s, EXTRA_UNDOC, strlen(EXTRA_UNDOC)) == 0) {
+        result->qundoc = 1;
+        s += strlen(EXTRA_UNDOC);
+    }
+
+    if (strncasecmp(s, EXTRA_DEBUG, strlen(EXTRA_DEBUG)) == 0) {
+        s += strlen(EXTRA_DEBUG);
+        if (*s == ':') {
+            if (debug_areas(result, s + 1) != 0) {
+                return 1;
+            }
+        }
+        else if (*s == '\0') {
+            /* default to MAIN */
+            debug_areas(result, NULL);
+        }
+        else {
+            bx_fprintf(stderr, "%s: invalid option -x %s\n", PROJECT, optarg);
+            return 2;
+        }
+        activate_debug_logging(result->debug);
+    }
+
+    if (!result->qundoc && !is_debug_activated()) {
+        bx_fprintf(stderr, "%s: invalid option -x %s\n", PROJECT, optarg);
+        return 3;
     }
     return 0;
 }
@@ -639,7 +690,7 @@ static void print_debug_info(opt_t *result)
         log_debug(__FILE__, MAIN, "  - Design Definition W shape (-c): %s\n", result->cld ? result->cld : "n/a");
         log_debug(__FILE__, MAIN, "  - Color mode: %d\n", result->color);
 
-        log_debug(__FILE__, MAIN, "  - Debug areas: ");
+        log_debug(__FILE__, MAIN, "  - Debug areas (-x debug:...): ");
         int dbgfirst = 1;
         for (size_t i = 0; i < NUM_LOG_AREAS; i++) {
             if (result->debug[i]) {
@@ -658,7 +709,7 @@ static void print_debug_info(opt_t *result)
         log_debug(__FILE__, MAIN, "  - Padding (-p): l:%d t:%d r:%d b:%d\n",
                 result->padding[BLEF], result->padding[BTOP], result->padding[BRIG], result->padding[BBOT]);
 
-        log_debug(__FILE__, MAIN, "  - Tag Query / Special handling for Web UI (-q): ");
+        log_debug(__FILE__, MAIN, "  - Tag Query (-q): ");
         if (result->query != NULL) {
             for (size_t qidx = 0; result->query[qidx] != NULL; ++qidx) {
                 log_debug_cont(MAIN, "%s%s", qidx > 0 ? ", " : "", result->query[qidx]);
@@ -668,6 +719,7 @@ static void print_debug_info(opt_t *result)
         }
         log_debug_cont(MAIN, "\n");
 
+        log_debug(__FILE__, MAIN, "  - qundoc (-x): %d\n", result->qundoc);
         log_debug(__FILE__, MAIN, "  - Remove box (-r): %d\n", result->r);
         log_debug(__FILE__, MAIN, "  - Requested box size (-s): %ldx%ld\n", result->reqwidth, result->reqheight);
         log_debug(__FILE__, MAIN, "  - Tabstop distance (-t): %d\n", result->tabstop);
@@ -703,7 +755,6 @@ opt_t *process_commandline(int argc, char *argv[])
         { "create",        required_argument, NULL, 'c' },
         { "color",         no_argument,       NULL, OPT_COLOR },
         { "no-color",      no_argument,       NULL, OPT_NO_COLOR },
-        { "debug",         optional_argument, NULL, 'g' },
         { "design",        required_argument, NULL, 'd' },
         { "eol",           required_argument, NULL, 'e' },
         { "config",        required_argument, NULL, 'f' },
@@ -720,9 +771,10 @@ opt_t *process_commandline(int argc, char *argv[])
         { "size",          required_argument, NULL, 's' },
         { "tabs",          required_argument, NULL, 't' },
         { "version",       no_argument,       NULL, 'v' },
+        { "extra",         required_argument, NULL, 'x' },
         { NULL,            0,                 NULL,  0  }
     };
-    const char *short_options = "a:c:d:e:f:g::hi:k:lmn:p:q:rs:t:v";
+    const char *short_options = "a:c:d:e:f:hi:k:lmn:p:q:rs:t:vx:";
 
     int oc;   /* option character */
     do {
@@ -770,14 +822,6 @@ opt_t *process_commandline(int argc, char *argv[])
                 result->f = strdup(optarg);   /* input file */
                 break;
             
-            case 'g':
-                if (debug_areas(result, optarg) != 0) {
-                    BFREE(result);
-                    return NULL;
-                }
-                activate_debug_logging(result->debug);
-                break;
-
             case 'h':
                 result->help = 1;
                 return result;
@@ -862,6 +906,13 @@ opt_t *process_commandline(int argc, char *argv[])
             case 'v':
                 result->version_requested = 1;   /* print version number */
                 return result;
+
+            case 'x':
+                if (undocumented_options(result, optarg) != 0) {
+                    BFREE(result);
+                    return NULL;
+                }
+                break;
 
             case ':':
             case '?':
