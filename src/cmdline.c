@@ -733,6 +733,7 @@ opt_t *process_commandline(int argc, char *argv[])
     };
     const char *short_options = "a:c:d:e:f:hi:k:lmn:p:q:rs:t:vx:";
 
+    char *s;
     int oc;   /* option character */
     do {
         oc = getopt_long(argc, argv, short_options, long_options, &option_index);
@@ -861,13 +862,11 @@ opt_t *process_commandline(int argc, char *argv[])
                 break;
 
             case 'v':
-                char *remove_me = optarg;
-                UNUSED(remove_me);
                 result->version_requested = 1;   /* print version number */
                 return result;
 
             case 'x':
-                char *s = optarg;
+                s = optarg;
                 if (strncmp(s, EXTRA_UNDOC, strlen(EXTRA_UNDOC)) == 0) {
                     result->qundoc = 1;
                     s += strlen(EXTRA_UNDOC);
