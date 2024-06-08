@@ -863,6 +863,7 @@ opt_t *process_commandline(int argc, char *argv[])
             case 'v':
                 result->version_requested = 1;   /* print version number */
                 return result;
+                break;
 
             case 'x':
                 char *s = optarg;
