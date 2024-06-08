@@ -861,9 +861,10 @@ opt_t *process_commandline(int argc, char *argv[])
                 break;
 
             case 'v':
+                char *remove_me = optarg;
+                UNUSED(remove_me);
                 result->version_requested = 1;   /* print version number */
                 return result;
-                break;
 
             case 'x':
                 char *s = optarg;
