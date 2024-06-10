@@ -61,6 +61,7 @@ void inflate_inbuf(void *yyscanner, const bxstr_t *configfile);
 #include <unitypes.h>
 
 #include "boxes.h"
+#include "logging.h"
 #include "shape.h"
 #include "tools.h"
 #include "parsing.h"
@@ -181,9 +182,7 @@ PFILENAME [^\r\n]+
         else if (*p == yyextra->sdel) {
             *p = '\0';
             yyless ((p - str) + 2 + qcnt);   /* string plus quotes */
-            #ifdef LEXER_DEBUG
-                fprintf (stderr, " STRING: \"%s\"\n", str);
-            #endif
+            log_debug(__FILE__, LEXER, " STRING: \"%s\"\n", str);
 
             uint32_t *utf8 = u32_strconv_from_arg(str, CONFIG_FILE_ENCODING);
             yylval->s = bxs_from_unicode(utf8);
@@ -293,9 +292,7 @@ PFILENAME [^\r\n]+
 
 
 <BOX>Tags {
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, "  YTAGS: %s\n", yytext);
-    #endif
+    log_debug(__FILE__, LEXER, "  YTAGS: %s\n", yytext);
     return YTAGS;
 }
 
@@ -368,9 +365,7 @@ PFILENAME [^\r\n]+
     /*
      * general key words
      */
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, "KEYWORD: %s\n", yytext);
-    #endif
+    log_debug(__FILE__, LEXER, "KEYWORD: %s\n", yytext);
     yylval->ascii = strdup(yytext);
     if (yylval->ascii == NULL) {
         perror (PROJECT);
@@ -398,9 +393,7 @@ PFILENAME [^\r\n]+
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, "ASCIIID: %s\n", yylval->ascii);
-    #endif
+    log_debug(__FILE__, LEXER, "ASCIIID: %s\n", yylval->ascii);
     return ASCII_ID;
 }
 
@@ -414,44 +407,38 @@ PFILENAME [^\r\n]+
         perror (PROJECT);
         exit (EXIT_FAILURE);
     }
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, " BXWORD: %s\n", u32_strconv_to_output(utf8));
-    #endif
+    if (is_debug_logging(LEXER)) {
+        char *out_utf8 = u32_strconv_to_output(utf8);
+        log_debug(__FILE__, LEXER, " BXWORD: %s\n", out_utf8);
+        BFREE(out_utf8);
+    }
     BFREE(utf8);
     return BXWORD;
 }
 
 
 <BOX>[\+-]?[0-9]+ {
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, "YNUMBER: %s\n", yytext);
-    #endif
+    log_debug(__FILE__, LEXER, "YNUMBER: %s\n", yytext);
     yylval->num = atoi (yytext);
     return YNUMBER;
 }
 
 
 <BOX,SHAPES,ELASTIC>[,(){}] {
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, " SYMBOL: \'%c\'\n", yytext[0]);
-    #endif
+    log_debug(__FILE__, LEXER, " SYMBOL: \'%c\'\n", yytext[0]);
     return yytext[0];
 }
 
 
 <INITIAL,BOX,SHAPES,ELASTIC>#.*$ {
     /* ignore comments */
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, "COMMENT: %s\n", yytext+1);
-    #endif
+    log_debug(__FILE__, LEXER, "COMMENT: %s\n", yytext + 1);
 }
 
 
 <INITIAL,BOX,SHAPES,ELASTIC>. {
     /* a character that made no sense where it was encountered. Let the parser handle it. */
-    #ifdef LEXER_DEBUG
-        fprintf (stderr, " YUNREC: \'%c\'\n", yytext[0]);
-    #endif
+    log_debug(__FILE__, LEXER, " YUNREC: \'%c\'\n", yytext[0]);
     return YUNREC;
 }
 
@@ -490,12 +477,15 @@ static void report_state_char(char *symbol, char c, char *expected_state_str)
 
 static void report_state(char *symbol, char *text, char *expected_state_str)
 {
-    int lexerDebug = 0;
-    #ifdef LEXER_DEBUG
-        lexerDebug = 1;
-    #endif
-    if (lexerDebug) {
-        fprintf(stderr, "%7s: %s -- STATE %s\n", symbol, text, expected_state_str);
+    if (is_debug_logging(LEXER)) {
+        size_t text_len = 0;
+        if (text != NULL) {
+            text_len = strlen(text);
+            if (text_len > 0 && (text[text_len - 1] == '\r' || text[text_len - 1] == '\t')) {
+                text[text_len - 1] = '\0';
+            }
+        }
+        log_debug(__FILE__, LEXER, "%7s: %s (%d) -- STATE %s\n", symbol, text, text_len, expected_state_str);
     }
 }
 
@@ -516,9 +506,7 @@ static int change_string_delimiters(pass_to_flex *extra, char *delim_expr)
         return 1;
     }
 
-    #ifdef LEXER_DEBUG
-        fprintf(stderr, "YDELIMS: change_string_delimiters('%c', '%c')\n", delim_expr[0], delim_expr[1]);
-    #endif
+    log_debug(__FILE__, LEXER, "YDELIMS: change_string_delimiters('%c', '%c')\n", delim_expr[0], delim_expr[1]);
     extra->sesc = delim_expr[0];
     extra->sdel = delim_expr[1];
 
