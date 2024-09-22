@@ -418,4 +418,4 @@ wlist_entry: ASCII_ID YNUMBER
 %%
 
 
-/*EOF*/                                          /* vim: set sw=4 cindent: */
+/* vim: set sw=4 cindent: */

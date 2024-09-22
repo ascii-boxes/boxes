@@ -400,4 +400,4 @@ int list_designs()
 }
 
 
-/*EOF*/                                                  /* vim: set sw=4: */
+/* vim: set sw=4: */

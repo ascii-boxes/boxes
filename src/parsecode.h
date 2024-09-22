@@ -195,4 +195,4 @@ int action_add_shape_line(pass_to_bison *bison_args, sentry_t *shape, bxstr_t *l
 
 #endif
 
-/*EOF*/                                       /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

@@ -76,4 +76,4 @@ void debug_print_shape(sentry_t *shape);
 
 #endif /*SHAPE_H*/
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

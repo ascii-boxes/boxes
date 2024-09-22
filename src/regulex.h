@@ -102,4 +102,4 @@ uint32_t *u32_regex_replace(pcre2_code *search, uint32_t *replace, uint32_t *inp
 
 #endif
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

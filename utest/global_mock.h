@@ -36,4 +36,4 @@ void teardown();
 
 #endif
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

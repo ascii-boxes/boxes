@@ -539,4 +539,4 @@ int main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-/*EOF*/                                                  /* vim: set sw=4: */
+/* vim: set sw=4: */

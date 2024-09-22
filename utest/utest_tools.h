@@ -41,4 +41,4 @@ void print_array_s(size_t p_array[], size_t p_len);
 
 #endif
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

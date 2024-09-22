@@ -172,4 +172,4 @@ int query_by_tag()
 }
 
 
-/*EOF*/                                                  /* vim: set sw=4: */
+/* vim: set sw=4: */

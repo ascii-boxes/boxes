@@ -51,4 +51,4 @@ int apply_substitutions(input_t *input_data, const int mode);
 
 #endif
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

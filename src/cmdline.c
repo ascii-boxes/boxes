@@ -941,4 +941,4 @@ opt_t *process_commandline(int argc, char *argv[])
 }
 
 
-/*EOF*/                                                  /* vim: set sw=4: */
+/* vim: set sw=4: */

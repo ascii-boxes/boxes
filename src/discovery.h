@@ -28,4 +28,4 @@ bxstr_t *discover_config_file(const int global_only);
 
 #endif /* BOXES_DISCOVERY_H */
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

@@ -53,4 +53,4 @@ opt_t *process_commandline(int argc, char *argv[]);
 
 #endif
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

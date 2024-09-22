@@ -136,6 +136,3 @@ package: $(BOXES_EXECUTABLE_NAME)
 clean:
 	rm -rf $(OUT_DIR)
 	rm -f core
-
-
-#EOF

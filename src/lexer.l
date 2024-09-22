@@ -514,4 +514,4 @@ static int change_string_delimiters(pass_to_flex *extra, char *delim_expr)
 }
 
 
-/*EOF*/                                         /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

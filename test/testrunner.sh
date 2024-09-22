@@ -331,5 +331,3 @@ rm "${testOutputFile}"
 
 echo "    OK"
 exit 0
-
-#EOF

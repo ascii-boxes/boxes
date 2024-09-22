@@ -225,4 +225,4 @@ let b:current_syntax = "boxes"
 
 
 
-"EOF                                      vim: sw=4 nowrap:
+" vim: sw=4 nowrap:

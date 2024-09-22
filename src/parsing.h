@@ -51,4 +51,4 @@ design_t *parse_config_files(bxstr_t *first_config_file, size_t *r_num_designs);
 
 #endif
 
-/*EOF*/                                       /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

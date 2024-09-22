@@ -110,4 +110,4 @@ void test_regex_replace_error(void **state)
 }
 
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */

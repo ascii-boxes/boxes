@@ -55,6 +55,3 @@
 
 
 #endif /*CONFIG_H*/
-
-
-/*EOF*/

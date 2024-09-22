@@ -28,4 +28,4 @@ int output_box(const sentry_t *thebox);
 
 #endif /*GENERATE_H*/
 
-/*EOF*/                                          /* vim: set cindent sw=4: */
+/* vim: set cindent sw=4: */
