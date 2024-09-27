@@ -739,6 +739,12 @@ int generate_box(sentry_t *thebox)
     int rc;
     int i;
 
+    if (is_debug_logging(MAIN)) {
+        for (i = 0; i < NUM_SHAPES; i++) {
+            debug_print_shape(opt.design->shape + i);
+        }
+    }
+
     rc = horiz_generate(&(thebox[0]), &(thebox[2]));
     if (rc) {
         goto err;

@@ -1,0 +1,22 @@
+:DESC
+Test case which checks some logging features.
+
+:ARGS
+-d dog -x debug:all
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED discard-stderr
+          __   _,--="=--,_   __
+         /  \."    .-.    "./  \
+        /  ,/  _   : :   _  \/` \
+        \  `| /o\  :_:  /o\ |\__/
+         `-'| :="~` _ `~"=: |
+            \`     (_)     `/ jgs
+     .-"-.   \      |      /   .-"-.
+.---{     }--|  /,.-'-.,\  |--{     }---.
+ )  (_)_)_)  \_/`~-===-~`\_/  (_(_(_)  (
+(  foo                                  )
+ )                                     (
+'---------------------------------------'
+:EOF

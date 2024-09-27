@@ -468,8 +468,9 @@ void debug_print_shape(sentry_t *shape)
             log_debug(__FILE__, MAIN, "NULL\n");
             return;
         }
-        log_debug(__FILE__, MAIN, "Shape %3s (%dx%d): elastic=%s, bl=",
-            shape_name[shape->name], (int) shape->width, (int) shape->height, shape->elastic ? "true" : "false");
+        log_debug(__FILE__, MAIN, "Shape %3s (%dx%d): elastic=%s,%s bl=",
+            shape_name[shape->name], (int) shape->width, (int) shape->height,
+            shape->elastic ? "true" : "false", shape->elastic ? " " : "");
         if (shape->blank_leftward == NULL) {
             log_debug_cont(MAIN, "NULL");
         }

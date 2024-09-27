@@ -1,0 +1,13 @@
+:DESC
+Test case 130 with logging turned on.
+
+:ARGS
+-f 130_data/B.cfg -d designA -p l1 -a vc -x debug:all
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED discard-stderr
+AAA
+AAA foo
+AAA
+:EOF

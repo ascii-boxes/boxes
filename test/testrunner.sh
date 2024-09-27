@@ -232,6 +232,9 @@ function arrange_test_fixtures()
     if [ $(grep -c "^:EXPECTED-ERROR " ${opt_testCase}) -eq 1 ]; then
         expectedReturnCode=$(grep "^:EXPECTED-ERROR " "${opt_testCase}" | sed -e 's/:EXPECTED-ERROR //')
     fi
+    if [ $(grep -c "^:EXPECTED discard-stderr" ${opt_testCase}) -eq 1 ]; then
+        discardStderr=true
+    fi
 
     cat "${opt_testCase}" | sed -n '/^:INPUT/,/^:OUTPUT-FILTER/p;' | sed '1d;$d' | tr -d '\r' > "${testInputFile}"
     cat "${opt_testCase}" | sed -n '/^:OUTPUT-FILTER/,/^:EXPECTED\b.*$/p;' | sed '1d;$d' | tr -d '\r' > "${testFilterFile}"
@@ -248,9 +251,17 @@ function run_boxes()
 
     echo "    Invoking: $(basename $boxesBinary) $boxesArgs"
     if [ -z "${BOXES_TEST_XXD:-}" ]; then
-        eval "$boxesBinary $boxesArgs" < "$testInputFile" > "$testOutputFile" 2>&1
+        if [ ${discardStderr} == true ]; then
+            eval "$boxesBinary $boxesArgs" < "$testInputFile" > "$testOutputFile" 2> "$testErrorFile"
+        else
+            eval "$boxesBinary $boxesArgs" < "$testInputFile" > "$testOutputFile" 2>&1
+        fi
     else
-        eval "$boxesBinary $boxesArgs" < "$testInputFile" | xxd > "$testOutputFile" 2>&1
+        if [ ${discardStderr} == true ]; then
+            eval "$boxesBinary $boxesArgs" < "$testInputFile" | xxd > "$testOutputFile" 2> "$testErrorFile"
+        else
+            eval "$boxesBinary $boxesArgs" < "$testInputFile" | xxd > "$testOutputFile" 2>&1
+        fi
     fi
     actualReturnCode=$?
 }
@@ -311,7 +322,9 @@ declare -r testInputFile=${opt_testCase/%.txt/.input.tmp}
 declare -r testExpectationFile=${opt_testCase/%.txt/.expected.tmp}
 declare -r testFilterFile=${opt_testCase/%.txt/.sed.tmp}
 declare -r testOutputFile=${opt_testCase/%.txt/.out.tmp}
+declare -r testErrorFile=${opt_testCase/%.txt/.err.tmp}
 declare -r boxesArgs=$(sed -n '/^:ARGS/,+1p' < "${opt_testCase}" | grep -v ^:INPUT | sed '1d' | tr -d '\r')
+declare discardStderr=false
 
 arrange_environment
 arrange_test_fixtures
@@ -328,6 +341,7 @@ rm "${testInputFile}"
 rm "${testFilterFile}"
 rm "${testExpectationFile}"
 rm "${testOutputFile}"
+rm -f "${testErrorFile}"
 
 echo "    OK"
 exit 0

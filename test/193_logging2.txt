@@ -1,0 +1,13 @@
+:DESC
+Test case which checks some logging features.
+
+:ARGS
+-d headline -x debug:main,regexp,parser,lexer,DISCOVERY
+:INPUT
+Hello World!
+:OUTPUT-FILTER
+:EXPECTED discard-stderr
+/*****************************/
+/*  H e l l o   W o r l d !  */
+/*****************************/
+:EOF
