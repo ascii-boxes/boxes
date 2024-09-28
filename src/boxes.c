@@ -469,6 +469,31 @@ static void activateSystemEncoding()
 
 
 
+/**
+ * On some (presumably older) Windows (like Windows 10), we must enable ANSI code support in the terminal.
+ */
+void enable_ansi_mode() {
+    #if defined(_WIN32) || defined(__MINGW32__)
+        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        if (hOut == INVALID_HANDLE_VALUE) {
+            return;
+        }
+
+        DWORD dwMode = 0;
+        if (!GetConsoleMode(hOut, &dwMode)) {
+            return;
+        }
+
+        #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+            #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+        #endif
+        dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING | ENABLE_PROCESSED_OUTPUT;
+        SetConsoleMode(hOut, dwMode);
+    #endif
+}
+
+
+
 /*       _\|/_
          (o o)
  +----oOO-{_}-OOo------------------------------------------------------------+
@@ -481,8 +506,6 @@ int main(int argc, char *argv[])
     int saved_designwidth;            /* opt.design->minwith backup, used for mending */
     int saved_designheight;           /* opt.design->minheight backup, used for mending */
 
-    log_debug(__FILE__, MAIN, "BOXES STARTING ...\n"); /* TODO This line will never execute, because debug not on yet */
-
     /* Temporarily set the system encoding, for proper output of --help text etc. */
     activateSystemEncoding();
     encoding = locale_charset();
@@ -494,6 +517,7 @@ int main(int argc, char *argv[])
     log_debug(__FILE__, MAIN, "Character Encoding = %s\n", encoding);
 
     color_output_enabled = check_color_support(opt.color);
+    enable_ansi_mode();
 
     handle_config_parsing();
 
