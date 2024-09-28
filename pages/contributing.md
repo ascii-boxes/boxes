@@ -2,7 +2,7 @@
 title: Contributing
 permalink: /contributing.html
 created_at: 2014-12-23 22:50:09 +0100
-last_modified_at: 2021-05-04 21:36:00 +0200
+last_modified_at: 2024-09-28 15:00:00 +0200
 ---
 
 # Contributing
