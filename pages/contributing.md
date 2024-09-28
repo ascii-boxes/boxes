@@ -20,8 +20,7 @@ Boxes has been around a long time. Great care was taken to make the *boxes* sour
 with all kinds of different platforms.
 
 The planned functionality has long been implemented, and it is very stable. Development has thus slowed down and
-concentrates on maintenance and contributor-driven changes. (The year 2021 is a bit of an exception, as the original
-author has taken up the project again to implement all open feature requests.)
+concentrates on maintenance and contributor-driven changes.
 
 This is why we attach great importance to contributions.
 
@@ -57,7 +56,8 @@ can simply push them to your forked repo, and the pull request will update autom
    level=2
    text="Pull Request Acceptance Criteria" %}
 
-Since *boxes* is not actively being developed anymore, changes to the code base must be "production ready" from the start. The following check list may help:
+Since *boxes* is not actively being developed anymore, changes to the code base must be "production ready" from the
+start. The following check list may help:
 
   - The [GitHub workflow](https://github.com/{{ site.github }}/actions){:target="_blank"} must pass for the pull
     request. This is indicated by a small green check mark next to your pull request.
@@ -69,6 +69,23 @@ Since *boxes* is not actively being developed anymore, changes to the code base 
     code base.
 
 These criteria apply only to code changes. (Although other changes should not break the build, either.)
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2
+   text="Debug Output" %}
+
+*Boxes* has some debug logging built in, which may come in handy when troubleshooting during development.
+It can be activated using the undocumented option `-x debug`. Optionally, `debug` may be followed by a colon and a
+comma-separated list of "debug areas" which may be used to turn debug logging on and off for those sections of code.
+Possible "debug areas" are `main`, `regexp`, `parser`, `lexer`, and `discovery`. The default debug area is `main`.
+The option `-x debug:all` is available to activate all debug areas at the same time.
+
+Debug logging requires a version of *boxes* newer than 2.3.0, or compiling from the current source.
+
+The debug log messages are not super valuable. Don't expect too much. The author added them a long time ago
+without thinking about other people reading them.
 
 
 <h2 id="contributors" class="text-muted">Contributors</h2>
