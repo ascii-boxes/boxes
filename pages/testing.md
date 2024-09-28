@@ -151,6 +151,9 @@ A test case that tests a **successful** invocation of boxes looks like this:
 Sections may be empty, e.g. if there are no arguments or there is no input. The `:DESC` section is optional, so it is
 valid if the test case starts with an `:ARGS` section. The order of sections is fixed.
 
+The `:EXPECTED` section understands an additional argument `discard-stderr`, which instructs the test runner to, well,
+discard stderr output instead of including it with the actual test result to be checked.
+
 A test case that makes sure boxes **fails** under certain conditions looks like this:
 
     :DESC
