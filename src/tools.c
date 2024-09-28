@@ -596,22 +596,6 @@ void analyze_line_ascii(input_t *input_ptr, line_t *line)
 
 
 
-int array_contains(char **array, const size_t array_len, const char *s)
-{
-    int result = 0;
-    if (array != NULL && array_len > 0) {
-        for (size_t i = 0; i < array_len; ++i) {
-            if (strcmp(array[i], s) == 0) {
-                result = 1;
-                break;
-            }
-        }
-    }
-    return result;
-}
-
-
-
 int array_contains0(char **array, const char *s)
 {
     int result = 0;

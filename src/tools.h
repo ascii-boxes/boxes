@@ -166,9 +166,6 @@ size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, s
 int is_csi_reset(const uint32_t *csi);
 
 
-int array_contains(char **array, const size_t array_len, const char *s);
-
-
 /**
  * Determine if the given `array` contains the given string (case-insensitive!).
  * @param array an array of strings to search
