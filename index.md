@@ -13,8 +13,7 @@ redirect_from:
    width="240" height="87" alt="boxes"></p>
 
 <p class="text-center mb-4"><i>Boxes</i> is a command line program which draws, removes, and repairs
-ASCII art boxes.<br><a href="#more">Learn more</a>,
-<a href="{{ site.baseurl }}/download.html">Download/Install</a></p>
+ASCII art boxes.<br><a href="{{ site.baseurl }}/download.html">Download/Install</a></p>
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
@@ -26,6 +25,8 @@ ASCII art boxes.<br><a href="#more">Learn more</a>,
     <li data-target="#boxesCarouselIndicators" data-slide-to="2"></li>
     <li data-target="#boxesCarouselIndicators" data-slide-to="3"></li>
     <li data-target="#boxesCarouselIndicators" data-slide-to="4"></li>
+    <li data-target="#boxesCarouselIndicators" data-slide-to="5"></li>
+    <li data-target="#boxesCarouselIndicators" data-slide-to="6"></li>
   </ol>
   <div class="carousel-inner">
     <div class="carousel-item active">
@@ -50,6 +51,20 @@ ASCII art boxes.<br><a href="#more">Learn more</a>,
     </div>
     <div class="carousel-item">
       <img src="{{ site.baseurl }}/images/carousel-5.png" class="d-block w-100" alt="boxes-5">
+    </div>
+    <div class="carousel-item">
+      <img src="{{ site.baseurl }}/images/carousel-6.png" class="d-block w-100" alt="boxes-6">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Unicode</h5>
+        <p>Box designs can use the entire UTF-8 character set</p>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="{{ site.baseurl }}/images/carousel-7.png" class="d-block w-100" alt="boxes-7">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Colors</h5>
+        <p>Box designs can be colored, including box content</p>
+      </div>
     </div>
   </div>
   <a class="carousel-control-prev" href="#boxesCarouselIndicators" role="button" data-slide="prev">
