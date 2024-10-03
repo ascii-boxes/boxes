@@ -1,6 +1,6 @@
-.\" @(#)boxes.1 2.3.0 02/17/2024
+.\" @(#)boxes.1 2.3.1 10/03/2024
 .\"
-.TH boxes 1 "February 17 2024"
+.TH boxes 1 "October 10 2024"
 .UC 4
 .SH NAME
 boxes \- text mode box and comment drawing filter
