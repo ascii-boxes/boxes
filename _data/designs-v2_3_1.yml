@@ -1106,7 +1106,7 @@
                                     '  _.'  |
                                     '-'/    \
 - name: vim-box
-  designer: '(public domain)'
+  designer: 'Bram Moolenaar'
   coder: 'Ricky Anderson'
   tags:
     - box

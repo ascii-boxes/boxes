@@ -126,7 +126,7 @@ def color2html(design: Design) -> None:
 
 
 def add_design_details(config: str, executable: str, design: Design) -> None:
-    process = subprocess.run([executable, '-f', config, '-q', '(undoc)', '-d', design.name, '-l'], stdout=subprocess.PIPE)
+    process = subprocess.run([executable, '-f', config, '-x', '(undoc)', '-d', design.name, '-l'], stdout=subprocess.PIPE)
     lines = process.stdout.decode('utf-8').splitlines()
     p_orgd = re.compile('^Original Designer:\\s+(.*)')
     p_auth = re.compile('^Author:\\s+(.*)')
