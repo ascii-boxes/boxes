@@ -5,7 +5,7 @@ redirect_from:
   - /docs/faq.html
   - /docs/faq.shtml
 created_at: 1999-04-06
-last_modified_at: 2021-10-05 21:44:00 +0200
+last_modified_at: 2024-10-12 14:45:00 +0200
 ---
 
 # FAQ
@@ -129,3 +129,32 @@ The result looks like this:
 
 <img src="{{ site.baseurl}}/images/faq-alignment.png" class="img-fluid" width="1400" height="477"
      alt="box aligned in terminal window" />
+
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=3 slug="q8"
+   text="Q. 8. Can you rewrite this in X?" %}
+
+Short answer: No.
+
+Long answer: I know, *boxes* is written in C, which was a perfectly reasonable choice given that it was made in the
+1990s. A lot of software was written in C at the time. It was one of the most portable ways of writing software. And
+it requires no runtime like Java or Python would. Today (2024), we have Go, and Rust, and other comparatively new
+languages available that would be a great fit for *boxes* and offer far superior developer experience. So why not
+rewrite *boxes* in one of those?
+
+As Joel Spolsky explains in his epic blog post
+["Things You Should Never Do, Part I"](https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/),
+rewriting a codebase is most likely a horrible mistake, and generally a project that is likely to fail. Even if it
+wasn't really a rewrite, but rather we take the C code and cross-compile it to something else, that would at best
+double our maintenance effort. I've been maintaining *boxes* for over 25 years now, and you can imagine that my life
+is very different now than it was then. *boxes* is kept going on a very slim time budget. I need to be careful and
+choose my battles wisely. That doesn't mean large efforts are totally out of the question, as we see with Unicode
+and color support which was eventually added. But it took many years to do that. A rewrite, or even just a major
+increase in support effort, is just not possible.
+
+So it comes down to effort for me. On the upside, that means that if *you* were to contribute a reimplementation
+of *boxes* in another language, and that implementation passed the
+[end-to-end test suite]({{ site.baseurl}}/testing.html#black-box-tests), then that's great! If you'd be willing to
+do all the maintenance, I would host it under the [ascii-boxes](https://github.com/ascii-boxes) group on GitHub!
