@@ -154,8 +154,7 @@ ucs4_t to_utf32(char ascii)
 {
     ucs4_t c = char_nul;
     if (ascii >= 0x20 && ascii < 0x7f) {
-        char *bytes = (char *) (&c);
-        bytes[0] = ascii;
+        c = (ucs4_t)ascii;  // Store the ASCII value directly in c
     }
     return c;
 }
