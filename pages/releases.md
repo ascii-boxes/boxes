@@ -69,7 +69,7 @@ Click on the version numbers to view the release notes for each release.
       <td>February&nbsp;15, 2021</td>
       <td><a href="https://github.com/{{ site.github }}/tree/v2.0.0">link</a></td>
       <td><a href="https://github.com/{{ site.github }}/releases/tag/v2.0.0">link</a></td>
-      <td class="d-none d-sm-table-cell">major update</td>
+      <td class="d-none d-sm-table-cell">Colored UTF-8 input</td>
     </tr>
     <tr>
       <th scope="row"><a href="{{ site.baseurl}}{% post_url 2019-02-21-boxes-v1.3-released %}">1.3</a></th>

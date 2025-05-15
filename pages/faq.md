@@ -5,16 +5,12 @@ redirect_from:
   - /docs/faq.html
   - /docs/faq.shtml
 created_at: 1999-04-06
-last_modified_at: 2024-10-12 14:45:00 +0200
+last_modified_at: 2025-05-15 21:35:00 +0200
 ---
 
 # FAQ
 
-These are the frequently asked questions about the *boxes* program and their answers.
-
-These questions are *actually* "frequently asked". For general information on the *boxes* program, installation
-instructions, and information on box design creation please refer to the
-[*boxes* documentation]({{ site.baseurl }}/).
+These are some frequently asked questions about the *boxes* program and their answers.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
@@ -39,7 +35,7 @@ name of the file, not the name of a directory into which a config file would be 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
    level=3 slug="q3"
-   text="Q. 3. Boxes destroys my tabs!" %}
+   text="Q. 3. How to preserve tabs" %}
 
 By default, all tab characters are replaced by spaces. However, you can change this behavior using the `-t` option
 (since version 1.1). The `-t` option only affects leading tabs. Tabs which end up inside the box are *always* converted
@@ -50,10 +46,10 @@ Note that you can also set the tab stop distance (== how many spaces per tab) us
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
    level=3 slug="q4"
-   text="Q. 4. \"Can't read file C:\TEMP\VIO44.TMP\" when calling boxes from vim" %}
+   text="Q. 4. \"Can't read file C:\TEMP\VIO44.TMP\" when calling boxes from Vim" %}
 
-On Windows, this error message may appear instead of a box when *boxes* is called from vim. This is not a problem of
-*boxes*. In fact, it's a misleading message from the vim editor which is supposed to tell you that *boxes* is not in
+On Windows, this error message may appear instead of a box when *boxes* is called from Vim. This is not a problem of
+*boxes*. In fact, it's a misleading message from the Vim editor which is supposed to tell you that *boxes* is not in
 your PATH. Solution: Copy *boxes.exe* and *boxes.cfg* to a directory which is in your PATH. (thanks *Jeff Lanzarotta*,
 05-Jul-00)
 
@@ -95,10 +91,11 @@ In addition to that, the following issues have occurred:
    level=3 slug="q6"
    text="Q. 6. Character Encoding" %}
 
-Since v2.0.0, *boxes* supports different character encodings for input/output text. The config file, however, is
-still ASCII (we are working on that). *boxes* normally picks up your system encoding, which on most systems, is simply
-UTF-8. You can override this behavior with `-n`. *boxes* shows what it thinks is the system encoding when you call
-`boxes -h` - the displayed default value for `-n` is the system encoding.
+Since v2.0.0, *boxes* supports different character encodings for input/output text. Since v2.3.0, the config file is
+UTF-8, which allows for box drawing characters, and in addition, ANSI color codes are supported.\\
+*boxes* normally picks up your system encoding, which on most systems, is simply UTF-8. You can override this
+behavior with `-n`. *boxes* shows what it thinks is the system encoding when you call `boxes -h` - the displayed
+default value for `-n` is the system encoding.
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
@@ -107,7 +104,8 @@ UTF-8. You can override this behavior with `-n`. *boxes* shows what it thinks is
    text="Q. 7. How to align a box within a terminal window?" %}
 
 The *boxes* options only allow aligning the text within a box, but it is actually possible to use *boxes* to align the
-entire box within a terminal window. At least on Unix / Linux ... we don't currently know how to do this on Windows.
+entire box within a terminal window. At least on Unix / Linux ... on Windows, it is hard to find out the terminal
+width.
 
 This method assumes that `tput cols` yields the width of the terminal window. If it doesn't, you'd have to find another
 way to get this information, for example a `$COLUMNS` environment variable.
@@ -140,7 +138,7 @@ Short answer: No.
 
 Long answer: I know, *boxes* is written in C, which was a perfectly reasonable choice given that it was made in the
 1990s. A lot of software was written in C at the time. It was one of the most portable ways of writing software. And
-it requires no runtime like Java or Python would. Today (2024), we have Go, and Rust, and other comparatively new
+it required no runtime like Java or Python did. Today (2024), we have Go, and Rust, and other comparatively new
 languages available that would be a great fit for *boxes* and offer far superior developer experience. So why not
 rewrite *boxes* in one of those?
 
