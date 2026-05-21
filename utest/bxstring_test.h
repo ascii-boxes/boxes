@@ -108,6 +108,13 @@ void test_bxs_free_null(void **state);
 void test_bxs_concat(void **state);
 void test_bxs_concat_nullarg(void **state);
 
+void test_ansi_unicode_vs16_warning(void **state);
+void test_ansi_unicode_no_vs16_warning(void **state);
+void test_ansi_unicode_wide_bulb(void **state);
+void test_ansi_unicode_vs16_keycap(void **state);
+void test_ansi_unicode_vs16_consecutive(void **state);
+void test_ansi_unicode_vs16_mixed(void **state);
+
 
 #endif
 

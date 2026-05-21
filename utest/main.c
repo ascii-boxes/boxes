@@ -183,7 +183,13 @@ int main(void)
         cmocka_unit_test_setup(test_bxs_valid_in_filename_error, beforeTest),
         cmocka_unit_test_setup(test_bxs_free_null, beforeTest),
         cmocka_unit_test_setup(test_bxs_concat, beforeTest),
-        cmocka_unit_test_setup(test_bxs_concat_nullarg, beforeTest)
+        cmocka_unit_test_setup(test_bxs_concat_nullarg, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_vs16_warning, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_no_vs16_warning, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_wide_bulb, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_vs16_keycap, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_vs16_consecutive, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_vs16_mixed, beforeTest)
     };
 
     const struct CMUnitTest remove_tests[] = {

@@ -1499,4 +1499,147 @@ void test_bxs_concat_nullarg(void **state)
 }
 
 
+void test_ansi_unicode_vs16_warning(void **state)
+{
+    UNUSED(state);
+
+    /* ⚠️ = U+26A0 (WARNING SIGN) + U+FE0F (VS-16) */
+    uint32_t *ustr32 = u32_strconv_from_arg("\xe2\x9a\xa0\xef\xb8\x8f", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_string_equal("xx", actual->ascii);
+    assert_int_equal(0, (int) actual->indent);
+    assert_int_equal(2, (int) actual->num_columns);
+    assert_int_equal(2, (int) actual->num_chars);
+    assert_int_equal(2, (int) actual->num_chars_visible);
+    assert_int_equal(0, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
+void test_ansi_unicode_no_vs16_warning(void **state)
+{
+    UNUSED(state);
+
+    /* ⚠ = U+26A0 (WARNING SIGN) without VS-16 */
+    uint32_t *ustr32 = u32_strconv_from_arg("\xe2\x9a\xa0", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_string_equal("x", actual->ascii);
+    assert_int_equal(0, (int) actual->indent);
+    assert_int_equal(1, (int) actual->num_columns);
+    assert_int_equal(1, (int) actual->num_chars);
+    assert_int_equal(1, (int) actual->num_chars_visible);
+    assert_int_equal(0, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
+void test_ansi_unicode_wide_bulb(void **state)
+{
+    UNUSED(state);
+
+    /* 💡 = U+1F4A1 (inherently wide, East Asian Width W) */
+    uint32_t *ustr32 = u32_strconv_from_arg("\xf0\x9f\x92\xa1", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_string_equal("xx", actual->ascii);
+    assert_int_equal(0, (int) actual->indent);
+    assert_int_equal(2, (int) actual->num_columns);
+    assert_int_equal(1, (int) actual->num_chars);
+    assert_int_equal(1, (int) actual->num_chars_visible);
+    assert_int_equal(0, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
+void test_ansi_unicode_vs16_keycap(void **state)
+{
+    UNUSED(state);
+
+    /* 1️⃣ = U+0031 (digit '1') + U+FE0F (VS-16) + U+20E3 (combining enclosing keycap) */
+    uint32_t *ustr32 = u32_strconv_from_arg("\x31\xef\xb8\x8f\xe2\x83\xa3", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_string_equal("11", actual->ascii);
+    assert_int_equal(0, (int) actual->indent);
+    assert_int_equal(2, (int) actual->num_columns);
+    assert_int_equal(3, (int) actual->num_chars);
+    assert_int_equal(3, (int) actual->num_chars_visible);
+    assert_int_equal(0, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
+void test_ansi_unicode_vs16_consecutive(void **state)
+{
+    UNUSED(state);
+
+    /* Three consecutive VS-16 (U+FE0F U+FE0F U+FE0F) — pathological input, must not overflow */
+    uint32_t *ustr32 = u32_strconv_from_arg("\xef\xb8\x8f\xef\xb8\x8f\xef\xb8\x8f", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_int_equal(0, (int) actual->num_columns);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
+void test_ansi_unicode_vs16_mixed(void **state)
+{
+    UNUSED(state);
+
+    /* "⚠️ hi 💡 ok" = U+26A0 U+FE0F ' ' 'h' 'i' ' ' U+1F4A1 ' ' 'o' 'k' */
+    uint32_t *ustr32 = u32_strconv_from_arg(
+            "\xe2\x9a\xa0\xef\xb8\x8f hi \xf0\x9f\x92\xa1 ok", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_non_null(actual->memory);
+    assert_string_equal("xx hi xx ok", actual->ascii);
+    assert_int_equal(0, (int) actual->indent);
+    assert_int_equal(11, (int) actual->num_columns);
+    assert_int_equal(10, (int) actual->num_chars);
+    assert_int_equal(10, (int) actual->num_chars_visible);
+    assert_int_equal(0, (int) actual->num_chars_invisible);
+    assert_int_equal(0, (int) actual->trailing);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
 /* vim: set cindent sw=4: */
