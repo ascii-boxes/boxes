@@ -91,7 +91,7 @@ bxstr_t *bxs_from_unicode(uint32_t *pInput)
     bxstr_t *result = (bxstr_t *) calloc(1, sizeof(bxstr_t));
     result->memory = u32_strdup(pInput);
     result->num_chars = u32_strlen(pInput);
-    size_t ascii_len = ((size_t) u32_strwidth(pInput, encoding)) + 1;
+    size_t ascii_len = ((size_t) u32_strwidth(pInput, encoding)) + count_vs16_promotions(pInput) + 1;
     result->ascii = (char *) calloc(ascii_len, sizeof(char));
     size_t map_size = 5;
     result->first_char = (size_t *) calloc(map_size, sizeof(size_t));
@@ -129,8 +129,11 @@ bxstr_t *bxs_from_unicode(uint32_t *pInput)
         else {
             int cols = 1;
             if (is_ascii_printable(c)) {
-                *ascii_ptr = c & 0xff;
-                ++ascii_ptr;
+                if (rest[1] == VARIATION_SELECTOR_16) {
+                    cols = 2;
+                }
+                memset(ascii_ptr, c & 0xff, cols);
+                ascii_ptr += cols;
             }
             else if (c == char_tab) {
                 *ascii_ptr = ' ';
@@ -138,6 +141,9 @@ bxstr_t *bxs_from_unicode(uint32_t *pInput)
             }
             else {
                 cols = BMAX(0, uc_width(c, encoding));
+                if (cols < 2 && c != VARIATION_SELECTOR_16 && rest[1] == VARIATION_SELECTOR_16) {
+                    cols = 2;
+                }
                 if (cols > 0) {
                     memset(ascii_ptr, (int) (uc_is_blank(c) ? ' ' : 'x'), cols);
                     ascii_ptr += cols;

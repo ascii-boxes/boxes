@@ -360,4 +360,16 @@ void u32_insert_space_at(uint32_t **s, const size_t idx, const size_t n)
 }
 
 
+size_t count_vs16_promotions(const uint32_t *s)
+{
+    size_t count = 0;
+    for (size_t i = 0; s[i] != char_nul; i++) {
+        if (s[i] == VARIATION_SELECTOR_16) {
+            count++;
+        }
+    }
+    return count;
+}
+
+
 /* vim: set cindent sw=4: */

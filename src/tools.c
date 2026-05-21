@@ -496,7 +496,7 @@ size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, s
         return 0;
     }
 
-    size_t buflen = (size_t) u32_strwidth(s, encoding) + 1;
+    size_t buflen = (size_t) u32_strwidth(s, encoding) + count_vs16_promotions(s) + 1;
     size_t map_size = BMAX((size_t) 5, buflen);
     size_t map_idx = 0;
     size_t *map = (size_t *) calloc(map_size, sizeof(size_t)); /* might not be enough if many double-wide chars */
@@ -517,12 +517,21 @@ size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, s
             (*num_esc)++;
         }
         else if (is_ascii_printable(c)) {
-            *p = c & 0xff;
-            map[map_idx++] = mb_idx;
-            ++p;
+            int cols = 1;
+            if (rest[1] == VARIATION_SELECTOR_16) {
+                cols = 2;
+            }
+            memset(p, c & 0xff, cols);
+            for (int i = 0; i < cols; i++) {
+                map[map_idx++] = mb_idx;
+            }
+            p += cols;
         }
         else {
             int cols = uc_width(c, encoding);
+            if (cols < 2 && c != VARIATION_SELECTOR_16 && rest[1] == VARIATION_SELECTOR_16) {
+                cols = 2;
+            }
             if (cols > 0) {
                 memset(p, (int) 'x', cols);
                 for (int i = 0; i < cols; i++) {
