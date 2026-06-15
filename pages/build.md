@@ -222,12 +222,16 @@ Basically very simple, but there may be a few pitfalls, so we'll go through each
 
 5. Next,
 
-       make win32
+       CC=gcc make win32
 
    If you want to create an executable with debug information, call `make clean && make win32.debug` instead.
 6. Run the tests:
 
-       make win32.utest
+       CC=gcc make win32.utest
+       
+       export LANG=en_US.UTF-8
+       export TERM=xterm-color
+       make test-sunny
        make test
 
    Yes, the black-box tests don't need a `win32.` prefix, because they are run via a shell script.

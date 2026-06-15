@@ -16,7 +16,7 @@ Full UTF-8 support must sometimes be explicitly enabled.
    locale" does not matter.  
    ![System Locale Dialog]({{ site.baseurl}}/images/windows10-unicode.png){: .img-shad .img-fluid}
 
-The above is written for Windows 10, but it should be roughly the same on Windows 11.
+The above works for both Windows 10 and Windows 11.
 
 After that, enjoy fine Unicode display even in a regular CMD shell:
 
