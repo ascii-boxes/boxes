@@ -124,12 +124,12 @@ jobs:
                       dos2unix
                       flex
                       git
+                      libiconv-devel
+                      libunistring-devel
                       make
-                      mingw-w64-i686-cmocka
-                      mingw-w64-i686-gcc
-                      mingw-w64-i686-libiconv
-                      mingw-w64-i686-libunistring
-                      mingw-w64-i686-pcre2
+                      mingw-w64-x86_64-cmocka
+                      mingw-w64-x86_64-gcc
+                      pcre2-devel
                       unzip
                       vim
                       zip
