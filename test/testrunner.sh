@@ -191,8 +191,9 @@ function consolidate_coverage()
 
         echo -e "\nConsolidating test coverage ..."
         pushd ${OUT_DIR}/test-results || exit 1
+        # LCOV 2.5 cannot reread branch data merged under multiple test names (lcov#522).
         find . -name "*.info" | xargs printf -- '--add-tracefile %s\n' | xargs --exit \
-            lcov --rc "${branchCoverage}=1" "${lcovExcludeArgs[@]}" "${lcovArgs[@]}" \
+            lcov --forget-test-names --rc "${branchCoverage}=1" "${lcovExcludeArgs[@]}" "${lcovArgs[@]}" \
                 --output-file ../${COVERAGE_FILE} --add-tracefile ../${BASELINE_FILE} || status=$?
         popd || exit 1
         if [ ${status} -ne 0 ]; then
