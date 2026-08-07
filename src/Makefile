@@ -14,7 +14,9 @@
 #====================================================================================================================
 
 
-CC         ?= gcc
+ifneq ($(filter default undefined,$(origin CC)),)
+CC         = gcc
+endif
 
 OUT_DIR    = ../out
 SRC_DIR    = ../src
@@ -33,7 +35,7 @@ ORIG_SRC   = $(ORIG_GEN) $(ORIG_NORM)
 ORIG_FILES = $(ORIG_SRC) $(ORIG_HDR)
 
 
-.PHONY: boxes.static check_dir clean build cov debug package static flags_unix flags_static flags_win32 flags_
+.PHONY: boxes.static check_dir clean build cov debug package static flags_unix flags_static flags_windows flags_
 
 .NOTPARALLEL:
 
@@ -91,9 +93,9 @@ flags_static:
 	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
 	echo $(filter-out boxes.o,$(ALL_OBJ)) > $(OUT_DIR)/modules.txt
 
-flags_win32:
-	$(eval CFLAGS := -Os -s -m32 -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := $(LDFLAGS) -s -m32 $(LDFLAGS_ADDTL))
+flags_windows:
+	$(eval CFLAGS := -Os -s -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS) -s $(LDFLAGS_ADDTL))
 	$(eval BOXES_EXECUTABLE_NAME := boxes.exe)
 	$(eval ALL_OBJ := $(GEN_SRC:.c=.o) $(ORIG_NORM:.c=.o))
 	echo $(filter-out boxes.o,$(ALL_OBJ)) > $(OUT_DIR)/modules.txt

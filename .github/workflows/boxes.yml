@@ -100,13 +100,13 @@ jobs:
             LANG: en_US.UTF-8
             LC_CTYPE: en_US.UTF-8
             TERM: xterm-color
-            WIN32_PCRE2_INCLUDE: /mingw32/include
-            WIN32_PCRE2_LDFLAGS: -L/mingw32/lib
-            WIN32_LEX: flex
-            WIN32_YACC: bison
-            WIN32_CMOCKA_DLL: /mingw32/bin/libcmocka.dll
-            WIN32_CMOCKA_INCLUDE: /mingw32/include
-            WIN32_CMOCKA_LDFLAGS: -L/mingw32/lib
+            WINDOWS_PCRE2_INCLUDE: /ucrt64/include
+            WINDOWS_PCRE2_LDFLAGS: -L/ucrt64/lib
+            WINDOWS_LEX: flex
+            WINDOWS_YACC: bison
+            WINDOWS_CMOCKA_DLL: /ucrt64/bin/libcmocka.dll
+            WINDOWS_CMOCKA_INCLUDE: /ucrt64/include
+            WINDOWS_CMOCKA_LDFLAGS: -L/ucrt64/lib
         defaults:
             run:
                 shell: msys2 {0}
@@ -116,7 +116,7 @@ jobs:
             - name: add-packages
               uses: msys2/setup-msys2@v2
               with:
-                  msystem: MINGW32
+                  msystem: UCRT64
                   update: true
                   install: >-
                       bison
@@ -124,21 +124,22 @@ jobs:
                       dos2unix
                       flex
                       git
-                      libiconv-devel
-                      libunistring-devel
                       make
-                      mingw-w64-x86_64-cmocka
-                      mingw-w64-x86_64-gcc
-                      pcre2-devel
                       unzip
                       vim
                       zip
+                  pacboy: >-
+                      cmocka:p
+                      gcc:p
+                      libiconv:p
+                      libunistring:p
+                      pcre2:p
 
             - name: Build boxes.exe
-              run: make win32
+              run: make windows
 
             - name: Run white-box tests
-              run: make win32.utest
+              run: make windows.utest
 
             - name: Run sunny-day tests
               run: make test-sunny

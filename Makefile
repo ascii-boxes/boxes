@@ -30,8 +30,8 @@ BX_YACC ?= bison
 
 PCRE2_VERSION          = 10.47
 PCRE2_DIR              = vendor/pcre2-$(PCRE2_VERSION)
-WIN32_PCRE2_INCLUDE    ?= ../$(PCRE2_DIR)/src
-WIN32_PCRE2_LDFLAGS    ?= -L../$(PCRE2_DIR)/.libs
+WINDOWS_PCRE2_INCLUDE  ?= ../$(PCRE2_DIR)/src
+WINDOWS_PCRE2_LDFLAGS  ?= -L../$(PCRE2_DIR)/.libs
 LIBUNISTRING_VERSION   = 1.0
 LIBUNISTRING_DIR       = vendor/libunistring-$(LIBUNISTRING_VERSION)
 LIBNCURSES_VERSION     = 6.4
@@ -39,17 +39,16 @@ LIBNCURSES_DIR         = vendor/ncurses-$(LIBNCURSES_VERSION)
 LIBNCURSES_WIN_INCLUDE = /c/MinGW/include/ncurses
 WIN_FLEX_BISON_VERSION = 2.5.24
 WIN_FLEX_BISON_DIR     = vendor/flex_bison_$(WIN_FLEX_BISON_VERSION)
-WIN32_LEX              ?= ../$(WIN_FLEX_BISON_DIR)/win_flex.exe
-WIN32_YACC             ?= ../$(WIN_FLEX_BISON_DIR)/win_bison.exe
+WINDOWS_LEX            ?= ../$(WIN_FLEX_BISON_DIR)/win_flex.exe
+WINDOWS_YACC           ?= ../$(WIN_FLEX_BISON_DIR)/win_bison.exe
 WIN_CMOCKA_VERSION     = 1.1.0
 WIN_CMOCKA_DIR         = vendor/cmocka-$(WIN_CMOCKA_VERSION)
-WIN32_CMOCKA_DLL       ?= $(WIN_CMOCKA_DIR)/bin/cmocka.dll
-WIN32_CMOCKA_INCLUDE   ?= ../$(WIN_CMOCKA_DIR)/include
-WIN32_CMOCKA_LDFLAGS   ?= -L../$(WIN_CMOCKA_DIR)/lib
-WIN32_CI_PREFIX        ?= /mingw32
+WINDOWS_CMOCKA_DLL     ?= $(WIN_CMOCKA_DIR)/bin/cmocka.dll
+WINDOWS_CMOCKA_INCLUDE ?= ../$(WIN_CMOCKA_DIR)/include
+WINDOWS_CMOCKA_LDFLAGS ?= -L../$(WIN_CMOCKA_DIR)/lib
 
-.PHONY: clean cleanall build cov win32 debug win32.debug win32.pcre infomsg replaceinfos test covtest \
-        package win32.package package_common utest win32.utest static
+.PHONY: clean cleanall build cov windows debug windows.debug windows.prereq infomsg replaceinfos test covtest \
+        package windows.package package_common utest windows.utest static
 
 
 define TERMINFO_SCRIPT
@@ -85,17 +84,17 @@ endef
 build cov debug: infomsg replaceinfos
 	$(MAKE) -C src BOXES_PLATFORM=unix LEX=$(BX_LEX) YACC=$(BX_YACC) $@
 
-win32: infomsg replaceinfos
-	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=$(WIN32_PCRE2_INCLUDE) LDFLAGS=$(WIN32_PCRE2_LDFLAGS) \
-	    LEX=$(WIN32_LEX) YACC=$(WIN32_YACC) \
+windows: infomsg replaceinfos
+	$(MAKE) -C src BOXES_PLATFORM=windows C_INCLUDE_PATH=$(WINDOWS_PCRE2_INCLUDE) LDFLAGS=$(WINDOWS_PCRE2_LDFLAGS) \
+	    LEX=$(WINDOWS_LEX) YACC=$(WINDOWS_YACC) \
 	    LIBNCURSES_WIN_INCLUDE=$(LIBNCURSES_WIN_INCLUDE) build
 
-win32.debug: infomsg replaceinfos
-	$(MAKE) -C src BOXES_PLATFORM=win32 C_INCLUDE_PATH=$(WIN32_PCRE2_INCLUDE) LDFLAGS=$(WIN32_PCRE2_LDFLAGS) \
-	    LEX=$(WIN32_LEX) YACC=$(WIN32_YACC) \
+windows.debug: infomsg replaceinfos
+	$(MAKE) -C src BOXES_PLATFORM=windows C_INCLUDE_PATH=$(WINDOWS_PCRE2_INCLUDE) LDFLAGS=$(WINDOWS_PCRE2_LDFLAGS) \
+	    LEX=$(WINDOWS_LEX) YACC=$(WINDOWS_YACC) \
 	    LIBNCURSES_WIN_INCLUDE=$(LIBNCURSES_WIN_INCLUDE) debug
 
-win32.prereq: $(PCRE2_DIR)/.libs/libpcre2-32.a vendor/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip \
+windows.prereq: $(PCRE2_DIR)/.libs/libpcre2-32.a vendor/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip \
               vendor/cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip
 	unzip -n vendor/win_flex_bison-$(WIN_FLEX_BISON_VERSION).zip -d $(WIN_FLEX_BISON_DIR)
 	unzip -n vendor/cmocka-$(WIN_CMOCKA_VERSION)-mingw.zip -d vendor
@@ -192,7 +191,7 @@ $(OUT_DIR)/zip/$(PKG_NAME).zip:
 	unix2dos -n LICENSE $(OUT_DIR)/zip/$(PKG_NAME)/LICENSE.txt
 	unix2dos -n --force boxes-config $(OUT_DIR)/zip/$(PKG_NAME)/boxes.cfg
 	unix2dos -n README.md $(OUT_DIR)/zip/$(PKG_NAME)/README.md
-	unix2dos -n README.Win32.md $(OUT_DIR)/zip/$(PKG_NAME)/README.Win32.md
+	unix2dos -n README.Windows.md $(OUT_DIR)/zip/$(PKG_NAME)/README.Windows.md
 	unix2dos -n doc/boxes.1 $(OUT_DIR)/zip/$(PKG_NAME)/boxes.1
 	unix2dos -n doc/boxes.1.html $(OUT_DIR)/zip/$(PKG_NAME)/boxes-man-1.html
 	cp -a $(OUT_DIR)/boxes.exe $(OUT_DIR)/zip/$(PKG_NAME)/
@@ -202,7 +201,7 @@ $(OUT_DIR)/zip/$(PKG_NAME).zip:
 package: build
 	$(MAKE) BOXES_PLATFORM=unix $(PKG_NAME).tar.gz
 
-win32.package: win32 $(OUT_DIR)/zip/$(PKG_NAME).zip
+windows.package: windows $(OUT_DIR)/zip/$(PKG_NAME).zip
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -221,7 +220,7 @@ tools/boxes.cfg: boxes-config
 tools/boxes.exe: $(OUT_DIR)/boxes.exe
 	cp $(OUT_DIR)/boxes.exe tools/
 
-$(OUT_DIR)/boxes.exe: win32
+$(OUT_DIR)/boxes.exe: windows
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -237,10 +236,10 @@ covtest:
 utest:
 	$(MAKE) -C utest BOXES_PLATFORM=unix utest
 
-win32.utest: $(OUT_DIR)
-	cp $(WIN32_CMOCKA_DLL) $(OUT_DIR)/
-	$(MAKE) -C utest BOXES_PLATFORM=win32 C_INCLUDE_PATH=$(WIN32_PCRE2_INCLUDE):$(WIN32_CMOCKA_INCLUDE) \
-	    LDFLAGS_ADDTL="$(WIN32_PCRE2_LDFLAGS) $(WIN32_CMOCKA_LDFLAGS)" utest
+windows.utest: $(OUT_DIR)
+	cp $(WINDOWS_CMOCKA_DLL) $(OUT_DIR)/
+	$(MAKE) -C utest BOXES_PLATFORM=windows C_INCLUDE_PATH=$(WINDOWS_PCRE2_INCLUDE):$(WINDOWS_CMOCKA_INCLUDE) \
+	    LDFLAGS_ADDTL="$(WINDOWS_PCRE2_LDFLAGS) $(WINDOWS_CMOCKA_LDFLAGS)" utest
 
 test-sunny:
 	cd test; ./test-sunny-days-all.sh

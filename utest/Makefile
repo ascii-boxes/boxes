@@ -13,7 +13,9 @@
 #____________________________________________________________________________________________________________________
 #====================================================================================================================
 
-CC         ?= gcc
+ifneq ($(filter default undefined,$(origin CC)),)
+CC         = gcc
+endif
 
 OUT_DIR    = ../out
 SRC_DIR    = ../src
@@ -26,7 +28,7 @@ STRINGOP_OVERFLOW_CFLAG := $(shell $(CC) -Werror -Wno-stringop-overflow -x c -c 
 UTEST_NORM = global_mock.c bxstring_test.o cmdline_test.c logging_test.c tools_test.c regulex_test.o remove_test.o \
              main.o unicode_test.o utest_tools.o
 
-.PHONY: check_dir flags_unix flags_win32 flags_ utest
+.PHONY: check_dir flags_unix flags_windows flags_ utest
 
 .NOTPARALLEL:
 
@@ -45,9 +47,9 @@ flags_unix:
 	$(eval UTEST_EXECUTABLE_NAME := unittest)
 	$(eval UTEST_OBJ := $(UTEST_NORM:.c=.o))
 
-flags_win32:
-	$(eval CFLAGS := -Os -s -std=c99 -m32 -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
-	$(eval LDFLAGS := $(LDFLAGS) -s -std=c99 -m32 $(LDFLAGS_ADDTL))
+flags_windows:
+	$(eval CFLAGS := -Os -s -std=c99 -I. -I$(SRC_DIR) -Wall -W $(CFLAGS_ADDTL))
+	$(eval LDFLAGS := $(LDFLAGS) -s -std=c99 $(LDFLAGS_ADDTL))
 	$(eval UTEST_EXECUTABLE_NAME := unittest.exe)
 	$(eval UTEST_OBJ := $(UTEST_NORM:.c=.o))
 

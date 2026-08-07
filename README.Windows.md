@@ -1,8 +1,8 @@
-# boxes Win32 port Information
+# boxes Windows port Information
 
 **Date:** 16-Mar-2017
 
-This is the Win32 Version of boxes, built from the official source tarball.
+This is the Windows version of boxes, built from the official source tarball.
 Many thanks to **Ron Aaron** for making this Windows build possible!
 
 General information may be found in the generic README file provided with
