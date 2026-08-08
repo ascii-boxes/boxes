@@ -283,4 +283,51 @@ void test_repeat(void **state)
 }
 
 
+
+void test_count_invisible_chars_emoji(void **state)
+{
+    (void) state;
+
+    uint32_t *s = u32_strconv_from_arg(
+            "\x1b[31m\xf0\x9f\x91\x81\xef\xb8\x8f\xe2\x80\x8d"
+            "\xf0\x9f\x97\xa8\xef\xb8\x8f\x1b[0m1\xe2\x83\xa3", "UTF-8");
+    assert_non_null(s);
+
+    size_t num_esc = 0;
+    char *ascii = NULL;
+    size_t *map = NULL;
+    assert_int_equal(9, count_invisible_chars(s, &num_esc, &ascii, &map));
+    assert_int_equal(2, num_esc);
+    assert_string_equal("xx1", ascii);
+    size_t expected_map[] = {5, 5, 14};
+    assert_memory_equal(expected_map, map, sizeof(expected_map));
+
+    BFREE(map);
+    BFREE(ascii);
+    BFREE(s);
+}
+
+
+
+void test_count_invisible_chars_invalid_vs16(void **state)
+{
+    (void) state;
+
+    uint32_t *s = u32_strconv_from_arg("A\xcc\x81\xef\xb8\x8f", "UTF-8");
+    assert_non_null(s);
+
+    size_t num_esc = 0;
+    char *ascii = NULL;
+    size_t *map = NULL;
+    assert_int_equal(0, count_invisible_chars(s, &num_esc, &ascii, &map));
+    assert_int_equal(0, num_esc);
+    assert_string_equal("A", ascii);
+    assert_int_equal(0, map[0]);
+
+    BFREE(map);
+    BFREE(ascii);
+    BFREE(s);
+}
+
+
 /* vim: set cindent sw=4: */

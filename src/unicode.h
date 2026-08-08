@@ -49,10 +49,6 @@ extern const ucs4_t char_esc;
 /** ucs4_t character '\0' (zero) */
 extern const ucs4_t char_nul;
 
-/** U+FE0F Variation Selector 16 — switches preceding character to emoji presentation */
-#define VARIATION_SELECTOR_16 0xFE0F
-
-
 /**
  * Check whether the character at the given index has the given value.
  *
@@ -256,13 +252,14 @@ void u32_insert_space_at(uint32_t **s, const size_t idx, const size_t n);
 
 
 /**
- * Count occurrences of U+FE0F (VS-16) in `s`. Used to estimate extra buffer space needed for characters promoted from
- * text presentation (1 column) to emoji presentation (2 columns). May slightly overcount, which is safe for sizing.
+ * Return the display width of the character at `s`, with a temporary workaround for common emoji sequences whose
+ * width libunistring does not account for. Call once per code point in order, with `remaining` initialized to zero.
  *
- * @param s the UTF-32 string to scan
- * @return the number of VS-16 codepoints found
+ * @param s current position in a NUL-terminated UTF-32 string
+ * @param remaining number of following code points already included in a recognized emoji sequence
+ * @return the number of display columns occupied at this position
  */
-size_t count_vs16_promotions(const uint32_t *s);
+int u32_width_with_emoji(const uint32_t *s, size_t *remaining);
 
 
 #endif

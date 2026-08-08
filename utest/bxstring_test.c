@@ -1510,6 +1510,7 @@ void test_ansi_unicode_vs16_warning(void **state)
 
     assert_non_null(actual);
     assert_non_null(actual->memory);
+    assert_int_equal(0xFE0F, actual->memory[1]);
     assert_string_equal("xx", actual->ascii);
     assert_int_equal(0, (int) actual->indent);
     assert_int_equal(2, (int) actual->num_columns);
@@ -1585,9 +1586,10 @@ void test_ansi_unicode_vs16_keycap(void **state)
 
     assert_non_null(actual);
     assert_non_null(actual->memory);
-    assert_string_equal("11", actual->ascii);
+    assert_int_equal(0xFE0F, actual->memory[1]);
+    assert_string_equal("1", actual->ascii);
     assert_int_equal(0, (int) actual->indent);
-    assert_int_equal(2, (int) actual->num_columns);
+    assert_int_equal(1, (int) actual->num_columns);
     assert_int_equal(3, (int) actual->num_chars);
     assert_int_equal(3, (int) actual->num_chars_visible);
     assert_int_equal(0, (int) actual->num_chars_invisible);
@@ -1636,6 +1638,98 @@ void test_ansi_unicode_vs16_mixed(void **state)
     assert_int_equal(10, (int) actual->num_chars_visible);
     assert_int_equal(0, (int) actual->num_chars_invisible);
     assert_int_equal(0, (int) actual->trailing);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
+void test_ansi_unicode_invalid_vs16(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("A\xcc\x81\xef\xb8\x8f", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_string_equal("A", actual->ascii);
+    assert_int_equal(1, (int) actual->num_columns);
+    assert_int_equal(3, (int) actual->num_chars);
+    assert_int_equal(3, (int) actual->num_chars_visible);
+    assert_int_equal(strlen(actual->ascii), actual->num_columns);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
+void test_ansi_unicode_unqualified_keycap(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("1\xe2\x83\xa3", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_string_equal("1", actual->ascii);
+    assert_int_equal(1, (int) actual->num_columns);
+    assert_int_equal(2, (int) actual->num_chars);
+    assert_int_equal(2, (int) actual->num_chars_visible);
+    assert_int_equal(strlen(actual->ascii), actual->num_columns);
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
+void test_ansi_unicode_zwj_emoji(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg(
+            "\xf0\x9f\x91\x81\xef\xb8\x8f\xe2\x80\x8d\xf0\x9f\x97\xa8\xef\xb8\x8f", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_string_equal("xx", actual->ascii);
+    assert_int_equal(2, (int) actual->num_columns);
+    assert_int_equal(5, (int) actual->num_chars);
+    assert_int_equal(5, (int) actual->num_chars_visible);
+    assert_int_equal(strlen(actual->ascii), actual->num_columns);
+    size_t expected_indexes[] = {0, 1, 2, 3, 4, 5};
+    assert_memory_equal(expected_indexes, actual->first_char, sizeof(expected_indexes));
+    assert_memory_equal(expected_indexes, actual->visible_char, sizeof(expected_indexes));
+
+    BFREE(ustr32);
+    bxs_free(actual);
+}
+
+
+
+void test_ansi_unicode_colored_emoji(void **state)
+{
+    UNUSED(state);
+
+    uint32_t *ustr32 = u32_strconv_from_arg("\x1b[31m\xe2\x9a\xa0\xef\xb8\x8f\x1b[0m", "UTF-8");
+    assert_non_null(ustr32);
+    bxstr_t *actual = bxs_from_unicode(ustr32);
+
+    assert_non_null(actual);
+    assert_string_equal("xx", actual->ascii);
+    assert_int_equal(2, (int) actual->num_columns);
+    assert_int_equal(11, (int) actual->num_chars);
+    assert_int_equal(2, (int) actual->num_chars_visible);
+    assert_int_equal(9, (int) actual->num_chars_invisible);
+    size_t expected_first[] = {0, 6, 11};
+    size_t expected_visible[] = {5, 6, 11};
+    assert_memory_equal(expected_first, actual->first_char, sizeof(expected_first));
+    assert_memory_equal(expected_visible, actual->visible_char, sizeof(expected_visible));
 
     BFREE(ustr32);
     bxs_free(actual);

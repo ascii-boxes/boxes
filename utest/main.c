@@ -109,7 +109,9 @@ int main(void)
         cmocka_unit_test(test_is_ascii_id_invalid),
         cmocka_unit_test(test_is_ascii_id_strict_valid),
         cmocka_unit_test(test_is_ascii_id_strict_invalid),
-        cmocka_unit_test(test_repeat)
+        cmocka_unit_test(test_repeat),
+        cmocka_unit_test(test_count_invisible_chars_emoji),
+        cmocka_unit_test(test_count_invisible_chars_invalid_vs16)
     };
 
     const struct CMUnitTest unicode_tests[] = {
@@ -120,7 +122,8 @@ int main(void)
         cmocka_unit_test(test_is_allowed_in_filename),
         cmocka_unit_test(test_is_allowed_in_kv_string),
         cmocka_unit_test(test_u32_strnrstr),
-        cmocka_unit_test(test_u32_insert_space_at)
+        cmocka_unit_test(test_u32_insert_space_at),
+        cmocka_unit_test(test_u32_width_with_emoji)
     };
 
     const struct CMUnitTest bxstring_tests[] = {
@@ -189,7 +192,11 @@ int main(void)
         cmocka_unit_test_setup(test_ansi_unicode_wide_bulb, beforeTest),
         cmocka_unit_test_setup(test_ansi_unicode_vs16_keycap, beforeTest),
         cmocka_unit_test_setup(test_ansi_unicode_vs16_consecutive, beforeTest),
-        cmocka_unit_test_setup(test_ansi_unicode_vs16_mixed, beforeTest)
+        cmocka_unit_test_setup(test_ansi_unicode_vs16_mixed, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_invalid_vs16, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_unqualified_keycap, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_zwj_emoji, beforeTest),
+        cmocka_unit_test_setup(test_ansi_unicode_colored_emoji, beforeTest)
     };
 
     const struct CMUnitTest remove_tests[] = {

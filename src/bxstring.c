@@ -25,7 +25,6 @@
 #include <unictype.h>
 #include <unistdio.h>
 #include <unistr.h>
-#include <uniwidth.h>
 
 #include "bxstring.h"
 #include "tools.h"
@@ -91,8 +90,7 @@ bxstr_t *bxs_from_unicode(uint32_t *pInput)
     bxstr_t *result = (bxstr_t *) calloc(1, sizeof(bxstr_t));
     result->memory = u32_strdup(pInput);
     result->num_chars = u32_strlen(pInput);
-    size_t ascii_len = ((size_t) u32_strwidth(pInput, encoding)) + count_vs16_promotions(pInput) + 1;
-    result->ascii = (char *) calloc(ascii_len, sizeof(char));
+    result->ascii = (char *) calloc(result->num_chars + 1, 2 * sizeof(char));
     size_t map_size = 5;
     result->first_char = (size_t *) calloc(map_size, sizeof(size_t));
     result->visible_char = (size_t *) calloc(map_size, sizeof(size_t));
@@ -102,6 +100,7 @@ bxstr_t *bxs_from_unicode(uint32_t *pInput)
     size_t step_invis = 0;
     int indent_active = 1;
     size_t blank_streak = 0;
+    size_t emoji_remaining = 0;
     int first_candidate = -1;
     int non_blank_encountered = 0;
     size_t idx = 0;
@@ -127,27 +126,11 @@ bxstr_t *bxs_from_unicode(uint32_t *pInput)
             }
         }
         else {
-            int cols = 1;
-            if (is_ascii_printable(c)) {
-                if (rest[1] == VARIATION_SELECTOR_16) {
-                    cols = 2;
-                }
-                memset(ascii_ptr, c & 0xff, cols);
+            int cols = c == char_tab ? 1 : u32_width_with_emoji(rest, &emoji_remaining);
+            if (cols > 0) {
+                int fill = is_ascii_printable(c) ? c & 0xff : (uc_is_blank(c) || c == char_tab ? ' ' : 'x');
+                memset(ascii_ptr, fill, cols);
                 ascii_ptr += cols;
-            }
-            else if (c == char_tab) {
-                *ascii_ptr = ' ';
-                ++ascii_ptr;
-            }
-            else {
-                cols = BMAX(0, uc_width(c, encoding));
-                if (cols < 2 && c != VARIATION_SELECTOR_16 && rest[1] == VARIATION_SELECTOR_16) {
-                    cols = 2;
-                }
-                if (cols > 0) {
-                    memset(ascii_ptr, (int) (uc_is_blank(c) ? ' ' : 'x'), cols);
-                    ascii_ptr += cols;
-                }
             }
             if (is_blank(c)) {
                 if (indent_active) {

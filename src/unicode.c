@@ -28,6 +28,7 @@
 #include <uniconv.h>
 #include <unictype.h>
 #include <unistr.h>
+#include <uniwidth.h>
 
 #include "boxes.h"
 #include "tools.h"
@@ -459,15 +460,131 @@ void u32_insert_space_at(uint32_t **s, const size_t idx, const size_t n)
 }
 
 
-size_t count_vs16_promotions(const uint32_t *s)
+/*
+ * libunistring intentionally does not assign terminal widths to emoji sequences because terminal behavior differs.
+ * Boxes targets terminals where these common sequences occupy two columns. Keep this policy isolated here so it can
+ * be removed if libunistring eventually provides the desired sequence widths.
+ * See https://lists.gnu.org/archive/html/bug-libunistring/2026-06/msg00000.html
+ */
+#define VARIATION_SELECTOR_16 0xFE0F
+#define ZERO_WIDTH_JOINER 0x200D
+#define COMBINING_ENCLOSING_KEYCAP 0x20E3
+
+
+static int is_keycap_base(const ucs4_t c)
 {
-    size_t count = 0;
-    for (size_t i = 0; s[i] != char_nul; i++) {
-        if (s[i] == VARIATION_SELECTOR_16) {
-            count++;
+    return c == '#' || c == '*' || (c >= '0' && c <= '9');
+}
+
+
+static int is_valid_vs16_base(const ucs4_t c)
+{
+    return !is_keycap_base(c) && uc_is_property_emoji(c) && !uc_is_property_emoji_presentation(c);
+}
+
+
+static size_t emoji_atom_length(const uint32_t *s)
+{
+    ucs4_t base = s[0];
+    if (!uc_is_property_emoji(base) || !uc_is_property_extended_pictographic(base)) {
+        return 0;
+    }
+
+    size_t len = 1;
+    if (s[len] == VARIATION_SELECTOR_16 && uc_is_property_emoji(base)) {
+        len++;
+    }
+    if (s[len] != char_nul && uc_is_property_emoji_modifier_base(base)
+            && uc_is_property_emoji_modifier(s[len]))
+    {
+        len++;
+    }
+    return len;
+}
+
+
+static size_t emoji_zwj_sequence_length(const uint32_t *s)
+{
+    size_t len = emoji_atom_length(s);
+    if (len == 0) {
+        return 0;
+    }
+
+    size_t result = len;
+    int joined = 0;
+    while (s[result] == ZERO_WIDTH_JOINER) {
+        len = emoji_atom_length(s + result + 1);
+        if (len == 0) {
+            break;
+        }
+        result += len + 1;
+        joined = 1;
+    }
+    return joined ? result : 0;
+}
+
+
+static size_t keycap_sequence_length(const uint32_t *s)
+{
+    if (!is_keycap_base(s[0])) {
+        return 0;
+    }
+    if (s[1] == COMBINING_ENCLOSING_KEYCAP) {
+        return 2;
+    }
+    return s[1] == VARIATION_SELECTOR_16 && s[2] == COMBINING_ENCLOSING_KEYCAP ? 3 : 0;
+}
+
+
+static size_t emoji_modifier_sequence_length(const uint32_t *s)
+{
+    ucs4_t base = s[0];
+    if (!uc_is_property_emoji_modifier_base(base)) {
+        return 0;
+    }
+
+    size_t len = 1;
+    if (s[len] == VARIATION_SELECTOR_16) {
+        len++;
+    }
+    return s[len] != char_nul && uc_is_property_emoji_modifier(s[len]) ? len + 1 : 0;
+}
+
+
+int u32_width_with_emoji(const uint32_t *s, size_t *remaining)
+{
+    if (is_empty(s) || remaining == NULL) {
+        return 0;
+    }
+    if (*remaining > 0) {
+        (*remaining)--;
+        return 0;
+    }
+
+    size_t sequence_length = emoji_zwj_sequence_length(s);
+    if (sequence_length > 0) {
+        *remaining = sequence_length - 1;
+        return 2;
+    }
+
+    sequence_length = keycap_sequence_length(s);
+    if (sequence_length > 0) {
+        *remaining = sequence_length - 1;
+        return BMAX(0, uc_width(s[0], encoding));
+    }
+
+    sequence_length = emoji_modifier_sequence_length(s);
+    if (sequence_length == 0) {
+        if (s[1] == VARIATION_SELECTOR_16 && is_valid_vs16_base(s[0])) {
+            sequence_length = 2;
         }
     }
-    return count;
+
+    if (sequence_length > 0) {
+        *remaining = sequence_length - 1;
+        return 2;
+    }
+    return BMAX(0, uc_width(s[0], encoding));
 }
 
 

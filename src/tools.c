@@ -30,7 +30,6 @@
 #include <unictype.h>
 #include <unistr.h>
 #include <unitypes.h>
-#include <uniwidth.h>
 #ifdef _WIN32
 #include <windows.h>
 #include <wchar.h>
@@ -528,15 +527,15 @@ size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, s
         return 0;
     }
 
-    size_t buflen = (size_t) u32_strwidth(s, encoding) + count_vs16_promotions(s) + 1;
-    size_t map_size = BMAX((size_t) 5, buflen);
+    size_t map_size = 5;
     size_t map_idx = 0;
     size_t *map = (size_t *) calloc(map_size, sizeof(size_t)); /* might not be enough if many double-wide chars */
-    (*ascii) = (char *) calloc(buflen, sizeof(char));          /* maybe a little too much, but certainly enough */
+    (*ascii) = (char *) calloc(u32_strlen(s) + 1, 2 * sizeof(char));
     char *p = *ascii;
 
     size_t mb_idx = 0;
     size_t step_invis;
+    size_t emoji_remaining = 0;
     const uint32_t *rest = s;
 
     for (ucs4_t c = s[0]; c != char_nul; c = rest[0]) {
@@ -548,24 +547,11 @@ size_t count_invisible_chars(const uint32_t *s, size_t *num_esc, char **ascii, s
         if (c == char_esc) {
             (*num_esc)++;
         }
-        else if (is_ascii_printable(c)) {
-            int cols = 1;
-            if (rest[1] == VARIATION_SELECTOR_16) {
-                cols = 2;
-            }
-            memset(p, c & 0xff, cols);
-            for (int i = 0; i < cols; i++) {
-                map[map_idx++] = mb_idx;
-            }
-            p += cols;
-        }
         else {
-            int cols = uc_width(c, encoding);
-            if (cols < 2 && c != VARIATION_SELECTOR_16 && rest[1] == VARIATION_SELECTOR_16) {
-                cols = 2;
-            }
+            int cols = u32_width_with_emoji(rest, &emoji_remaining);
             if (cols > 0) {
-                memset(p, (int) 'x', cols);
+                int fill = is_ascii_printable(c) ? c & 0xff : (uc_is_blank(c) ? ' ' : 'x');
+                memset(p, fill, cols);
                 for (int i = 0; i < cols; i++) {
                     map[map_idx++] = mb_idx;
                 }

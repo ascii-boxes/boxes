@@ -39,6 +39,8 @@ void test_is_ascii_id_strict_valid(void **state);
 void test_is_ascii_id_strict_invalid(void **state);
 
 void test_repeat(void **state);
+void test_count_invisible_chars_emoji(void **state);
+void test_count_invisible_chars_invalid_vs16(void **state);
 
 
 #endif

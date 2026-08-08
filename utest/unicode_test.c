@@ -36,6 +36,23 @@
 
 
 
+static int emoji_width(const char *utf8)
+{
+    uint32_t *s = u32_strconv_from_arg(utf8, "UTF-8");
+    assert_non_null(s);
+
+    int width = 0;
+    size_t remaining = 0;
+    for (const uint32_t *p = s; *p != char_nul; p++) {
+        width += u32_width_with_emoji(p, &remaining);
+    }
+
+    BFREE(s);
+    return width;
+}
+
+
+
 void test_to_utf32(void **state)
 {
     UNUSED(state);
@@ -202,6 +219,64 @@ void test_u32_insert_space_at(void **state)
 
     BFREE(s);
     BFREE(expected);
+}
+
+
+
+void test_u32_width_with_emoji(void **state)
+{
+    UNUSED(state);
+
+    struct {
+        const char *utf8;
+        int width;
+    } cases[] = {
+        {"\xe2\x9a\xa0\xef\xb8\x8f", 2},                     /* ⚠️ */
+        {"\xe2\x9a\xa0", 1},                                 /* ⚠ */
+        {"\xf0\x9f\x92\xa1", 2},                             /* 💡 */
+        {"\xe2\x93\x82\xef\xb8\x8f", 2},                     /* Ⓜ️ */
+        {"A\xef\xb8\x8f", 1},                                /* invalid A + VS16 */
+        {"\xe2\x93\x9c\xef\xb8\x8f", 1},                     /* invalid ⓜ + VS16 */
+        {"A\xcc\x81\xef\xb8\x8f", 1},                        /* A + combining acute + VS16 */
+        {"1\xef\xb8\x8f\xe2\x83\xa3", 1},                    /* 1️⃣ */
+        {"1\xe2\x83\xa3", 1},                                /* 1⃣ */
+        {"#\xef\xb8\x8f\xe2\x83\xa3", 1},                    /* #️⃣ */
+        {"*\xe2\x83\xa3", 1},                                /* *⃣ */
+        {"0\xe2\x83\xa3", 1},                                /* 0⃣ */
+        {"9\xef\xb8\x8f\xe2\x83\xa3", 1},                    /* 9️⃣ */
+        {"1\xef\xb8\x8f", 1},                                /* 1 + VS16 */
+        {"#\xef\xb8\x8f", 1},                                /* # + VS16 */
+        {"*\xef\xb8\x8f", 1},                                /* * + VS16 */
+        {"A\xe2\x83\xa3", 1},                                /* invalid keycap */
+        {"\xf0\x9f\x91\x8b\xf0\x9f\x8f\xbb", 2},             /* 👋🏻 */
+        {"\xf0\x9f\x91\x81\xef\xb8\x8f\xe2\x80\x8d"
+         "\xf0\x9f\x97\xa8\xef\xb8\x8f", 2},                 /* 👁️‍🗨️ */
+        {"\xe2\x9d\xa4\xef\xb8\x8f\xe2\x80\x8d"
+         "\xf0\x9f\x94\xa5", 2},                             /* ❤️‍🔥 */
+        {"\xf0\x9f\x8f\xb3\xef\xb8\x8f\xe2\x80\x8d"
+         "\xf0\x9f\x8c\x88", 2},                             /* 🏳️‍🌈 */
+        {"\xf0\x9f\x91\xa8\xe2\x80\x8d\xf0\x9f\x91\xa9"
+         "\xe2\x80\x8d\xf0\x9f\x91\xa7", 2},                 /* 👨‍👩‍👧 */
+        {"\xf0\x9f\x91\xa9\xf0\x9f\x8f\xbd\xe2\x80\x8d"
+         "\xf0\x9f\x9a\x80", 2},                             /* 👩🏽‍🚀 */
+        {"\xe2\x98\x85\xe2\x80\x8d\xf0\x9f\x92\xa1", 3},     /* invalid ★ + ZWJ + 💡 */
+        {"\xf0\x9f\x92\xa1\xe2\x80\x8d\x41", 3},             /* invalid 💡 + ZWJ + A */
+        {"\xef\xb8\x8f\xef\xb8\x8f", 0},                     /* standalone VS16 */
+        {"\xe2\x9a\xa0\xef\xb8\x8e", 1},                     /* ⚠︎ */
+        {"\xe2\x9a\xa0\xef\xb8\x8f"
+         "1\xe2\x83\xa3\xf0\x9f\x91\x8b\xf0\x9f\x8f\xbb", 5} /* ⚠️1⃣👋🏻 */
+    };
+
+    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+        assert_int_equal(cases[i].width, emoji_width(cases[i].utf8));
+    }
+
+    size_t remaining = 0;
+    assert_int_equal(0, u32_width_with_emoji(NULL, &remaining));
+    uint32_t empty[] = {0};
+    assert_int_equal(0, u32_width_with_emoji(empty, &remaining));
+    uint32_t nonempty[] = {'A', 0};
+    assert_int_equal(0, u32_width_with_emoji(nonempty, NULL));
 }
 
 

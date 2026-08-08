@@ -114,6 +114,10 @@ void test_ansi_unicode_wide_bulb(void **state);
 void test_ansi_unicode_vs16_keycap(void **state);
 void test_ansi_unicode_vs16_consecutive(void **state);
 void test_ansi_unicode_vs16_mixed(void **state);
+void test_ansi_unicode_invalid_vs16(void **state);
+void test_ansi_unicode_unqualified_keycap(void **state);
+void test_ansi_unicode_zwj_emoji(void **state);
+void test_ansi_unicode_colored_emoji(void **state);
 
 
 #endif
