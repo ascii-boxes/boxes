@@ -243,9 +243,9 @@ padding, indentation, etc. for the mended box. Implies
 \fB\-n\fP \fIencoding\fP, \fB\-\-encoding\fP=\fIencoding\fP
 Character encoding. Overrides the character encoding of the input and output
 text. Choose from the list shown by \fIiconv -l\fP. If an invalid character
-encoding is specified here, \fIUTF-8\fP is used as a fallback. The default
-is to use the system encoding, which is normally the best course of action.
-So don't specify this option unless you have to.
+encoding is specified here, the system encoding is used as a fallback. The
+default is also to use the system encoding, which is normally the best course
+of action. So don't specify this option unless you must.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 \fB\-p\fP \fIstring\fP, \fB\-\-padding\fP=\fIstring\fP

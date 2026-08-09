@@ -1,0 +1,18 @@
+:DESC
+Tests that an invalid encoding falls back to the system encoding.
+
+:ENV
+export BOXES=../boxes-config
+export LC_ALL=C
+:ARGS
+-n NON-EXISTENT
+:INPUT
+ü
+:OUTPUT-FILTER
+s/( falling back to) .*$/\1 [system encoding]/
+:EXPECTED
+boxes: Invalid character encoding: NON-EXISTENT - falling back to [system encoding]
+/******/
+/* ?? */
+/******/
+:EOF
