@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
+#include <sys/stat.h>
 #include <uniconv.h>
 #include <unistd.h>
 
@@ -673,7 +674,13 @@ static int input_output_files(opt_t *result, char *argv[], int optind)
         else {
             result->outfile = bx_fopen(argv[optind + 1], "wb");
             if (result->outfile == NULL) {
-                perror(PROJECT);
+                struct stat statbuf;
+                if (stat(argv[optind + 1], &statbuf) == 0 && S_ISDIR(statbuf.st_mode)) {
+                    bx_fprintf(stderr, "%s: cannot use directory as output file\n", PROJECT);
+                }
+                else {
+                    bx_fprintf(stderr, "%s: Can't open output file -- %s\n", PROJECT, argv[optind + 1]);
+                }
                 if (result->infile != stdin) {
                     fclose(result->infile);
                 }
