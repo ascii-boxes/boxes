@@ -1,0 +1,13 @@
+:DESC
+Tests that a command-line design does not require a valid config file.
+
+:ENV
+export BOXES=non-existent
+:ARGS
+-c "#"
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+# foo
+:EOF

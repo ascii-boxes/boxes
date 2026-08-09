@@ -1,0 +1,10 @@
+:DESC
+Tests that a directory cannot be opened as an output file.
+
+:ARGS
+-f ../boxes-config 206_data/in.txt 206_data
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: cannot use directory as output file
+:EOF

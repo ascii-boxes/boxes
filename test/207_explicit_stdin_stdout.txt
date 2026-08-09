@@ -1,0 +1,13 @@
+:DESC
+Tests using explicit standard input and standard output operands.
+
+:ARGS
+-d simple - -
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+*******
+* foo *
+*******
+:EOF

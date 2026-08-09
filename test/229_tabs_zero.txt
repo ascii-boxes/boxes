@@ -1,0 +1,11 @@
+:DESC
+Tests that a zero tab stop distance is rejected.
+
+:ARGS
+-t 0
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: invalid tab stop distance -- 0
+:EOF

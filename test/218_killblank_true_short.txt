@@ -1,0 +1,15 @@
+:DESC
+Tests -k true when removing an open-sided box. (This should also be the default for open-sided boxes.)
+
+:ARGS
+-d ada-cmt -r -k true
+:INPUT
+--
+--
+-- foo
+--
+--
+:OUTPUT-FILTER
+:EXPECTED
+foo
+:EOF

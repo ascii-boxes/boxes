@@ -1,0 +1,13 @@
+:DESC
+Tests using standard input as the sole file operand.
+
+:ARGS
+-d simple -
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+*******
+* foo *
+*******
+:EOF

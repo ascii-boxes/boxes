@@ -1,0 +1,9 @@
+:DESC
+Tests drawing a box with empty input. We expect no output if no input.
+
+:ARGS
+-d simple
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+:EOF

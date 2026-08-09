@@ -1,0 +1,12 @@
+:DESC
+Tests reading from an input file with an explicit standard output operand.
+
+:ARGS
+-f ../boxes-config -d simple 206_data/in.txt -
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+*******
+* foo *
+*******
+:EOF

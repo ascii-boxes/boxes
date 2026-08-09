@@ -1,0 +1,11 @@
+:DESC
+Tests case-insensitive selection by design alias.
+
+:ARGS
+-f 136_design_alias_by_alias.cfg -d ALIAS2
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+X2 foo X2
+:EOF

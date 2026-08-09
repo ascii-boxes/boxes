@@ -1,0 +1,11 @@
+:DESC
+Tests that multiple tab handling mode characters are rejected.
+
+:ARGS
+-t 4eu
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: invalid tab handling specification - 4eu
+:EOF

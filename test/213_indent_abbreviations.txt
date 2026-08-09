@@ -1,0 +1,15 @@
+:DESC
+Tests the documented abbreviation of text indentation mode.
+
+:ARGS
+-d simple -i t
+:INPUT
+    foo
+      bar
+:OUTPUT-FILTER
+:EXPECTED
+*************
+*     foo   *
+*       bar *
+*************
+:EOF

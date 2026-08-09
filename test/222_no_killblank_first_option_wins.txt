@@ -1,0 +1,19 @@
+:DESC
+Tests the precedence of the first option when followed by a contradicting option.
+
+:ARGS
+-d ada-cmt -r --no-kill-blank --kill-blank
+:INPUT
+--
+--
+-- foo
+--
+--
+:OUTPUT-FILTER
+:EXPECTED
+
+
+foo
+
+
+:EOF

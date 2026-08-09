@@ -1,0 +1,15 @@
+:DESC
+Tests the maximum supported tab stop distance.
+
+:ARGS
+-d simple -t 16
+:INPUT
+	foo
+	bar
+:OUTPUT-FILTER
+:EXPECTED
+                *******
+                * foo *
+                * bar *
+                *******
+:EOF

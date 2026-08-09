@@ -1,0 +1,13 @@
+:DESC
+Tests reading from an input file and writing to an output file.
+
+:ARGS
+-d simple 206_data/in.txt 206_out.txt
+:ASSERT-OUTPUT-FILE 206_out.txt
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+*******
+* foo *
+*******
+:EOF

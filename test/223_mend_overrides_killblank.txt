@@ -1,0 +1,19 @@
+:DESC
+Tests that -m overrides an earlier request to kill blank lines.
+
+:ARGS
+-d c -k true -m
+:INPUT
+/*******/
+/*     */
+/* foo */
+/*     */
+/*******/
+:OUTPUT-FILTER
+:EXPECTED
+/********/
+/*      */
+/* foo  */
+/*      */
+/********/
+:EOF

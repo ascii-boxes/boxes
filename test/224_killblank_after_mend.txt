@@ -1,0 +1,19 @@
+:DESC
+Tests that -m retains blank lines despite a later -k true option.
+
+:ARGS
+-d c -m -k true
+:INPUT
+/*******/
+/*     */
+/* foo */
+/*     */
+/*******/
+:OUTPUT-FILTER
+:EXPECTED
+/********/
+/*      */
+/* foo  */
+/*      */
+/********/
+:EOF

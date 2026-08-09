@@ -1,0 +1,15 @@
+:DESC
+Tests indenting text inside the box.
+
+:ARGS
+-d simple -i text
+:INPUT
+    foo
+      bar
+:OUTPUT-FILTER
+:EXPECTED
+*************
+*     foo   *
+*       bar *
+*************
+:EOF

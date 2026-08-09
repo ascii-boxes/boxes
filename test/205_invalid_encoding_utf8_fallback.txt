@@ -1,0 +1,16 @@
+:DESC
+Tests that an invalid encoding falls back to UTF-8 even under an ASCII locale.
+
+:ENV
+export LC_ALL=C
+:ARGS
+-n NON-EXISTENT
+:INPUT
+ü
+:OUTPUT-FILTER
+:EXPECTED
+boxes: Invalid character encoding: NON-EXISTENT - falling back to UTF-8
+/*****/
+/* ü */
+/*****/
+:EOF

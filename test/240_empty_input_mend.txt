@@ -1,0 +1,9 @@
+:DESC
+Tests mending a box with empty input.
+
+:ARGS
+-d simple -m
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+:EOF

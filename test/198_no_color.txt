@@ -1,0 +1,15 @@
+:DESC
+Tests that --no-color removes ANSI sequences from both the design and input text.
+
+:ARGS
+-f ../boxes-config --no-color -d critical
+:INPUT
+[32mfoo[0m
+:OUTPUT-FILTER
+:EXPECTED
+▄▄ CRITICAL ▄▄
+█            █
+█  foo       █
+█            █
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+:EOF

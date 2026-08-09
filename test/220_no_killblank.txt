@@ -1,0 +1,17 @@
+:DESC
+Tests --no-kill-blank when removing a closed box.
+
+:ARGS
+-d c -r --no-kill-blank
+:INPUT
+/*******/
+/*     */
+/* foo */
+/*     */
+/*******/
+:OUTPUT-FILTER
+:EXPECTED
+   
+foo
+   
+:EOF

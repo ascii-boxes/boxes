@@ -1,0 +1,13 @@
+:DESC
+Tests that fractional box sizes are truncated (they really make no sense).
+
+:ARGS
+-s 12.7
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+/**********/
+/* foo    */
+/**********/
+:EOF

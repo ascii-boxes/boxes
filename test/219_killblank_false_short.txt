@@ -1,0 +1,17 @@
+:DESC
+Tests -k false when removing a closed box.
+
+:ARGS
+-f ../boxes-config -d c -r -k false
+:INPUT
+/*******/
+/*     */
+/* foo */
+/*     */
+/*******/
+:OUTPUT-FILTER
+:EXPECTED
+   
+foo
+   
+:EOF

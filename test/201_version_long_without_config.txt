@@ -1,0 +1,13 @@
+:DESC
+Tests that the long version option does not require a valid config file.
+
+:ENV
+export BOXES=non-existent
+:ARGS
+--version
+:INPUT
+:OUTPUT-FILTER
+s/^boxes version .*/boxes version VERSION/
+:EXPECTED
+boxes version VERSION
+:EOF

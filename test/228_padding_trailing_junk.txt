@@ -1,0 +1,11 @@
+:DESC
+Tests that trailing characters in a padding specification are rejected.
+
+:ARGS
+-p l2rX
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: invalid padding specification - l2rX
+:EOF

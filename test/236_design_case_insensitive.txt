@@ -1,0 +1,13 @@
+:DESC
+Tests case-insensitive selection by primary design name.
+
+:ARGS
+-d SIMPLE
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+*******
+* foo *
+*******
+:EOF

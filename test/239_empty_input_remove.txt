@@ -1,0 +1,9 @@
+:DESC
+Trying to remove a box from empty input will just give empty output.
+
+:ARGS
+-d simple -r
+:INPUT
+:OUTPUT-FILTER
+:EXPECTED
+:EOF

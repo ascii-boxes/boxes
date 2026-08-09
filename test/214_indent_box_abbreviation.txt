@@ -1,0 +1,15 @@
+:DESC
+Tests the documented abbreviation of box indentation mode.
+
+:ARGS
+-d simple -i b
+:INPUT
+    foo
+      bar
+:OUTPUT-FILTER
+:EXPECTED
+    *********
+    * foo   *
+    *   bar *
+    *********
+:EOF

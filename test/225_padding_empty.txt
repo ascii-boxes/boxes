@@ -1,0 +1,11 @@
+:DESC
+Tests that an empty padding specification is rejected.
+
+:ARGS
+-p ''
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: invalid padding specification - 
+:EOF

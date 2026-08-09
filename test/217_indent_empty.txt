@@ -1,0 +1,11 @@
+:DESC
+Tests that an empty indentation mode is rejected.
+
+:ARGS
+-i ''
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED-ERROR 1
+boxes: invalid indentation mode
+:EOF
