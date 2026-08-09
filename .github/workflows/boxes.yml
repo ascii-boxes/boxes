@@ -145,7 +145,10 @@ jobs:
               run: make test-sunny
 
             - name: Run black-box tests
-              run: make test
+              run: |
+                # Skip one test that makes no sense on Windows
+                rm -f test/205_invalid_encoding_system_fallback.txt
+                make test
 
             - name: Save boxes.exe artifact
               if: ${{ always() && hashFiles('out/boxes.exe') != '' }}

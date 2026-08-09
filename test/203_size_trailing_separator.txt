@@ -1,0 +1,13 @@
+:DESC
+Tests that a trailing dimension separator is treated like a width-only size.
+
+:ARGS
+-s 12x
+:INPUT
+foo
+:OUTPUT-FILTER
+:EXPECTED
+/**********/
+/* foo    */
+/**********/
+:EOF

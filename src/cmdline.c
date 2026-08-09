@@ -461,8 +461,10 @@ static int size_of_box(opt_t *result, char *optarg)
     if (optarg != p) {
         result->reqwidth = strtol(optarg, NULL, 10);
     }
-    if (p) {
+    if (p && p[1] != '\0') {
         result->reqheight = strtol(p + 1, NULL, 10);
+    }
+    if (p) {
         *p = 'x';
     }
     if (errno || (result->reqwidth == 0 && result->reqheight == 0) || result->reqwidth < 0 || result->reqheight < 0) {
