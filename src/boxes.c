@@ -209,11 +209,11 @@ static void handle_command_line(int argc, char *argv[])
  */
 static void handle_config_parsing()
 {
-    bxstr_t *config_file = discover_config_file(0);
-    if (config_file == NULL) {
-        exit(EXIT_FAILURE);
-    }
     if (opt.cld == NULL) {
+        bxstr_t *config_file = discover_config_file(0);
+        if (config_file == NULL) {
+            exit(EXIT_FAILURE);
+        }
         size_t r_num_designs = 0;
         designs = parse_config_files(config_file, &r_num_designs);
         if (designs == NULL) {
