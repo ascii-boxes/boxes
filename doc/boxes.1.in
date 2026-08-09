@@ -224,10 +224,10 @@ part, the default is
 \fB\-l\fP, \fB\-\-list\fP
 List designs. Produces a listing of all available box designs in the
 config file, along with a sample box and information about its creator.
-Also checks the syntax of the entire config file. If used in conjunction
+Also checks the syntax of the entire config file, unless used in conjunction
 with
 .B \-d\fP,
-displays detailed information about the specified design.
+which is to display detailed information about the specified design only.
 .\" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .TP 0.6i
 \fB\-m\fP, \fB\-\-mend\fP
