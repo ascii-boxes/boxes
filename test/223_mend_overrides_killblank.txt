@@ -11,9 +11,9 @@ Tests that -m overrides an earlier request to kill blank lines.
 /*******/
 :OUTPUT-FILTER
 :EXPECTED
-/********/
-/*      */
-/* foo  */
-/*      */
-/********/
+/*******/
+/*     */
+/* foo */
+/*     */
+/*******/
 :EOF

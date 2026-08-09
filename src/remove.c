@@ -970,6 +970,21 @@ static size_t confirmed_padding(bxstr_t *org_line, comparison_t comp_type, size_
 
 
 
+static size_t confirmed_padding_before(bxstr_t *org_line, comparison_t comp_type, size_t end_idx, size_t num_padding)
+{
+    size_t result = 0;
+    size_t start_idx = end_idx > num_padding ? end_idx - num_padding : 0;
+    for (size_t i = end_idx; i > start_idx; i--) {
+        if (org_is_not_blank(org_line, comp_type, i - 1)) {
+            break;
+        }
+        result++;
+    }
+    return result;
+}
+
+
+
 static void remove_top_from_input(remove_ctx_t *ctx)
 {
     if (ctx->top_end_idx > ctx->top_start_idx) {
@@ -1010,6 +1025,10 @@ static size_t calculate_end_idx(remove_ctx_t *ctx, size_t body_line_idx)
     bxstr_t *org_line = input.lines[input_line_idx].text;
 
     size_t e_idx = lctx->east_quality > 0 ? lctx->east_start : max_chars_line(org_line, ctx->comp_type);
+    if (lctx->east_quality > 0) {
+        e_idx -= confirmed_padding_before(org_line, ctx->comp_type, e_idx,
+                (size_t) BMAX(opt.design->padding[BRIG], 0));
+    }
     if (ctx->comp_type == ignore_invisible_input || ctx->comp_type == ignore_invisible_all) {
         e_idx = org_line->first_char[e_idx];
     }

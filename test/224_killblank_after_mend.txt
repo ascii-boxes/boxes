@@ -11,9 +11,9 @@ Tests that -m retains blank lines despite a later -k true option.
 /*******/
 :OUTPUT-FILTER
 :EXPECTED
-/********/
-/*      */
-/* foo  */
-/*      */
-/********/
+/*******/
+/*     */
+/* foo */
+/*     */
+/*******/
 :EOF
