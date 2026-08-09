@@ -311,6 +311,10 @@ static int eol_override(opt_t *result, char *optarg)
 static int indentation_mode(opt_t *result, char *optarg)
 {
     size_t optlen = strlen(optarg);
+    if (optlen == 0) {
+        bx_fprintf(stderr, "%s: invalid indentation mode\n", PROJECT);
+        return 1;
+    }
     if (optlen <= 3 && !strncasecmp("box", optarg, optlen)) {
         result->indentmode = 'b';
     }
