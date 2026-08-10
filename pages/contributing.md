@@ -2,7 +2,7 @@
 title: Contributing
 permalink: /contributing.html
 created_at: 2014-12-23 22:50:09 +0100
-last_modified_at: 2024-09-28 15:00:00 +0200
+last_modified_at: 2026-08-10 15:00:00 +0200
 ---
 
 # Contributing
@@ -67,8 +67,29 @@ start. The following check list may help:
     *autoconf*, the C code itself must work on every platform. In other words, you can use only such C commands that
     are known on every platform. When in doubt, restrict yourself to commands that you already find in the current
     code base.
+  - Be prepared to answer questions and react to requests from the reviewers of your pull request. Be available,
+    subscribe to the notifications, and even if review takes too long, don't ghost us. Instead, if you change your
+    mind, you may simply close your PR again to signal it.
 
-These criteria apply only to code changes. (Although other changes should not break the build, either.)
+
+{% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
+{% include heading.html
+   level=2
+   text="AI Policy" %}
+
+In keeping with what Linus Torvalds [said about the use of AI
+tools](https://lore.kernel.org/linux-media/CAHk-=wi4zC+Ze8e+p3tMv8TtG_80KzsZ1syL9anBtmEh5Z40vg@mail.gmail.com/), we
+believe it makes sense to use AI tools for your work on *boxes*. We don't require you to disclose it,
+name the models, or anything. And we shouldn't, as pointed out by
+[Isaac Su](https://isaacsu.com/2026/08/dont-credit-the-llm/) in 2026.
+
+We do, however, absolutely require you to take full ownership of your contribution. It is yours to understand, explain,
+fix, modify, perfect, and reason about - just like it always was.
+
+Don't be a meat proxy. "The AI did this" is not enough. If you feel tempted to open a PR with the result of a one-shot
+prompt, don't. Intead, open an issue with the idea and possibly the prompt. We can run it ourselves and work directly
+with the AI to get a cool improvement to *boxes* based on your idea. That can be a valuable contribution, too.
+
 
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
