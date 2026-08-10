@@ -373,12 +373,16 @@ static int tag_add(pass_to_bison *bison_args, bxstr_t *tag)
             curdes.tags[num_tags + 1] = NULL;
         }
         else {
-            yyerror(bison_args, "duplicate tag -- %s", bxs_to_output(tag));
+            char *out_tag = bxs_to_output(tag);
+            yyerror(bison_args, "duplicate tag -- %s", out_tag);
+            BFREE(out_tag);
             rc = RC_ERROR;
         }
     }
     else {
-        yyerror(bison_args, "invalid tag -- %s", bxs_to_output(tag));
+        char *out_tag = bxs_to_output(tag);
+        yyerror(bison_args, "invalid tag -- %s", out_tag);
+        BFREE(out_tag);
         rc = RC_ERROR;
     }
     return rc;
@@ -649,14 +653,18 @@ int action_parent_config(pass_to_bison *bison_args, bxstr_t *filepath)
         }
     }
     else if (!bxs_valid_in_filename(filepath, NULL)) {
-        yyerror(bison_args, "parent reference contains invalid characters: %s", bxs_to_output(filepath));
+        char *out_filepath = bxs_to_output(filepath);
+        yyerror(bison_args, "parent reference contains invalid characters: %s", out_filepath);
+        BFREE(out_filepath);
         return RC_ERROR;
     }
     else {
         FILE *f = bx_fopens(filepath, "r");
         if (f == NULL) {
             bison_args->skipping = 1;
-            yyerror(bison_args, "parent config file not found: %s", bxs_to_output(filepath));
+            char *out_filepath = bxs_to_output(filepath);
+            yyerror(bison_args, "parent config file not found: %s", out_filepath);
+            BFREE(out_filepath);
             return RC_ERROR;
         }
         else {

@@ -373,7 +373,9 @@ int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, 
                 }
             }
             else if (!anchored_right) {
-                shape_line = shorten(shapes_relevant + shape_idx, &quality, 0, 0, 1);
+                uint32_t *shortened = shorten(shapes_relevant + shape_idx, &quality, 0, 0, 1);
+                BFREE(shape_line);
+                shape_line = shortened;
                 if (is_debug_logging(MAIN)) {
                     char *out_shape_line = u32_strconv_to_output(shape_line);
                     log_debug(__FILE__, MAIN, "hmm() - shape_line shortened to %d (\"%s\")\n",
@@ -385,6 +387,7 @@ int hmm(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, size_t shape_idx, 
                 BFREE(shape_line);
             }
         }
+        BFREE(shape_line);
     }
 
     log_debug(__FILE__, MAIN, "hmm() - exit, result = %d\n", result);
@@ -404,6 +407,7 @@ static int hmm_shiftable(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, s
             int can_shorten_right = -1;
             size_t quality = shapes_relevant[i].text->num_chars;
             uint32_t *shape_line = shapes_relevant[i].text->memory;
+            uint32_t *shape_line_owned = NULL;
             while (shape_line != NULL) {
                 uint32_t *p = u32_strstr(cur_pos, shape_line);
                 if (p != NULL && p < end_pos && is_blank_between(cur_pos, p)) {
@@ -419,8 +423,12 @@ static int hmm_shiftable(shape_line_ctx_t *shapes_relevant, uint32_t *cur_pos, s
                     can_shorten_right = non_empty_shapes_after(shapes_relevant, i)
                             || !is_shape_line_empty(shapes_relevant, SHAPES_PER_SIDE - 1) ? 0 : 1;
                 }
-                shape_line = shorten(shapes_relevant + i, &quality, 0, 1, can_shorten_right);
+                uint32_t *shortened = shorten(shapes_relevant + i, &quality, 0, 1, can_shorten_right);
+                BFREE(shape_line_owned);
+                shape_line_owned = shortened;
+                shape_line = shape_line_owned;
             }
+            BFREE(shape_line_owned);
             break;
         }
     }
@@ -583,6 +591,7 @@ static int match_horiz_line(remove_ctx_t *ctx, int hside, size_t input_line_idx,
             bxs_free(shapes_relevant[i].text);
         }
         BFREE(shapes_relevant);
+        bxs_free(input_prepped);
 
         if (result) {
             log_debug(__FILE__, MAIN, "Matched %s side line using comp_type=%s and shape_line_idx=%d\n",

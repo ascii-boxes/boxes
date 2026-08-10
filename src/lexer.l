@@ -218,7 +218,9 @@ PFILENAME [^\r\n]+
     bxs_free(bxstr);
 
     BEGIN(INITIAL);
-    report_state("FILENAM", bxs_to_output(yylval->s), "INITIAL");
+    char *out_filename = bxs_to_output(yylval->s);
+    report_state("FILENAM", out_filename, "INITIAL");
+    BFREE(out_filename);
     return FILENAME;
 }
 

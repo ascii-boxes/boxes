@@ -158,8 +158,10 @@ int apply_substitutions(input_t *result, const int mode)
                 return 1;
             }
 
+            bxstr_t *replacement = bxs_from_unicode(newtext);
+            BFREE(newtext);
             bxs_free(result->lines[k].text);
-            result->lines[k].text = bxs_from_unicode(newtext);
+            result->lines[k].text = replacement;
 
             analyze_line_ascii(result, result->lines + k);   /* update maxline value */
 

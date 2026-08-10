@@ -86,6 +86,7 @@ static void usage_short(FILE *st)
 void usage_long(FILE *st)
 {
     bxstr_t *config_file = discover_config_file(0);
+    char *out_config_file = config_file != NULL ? bxs_to_output(config_file) : NULL;
 
     fprintf(st, "%s - draws any kind of box around your text (or removes it)\n", PROJECT);
     fprintf(st, "        Website: https://boxes.thomasjensen.com/\n");
@@ -98,7 +99,7 @@ void usage_long(FILE *st)
     fprintf(st, "  -e, --eol <eol>       Override line break type (experimental) [default: %s]\n",
                                          strcmp(EOL_DEFAULT, "\r\n") == 0 ? "CRLF" : "LF");
     fprintf(st, "  -f, --config <file>   Configuration file [default: %s]\n",
-                                         config_file != NULL ? bxs_to_output(config_file) : "none");
+                                         out_config_file != NULL ? out_config_file : "none");
     fprintf(st, "  -h, --help            Print usage information\n");
     fprintf(st, "  -i, --indent <mode>   Indentation mode [default: box]\n");
     fprintf(st, "  -k <bool>             Leading/trailing blank line retention on removal\n");
@@ -117,6 +118,7 @@ void usage_long(FILE *st)
                 areas which follow in a comma-separated list [default area: MAIN]. If <arg> is "(undoc)", trigger
                 undocumented behavior of design detail lister.");  // undocumented */
 
+    BFREE(out_config_file);
     bxs_free(config_file);
 }
 

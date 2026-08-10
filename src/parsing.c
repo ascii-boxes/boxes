@@ -65,8 +65,9 @@ static int open_yy_config_file(pass_to_bison *bison_args)
 {
     current_config_handle = bx_fopens(bison_args->config_file, "r");
     if (current_config_handle == NULL) {
-        fprintf(stderr, "%s: Couldn't open config file '%s' for input\n", PROJECT,
-                bxs_to_output(bison_args->config_file));
+        char *out_config_file = bxs_to_output(bison_args->config_file);
+        fprintf(stderr, "%s: Couldn't open config file '%s' for input\n", PROJECT, out_config_file);
+        BFREE(out_config_file);
         return 1;
     }
     yyset_in(current_config_handle, bison_args->lexer_state);
@@ -89,13 +90,19 @@ void print_design_list_header()
         }
         fprintf(opt.outfile, "%s%s", opt.eol, opt.eol);
         fprintf(opt.outfile, "Configuration Files:%s", opt.eol);
-        fprintf(opt.outfile, "    - %s%s", bxs_to_output(first_config_file), opt.eol);
+        char *out_config_file = bxs_to_output(first_config_file);
+        fprintf(opt.outfile, "    - %s%s", out_config_file, opt.eol);
+        BFREE(out_config_file);
         for (size_t i = 0; i < num_parent_configs; i++) {
-            fprintf(opt.outfile, "    - %s (parent)%s", bxs_to_output(parent_configs[i]), opt.eol);
+            out_config_file = bxs_to_output(parent_configs[i]);
+            fprintf(opt.outfile, "    - %s (parent)%s", out_config_file, opt.eol);
+            BFREE(out_config_file);
         }
     }
     else {
-        fprintf(opt.outfile, " in \"%s\":%s", bxs_to_output(first_config_file), opt.eol);
+        char *out_config_file = bxs_to_output(first_config_file);
+        fprintf(opt.outfile, " in \"%s\":%s", out_config_file, opt.eol);
+        BFREE(out_config_file);
         fprintf(opt.outfile, "-----------------------%s", num_designs == 1 ? "" : "-");
         for (int i = first_config_file->num_columns + strlen(buf); i > 0; --i) {
             fprintf(opt.outfile, "-");
@@ -119,7 +126,9 @@ int yyerror(pass_to_bison *bison_args, const char *fmt, ...)
     va_start (ap, fmt);
 
     pass_to_bison *bargs = bison_args ? bison_args : current_bison_args;
-    fprintf(stderr, "%s: %s: line %d: ", PROJECT, bxs_to_output(bargs->config_file), yyget_lineno(bargs->lexer_state));
+    char *out_config_file = bxs_to_output(bargs->config_file);
+    fprintf(stderr, "%s: %s: line %d: ", PROJECT, out_config_file, yyget_lineno(bargs->lexer_state));
+    BFREE(out_config_file);
     vfprintf(stderr, fmt, ap);
     fputc('\n', stderr);
 

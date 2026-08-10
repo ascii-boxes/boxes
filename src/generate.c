@@ -502,8 +502,8 @@ static int vert_assemble(const sentry_t *sarr, const shape_t *seite,
 
     for (line = 0; line < result->height; ++line) {
         result->mbcs[line] = bxs_from_unicode(mbcs_tmp[line]);
+        BFREE(mbcs_tmp[line]);
     }
-
     BFREE(mbcs_tmp);
     return 0;                            /* all clear */
 }
@@ -1091,8 +1091,10 @@ int output_box(const sentry_t *thebox)
         if (input.final_newline || j < nol - skip_end - 1) {
             line_end = opt.eol;
         }
-        fprintf(opt.outfile, "%s%s", bxs_to_output(obuf_trimmed), line_end);
+        char *out_obuf = bxs_to_output(obuf_trimmed);
+        fprintf(opt.outfile, "%s%s", out_obuf, line_end);
 
+        BFREE(out_obuf);
         bxs_free(obuf);
         bxs_free(obuf_trimmed);
         if (opt.tabexp == 'k') {

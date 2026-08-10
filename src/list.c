@@ -212,11 +212,15 @@ static void print_design_details(design_t *d)
     }
     fprintf(opt.outfile, "%s", opt.eol);
 
-    fprintf(opt.outfile, "Author:                 %s%s",
-            d->author ? bxs_to_output(d->author) : "(unknown author)", opt.eol);
-    fprintf(opt.outfile, "Original Designer:      %s%s",
-            d->designer ? bxs_to_output(d->designer) : "(unknown artist)", opt.eol);
-    fprintf(opt.outfile, "Configuration File:     %s%s", bxs_to_output(d->defined_in), opt.eol);
+    char *out_author = d->author ? bxs_to_output(d->author) : NULL;
+    char *out_designer = d->designer ? bxs_to_output(d->designer) : NULL;
+    char *out_defined_in = bxs_to_output(d->defined_in);
+    fprintf(opt.outfile, "Author:                 %s%s", out_author ? out_author : "(unknown author)", opt.eol);
+    fprintf(opt.outfile, "Original Designer:      %s%s", out_designer ? out_designer : "(unknown artist)", opt.eol);
+    fprintf(opt.outfile, "Configuration File:     %s%s", out_defined_in, opt.eol);
+    BFREE(out_author);
+    BFREE(out_designer);
+    BFREE(out_defined_in);
 
     fprintf(opt.outfile, "Indentation Mode:       ");
     switch (d->indentmode) {
@@ -234,9 +238,13 @@ static void print_design_details(design_t *d)
     fprintf(opt.outfile, "Replacement Rules:      ");
     if (d->num_reprules > 0) {
         for (int i = 0; i < (int) d->num_reprules; ++i) {
+            char *out_search = bxs_to_output(d->reprules[i].search);
+            char *out_replace = bxs_to_output(d->reprules[i].repstr);
             fprintf(opt.outfile, "%d. (%s) \"%s\" WITH \"%s\"%s", i + 1,
                     d->reprules[i].mode == 'g' ? "glob" : "once",
-                    bxs_to_output(d->reprules[i].search), bxs_to_output(d->reprules[i].repstr), opt.eol);
+                    out_search, out_replace, opt.eol);
+            BFREE(out_search);
+            BFREE(out_replace);
             if (i < (int) d->num_reprules - 1) {
                 fprintf(opt.outfile, "                        ");
             }
@@ -248,9 +256,13 @@ static void print_design_details(design_t *d)
     fprintf(opt.outfile, "Reversion Rules:        ");
     if (d->num_revrules > 0) {
         for (int i = 0; i < (int) d->num_revrules; ++i) {
+            char *out_search = bxs_to_output(d->revrules[i].search);
+            char *out_replace = bxs_to_output(d->revrules[i].repstr);
             fprintf(opt.outfile, "%d. (%s) \"%s\" TO \"%s\"%s", i + 1,
                     d->revrules[i].mode == 'g' ? "glob" : "once",
-                    bxs_to_output(d->revrules[i].search), bxs_to_output(d->revrules[i].repstr), opt.eol);
+                    out_search, out_replace, opt.eol);
+            BFREE(out_search);
+            BFREE(out_replace);
             if (i < (int) d->num_revrules - 1) {
                 fprintf(opt.outfile, "                        ");
             }
@@ -323,7 +335,9 @@ static void print_design_details(design_t *d)
      *  Display all shapes
      */
     if (opt.qundoc) {
-        fprintf(opt.outfile, "Sample:%s%s%s", opt.eol, bxs_to_output(d->sample), opt.eol);
+        char *out_sample = bxs_to_output(d->sample);
+        fprintf(opt.outfile, "Sample:%s%s%s", opt.eol, out_sample, opt.eol);
+        BFREE(out_sample);
     }
     else {
         int first_shape = 1;
@@ -333,14 +347,16 @@ static void print_design_details(design_t *d)
             }
             for (size_t w = 0; w < d->shape[i].height; ++w) {
                 bxstr_t *escaped_line = escape(d->shape[i].mbcs[w]);
+                char *out_escaped_line = bxs_to_output(escaped_line);
                 fprintf(opt.outfile, "%-24s%3s%c \"%s\"%c%s",
                         (first_shape == 1 && w == 0 ? "Defined Shapes:" : ""),
                         (w == 0 ? shape_name[i] : ""), (w == 0 ? ':' : ' '),
-                        bxs_to_output(escaped_line),
+                        out_escaped_line,
                         (w < d->shape[i].height - 1 ? ',' : ' '),
                         opt.eol
                 );
-                BFREE (escaped_line);
+                BFREE(out_escaped_line);
+                BFREE(escaped_line);
             }
             first_shape = 0;
         }
@@ -366,25 +382,27 @@ int list_designs()
 
         for (int i = 0; i < num_designs; ++i) {
             char *all_names = names(list[i]);
+            char *out_author = list[i]->author ? bxs_to_output(list[i]->author) : NULL;
+            char *out_designer = list[i]->designer ? bxs_to_output(list[i]->designer) : NULL;
+            char *out_sample = bxs_to_output(list[i]->sample);
             if (list[i]->author && list[i]->designer && bxs_strcmp(list[i]->author, list[i]->designer) != 0) {
                 fprintf(opt.outfile, "%s%s%s, coded by %s:%s%s%s%s%s", all_names, opt.eol,
-                        bxs_to_output(list[i]->designer), bxs_to_output(list[i]->author), opt.eol, opt.eol,
-                        bxs_to_output(list[i]->sample), opt.eol, opt.eol);
+                        out_designer, out_author, opt.eol, opt.eol, out_sample, opt.eol, opt.eol);
             }
             else if (list[i]->designer) {
                 fprintf(opt.outfile, "%s%s%s:%s%s%s%s%s", all_names, opt.eol,
-                        bxs_to_output(list[i]->designer), opt.eol, opt.eol,
-                        bxs_to_output(list[i]->sample), opt.eol, opt.eol);
+                        out_designer, opt.eol, opt.eol, out_sample, opt.eol, opt.eol);
             }
             else if (list[i]->author) {
                 fprintf(opt.outfile, "%s%sunknown artist, coded by %s:%s%s%s%s%s", all_names, opt.eol,
-                        bxs_to_output(list[i]->author), opt.eol, opt.eol,
-                        bxs_to_output(list[i]->sample), opt.eol, opt.eol);
+                        out_author, opt.eol, opt.eol, out_sample, opt.eol, opt.eol);
             }
             else {
-                fprintf(opt.outfile, "%s:%s%s%s%s%s", all_names, opt.eol, opt.eol,
-                        bxs_to_output(list[i]->sample), opt.eol, opt.eol);
+                fprintf(opt.outfile, "%s:%s%s%s%s%s", all_names, opt.eol, opt.eol, out_sample, opt.eol, opt.eol);
             }
+            BFREE(out_author);
+            BFREE(out_designer);
+            BFREE(out_sample);
             BFREE(all_names);
 
             for (size_t tidx = 0; list[i]->tags[tidx] != NULL; ++tidx) {

@@ -173,8 +173,9 @@ config_file
             BFREE (bison_args->designs);
             bison_args->num_designs = 0;
             if (!opt.design_choice_by_user && bison_args->num_parent_configs == 0) {
-                fprintf(stderr, "%s: no valid data in config file -- %s\n", PROJECT,
-                        bxs_to_output(bison_args->config_file));
+                char *out_config_file = bxs_to_output(bison_args->config_file);
+                fprintf(stderr, "%s: no valid data in config file -- %s\n", PROJECT, out_config_file);
+                BFREE(out_config_file);
                 YYABORT;
             }
             YYACCEPT;
