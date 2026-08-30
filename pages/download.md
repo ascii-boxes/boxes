@@ -36,8 +36,7 @@ The best way to get *boxes* is via your package manager. Here are some package m
 For Windows, we also have a portable ZIP which you can unpack somewhere in your `PATH`. Make sure to put boxes.exe and
 boxes.cfg in the same directory. Get the ZIP file
 [here](https://github.com/{{ site.github }}/releases/download/v{{ site.currentVersion }}/boxes-{{
-  site.currentVersion }}-intel-win32.zip).
-
+  site.currentVersion }}-intel-x64.zip).
 
 {% comment %} ---------------------------------------------------------------------------------------- {% endcomment %}
 {% include heading.html
