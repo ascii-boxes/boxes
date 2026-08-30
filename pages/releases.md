@@ -4,7 +4,7 @@ permalink: /releases.html
 redirect_from:
   - /docs/releases.html
 created_at: 2015-03-17 22:06:12 +0100
-last_modified_at: 2024-10-03 14:00:00 +0200
+last_modified_at: 2026-08-29 22:00:00 +0200
 ---
 
 # Release Notes
@@ -22,6 +22,13 @@ Click on the version numbers to view the release notes for each release.
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <th scope="row"><a href="{{ site.baseurl}}{% post_url 2026-08-29-boxes-v2.3.2-released %}">2.3.2</a></th>
+      <td>August&nbsp;29, 2026</td>
+      <td><a href="https://github.com/{{ site.github }}/tree/v2.3.2">link</a></td>
+      <td><a href="https://github.com/{{ site.github }}/releases/tag/v2.3.2">link</a></td>
+      <td class="d-none d-sm-table-cell">multiple fixes</td>
+    </tr>
     <tr>
       <th scope="row"><a href="{{ site.baseurl}}{% post_url 2024-10-03-boxes-v2.3.1-released %}">2.3.1</a></th>
       <td>October&nbsp;3, 2024</td>
